@@ -1,6 +1,7 @@
 package com.moabam.api.dto;
 
 import static com.moabam.global.common.util.OAuthParameterNames.*;
+import static java.util.Objects.*;
 
 import java.util.List;
 
@@ -21,8 +22,8 @@ public record AuthorizationCodeIssue(
 	@Builder
 	public AuthorizationCodeIssue(String clientId, String redirectUri, String responseType, List<String> scope,
 		String state) {
-		this.clientId = clientId;
-		this.redirectUri = redirectUri;
+		this.clientId = requireNonNull(clientId);
+		this.redirectUri = requireNonNull(redirectUri);
 		this.responseType = responseType;
 		this.scope = scope;
 		this.state = state;
