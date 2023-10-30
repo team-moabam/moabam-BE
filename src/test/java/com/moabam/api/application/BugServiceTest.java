@@ -1,10 +1,9 @@
 package com.moabam.api.application;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.DisplayNameGenerator.*;
 import static org.mockito.BDDMockito.*;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,8 +16,6 @@ import com.moabam.api.dto.BugResponse;
 import com.moabam.factory.MemberFactory;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayNameGeneration(ReplaceUnderscores.class)
-@SuppressWarnings("NonAsciiCharacters")
 class BugServiceTest {
 
 	@InjectMocks
@@ -27,8 +24,9 @@ class BugServiceTest {
 	@Mock
 	MemberService memberService;
 
+	@DisplayName("벌레를 조회한다.")
 	@Test
-	void 벌레를_조회한다() {
+	void get_bug_success() {
 		// given
 		Long memberId = 1L;
 		Member member = MemberFactory.create(memberId);
