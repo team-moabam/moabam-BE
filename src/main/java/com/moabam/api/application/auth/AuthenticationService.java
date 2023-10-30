@@ -1,6 +1,6 @@
 package com.moabam.api.application.auth;
 
-import com.moabam.api.dto.AuthorizationCodeRequest;
+import com.moabam.api.dto.auth.AuthorizationCodeIssue;
 import com.moabam.global.config.OAuthConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,8 +11,8 @@ public class AuthenticationService {
 
 	private final OAuthConfig oAuthConfig;
 
-	public AuthorizationCodeRequest authorizaionCodeParams() {
-		return AuthorizationCodeRequest.builder()
+	public AuthorizationCodeIssue authorizaionCodeParams() {
+		return AuthorizationCodeIssue.builder()
 			.clientId(oAuthConfig.client().clientId())
 			.redirectUri(oAuthConfig.provider().redirectUrl())
 			.scope(oAuthConfig.client().scope())

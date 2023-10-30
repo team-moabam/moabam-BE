@@ -1,6 +1,6 @@
 package com.moabam.api.application.auth;
 
-import com.moabam.api.dto.AuthorizationCodeRequest;
+import com.moabam.api.dto.auth.AuthorizationCodeIssue;
 import com.moabam.global.config.OAuthConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +37,7 @@ class AuthenticationServiceTest {
 	@Test
 	void authenticationUrl() {
 		// Given + When
-		AuthorizationCodeRequest codeRequest = authenticationService.authorizaionCodeParams();
+		AuthorizationCodeIssue codeRequest = authenticationService.authorizaionCodeParams();
 
 		// Then
 		assertAll(

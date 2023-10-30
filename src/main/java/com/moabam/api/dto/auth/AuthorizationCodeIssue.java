@@ -1,4 +1,4 @@
-package com.moabam.api.dto;
+package com.moabam.api.dto.auth;
 
 import com.moabam.global.common.util.GlobalConstant;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import java.util.List;
 
 import static com.moabam.global.common.util.OAuthParameterNames.*;
 
-public record AuthorizationCodeRequest(
+public record AuthorizationCodeIssue(
 	String clientId,
 	String redirectUri,
 	String responseType,
@@ -18,8 +18,8 @@ public record AuthorizationCodeRequest(
 ) {
 
 	@Builder
-	public AuthorizationCodeRequest(String clientId, String redirectUri, String responseType, List<String> scope,
-									String state) {
+	public AuthorizationCodeIssue(String clientId, String redirectUri, String responseType, List<String> scope,
+								  String state) {
 		this.clientId = clientId;
 		this.redirectUri = redirectUri;
 		this.responseType = responseType;
