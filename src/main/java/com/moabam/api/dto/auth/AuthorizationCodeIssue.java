@@ -2,8 +2,7 @@ package com.moabam.api.dto.auth;
 
 import com.moabam.global.common.util.GlobalConstant;
 import lombok.Builder;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -27,17 +26,18 @@ public record AuthorizationCodeIssue(
 		this.state = state;
 	}
 
-	public MultiValueMap<String, String> generateQueryParams() {
-		MultiValueMap<String, String> oauthParam = new LinkedMultiValueMap<>();
-		oauthParam.add(RESPONSE_TYPE, CODE);
-		oauthParam.add(CLIENT_ID, clientId);
-		oauthParam.add(REDIRECT_URL, redirectUri);
+	public String generateQueryParamsWith(String baseUrl) {
+		UriComponentsBuilder authorizationCodeUri = UriComponentsBuilder
+			.fromPath(baseUrl)
+			.queryParam(RESPONSE_TYPE, CODE)
+			.queryParam(CLIENT_ID, clientId)
+			.queryParam(REDIRECT_URI, redirectUri);
 
 		if (!scope.isEmpty()) {
 			String scopes = String.join(GlobalConstant.COMMA, scope);
-			oauthParam.add(SCOPE, scopes);
+			authorizationCodeUri.queryParam(SCOPE, scopes);
 		}
 
-		return oauthParam;
+		return authorizationCodeUri.toUriString();
 	}
 }

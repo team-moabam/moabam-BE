@@ -20,8 +20,8 @@ public record OAuthConfig(
 	}
 
 	public record Provider(
-		String authorizationUrl,
-		String redirectUrl
+		String authorizationUri,
+		String redirectUri
 	) {
 
 	}

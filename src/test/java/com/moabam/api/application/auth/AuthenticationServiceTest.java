@@ -1,6 +1,5 @@
 package com.moabam.api.application.auth;
 
-import com.moabam.api.dto.auth.AuthorizationCodeIssue;
 import com.moabam.global.config.OAuthConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +12,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {
@@ -37,13 +35,9 @@ class AuthenticationServiceTest {
 	@Test
 	void authenticationUrl() {
 		// Given + When
-		AuthorizationCodeIssue codeRequest = authenticationService.authorizaionCodeParams();
+		String authorizaionCodeUri = authenticationService.getAuthorizaionCodeUri();
 
 		// Then
-		assertAll(
-			() -> assertThat(codeRequest.clientId()).isEqualTo(oauthConfig.client().clientId()),
-			() -> assertThat(codeRequest.scope()).isEqualTo(oauthConfig.client().scope()),
-			() -> assertThat(codeRequest.redirectUri()).isEqualTo(oauthConfig.provider().redirectUrl())
-			);
+		assertThat(authorizaionCodeUri).contains(oauthConfig.client().clientId(), String.join(",", oauthConfig.client().scope()), oauthConfig.provider().redirectUri());
 	}
 }

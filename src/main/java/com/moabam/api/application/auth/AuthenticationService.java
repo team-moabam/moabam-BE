@@ -11,15 +11,12 @@ public class AuthenticationService {
 
 	private final OAuthConfig oAuthConfig;
 
-	public AuthorizationCodeIssue authorizaionCodeParams() {
+	public String getAuthorizaionCodeUri() {
 		return AuthorizationCodeIssue.builder()
 			.clientId(oAuthConfig.client().clientId())
-			.redirectUri(oAuthConfig.provider().redirectUrl())
+			.redirectUri(oAuthConfig.provider().redirectUri())
 			.scope(oAuthConfig.client().scope())
-			.build();
-	}
-
-	public String getUrl() {
-		return oAuthConfig.provider().authorizationUrl();
+			.build()
+			.generateQueryParamsWith(oAuthConfig.provider().authorizationUri());
 	}
 }
