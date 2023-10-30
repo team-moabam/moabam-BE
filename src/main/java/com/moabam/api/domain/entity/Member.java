@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,10 @@ public class Member extends BaseTimeEntity {
 
 	@Embedded
 	private Bug bug;
+
+	@Builder
+	private Member(Long id, Bug bug) {
+		this.id = id;
+		this.bug = bug;
+	}
 }
