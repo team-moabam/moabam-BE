@@ -1,4 +1,4 @@
-package com.moabam.api.dto.auth;
+package com.moabam.api.dto;
 
 import static com.moabam.global.common.util.OAuthParameterNames.*;
 

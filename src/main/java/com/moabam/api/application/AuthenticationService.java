@@ -1,8 +1,8 @@
-package com.moabam.api.application.auth;
+package com.moabam.api.application;
 
 import org.springframework.stereotype.Service;
 
-import com.moabam.api.dto.auth.AuthorizationCodeIssue;
+import com.moabam.api.dto.AuthorizationCodeIssue;
 import com.moabam.global.config.OAuthConfig;
 
 import lombok.RequiredArgsConstructor;

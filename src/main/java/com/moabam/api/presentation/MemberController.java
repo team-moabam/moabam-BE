@@ -1,4 +1,4 @@
-package com.moabam.api.presentation.member;
+package com.moabam.api.presentation;
 
 import java.io.IOException;
 
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moabam.api.application.auth.AuthenticationService;
+import com.moabam.api.application.AuthenticationService;
 import com.moabam.global.common.util.GlobalConstant;
 
 import jakarta.servlet.http.HttpServletResponse;

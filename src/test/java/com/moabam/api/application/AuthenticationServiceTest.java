@@ -1,4 +1,4 @@
-package com.moabam.api.application.auth;
+package com.moabam.api.application;
 
 import static org.assertj.core.api.Assertions.*;
 

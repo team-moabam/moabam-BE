@@ -1,4 +1,4 @@
-package com.moabam.api.presentation.member;
+package com.moabam.api.presentation;
 
 import static com.moabam.global.common.util.OAuthParameterNames.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.application.auth.AuthenticationService;
+import com.moabam.api.application.AuthenticationService;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
 

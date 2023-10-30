@@ -1,4 +1,4 @@
-package com.moabam.api.domain.member;
+package com.moabam.api.domain;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,7 +38,14 @@ class MemberTest {
 
 			assertAll(
 				() -> assertThat(member.getProfileImage()).isEqualTo(BaseImageUrl.PROFILE_URL.getUrl()),
-				() -> assertThat(member.getRole()).isEqualTo(Role.USER)
+				() -> assertThat(member.getRole()).isEqualTo(Role.USER),
+				() -> assertThat(member.getNightBug()).isZero(),
+				() -> assertThat(member.getGoldenBug()).isZero(),
+				() -> assertThat(member.getMorningBug()).isZero(),
+				() -> assertThat(member.getTotalCertifyCount()).isZero(),
+				() -> assertThat(member.getReportCount()).isZero(),
+				() -> assertThat(member.getCurrentMorningCount()).isZero(),
+				() -> assertThat(member.getCurrentNightCount()).isZero()
 			);
 		});
 	}

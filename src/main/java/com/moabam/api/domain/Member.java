@@ -1,4 +1,4 @@
-package com.moabam.api.domain.member;
+package com.moabam.api.domain;
 
 import static java.util.Objects.*;
 
