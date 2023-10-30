@@ -42,4 +42,18 @@ class AuthenticationServiceTest {
 		assertThat(authorizaionCodeUri).contains(oauthConfig.client().clientId(),
 			String.join(",", oauthConfig.client().scope()), oauthConfig.provider().redirectUri());
 	}
+
+	@DisplayName("Client id가 없을 때 url 생성 실패")
+	@Test
+	void create_failby_no_client_id() {
+		// Given
+		AuthenticationService noPropertyService = new AuthenticationService(new OAuthConfig(
+			new OAuthConfig.Provider(null, null),
+			new OAuthConfig.Client(null, null, null, null)
+		));
+
+		// When + Then
+		assertThatThrownBy(noPropertyService::getAuthorizaionCodeUri)
+			.isInstanceOf(NullPointerException.class);
+	}
 }
