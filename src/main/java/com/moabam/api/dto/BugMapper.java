@@ -1,4 +1,4 @@
-package com.moabam.api.dto.bug;
+package com.moabam.api.dto;
 
 import com.moabam.api.domain.entity.Bug;
 

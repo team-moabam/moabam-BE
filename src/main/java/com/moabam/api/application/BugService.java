@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.domain.entity.Member;
-import com.moabam.api.dto.bug.BugMapper;
-import com.moabam.api.dto.bug.BugResponse;
+import com.moabam.api.dto.BugMapper;
+import com.moabam.api.dto.BugResponse;
 
 import lombok.RequiredArgsConstructor;
 

@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.domain.entity.Bug;
 import com.moabam.api.domain.entity.Member;
-import com.moabam.api.dto.bug.BugResponse;
+import com.moabam.api.dto.BugResponse;
 import com.moabam.factory.MemberFactory;
 
 @ExtendWith(MockitoExtension.class)
