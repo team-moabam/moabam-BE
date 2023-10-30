@@ -2,7 +2,6 @@ package com.moabam.api.dto.auth;
 
 import static com.moabam.global.common.util.OAuthParameterNames.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.web.util.UriComponentsBuilder;
@@ -40,8 +39,7 @@ public record AuthorizationCodeIssue(
 			String scopes = String.join(GlobalConstant.COMMA, scope);
 			authorizationCodeUri.queryParam(SCOPE, scopes);
 		}
-		LocalDateTime dateTime;
-		dateTime.is
+
 		return authorizationCodeUri.toUriString();
 	}
 }
