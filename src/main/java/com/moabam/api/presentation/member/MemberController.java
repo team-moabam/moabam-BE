@@ -21,20 +21,20 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class MemberController {
 
-	private final AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
-	@GetMapping
-	public void socialLogin(HttpServletResponse httpServletResponse) throws IOException {
-		String authorizationCodeUri = authenticationService.getAuthorizaionCodeUri();
-		httpServletResponse.setContentType(MediaType.APPLICATION_FORM_URLENCODED + GlobalConstant.SEMI_COLON
-			+ StandardCharsets.UTF_8.name());
-		httpServletResponse.sendRedirect(authorizationCodeUri);
-	}
+    @GetMapping
+    public void socialLogin(HttpServletResponse httpServletResponse) throws IOException {
+        String authorizationCodeUri = authenticationService.getAuthorizaionCodeUri();
+        httpServletResponse.setContentType(MediaType.APPLICATION_FORM_URLENCODED + GlobalConstant.SEMI_COLON
+                + StandardCharsets.UTF_8.name());
+        httpServletResponse.sendRedirect(authorizationCodeUri);
+    }
 
-	@GetMapping("/login/kakao/oauth")
-	public void authorizationServerCodeResponse(@ModelAttribute AuthorizationCodeResponse authorizationCodeResponse) {
-		if (authorizationCodeResponse.code().isEmpty()) {
-			throw new NotFoundException(ErrorMessage.LOGIN_FAILED);
-		}
-	}
+    @GetMapping("/login/kakao/oauth")
+    public void authorizationServerCodeResponse(@ModelAttribute AuthorizationCodeResponse authorizationCodeResponse) {
+        if (authorizationCodeResponse.code().isEmpty()) {
+            throw new NotFoundException(ErrorMessage.LOGIN_FAILED);
+        }
+    }
 }

@@ -9,14 +9,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-	private final OAuthConfig oAuthConfig;
+    private final OAuthConfig oAuthConfig;
 
-	public String getAuthorizaionCodeUri() {
-		return AuthorizationCodeIssue.builder()
-			.clientId(oAuthConfig.client().clientId())
-			.redirectUri(oAuthConfig.provider().redirectUri())
-			.scope(oAuthConfig.client().scope())
-			.build()
-			.generateQueryParamsWith(oAuthConfig.provider().authorizationUri());
-	}
+    public String getAuthorizaionCodeUri() {
+        return AuthorizationCodeIssue.builder()
+                .clientId(oAuthConfig.client().clientId())
+                .redirectUri(oAuthConfig.provider().redirectUri())
+                .scope(oAuthConfig.client().scope())
+                .build()
+                .generateQueryParamsWith(oAuthConfig.provider().authorizationUri());
+    }
 }
