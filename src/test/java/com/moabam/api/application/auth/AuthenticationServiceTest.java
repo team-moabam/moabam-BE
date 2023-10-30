@@ -1,6 +1,9 @@
 package com.moabam.api.application.auth;
 
-import com.moabam.global.config.OAuthConfig;
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,9 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.moabam.global.config.OAuthConfig;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {
@@ -31,13 +32,14 @@ class AuthenticationServiceTest {
 		ReflectionTestUtils.setField(authenticationService, "oAuthConfig", oauthConfig);
 	}
 
-	@DisplayName("")
+	@DisplayName("authentication code Url 생성 성공")
 	@Test
 	void authenticationUrl() {
 		// Given + When
 		String authorizaionCodeUri = authenticationService.getAuthorizaionCodeUri();
 
 		// Then
-		assertThat(authorizaionCodeUri).contains(oauthConfig.client().clientId(), String.join(",", oauthConfig.client().scope()), oauthConfig.provider().redirectUri());
+		assertThat(authorizaionCodeUri).contains(oauthConfig.client().clientId(),
+			String.join(",", oauthConfig.client().scope()), oauthConfig.provider().redirectUri());
 	}
 }
