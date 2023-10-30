@@ -1,11 +1,14 @@
 package com.moabam.api.domain.entity;
 
+import static com.moabam.api.domain.entity.enums.RoomType.*;
+import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
 import org.hibernate.annotations.ColumnDefault;
 
 import com.moabam.api.domain.entity.enums.RoomType;
 import com.moabam.global.common.entity.BaseTimeEntity;
+import com.moabam.global.error.exception.BadRequestException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,10 +29,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends BaseTimeEntity {
 
-	// TODO: 방 레벨별 이미지
-	private final String ROOM_LEVEL_0_IMAGE = "";
-	private final String ROOM_LEVEL_10_IMAGE = "";
-	private final String ROOM_LEVEL_20_IMAGE = "";
+	private static final String ROOM_LEVEL_0_IMAGE = "";
+	private static final String ROOM_LEVEL_10_IMAGE = "";
+	private static final String ROOM_LEVEL_20_IMAGE = "";
+
+	private static final int MORNING_START_TIME = 4;
+	private static final int MORNING_END_TIME = 10;
+	private static final int NIGHT_START_TIME = 20;
+	private static final int NIGHT_END_TIME = 2;
+	private static final int CLOCK_ZERO = 0;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -74,7 +82,7 @@ public class Room extends BaseTimeEntity {
 		this.password = password;
 		this.level = 0;
 		this.roomType = requireNonNull(roomType);
-		this.certifyTime = certifyTime;
+		this.certifyTime = validateCertifyTime(roomType, certifyTime);
 		this.currentUserCount = 1;
 		this.maxUserCount = maxUserCount;
 		this.announcement = announcement;
@@ -91,5 +99,22 @@ public class Room extends BaseTimeEntity {
 
 	public void upgradeRoomImage(String roomImage) {
 		this.roomImage = roomImage;
+	}
+
+	public void changeCertifyTime(int certifyTime) {
+		this.certifyTime = validateCertifyTime(this.roomType, certifyTime);
+	}
+
+	private int validateCertifyTime(RoomType roomType, int certifyTime) {
+		if (roomType.equals(MORNING) && (certifyTime < MORNING_START_TIME || certifyTime > MORNING_END_TIME)) {
+			throw new BadRequestException(INVALID_REQUEST_FIELD);
+		}
+
+		if (roomType.equals(NIGHT)
+			&& ((certifyTime < NIGHT_START_TIME && certifyTime > NIGHT_END_TIME) || certifyTime < CLOCK_ZERO)) {
+			throw new BadRequestException(INVALID_REQUEST_FIELD);
+		}
+
+		return certifyTime;
 	}
 }
