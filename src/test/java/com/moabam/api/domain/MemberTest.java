@@ -37,7 +37,7 @@ class MemberTest {
 				.build();
 
 			assertAll(
-				() -> assertThat(member.getProfileImage()).isEqualTo(BaseImageUrl.PROFILE_URL.getUrl()),
+				() -> assertThat(member.getProfileImage()).isEqualTo(BaseImageUrl.PROFILE_URL),
 				() -> assertThat(member.getRole()).isEqualTo(Role.USER),
 				() -> assertThat(member.getNightBug()).isZero(),
 				() -> assertThat(member.getGoldenBug()).isZero(),

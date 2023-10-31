@@ -1,15 +1,10 @@
 package com.moabam.global.common.util;
 
-import lombok.Getter;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-@Getter
-public enum BaseImageUrl {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class BaseImageUrl {
 
-	PROFILE_URL("/profile/baseUrl");
-
-	private String url;
-
-	BaseImageUrl(String url) {
-		this.url = url;
-	}
+	public static final String PROFILE_URL = "/profile/baseUrl";
 }

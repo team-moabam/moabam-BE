@@ -5,6 +5,8 @@ import static java.util.Objects.*;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import com.moabam.global.common.entity.BaseTimeEntity;
 import com.moabam.global.common.util.BaseImageUrl;
@@ -24,13 +26,15 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "members")
+@Table(name = "member")
+@SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where participant_id = ?")
+@Where(clause = "deleted_at IS NOT NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "member_id")
+	@Column(name = "id")
 	private Long id;
 
 	@Column(name = "social_id", nullable = false, unique = true)
@@ -39,7 +43,7 @@ public class Member extends BaseTimeEntity {
 	@Column(name = "nickname", nullable = false, unique = true)
 	private String nickname;
 
-	@Column(name = "intro")
+	@Column(name = "intro", length = 30)
 	private String intro;
 
 	@Column(name = "profile_image", nullable = false)
@@ -75,16 +79,18 @@ public class Member extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
+	@ColumnDefault("USER")
 	private Role role;
 
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
 	@Builder
-	private Member(String socialId, String nickname, String profileImage) {
+	private Member(Long id, String socialId, String nickname, String profileImage) {
+		this.id = id;
 		this.socialId = requireNonNull(socialId);
 		this.nickname = requireNonNull(nickname);
-		this.profileImage = requireNonNullElse(profileImage, BaseImageUrl.PROFILE_URL.getUrl());
+		this.profileImage = requireNonNullElse(profileImage, BaseImageUrl.PROFILE_URL);
 		this.role = Role.USER;
 	}
 }

@@ -48,17 +48,16 @@ class MemberControllerTest {
 	void authorization_code_request_success() throws Exception {
 		// given
 		String uri = UriComponentsBuilder
-			.fromPath(oAuthConfig.provider().authorizationUri())
+			.fromUriString(oAuthConfig.provider().authorizationUri())
 			.queryParam(RESPONSE_TYPE, "code")
 			.queryParam(CLIENT_ID, oAuthConfig.client().clientId())
 			.queryParam(REDIRECT_URI, oAuthConfig.provider().redirectUri())
 			.queryParam(SCOPE, String.join(",", oAuthConfig.client().scope()))
 			.toUriString();
 
-		// when
+		// expected
 		ResultActions result = mockMvc.perform(get("/members"));
 
-		// then
 		result.andExpect(status().is3xxRedirection())
 			.andExpect(header().string("Content-type",
 				MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8))
