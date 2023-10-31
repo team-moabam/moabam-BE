@@ -28,6 +28,7 @@ import com.moabam.api.domain.repository.ParticipantRepository;
 import com.moabam.api.domain.repository.RoomRepository;
 import com.moabam.api.domain.repository.RoutineRepository;
 import com.moabam.api.dto.CreateRoomRequest;
+import com.moabam.api.dto.EnterRoomRequest;
 import com.moabam.api.dto.ModifyRoomRequest;
 
 @Transactional
@@ -61,7 +62,6 @@ class RoomControllerTest {
 
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"재윤과 앵맹이의 방임", null, routines, MORNING, 10, 4);
-
 		String json = objectMapper.writeValueAsString(createRoomRequest);
 
 		// expected
@@ -89,7 +89,6 @@ class RoomControllerTest {
 
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 있는 재윤과 앵맹이의 방임", password, routines, MORNING, 10, 4);
-
 		String json = objectMapper.writeValueAsString(createRoomRequest);
 
 		// expected
@@ -117,7 +116,6 @@ class RoomControllerTest {
 
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 있는 재윤과 앵맹이의 방임", password, routines, MORNING, 10, 4);
-
 		String json = objectMapper.writeValueAsString(createRoomRequest);
 
 		// expected
@@ -142,7 +140,6 @@ class RoomControllerTest {
 
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 없는 재윤과 앵맹이의 방임", null, routines, MORNING, 10, 4);
-
 		String json = objectMapper.writeValueAsString(createRoomRequest);
 
 		// expected
@@ -161,7 +158,6 @@ class RoomControllerTest {
 
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 없는 재윤과 앵맹이의 방임", null, routines, MORNING, 10, 4);
-
 		String json = objectMapper.writeValueAsString(createRoomRequest);
 
 		// expected
@@ -185,7 +181,6 @@ class RoomControllerTest {
 
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 없는 재윤과 앵맹이의 방임", null, routines, MORNING, certifyTime, 4);
-
 		String json = objectMapper.writeValueAsString(createRoomRequest);
 
 		// expected
@@ -209,7 +204,6 @@ class RoomControllerTest {
 
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 없는 재윤과 앵맹이의 방임", null, routines, NIGHT, certifyTime, 4);
-
 		String json = objectMapper.writeValueAsString(createRoomRequest);
 
 		// expected
@@ -242,7 +236,6 @@ class RoomControllerTest {
 		participantRepository.save(participant);
 
 		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "1234", 10, 7);
-
 		String json = objectMapper.writeValueAsString(modifyRoomRequest);
 
 		// expected
@@ -274,7 +267,6 @@ class RoomControllerTest {
 		participantRepository.save(participant);
 
 		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "1234", 10, 7);
-
 		String json = objectMapper.writeValueAsString(modifyRoomRequest);
 
 		// expected
@@ -282,6 +274,138 @@ class RoomControllerTest {
 				.contentType(APPLICATION_JSON)
 				.content(json))
 			.andExpect(status().isNotFound())
+			.andDo(print());
+	}
+
+	@DisplayName("비밀번호 있는 방 참여 성공")
+	@Test
+	void enter_room_with_password_success() throws Exception {
+		// given
+		Room room = Room.builder()
+			.title("처음 제목")
+			.password("7777")
+			.roomType(MORNING)
+			.certifyTime(9)
+			.maxUserCount(5)
+			.build();
+
+		Room savedRoom = roomRepository.save(room);
+
+		EnterRoomRequest enterRoomRequest = new EnterRoomRequest("7777");
+		String json = objectMapper.writeValueAsString(enterRoomRequest);
+
+		// expected
+		mockMvc.perform(post("/rooms/" + savedRoom.getId())
+				.contentType(APPLICATION_JSON)
+				.content(json))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("비밀번호 없는 방 참여 성공")
+	@Test
+	void enter_room_with_no_password_success() throws Exception {
+		// given
+		Room room = Room.builder()
+			.title("처음 제목")
+			.roomType(MORNING)
+			.certifyTime(9)
+			.maxUserCount(5)
+			.build();
+
+		Room savedRoom = roomRepository.save(room);
+
+		EnterRoomRequest enterRoomRequest = new EnterRoomRequest(null);
+		String json = objectMapper.writeValueAsString(enterRoomRequest);
+
+		// expected
+		mockMvc.perform(post("/rooms/" + savedRoom.getId())
+				.contentType(APPLICATION_JSON)
+				.content(json))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("방 참여 후 인원수 증가 테스트")
+	@Test
+	void enter_and_increase_room_user_count() throws Exception {
+		// given
+		Room room = Room.builder()
+			.title("방 제목")
+			.password("1234")
+			.roomType(MORNING)
+			.certifyTime(9)
+			.maxUserCount(5)
+			.build();
+
+		Room savedRoom = roomRepository.save(room);
+
+		EnterRoomRequest enterRoomRequest = new EnterRoomRequest("1234");
+		String json = objectMapper.writeValueAsString(enterRoomRequest);
+
+		// when
+		mockMvc.perform(post("/rooms/" + savedRoom.getId())
+				.contentType(APPLICATION_JSON)
+				.content(json))
+			.andExpect(status().isOk());
+
+		Room findRoom = roomRepository.findById(savedRoom.getId()).orElseThrow();
+
+		// then
+		assertThat(findRoom.getCurrentUserCount()).isEqualTo(2);
+	}
+
+	@DisplayName("비밀번호 불일치 방 참여시 예외 발생")
+	@Test
+	void enter_room_wrong_password_fail() throws Exception {
+		// given
+		Room room = Room.builder()
+			.title("처음 제목")
+			.password("7777")
+			.roomType(MORNING)
+			.certifyTime(9)
+			.maxUserCount(5)
+			.build();
+
+		Room savedRoom = roomRepository.save(room);
+
+		EnterRoomRequest enterRoomRequest = new EnterRoomRequest("1234");
+		String json = objectMapper.writeValueAsString(enterRoomRequest);
+
+		// expected
+		mockMvc.perform(post("/rooms/" + savedRoom.getId())
+				.contentType(APPLICATION_JSON)
+				.content(json))
+			.andExpect(status().isBadRequest())
+			.andDo(print());
+	}
+
+	@DisplayName("인원수가 모두 찬 방 참여시 예외 발생")
+	@Test
+	void enter_max_user_room_fail() throws Exception {
+		// given
+		Room room = Room.builder()
+			.title("처음 제목")
+			.password("7777")
+			.roomType(MORNING)
+			.certifyTime(9)
+			.maxUserCount(5)
+			.build();
+
+		for (int i = 0; i < 4; i++) {
+			room.increaseCurrentUserCount();
+		}
+
+		Room savedRoom = roomRepository.save(room);
+
+		EnterRoomRequest enterRoomRequest = new EnterRoomRequest("7777");
+		String json = objectMapper.writeValueAsString(enterRoomRequest);
+
+		// expected
+		mockMvc.perform(post("/rooms/" + savedRoom.getId())
+				.contentType(APPLICATION_JSON)
+				.content(json))
+			.andExpect(status().isBadRequest())
 			.andDo(print());
 	}
 }
