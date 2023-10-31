@@ -102,13 +102,17 @@ class AuthenticationServiceTest {
 	void redirect_fail_test() {
 		// given
 		HttpServletResponse mockHttpServletResponse = Mockito.mock(HttpServletResponse.class);
-		assertThatThrownBy(() -> {
-			// Given
+
+		try {
 			doThrow(IOException.class).when(mockHttpServletResponse).sendRedirect(any(String.class));
 
-			// When + Then
-			authenticationService.redirectToLoginPage(mockHttpServletResponse);
-		}).isExactlyInstanceOf(BadRequestException.class)
-			.hasMessage(ErrorMessage.REQUEST_FAILD.getMessage());
+			assertThatThrownBy(() -> {
+				// When + Then
+				authenticationService.redirectToLoginPage(mockHttpServletResponse);
+			}).isExactlyInstanceOf(BadRequestException.class)
+				.hasMessage(ErrorMessage.REQUEST_FAILD.getMessage());
+		} catch (Exception ignored) {
+
+		}
 	}
 }
