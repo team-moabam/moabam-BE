@@ -21,7 +21,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
-import com.moabam.api.mapper.OAuthMapper;
+import com.moabam.api.dto.OAuthMapper;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;

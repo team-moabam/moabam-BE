@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.moabam.api.domain.entity.Member;
+import com.moabam.api.domain.entity.enums.Role;
 import com.moabam.global.common.util.BaseImageUrl;
 
 class MemberTest {

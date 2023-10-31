@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
-import com.moabam.api.mapper.OAuthMapper;
+import com.moabam.api.dto.OAuthMapper;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;
