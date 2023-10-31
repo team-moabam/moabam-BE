@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "certifications")
+@Table(name = "certification")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Certification extends BaseTimeEntity {
 
@@ -30,7 +30,7 @@ public class Certification extends BaseTimeEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "routine_id", nullable = false)
+	@JoinColumn(name = "routine_id", nullable = false, updatable = false)
 	private Routine routine;
 
 	@Column(name = "member_id", nullable = false, updatable = false)

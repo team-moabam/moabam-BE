@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "participants")
+@Table(name = "participant")
 @SQLDelete(sql = "UPDATE participants SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Participant {
@@ -33,10 +33,10 @@ public class Participant {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "room_id", updatable = false)
+	@JoinColumn(name = "room_id", updatable = false, nullable = false)
 	private Room room;
 
-	@Column(name = "member_id", updatable = false)
+	@Column(name = "member_id", updatable = false, nullable = false)
 	private Long memberId;
 
 	@Column(name = "is_manager")

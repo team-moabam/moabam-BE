@@ -22,7 +22,6 @@ class RoomTest {
 			.roomType(RoomType.MORNING)
 			.certifyTime(10)
 			.maxUserCount(9)
-			.announcement("HI Dev")
 			.build();
 
 		// then
@@ -39,7 +38,6 @@ class RoomTest {
 			.roomType(RoomType.MORNING)
 			.certifyTime(10)
 			.maxUserCount(9)
-			.announcement("HI Dev")
 			.build();
 
 		// then
@@ -58,7 +56,6 @@ class RoomTest {
 			.roomType(RoomType.MORNING)
 			.certifyTime(9)
 			.maxUserCount(5)
-			.announcement("HELLO")
 			.build();
 
 		// given, when, then

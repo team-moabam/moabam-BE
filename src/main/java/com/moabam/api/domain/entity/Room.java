@@ -25,13 +25,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "rooms")
+@Table(name = "room")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends BaseTimeEntity {
 
-	private static final String ROOM_LEVEL_0_IMAGE = "";
-	private static final String ROOM_LEVEL_10_IMAGE = "";
-	private static final String ROOM_LEVEL_20_IMAGE = "";
+	private static final String ROOM_LEVEL_0_IMAGE = "'temptemp'";
+	private static final String ROOM_LEVEL_10_IMAGE = "'temp'";
+	private static final String ROOM_LEVEL_20_IMAGE = "'tempp'";
 
 	private static final int MORNING_START_TIME = 4;
 	private static final int MORNING_END_TIME = 10;
@@ -76,8 +76,7 @@ public class Room extends BaseTimeEntity {
 	private String roomImage;
 
 	@Builder
-	private Room(String title, String password, RoomType roomType, int certifyTime, int maxUserCount,
-		String announcement) {
+	private Room(String title, String password, RoomType roomType, int certifyTime, int maxUserCount) {
 		this.title = requireNonNull(title);
 		this.password = password;
 		this.level = 0;
@@ -85,7 +84,6 @@ public class Room extends BaseTimeEntity {
 		this.certifyTime = validateCertifyTime(roomType, certifyTime);
 		this.currentUserCount = 1;
 		this.maxUserCount = maxUserCount;
-		this.announcement = announcement;
 		this.roomImage = ROOM_LEVEL_0_IMAGE;
 	}
 

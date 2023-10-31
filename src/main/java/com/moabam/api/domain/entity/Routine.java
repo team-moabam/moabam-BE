@@ -1,5 +1,7 @@
 package com.moabam.api.domain.entity;
 
+import static java.util.Objects.*;
+
 import com.moabam.global.common.entity.BaseTimeEntity;
 
 import jakarta.persistence.Column;
@@ -18,7 +20,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "routines")
+@Table(name = "routine")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Routine extends BaseTimeEntity {
 
@@ -36,8 +38,8 @@ public class Routine extends BaseTimeEntity {
 
 	@Builder
 	private Routine(Room room, String content) {
-		this.room = room;
-		this.content = content;
+		this.room = requireNonNull(room);
+		this.content = requireNonNull(content);
 	}
 
 	public void changeContent(String content) {
