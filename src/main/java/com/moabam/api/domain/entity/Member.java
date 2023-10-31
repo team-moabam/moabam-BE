@@ -1,4 +1,4 @@
-package com.moabam.api.domain;
+package com.moabam.api.domain.entity;
 
 import static java.util.Objects.*;
 
@@ -8,6 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.moabam.api.domain.entity.enums.Role;
 import com.moabam.global.common.entity.BaseTimeEntity;
 import com.moabam.global.common.util.BaseImageUrl;
 
