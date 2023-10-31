@@ -14,7 +14,7 @@ import jakarta.validation.constraints.Size;
 public record CreateRoomRequest(
 	@NotBlank String title,
 	@Pattern(regexp = "^(|[0-9]{4,8})$") String password,
-	@NotNull @Size(min = 0, max = 4) List<String> routines,
+	@NotNull @Size(min = 1, max = 4) List<String> routines,
 	@NotNull RoomType roomType,
 	@Range(min = 0, max = 23) int certifyTime,
 	@Range(min = 0, max = 10) int maxUserCount
