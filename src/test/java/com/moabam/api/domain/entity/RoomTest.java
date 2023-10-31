@@ -26,6 +26,13 @@ class RoomTest {
 
 		// then
 		assertThat(room.getPassword()).isNull();
+		assertThat(room.getRoomImage()).isEqualTo("'temptemp'");
+		assertThat(room.getRoomType()).isEqualTo(RoomType.MORNING);
+		assertThat(room.getCertifyTime()).isEqualTo(10);
+		assertThat(room.getMaxUserCount()).isEqualTo(9);
+		assertThat(room.getLevel()).isZero();
+		assertThat(room.getCurrentUserCount()).isEqualTo(1);
+		assertThat(room.getAnnouncement()).isNull();
 	}
 
 	@DisplayName("비밀번호 설정 후 방 생성 성공")

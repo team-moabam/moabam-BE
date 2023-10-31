@@ -86,6 +86,7 @@ jacocoTestReport {
                             "**/*Mapper*",
                             "**/*ErrorMessage*",
                             "**/*DynamicQuery*",
+                            "**/*BaseTimeEntity*",
                     ] + Qdomains)
                 })
         )
