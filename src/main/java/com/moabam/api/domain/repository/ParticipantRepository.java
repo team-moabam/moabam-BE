@@ -8,5 +8,5 @@ import com.moabam.api.domain.entity.Participant;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
-	Optional<Participant> findParticipantByRoomIdAndMemberId(Long roomId, Long MemberId);
+	Optional<Participant> findParticipantByRoomIdAndMemberId(Long roomId, Long memberId);
 }
