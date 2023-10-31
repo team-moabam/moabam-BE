@@ -111,6 +111,18 @@ public class Room extends BaseTimeEntity {
 		this.maxUserCount = maxUserCount;
 	}
 
+	public void increaseCurrentUserCount() {
+		this.currentUserCount += 1;
+
+		if (this.currentUserCount > this.maxUserCount) {
+			throw new BadRequestException(ROOM_MAX_USER_REACHED);
+		}
+	}
+
+	public void decreaseCurrentUserCount() {
+		this.currentUserCount -= 1;
+	}
+
 	public void upgradeRoomImage(String roomImage) {
 		this.roomImage = roomImage;
 	}

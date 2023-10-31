@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.RoomService;
 import com.moabam.api.dto.CreateRoomRequest;
+import com.moabam.api.dto.EnterRoomRequest;
 import com.moabam.api.dto.ModifyRoomRequest;
 
 import jakarta.validation.Valid;
@@ -34,5 +35,11 @@ public class RoomController {
 	public void modifyRoom(@Valid @RequestBody ModifyRoomRequest modifyRoomRequest,
 		@PathVariable("roomId") Long roomId) {
 		roomService.modifyRoom(1L, roomId, modifyRoomRequest);
+	}
+
+	@PostMapping("/{roomId}")
+	@ResponseStatus(HttpStatus.OK)
+	public void enterRoom(@Valid @RequestBody EnterRoomRequest enterRoomRequest, @PathVariable("roomId") Long roomId) {
+		roomService.enterRoom(1L, roomId, enterRoomRequest);
 	}
 }
