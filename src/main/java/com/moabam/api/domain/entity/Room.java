@@ -95,6 +95,22 @@ public class Room extends BaseTimeEntity {
 		this.announcement = announcement;
 	}
 
+	public void changeTitle(String title) {
+		this.title = title;
+	}
+
+	public void changePassword(String password) {
+		this.password = password;
+	}
+
+	public void changeMaxCount(int maxUserCount) {
+		if (maxUserCount < this.currentUserCount) {
+			throw new BadRequestException(ROOM_MAX_USER_COUNT_MODIFY_FAIL);
+		}
+
+		this.maxUserCount = maxUserCount;
+	}
+
 	public void upgradeRoomImage(String roomImage) {
 		this.roomImage = roomImage;
 	}
