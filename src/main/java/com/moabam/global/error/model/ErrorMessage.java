@@ -13,7 +13,10 @@ public enum ErrorMessage {
 	ROOM_MODIFY_UNAUTHORIZED_REQUEST("방장이 아닌 사용자는 방을 수정할 수 없습니다."),
 	PARTICIPANT_NOT_FOUND("방에 대한 참여자의 정보가 없습니다."),
 	LOGIN_FAILED("로그인에 실패했습니다."),
-	REQUEST_FAILD("네트우크 접근 실패입니다.");
+	REQUEST_FAILD("네트우크 접근 실패입니다."),
+
+	INVALID_PRICE("가격은 0 이상이어야 합니다."),
+	INVALID_QUANTITY("수량은 1 이상이어야 합니다.");
 
 	private final String message;
 }
