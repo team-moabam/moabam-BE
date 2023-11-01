@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class BugMapper {
 
-	public static BugResponse from(Bug bug) {
+	public static BugResponse toBugResponse(Bug bug) {
 		return BugResponse.builder()
 			.morningBug(bug.getMorningBug())
 			.nightBug(bug.getNightBug())

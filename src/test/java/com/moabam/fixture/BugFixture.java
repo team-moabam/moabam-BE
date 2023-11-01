@@ -1,8 +1,6 @@
 package com.moabam.fixture;
 
 import com.moabam.api.domain.entity.Bug;
-import com.moabam.api.dto.BugMapper;
-import com.moabam.api.dto.BugResponse;
 
 public final class BugFixture {
 
@@ -16,9 +14,5 @@ public final class BugFixture {
 			.nightBug(NIGHT_BUG)
 			.goldenBug(GOLDEN_BUG)
 			.build();
-	}
-
-	public static BugResponse bugResponse() {
-		return BugMapper.from(bug());
 	}
 }

@@ -18,6 +18,6 @@ public class BugService {
 
 	public BugResponse getBug(Long memberId) {
 		Member member = memberService.getById(memberId);
-		return BugMapper.from(member.getBug());
+		return BugMapper.toBugResponse(member.getBug());
 	}
 }
