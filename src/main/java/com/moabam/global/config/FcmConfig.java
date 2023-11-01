@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @EnableScheduling
 public class FcmConfig {
 
-	private static final String FIREBASE_PATH = "resources/config/moabam-firebase.json";
+	private static final String FIREBASE_PATH = "config/moabam-firebase.json";
 
 	@Bean
 	public FirebaseMessaging firebaseMessaging() {
