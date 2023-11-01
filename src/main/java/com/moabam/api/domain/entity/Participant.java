@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(name = "participant")
-@SQLDelete(sql = "UPDATE participants SET deleted_at = CURRENT_TIMESTAMP where id = ?")
+@SQLDelete(sql = "UPDATE participant SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Participant {
 
@@ -49,7 +49,8 @@ public class Participant {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	private Participant(Room room, Long memberId) {
+	private Participant(Long id, Room room, Long memberId) {
+		this.id = id;
 		this.room = requireNonNull(room);
 		this.memberId = requireNonNull(memberId);
 		this.isManager = false;

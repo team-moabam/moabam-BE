@@ -32,7 +32,6 @@ public class Room extends BaseTimeEntity {
 	private static final String ROOM_LEVEL_0_IMAGE = "'temptemp'";
 	private static final String ROOM_LEVEL_10_IMAGE = "'temp'";
 	private static final String ROOM_LEVEL_20_IMAGE = "'tempp'";
-
 	private static final int MORNING_START_TIME = 4;
 	private static final int MORNING_END_TIME = 10;
 	private static final int NIGHT_START_TIME = 20;
@@ -55,7 +54,7 @@ public class Room extends BaseTimeEntity {
 	private int level;
 
 	@Enumerated(value = EnumType.STRING)
-	@Column(name = "type")
+	@Column(name = "room_type")
 	private RoomType roomType;
 
 	@Column(name = "certify_time", nullable = false)
@@ -76,7 +75,8 @@ public class Room extends BaseTimeEntity {
 	private String roomImage;
 
 	@Builder
-	private Room(String title, String password, RoomType roomType, int certifyTime, int maxUserCount) {
+	private Room(Long id, String title, String password, RoomType roomType, int certifyTime, int maxUserCount) {
+		this.id = id;
 		this.title = requireNonNull(title);
 		this.password = password;
 		this.level = 0;

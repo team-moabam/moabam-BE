@@ -40,7 +40,8 @@ public class Certification extends BaseTimeEntity {
 	private String image;
 
 	@Builder
-	private Certification(Routine routine, Long memberId, String image) {
+	private Certification(Long id, Routine routine, Long memberId, String image) {
+		this.id = id;
 		this.routine = requireNonNull(routine);
 		this.memberId = requireNonNull(memberId);
 		this.image = requireNonNull(image);
