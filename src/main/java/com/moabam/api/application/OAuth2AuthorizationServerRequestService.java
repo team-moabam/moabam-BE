@@ -21,6 +21,12 @@ import jakarta.servlet.http.HttpServletResponse;
 @Service
 public class OAuth2AuthorizationServerRequestService {
 
+	private final RestTemplate restTemplate;
+
+	public OAuth2AuthorizationServerRequestService() {
+		restTemplate = new RestTemplate();
+	}
+
 	public void loginRequest(HttpServletResponse httpServletResponse, String authorizationCodeUri) {
 		try {
 			httpServletResponse.setContentType(MediaType.APPLICATION_FORM_URLENCODED + GlobalConstant.CHARSET_UTF_8);
@@ -37,6 +43,13 @@ public class OAuth2AuthorizationServerRequestService {
 			MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8);
 		HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(uriParams, headers);
 
-		return new RestTemplate().exchange(tokenUri, HttpMethod.POST, httpEntity, AuthorizationTokenResponse.class);
+		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse = restTemplate.exchange(tokenUri,
+			HttpMethod.POST, httpEntity, AuthorizationTokenResponse.class);
+
+		if (authorizationTokenResponse.getStatusCode().isError()) {
+			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
+		}
+
+		return authorizationTokenResponse;
 	}
 }

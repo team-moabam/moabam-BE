@@ -62,10 +62,6 @@ public class AuthenticationService {
 			oauth2AuthorizationServerRequestService.requestAuthorizationServer(oAuthConfig.provider().tokenUri(),
 				uriParams);
 
-		if (authorizationTokenResponse.getStatusCode().isError()) {
-			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
-		}
-
 		return authorizationTokenResponse.getBody();
 	}
 
@@ -92,5 +88,6 @@ public class AuthenticationService {
 		validAuthorizationGrant(authorizationCodeResponse);
 		AuthorizationTokenResponse authorizationTokenResponse = issueTokenToAuthorizationServer(
 			authorizationCodeResponse.code());
+		// TODO 발급한 토큰으로 사용자의 정보 얻어와야함 : 프로필 & 닉네임
 	}
 }

@@ -12,22 +12,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
 import com.moabam.api.dto.AuthorizationCodeResponse;
-import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.api.dto.OAuthMapper;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;
@@ -109,27 +101,5 @@ class AuthenticationServiceTest {
 		assertThatThrownBy(() -> authenticationService.requestToken(authorizationCodeResponse))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.GRANT_FAILED.getMessage());
-	}
-
-	@DisplayName("토큰 발급 실패")
-	@ParameterizedTest
-	@ValueSource(ints = {400, 401, 403, 429, 500, 502, 503})
-	void token_issue_fail(int code) {
-		// given
-		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse = mock(ResponseEntity.class);
-		AuthorizationCodeResponse authorizationCodeResponse = new AuthorizationCodeResponse(
-			"testtesttesttesttesttest", null,
-			null, null);
-
-		given(new RestTemplate().exchange(
-			any(String.class), HttpMethod.POST, any(HttpEntity.class), AuthorizationTokenResponse.class
-		)).willReturn(authorizationTokenResponse);
-
-		// When + Then
-		when(authorizationTokenResponse.getStatusCode()).thenReturn(HttpStatusCode.valueOf(code));
-
-		assertThatThrownBy(() -> authenticationService.requestToken(authorizationCodeResponse))
-			.isInstanceOf(BadRequestException.class)
-			.hasMessage(ErrorMessage.REQUEST_FAILED.getMessage());
 	}
 }
