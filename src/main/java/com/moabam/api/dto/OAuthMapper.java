@@ -1,6 +1,5 @@
 package com.moabam.api.dto;
 
-import com.moabam.api.dto.AuthorizationCodeRequest;
 import com.moabam.global.config.OAuthConfig;
 
 import lombok.AccessLevel;
