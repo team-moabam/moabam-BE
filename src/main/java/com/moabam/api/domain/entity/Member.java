@@ -1,4 +1,4 @@
-package com.moabam.api.domain;
+package com.moabam.api.domain.entity;
 
 import static java.util.Objects.*;
 
@@ -8,6 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.moabam.api.domain.entity.enums.Role;
 import com.moabam.global.common.entity.BaseTimeEntity;
 import com.moabam.global.common.util.BaseImageUrl;
 
@@ -27,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "member")
-@SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where participant_id = ?")
+@SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 @Where(clause = "deleted_at IS NOT NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
