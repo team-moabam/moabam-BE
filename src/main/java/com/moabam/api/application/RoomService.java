@@ -12,6 +12,7 @@ import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.entity.Room;
 import com.moabam.api.domain.entity.Routine;
 import com.moabam.api.domain.repository.ParticipantRepository;
+import com.moabam.api.domain.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.repository.RoomRepository;
 import com.moabam.api.domain.repository.RoutineRepository;
 import com.moabam.api.dto.CreateRoomRequest;
@@ -32,6 +33,7 @@ public class RoomService {
 	private final RoomRepository roomRepository;
 	private final RoutineRepository routineRepository;
 	private final ParticipantRepository participantRepository;
+	private final ParticipantSearchRepository participantSearchRepository;
 
 	@Transactional
 	public void createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
@@ -42,7 +44,6 @@ public class RoomService {
 			.memberId(memberId)
 			.build();
 		participant.enableManager();
-
 		roomRepository.save(room);
 		routineRepository.saveAll(routines);
 		participantRepository.save(participant);
@@ -51,7 +52,7 @@ public class RoomService {
 	@Transactional
 	public void modifyRoom(Long memberId, Long roomId, ModifyRoomRequest modifyRoomRequest) {
 		// TODO: 추후에 별도 메서드로 뺄듯
-		Participant participant = participantRepository.findParticipantByRoomIdAndMemberId(roomId, memberId)
+		Participant participant = participantSearchRepository.findParticipant(roomId, memberId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
 
 		if (!participant.isManager()) {

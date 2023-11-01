@@ -37,7 +37,8 @@ public class Routine extends BaseTimeEntity {
 	private String content;
 
 	@Builder
-	private Routine(Room room, String content) {
+	private Routine(Long id, Room room, String content) {
+		this.id = id;
 		this.room = requireNonNull(room);
 		this.content = requireNonNull(content);
 	}
