@@ -42,7 +42,7 @@ class BugControllerTest {
 		BugResponse expected = BugMapper.toBugResponse(BugFixture.bug());
 		given(bugService.getBug(memberId)).willReturn(expected);
 
-		// when & then
+		// expected
 		String content = mockMvc.perform(get("/bugs"))
 			.andDo(print())
 			.andExpect(status().isOk())
