@@ -21,6 +21,7 @@ public class ProductService {
 
 	public ProductsResponse getProducts() {
 		List<Product> products = productRepository.findAll();
+
 		return ProductMapper.toProductsResponse(products);
 	}
 }
