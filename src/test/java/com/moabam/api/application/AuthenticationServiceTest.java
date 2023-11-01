@@ -21,6 +21,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
+import com.moabam.api.dto.AuthorizationCodeResponse;
 import com.moabam.api.mapper.OAuthMapper;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
@@ -110,9 +111,22 @@ class AuthenticationServiceTest {
 				// When + Then
 				authenticationService.redirectToLoginPage(mockHttpServletResponse);
 			}).isExactlyInstanceOf(BadRequestException.class)
-				.hasMessage(ErrorMessage.REQUEST_FAILD.getMessage());
+				.hasMessage(ErrorMessage.REQUEST_FAILED.getMessage());
 		} catch (Exception ignored) {
 
 		}
+	}
+
+	@DisplayName("인가코드 반환 실패 테스트")
+	@Test
+	void authorization_grant_fail_test() {
+		// Given
+		AuthorizationCodeResponse authorizationCodeResponse = new AuthorizationCodeResponse(null, "error",
+			"errorDescription", null);
+
+		// When + Then
+		assertThatThrownBy(() -> authenticationService.requestToken(authorizationCodeResponse))
+			.isInstanceOf(BadRequestException.class)
+			.hasMessage(ErrorMessage.GRANT_FAILED.getMessage());
 	}
 }

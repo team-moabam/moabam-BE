@@ -20,4 +20,9 @@ public class MemberController {
 	public void socialLogin(HttpServletResponse httpServletResponse) {
 		authenticationService.redirectToLoginPage(httpServletResponse);
 	}
+
+	@GetMapping
+	public void authorizationTokenIssue() {
+
+	}
 }

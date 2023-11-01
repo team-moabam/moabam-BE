@@ -16,4 +16,5 @@ public class OAuthMapper {
 			.scope(oAuthConfig.client().scope())
 			.build();
 	}
+
 }

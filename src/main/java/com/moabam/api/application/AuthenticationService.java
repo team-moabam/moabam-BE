@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
+import com.moabam.api.dto.AuthorizationCodeResponse;
 import com.moabam.api.mapper.OAuthMapper;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
@@ -51,7 +52,18 @@ public class AuthenticationService {
 			httpServletResponse.setContentType(MediaType.APPLICATION_FORM_URLENCODED + GlobalConstant.CHARSET_UTF_8);
 			httpServletResponse.sendRedirect(authorizationCodeUri);
 		} catch (IOException e) {
-			throw new BadRequestException(ErrorMessage.REQUEST_FAILD);
+			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
+		}
+	}
+
+	public void requestToken(AuthorizationCodeResponse authorizationCodeResponse) {
+		validAuthorizationGrant(authorizationCodeResponse);
+
+	}
+
+	private void validAuthorizationGrant(AuthorizationCodeResponse authorizationCodeResponse) {
+		if (authorizationCodeResponse.code() == null) {
+			throw new BadRequestException(ErrorMessage.GRANT_FAILED);
 		}
 	}
 }
