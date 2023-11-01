@@ -15,14 +15,16 @@ import lombok.RequiredArgsConstructor;
 public class NotificationRepository {
 
 	private static final long EXPIRE_KNOCK = 20;
+	private static final long EXPIRE_FCM_TOKEN = 60;
 	private static final String TO = "_TO_";
 	private final StringRedisRepository stringRedisRepository;
 
-	public void save(Long key, String value, Duration expireTime) {
+	// TODO : 세연님 로그인 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 저장하면 됩니다.
+	public void saveFcmToken(Long key, String value) {
 		stringRedisRepository.save(
 			String.valueOf(requireNonNull(key)),
 			requireNonNull(value),
-			requireNonNull(expireTime)
+			requireNonNull(Duration.ofDays(EXPIRE_FCM_TOKEN))
 		);
 	}
 
@@ -34,6 +36,7 @@ public class NotificationRepository {
 		);
 	}
 
+	// TODO : 세연님 로그아웃 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 삭제하시면 됩니다.
 	public void deleteFcmTokenByMemberId(Long memberId) {
 		stringRedisRepository.delete(String.valueOf(requireNonNull(memberId)));
 	}
