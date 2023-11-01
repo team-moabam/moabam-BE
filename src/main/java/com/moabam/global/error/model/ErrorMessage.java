@@ -16,7 +16,12 @@ public enum ErrorMessage {
 
 	LOGIN_FAILED("로그인에 실패했습니다."),
 	REQUEST_FAILED("네트우크 접근 실패입니다."),
-	GRANT_FAILED("인가 코드 실패");
+	GRANT_FAILED("인가 코드 실패"),
+	MEMBER_NOT_FOUND("존재하지 않는 회원입니다."),
+
+	INVALID_BUG_COUNT("벌레 개수는 0 이상이어야 합니다."),
+	INVALID_PRICE("가격은 0 이상이어야 합니다."),
+	INVALID_QUANTITY("수량은 1 이상이어야 합니다.");
 
 	private final String message;
 }

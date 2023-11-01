@@ -86,8 +86,7 @@ public class AuthenticationService {
 
 	public void requestToken(AuthorizationCodeResponse authorizationCodeResponse) {
 		validAuthorizationGrant(authorizationCodeResponse);
-		AuthorizationTokenResponse authorizationTokenResponse = issueTokenToAuthorizationServer(
-			authorizationCodeResponse.code());
+		issueTokenToAuthorizationServer(authorizationCodeResponse.code());
 		// TODO 발급한 토큰으로 사용자의 정보 얻어와야함 : 프로필 & 닉네임
 	}
 }
