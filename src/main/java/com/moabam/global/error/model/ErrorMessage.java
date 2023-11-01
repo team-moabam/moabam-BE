@@ -15,7 +15,9 @@ public enum ErrorMessage {
 	LOGIN_FAILED("로그인에 실패했습니다."),
 	REQUEST_FAILD("네트우크 접근 실패입니다."),
 
-	FCM_INIT_FAILED("파이어베이스 설정을 실패했습니다.");
+	FCM_INIT_FAILED("파이어베이스 설정을 실패했습니다."),
+	FCM_TOKEN_NOT_FOUND("해당 유저는 접속 중이 아닙니다."),
+	KNOCK_CONFLICT("이미 콕 알림을 보낸 대상입니다.");
 
 	private final String message;
 }
