@@ -22,10 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 @EnableScheduling
 public class FcmConfig {
 
-	private static final String FIREBASE_PATH = "config/moabam-firebase.json";
+	private static final String FIREBASE_PATH = "resources/config/moabam-firebase.json";
 
 	@Bean
-	public FirebaseMessaging initFirebaseMessaging() {
+	public FirebaseMessaging firebaseMessaging() {
 		try (InputStream inputStream = new ClassPathResource(FIREBASE_PATH).getInputStream()) {
 			GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream);
 			FirebaseOptions firebaseOptions = FirebaseOptions.builder()
