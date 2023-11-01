@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.AuthenticationService;
+import com.moabam.api.dto.AuthorizationCodeResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,8 @@ public class MemberController {
 		authenticationService.redirectToLoginPage(httpServletResponse);
 	}
 
-	@GetMapping
-	public void authorizationTokenIssue() {
-
+	@GetMapping("/login/kakao/oauth")
+	public void authorizationTokenIssue(AuthorizationCodeResponse authorizationCodeResponse) {
+		authenticationService.requestToken(authorizationCodeResponse);
 	}
 }

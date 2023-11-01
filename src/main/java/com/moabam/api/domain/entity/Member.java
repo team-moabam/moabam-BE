@@ -80,7 +80,7 @@ public class Member extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
-	@ColumnDefault("USER")
+	@ColumnDefault("`USER`")
 	private Role role;
 
 	@Column(name = "deleted_at")
@@ -93,5 +93,21 @@ public class Member extends BaseTimeEntity {
 		this.nickname = requireNonNull(nickname);
 		this.profileImage = requireNonNullElse(profileImage, BaseImageUrl.PROFILE_URL);
 		this.role = Role.USER;
+	}
+
+	public void enterMorningRoom() {
+		this.currentMorningCount++;
+	}
+
+	public void enterNightRoom() {
+		this.currentNightCount++;
+	}
+
+	public void exitMorningRoom() {
+		this.currentMorningCount--;
+	}
+
+	public void exitNightRoom() {
+		this.currentNightCount--;
 	}
 }
