@@ -17,9 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.BugService;
-import com.moabam.api.domain.entity.Bug;
-import com.moabam.api.dto.BugMapper;
 import com.moabam.api.dto.BugResponse;
+import com.moabam.fixture.BugFixture;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -39,11 +38,7 @@ class BugControllerTest {
 	void get_bug_success() throws Exception {
 		// given
 		Long memberId = 1L;
-		BugResponse expected = BugMapper.from(Bug.builder()
-			.morningBug(10)
-			.nightBug(20)
-			.goldenBug(30)
-			.build());
+		BugResponse expected = BugFixture.bugResponse();
 		given(bugService.getBug(memberId)).willReturn(expected);
 
 		// when & then
