@@ -61,9 +61,15 @@ public class GlobalExceptionHandler {
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(NullPointerException.class)
+	protected ErrorResponse handleFirebaseException(NullPointerException exception) {
+		return new ErrorResponse(exception.getMessage(), null);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	protected ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException moabamException) {
-		List<FieldError> fieldErrors = moabamException.getBindingResult().getFieldErrors();
+	protected ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+		List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
 		Map<String, String> validation = new HashMap<>();
 
 		for (FieldError fieldError : fieldErrors) {
