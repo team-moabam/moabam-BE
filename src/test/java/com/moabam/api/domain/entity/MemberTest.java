@@ -23,6 +23,7 @@ class MemberTest {
 			.socialId(socialId)
 			.nickname(nickname)
 			.profileImage(profileImage)
+			.bug(Bug.builder().build())
 			.build());
 	}
 
@@ -35,14 +36,15 @@ class MemberTest {
 				.socialId(socialId)
 				.nickname(nickname)
 				.profileImage(null)
+				.bug(Bug.builder().build())
 				.build();
 
 			assertAll(
 				() -> assertThat(member.getProfileImage()).isEqualTo(BaseImageUrl.PROFILE_URL),
 				() -> assertThat(member.getRole()).isEqualTo(Role.USER),
-				() -> assertThat(member.getNightBug()).isZero(),
-				() -> assertThat(member.getGoldenBug()).isZero(),
-				() -> assertThat(member.getMorningBug()).isZero(),
+				() -> assertThat(member.getBug().getNightBug()).isZero(),
+				() -> assertThat(member.getBug().getGoldenBug()).isZero(),
+				() -> assertThat(member.getBug().getMorningBug()).isZero(),
 				() -> assertThat(member.getTotalCertifyCount()).isZero(),
 				() -> assertThat(member.getReportCount()).isZero(),
 				() -> assertThat(member.getCurrentMorningCount()).isZero(),
