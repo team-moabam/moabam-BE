@@ -12,3 +12,12 @@ oauth2:
     authorization_uri: https://test.com/test/test
     redirect_uri: http://test:8080/test
     token_uri: https://test.test.com/test/test
+
+# Spring
+spring:
+
+  # Redis
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379

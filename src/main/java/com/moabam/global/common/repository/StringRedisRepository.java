@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public abstract class StringRedisRepository {
+public class StringRedisRepository {
 
 	private final StringRedisTemplate stringRedisTemplate;
 
