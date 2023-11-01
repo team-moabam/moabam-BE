@@ -20,16 +20,17 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class NotificationService {
 
+	private final FirebaseMessaging firebaseMessaging;
 	private final NotificationRepository notificationRepository;
 
 	@Transactional
-	public void sendKnockNotification(Long targetId, MemberTest member) {
+	public void sendKnockNotification(MemberTest member, Long targetId) {
 		validateFcmToken(targetId);
 		validateKnockNotification(member.memberId(), targetId);
 		String fcmToken = notificationRepository.findFcmTokenByMemberId(targetId);
 		Notification notification = NotificationMapper.toKnockNotificationEntity(member.memberId());
 		Message message = NotificationMapper.toMessageEntity(notification, fcmToken);
-		FirebaseMessaging.getInstance().sendAsync(message);
+		firebaseMessaging.sendAsync(message);
 		notificationRepository.saveKnockNotification(member.memberId(), targetId);
 	}
 
@@ -40,7 +41,7 @@ public class NotificationService {
 	}
 
 	private void validateKnockNotification(Long memberId, Long targetId) {
-		if (!notificationRepository.existsKnockByMemberId(memberId, targetId)) {
+		if (notificationRepository.existsKnockByMemberId(memberId, targetId)) {
 			throw new ConflictException(ErrorMessage.KNOCK_CONFLICT);
 		}
 	}
