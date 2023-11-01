@@ -1,4 +1,4 @@
-package com.moabam.api.mapper;
+package com.moabam.api.dto;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
 import com.moabam.global.config.OAuthConfig;

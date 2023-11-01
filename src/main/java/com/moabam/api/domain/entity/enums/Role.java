@@ -1,4 +1,4 @@
-package com.moabam.api.domain;
+package com.moabam.api.domain.entity.enums;
 
 public enum Role {
 

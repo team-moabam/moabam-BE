@@ -1,4 +1,4 @@
-package com.moabam.api.domain;
+package com.moabam.api.domain.entity;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.moabam.api.domain.entity.enums.Role;
 import com.moabam.global.common.util.BaseImageUrl;
 
 class MemberTest {
