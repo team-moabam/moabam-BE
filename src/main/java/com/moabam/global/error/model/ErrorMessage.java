@@ -17,7 +17,9 @@ public enum ErrorMessage {
 
 	MEMBER_NOT_FOUND("존재하지 않는 회원입니다."),
 
-	INVALID_BUG_COUNT("벌레 개수는 0 이상이어야 합니다.");
+	INVALID_BUG_COUNT("벌레 개수는 0 이상이어야 합니다."),
+	INVALID_PRICE("가격은 0 이상이어야 합니다."),
+	INVALID_QUANTITY("수량은 1 이상이어야 합니다.");
 
 	private final String message;
 }
