@@ -2,17 +2,10 @@ package com.moabam.api.application;
 
 import static com.moabam.global.common.util.OAuthParameterNames.*;
 
-import java.io.IOException;
-
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
@@ -33,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthenticationService {
 
 	private final OAuthConfig oAuthConfig;
+	private final OAuth2AuthorizationServerRequestService oauth2AuthorizationServerRequestService;
 
 	private String getAuthorizationCodeUri() {
 		AuthorizationCodeRequest authorizationCodeRequest = OAuthMapper.toAuthorizationCodeRequest(oAuthConfig);
@@ -63,27 +57,15 @@ public class AuthenticationService {
 	private AuthorizationTokenResponse issueTokenToAuthorizationServer(String code) {
 		AuthorizationTokenRequest authorizationTokenRequest = OAuthMapper.toAuthorizationTokenRequest(oAuthConfig,
 			code);
-		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse = requestAuthorizationServer(
-			authorizationTokenRequest);
+		MultiValueMap<String, String> uriParams = generateTokenRequest(authorizationTokenRequest);
+		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse = oauth2AuthorizationServerRequestService.requestAuthorizationServer(
+			oAuthConfig.provider().tokenUri(), uriParams);
 
 		if (authorizationTokenResponse.getStatusCode().isError()) {
 			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
 		}
 
 		return authorizationTokenResponse.getBody();
-	}
-
-	private ResponseEntity<AuthorizationTokenResponse> requestAuthorizationServer(
-		AuthorizationTokenRequest authorizationTokenRequest) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_TYPE,
-			MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8);
-		HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(
-			generateTokenRequest(authorizationTokenRequest), headers);
-
-		return new RestTemplate().exchange(
-			oAuthConfig.provider().tokenUri(), HttpMethod.POST,
-			httpEntity, AuthorizationTokenResponse.class);
 	}
 
 	private MultiValueMap<String, String> generateTokenRequest(AuthorizationTokenRequest authorizationTokenRequest) {
@@ -102,13 +84,7 @@ public class AuthenticationService {
 
 	public void redirectToLoginPage(HttpServletResponse httpServletResponse) {
 		String authorizationCodeUri = getAuthorizationCodeUri();
-
-		try {
-			httpServletResponse.setContentType(MediaType.APPLICATION_FORM_URLENCODED + GlobalConstant.CHARSET_UTF_8);
-			httpServletResponse.sendRedirect(authorizationCodeUri);
-		} catch (IOException e) {
-			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
-		}
+		oauth2AuthorizationServerRequestService.loginRequest(httpServletResponse, authorizationCodeUri);
 	}
 
 	public void requestToken(AuthorizationCodeResponse authorizationCodeResponse) {
