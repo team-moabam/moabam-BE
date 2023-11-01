@@ -58,8 +58,9 @@ public class AuthenticationService {
 		AuthorizationTokenRequest authorizationTokenRequest = OAuthMapper.toAuthorizationTokenRequest(oAuthConfig,
 			code);
 		MultiValueMap<String, String> uriParams = generateTokenRequest(authorizationTokenRequest);
-		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse = oauth2AuthorizationServerRequestService.requestAuthorizationServer(
-			oAuthConfig.provider().tokenUri(), uriParams);
+		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse =
+			oauth2AuthorizationServerRequestService.requestAuthorizationServer(oAuthConfig.provider().tokenUri(),
+				uriParams);
 
 		if (authorizationTokenResponse.getStatusCode().isError()) {
 			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
