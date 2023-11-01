@@ -25,8 +25,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Getter
+@Entity
 @Table(name = "member")
 @SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where participant_id = ?")
 @Where(clause = "deleted_at IS NOT NULL")
@@ -80,7 +80,7 @@ public class Member extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
-	@ColumnDefault("'USER'")
+	@ColumnDefault("USER")
 	private Role role;
 
 	@Column(name = "deleted_at")
