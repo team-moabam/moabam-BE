@@ -23,6 +23,7 @@ class MemberTest {
 			.socialId(socialId)
 			.nickname(nickname)
 			.profileImage(profileImage)
+			.bug(Bug.builder().build())
 			.build());
 	}
 
@@ -35,6 +36,7 @@ class MemberTest {
 				.socialId(socialId)
 				.nickname(nickname)
 				.profileImage(null)
+				.bug(Bug.builder().build())
 				.build();
 
 			assertAll(
