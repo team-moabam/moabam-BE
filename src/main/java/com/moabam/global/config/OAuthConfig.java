@@ -13,6 +13,7 @@ public record OAuthConfig(
 	public record Client(
 		String provider,
 		String clientId,
+		String clientSecret,
 		String authorizationGrantType,
 		List<String> scope
 	) {
@@ -21,7 +22,8 @@ public record OAuthConfig(
 
 	public record Provider(
 		String authorizationUri,
-		String redirectUri
+		String redirectUri,
+		String tokenUri
 	) {
 
 	}

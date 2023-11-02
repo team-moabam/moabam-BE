@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(name = "member")
-@SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where participant_id = ?")
+@SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 @Where(clause = "deleted_at IS NOT NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
@@ -72,7 +72,7 @@ public class Member extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
-	@ColumnDefault("USER")
+	@ColumnDefault("'USER'")
 	private Role role;
 
 	@Column(name = "deleted_at")
@@ -86,5 +86,25 @@ public class Member extends BaseTimeEntity {
 		this.profileImage = requireNonNullElse(profileImage, BaseImageUrl.PROFILE_URL);
 		this.bug = requireNonNull(bug);
 		this.role = Role.USER;
+	}
+
+	public void enterMorningRoom() {
+		currentMorningCount++;
+	}
+
+	public void enterNightRoom() {
+		currentNightCount++;
+	}
+
+	public void exitMorningRoom() {
+		if (currentMorningCount > 0) {
+			currentMorningCount--;
+		}
+	}
+
+	public void exitNightRoom() {
+		if (currentMorningCount > 0) {
+			currentNightCount--;
+		}
 	}
 }
