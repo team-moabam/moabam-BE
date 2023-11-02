@@ -27,13 +27,10 @@ public class FcmConfig {
 	@Bean
 	public FirebaseMessaging firebaseMessaging() {
 		try (InputStream inputStream = new ClassPathResource(FIREBASE_PATH).getInputStream()) {
-			log.info("======= 1 =======");
 			GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream);
-			log.info("======= 2 =======");
 			FirebaseOptions firebaseOptions = FirebaseOptions.builder()
 				.setCredentials(credentials)
 				.build();
-			log.info("======= 3 =======");
 			if (FirebaseApp.getApps().isEmpty()) {
 				FirebaseApp.initializeApp(firebaseOptions);
 				log.info("======= Firebase init start =======");
