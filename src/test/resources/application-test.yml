@@ -1,3 +1,13 @@
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
 oauth2:
   client:
     provider: test
