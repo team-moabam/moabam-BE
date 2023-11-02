@@ -13,6 +13,7 @@ import com.moabam.global.common.entity.BaseTimeEntity;
 import com.moabam.global.common.util.BaseImageUrl;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,10 +26,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Entity
+@Getter
 @Table(name = "member")
-@SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where participant_id = ?")
+@SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 @Where(clause = "deleted_at IS NOT NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
@@ -66,32 +67,44 @@ public class Member extends BaseTimeEntity {
 	@ColumnDefault("0")
 	private int currentMorningCount;
 
-	@Column(name = "morning_bug", nullable = false)
-	@ColumnDefault("0")
-	private int morningBug;
-
-	@Column(name = "night_bug", nullable = false)
-	@ColumnDefault("0")
-	private int nightBug;
-
-	@Column(name = "golden_bug", nullable = false)
-	@ColumnDefault("0")
-	private int goldenBug;
+	@Embedded
+	private Bug bug;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
-	@ColumnDefault("USER")
+	@ColumnDefault("'USER'")
 	private Role role;
 
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
 	@Builder
-	private Member(Long id, String socialId, String nickname, String profileImage) {
+	private Member(Long id, String socialId, String nickname, String profileImage, Bug bug) {
 		this.id = id;
 		this.socialId = requireNonNull(socialId);
 		this.nickname = requireNonNull(nickname);
 		this.profileImage = requireNonNullElse(profileImage, BaseImageUrl.PROFILE_URL);
+		this.bug = requireNonNull(bug);
 		this.role = Role.USER;
+	}
+
+	public void enterMorningRoom() {
+		currentMorningCount++;
+	}
+
+	public void enterNightRoom() {
+		currentNightCount++;
+	}
+
+	public void exitMorningRoom() {
+		if (currentMorningCount > 0) {
+			currentMorningCount--;
+		}
+	}
+
+	public void exitNightRoom() {
+		if (currentMorningCount > 0) {
+			currentNightCount--;
+		}
 	}
 }

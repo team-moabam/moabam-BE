@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.moabam.api.domain.entity.enums.Role;
+import com.moabam.fixture.MemberFixture;
 import com.moabam.global.common.util.BaseImageUrl;
 
 class MemberTest {
@@ -23,6 +25,7 @@ class MemberTest {
 			.socialId(socialId)
 			.nickname(nickname)
 			.profileImage(profileImage)
+			.bug(Bug.builder().build())
 			.build());
 	}
 
@@ -35,14 +38,15 @@ class MemberTest {
 				.socialId(socialId)
 				.nickname(nickname)
 				.profileImage(null)
+				.bug(Bug.builder().build())
 				.build();
 
 			assertAll(
 				() -> assertThat(member.getProfileImage()).isEqualTo(BaseImageUrl.PROFILE_URL),
 				() -> assertThat(member.getRole()).isEqualTo(Role.USER),
-				() -> assertThat(member.getNightBug()).isZero(),
-				() -> assertThat(member.getGoldenBug()).isZero(),
-				() -> assertThat(member.getMorningBug()).isZero(),
+				() -> assertThat(member.getBug().getNightBug()).isZero(),
+				() -> assertThat(member.getBug().getGoldenBug()).isZero(),
+				() -> assertThat(member.getBug().getMorningBug()).isZero(),
 				() -> assertThat(member.getTotalCertifyCount()).isZero(),
 				() -> assertThat(member.getReportCount()).isZero(),
 				() -> assertThat(member.getCurrentMorningCount()).isZero(),
@@ -67,5 +71,43 @@ class MemberTest {
 		assertThatThrownBy(Member.builder()
 			.socialId(socialId)::build)
 			.isInstanceOf(NullPointerException.class);
+	}
+
+	@DisplayName("멤버 방 출입 기능 테스트")
+	@Nested
+	class MemberRoomInOut {
+
+		@DisplayName("회원 방 입장 성공")
+		@Test
+		void member_room_enter_success() {
+			// given
+			Member member = MemberFixture.member();
+
+			// when
+			int beforeMorningCount = member.getCurrentMorningCount();
+			member.enterMorningRoom();
+
+			int beforeNightCount = member.getCurrentNightCount();
+			member.enterNightRoom();
+
+			// then
+			assertThat(member.getCurrentMorningCount()).isEqualTo(beforeMorningCount + 1);
+			assertThat(member.getCurrentMorningCount()).isEqualTo(beforeNightCount + 1);
+		}
+
+		@DisplayName("회원 방 탈출 성공")
+		@Test
+		void member_room_exit_success() {
+			// given
+			Member member = MemberFixture.member();
+
+			// when
+			member.exitMorningRoom();
+			member.exitNightRoom();
+
+			// then
+			assertThat(member.getCurrentMorningCount()).isZero();
+			assertThat(member.getCurrentMorningCount()).isZero();
+		}
 	}
 }
