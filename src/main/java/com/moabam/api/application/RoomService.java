@@ -90,7 +90,7 @@ public class RoomService {
 			throw new BadRequestException(ROOM_EXIT_MANAGER_FAIL);
 		}
 
-		// TODO: 사용자의 방 입장 횟수 감소 기능 넣기
+		memberService.decreaseRoomCount(memberId, room.getRoomType());
 		participant.removeRoom();
 		participantRepository.flush();
 		participantRepository.delete(participant);

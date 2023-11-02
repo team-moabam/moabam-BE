@@ -50,4 +50,16 @@ public class MemberService {
 
 		member.enterNightRoom();
 	}
+
+	@Transactional
+	public void decreaseRoomCount(Long memberId, RoomType roomType) {
+		Member member = getById(memberId);
+
+		if (roomType.equals(MORNING)) {
+			member.exitMorningRoom();
+			return;
+		}
+
+		member.exitNightRoom();
+	}
 }
