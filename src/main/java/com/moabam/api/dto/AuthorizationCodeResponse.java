@@ -4,7 +4,7 @@ public record AuthorizationCodeResponse(
 	String code,
 	String error,
 	String errorDescription,
-	String stats
+	String state
 ) {
 
 }

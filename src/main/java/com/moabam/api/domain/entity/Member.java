@@ -72,7 +72,7 @@ public class Member extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
-	@ColumnDefault("`USER`")
+	@ColumnDefault("'USER'")
 	private Role role;
 
 	@Column(name = "deleted_at")
