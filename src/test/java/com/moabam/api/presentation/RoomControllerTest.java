@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,6 +67,17 @@ class RoomControllerTest {
 	void setUp() {
 		member = MemberFixture.member();
 		memberRepository.save(member);
+	}
+
+	@AfterEach
+	void cleanUp() {
+		while (member.getCurrentMorningCount() > 0) {
+			member.exitMorningRoom();
+		}
+
+		while (member.getCurrentNightCount() > 0) {
+			member.exitNightRoom();
+		}
 	}
 
 	@DisplayName("비밀번호 없는 방 생성 성공")
@@ -561,6 +573,7 @@ class RoomControllerTest {
 		mockMvc.perform(delete("/rooms/" + room.getId()))
 			.andExpect(status().isOk())
 			.andDo(print());
+
 		participantRepository.flush();
 		Participant deletedParticipant = participantRepository.findById(participant.getId()).orElseThrow();
 		assertThat(room.getCurrentUserCount()).isEqualTo(4);
@@ -624,5 +637,75 @@ class RoomControllerTest {
 			.andExpect(status().isBadRequest())
 			.andExpect(content().json(message))
 			.andDo(print());
+	}
+
+	@DisplayName("아침 방 나가기 이후 사용자의 방 입장 횟수 감소 테스트")
+	@Test
+	void exit_and_decrease_morning_room_count() throws Exception {
+		// given
+		Room room = Room.builder()
+			.title("방 제목")
+			.password("1234")
+			.roomType(MORNING)
+			.certifyTime(9)
+			.maxUserCount(5)
+			.build();
+
+		Participant participant = Participant.builder()
+			.room(room)
+			.memberId(1L)
+			.build();
+
+		for (int i = 0; i < 3; i++) {
+			member.enterMorningRoom();
+		}
+
+		memberRepository.save(member);
+		roomRepository.save(room);
+		participantRepository.save(participant);
+
+		// when
+		mockMvc.perform(delete("/rooms/" + room.getId()))
+			.andExpect(status().isOk());
+
+		Member getMember = memberRepository.findById(1L).orElseThrow();
+
+		// then
+		assertThat(getMember.getCurrentMorningCount()).isEqualTo(2);
+	}
+
+	@DisplayName("저녁 방 나가기 이후 사용자의 방 입장 횟수 감소 테스트")
+	@Test
+	void exit_and_decrease_night_room_count() throws Exception {
+		// given
+		Room room = Room.builder()
+			.title("방 제목")
+			.password("1234")
+			.roomType(NIGHT)
+			.certifyTime(23)
+			.maxUserCount(5)
+			.build();
+
+		Participant participant = Participant.builder()
+			.room(room)
+			.memberId(1L)
+			.build();
+
+		for (int i = 0; i < 3; i++) {
+			member.enterNightRoom();
+		}
+
+		memberRepository.save(member);
+		roomRepository.save(room);
+		participantRepository.save(participant);
+
+		// when
+		mockMvc.perform(delete("/rooms/" + room.getId()))
+			.andExpect(status().isOk());
+
+		Member getMember = memberRepository.findById(1L).orElseThrow();
+
+		// then
+		assertThat(getMember.getCurrentNightCount()).isEqualTo(2);
 	}
 }
