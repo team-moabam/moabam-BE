@@ -89,18 +89,22 @@ public class Member extends BaseTimeEntity {
 	}
 
 	public void enterMorningRoom() {
-		this.currentMorningCount++;
+		currentMorningCount++;
 	}
 
 	public void enterNightRoom() {
-		this.currentNightCount++;
+		currentNightCount++;
 	}
 
 	public void exitMorningRoom() {
-		this.currentMorningCount--;
+		if (currentMorningCount > 0) {
+			currentMorningCount--;
+		}
 	}
 
 	public void exitNightRoom() {
-		this.currentNightCount--;
+		if (currentMorningCount > 0) {
+			currentNightCount--;
+		}
 	}
 }

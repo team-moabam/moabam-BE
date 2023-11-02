@@ -15,12 +15,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
 import com.moabam.api.dto.AuthorizationCodeResponse;
+import com.moabam.api.dto.AuthorizationTokenRequest;
+import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.api.dto.OAuthMapper;
+import com.moabam.fixture.AuthorizationTokenResponseFixture;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -90,9 +95,9 @@ class AuthenticationServiceTest {
 		verify(oAuth2AuthorizationServerRequestService).loginRequest(eq(mockHttpServletResponse), anyString());
 	}
 
-	@DisplayName("인가코드 반환 실패 테스트")
+	@DisplayName("인가코드 반환 실패")
 	@Test
-	void authorization_grant_fail_test() {
+	void authorization_grant_fail() {
 		// Given
 		AuthorizationCodeResponse authorizationCodeResponse = new AuthorizationCodeResponse(null, "error",
 			"errorDescription", null);
@@ -101,5 +106,55 @@ class AuthenticationServiceTest {
 		assertThatThrownBy(() -> authenticationService.requestToken(authorizationCodeResponse))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.GRANT_FAILED.getMessage());
+	}
+
+	@DisplayName("인가코드 반환 성공")
+	@Test
+	void authorization_grant_success() {
+		// Given
+		AuthorizationCodeResponse authorizationCodeResponse = new AuthorizationCodeResponse("test", null,
+			null, null);
+		AuthorizationTokenResponse authorizationTokenResponse =
+			AuthorizationTokenResponseFixture.authorizationTokenResponse();
+
+		// When
+		when(oAuth2AuthorizationServerRequestService.requestAuthorizationServer(anyString(), any())).thenReturn(
+			new ResponseEntity<>(authorizationTokenResponse, HttpStatus.OK));
+
+		// When + Then
+		assertThatNoException().isThrownBy(() -> authenticationService.requestToken(authorizationCodeResponse));
+	}
+
+	@DisplayName("토큰 요청 매퍼 실패 - code null")
+	@Test
+	void token_request_mapping_failBy_code() {
+		// When + Then
+		Assertions.assertThatThrownBy(() -> OAuthMapper.toAuthorizationTokenRequest(oauthConfig, null))
+			.isInstanceOf(NullPointerException.class);
+	}
+
+	@DisplayName("토큰 요청 매퍼 실패 - config 에러")
+	@Test
+	void token_request_mapping_failBy_config() {
+		// When + Then
+		Assertions.assertThatThrownBy(() -> OAuthMapper.toAuthorizationTokenRequest(noOAuthConfig, "Test"))
+			.isInstanceOf(NullPointerException.class);
+	}
+
+	@DisplayName("토큰 요청 매퍼 성공")
+	@Test
+	void token_request_mapping_success() {
+		// Given
+		String code = "Test";
+		AuthorizationTokenRequest authorizationTokenRequest = OAuthMapper.toAuthorizationTokenRequest(oauthConfig,
+			code);
+
+		// When + Then
+		assertThat(authorizationTokenRequest).isNotNull();
+		assertAll(
+			() -> assertThat(authorizationTokenRequest.clientId()).isEqualTo(oauthConfig.client().clientId()),
+			() -> assertThat(authorizationTokenRequest.redirectUri()).isEqualTo(oauthConfig.provider().redirectUri()),
+			() -> assertThat(authorizationTokenRequest.code()).isEqualTo(code)
+		);
 	}
 }

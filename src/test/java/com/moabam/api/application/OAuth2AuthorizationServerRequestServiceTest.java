@@ -61,7 +61,7 @@ public class OAuth2AuthorizationServerRequestServiceTest {
 		@Test
 		void authorization_code_uri_generate_success() throws IOException {
 			// given
-			MockHttpServletResponse mockHttpServletResponse = mockHttpServletResponse = new MockHttpServletResponse();
+			MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
 
 			// when
 			oAuth2AuthorizationServerRequestService.loginRequest(mockHttpServletResponse, uri);
