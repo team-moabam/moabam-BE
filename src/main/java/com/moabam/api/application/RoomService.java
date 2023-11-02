@@ -34,6 +34,7 @@ public class RoomService {
 	private final RoutineRepository routineRepository;
 	private final ParticipantRepository participantRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
+	private final MemberService memberService;
 
 	@Transactional
 	public void createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
@@ -43,6 +44,7 @@ public class RoomService {
 			.room(room)
 			.memberId(memberId)
 			.build();
+
 		participant.enableManager();
 		roomRepository.save(room);
 		routineRepository.saveAll(routines);
@@ -51,15 +53,13 @@ public class RoomService {
 
 	@Transactional
 	public void modifyRoom(Long memberId, Long roomId, ModifyRoomRequest modifyRoomRequest) {
-		// TODO: 추후에 별도 메서드로 뺄듯
-		Participant participant = participantSearchRepository.findParticipant(roomId, memberId)
-			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
+		Participant participant = getParticipant(memberId, roomId);
 
 		if (!participant.isManager()) {
 			throw new ForbiddenException(ROOM_MODIFY_UNAUTHORIZED_REQUEST);
 		}
 
-		Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
+		Room room = getRoom(roomId);
 		room.changeTitle(modifyRoomRequest.title());
 		room.changePassword(modifyRoomRequest.password());
 		room.changeCertifyTime(modifyRoomRequest.certifyTime());
@@ -68,9 +68,55 @@ public class RoomService {
 
 	@Transactional
 	public void enterRoom(Long memberId, Long roomId, EnterRoomRequest enterRoomRequest) {
-		// TODO: 해당 사용자의 방 입장 횟수 확인, 증가, (비동기 처리? -> 일단 엔티티 로직에서 임시방편) 기능 넣기
-		String requestPassword = enterRoomRequest.password();
-		Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
+		Room room = getRoom(roomId);
+		validateRoomEnter(memberId, enterRoomRequest.password(), room);
+
+		room.increaseCurrentUserCount();
+		memberService.increaseRoomCount(memberId, room.getRoomType());
+		
+		Participant participant = Participant.builder()
+			.room(room)
+			.memberId(memberId)
+			.build();
+		participantRepository.save(participant);
+	}
+
+	@Transactional
+	public void exitRoom(Long memberId, Long roomId) {
+		Participant participant = getParticipant(memberId, roomId);
+		Room room = participant.getRoom();
+
+		if (participant.isManager() && room.getCurrentUserCount() != 1) {
+			throw new BadRequestException(ROOM_EXIT_MANAGER_FAIL);
+		}
+
+		// TODO: 사용자의 방 입장 횟수 감소 기능 넣기
+		participant.removeRoom();
+		participantRepository.flush();
+		participantRepository.delete(participant);
+
+		if (!participant.isManager()) {
+			room.decreaseCurrentUserCount();
+			return;
+		}
+
+		roomRepository.flush();
+		roomRepository.delete(room);
+	}
+
+	private Participant getParticipant(Long memberId, Long roomId) {
+		return participantSearchRepository.findParticipant(memberId, roomId)
+			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
+	}
+
+	private Room getRoom(Long roomId) {
+		return roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
+	}
+
+	private void validateRoomEnter(Long memberId, String requestPassword, Room room) {
+		if (!memberService.isEnterRoomAvailable(memberId, room.getRoomType())) {
+			throw new BadRequestException(MEMBER_ROOM_EXCEED);
+		}
 
 		if (!StringUtils.isEmpty(requestPassword) && !room.getPassword().equals(requestPassword)) {
 			throw new BadRequestException(WRONG_ROOM_PASSWORD);
@@ -79,13 +125,5 @@ public class RoomService {
 		if (room.getCurrentUserCount() == room.getMaxUserCount()) {
 			throw new BadRequestException(ROOM_MAX_USER_REACHED);
 		}
-
-		room.increaseCurrentUserCount();
-		Participant participant = Participant.builder()
-			.room(room)
-			.memberId(memberId)
-			.build();
-
-		participantRepository.save(participant);
 	}
 }
