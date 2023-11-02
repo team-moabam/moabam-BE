@@ -27,6 +27,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.error.exception.BadRequestException;
@@ -146,5 +147,61 @@ public class OAuth2AuthorizationServerRequestServiceTest {
 				.isInstanceOf(BadRequestException.class)
 				.hasMessage(ErrorMessage.REQUEST_FAILED.getMessage());
 		}
+	}
+
+	@DisplayName("토큰 정보 조회 요청")
+	@Nested
+	class TokenInfo {
+
+		@DisplayName("토큰 정보 조회 성공")
+		@Test
+		void toekn_issue_request_success() {
+			// given
+			String tokenInfoUri = "http://token-info.com/test";
+			String tokenValue = "testetstetset";
+
+			ResponseEntity<AuthorizationTokenInfoResponse> infoResponse = mock(ResponseEntity.class);
+
+			// when
+			when(restTemplate.exchange(
+				eq(tokenInfoUri),
+				eq(HttpMethod.GET),
+				any(HttpEntity.class),
+				eq(AuthorizationTokenInfoResponse.class)
+			)).thenReturn(infoResponse);
+
+			when(infoResponse.getStatusCode()).thenReturn(HttpStatusCode.valueOf(200));
+
+			// Then
+			assertThatNoException().isThrownBy(
+				() -> oAuth2AuthorizationServerRequestService.tokenInfoRequest(tokenInfoUri, tokenValue));
+		}
+
+		@DisplayName("토큰 정보 조회 실패")
+		@ParameterizedTest
+		@ValueSource(ints = {400, 401})
+		void request_token_info_success(int code) {
+			// given
+			String tokenInfoUri = "http://token-info.com/test";
+			String tokenValue = "testetstetset";
+
+			ResponseEntity<AuthorizationTokenInfoResponse> infoResponse = mock(ResponseEntity.class);
+
+			// when
+			when(restTemplate.exchange(
+				eq(tokenInfoUri),
+				eq(HttpMethod.GET),
+				any(HttpEntity.class),
+				eq(AuthorizationTokenInfoResponse.class)
+			)).thenReturn(infoResponse);
+
+			when(infoResponse.getStatusCode()).thenReturn(HttpStatusCode.valueOf(code));
+
+			// then
+			assertThatThrownBy(() -> oAuth2AuthorizationServerRequestService.tokenInfoRequest(tokenInfoUri, tokenValue))
+				.isInstanceOf(BadRequestException.class)
+				.hasMessage(ErrorMessage.REQUEST_FAILED.getMessage());
+		}
+
 	}
 }

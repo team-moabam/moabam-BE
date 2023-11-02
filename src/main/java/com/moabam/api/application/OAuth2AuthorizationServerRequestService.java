@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.global.common.util.GlobalConstant;
+import com.moabam.global.common.util.TokenConstant;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -51,5 +53,20 @@ public class OAuth2AuthorizationServerRequestService {
 		}
 
 		return authorizationTokenResponse;
+	}
+
+	public ResponseEntity<AuthorizationTokenInfoResponse> tokenInfoRequest(String tokenInfoUri, String tokenValue) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(TokenConstant.AUTHORIZATION, tokenValue);
+		HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
+
+		ResponseEntity<AuthorizationTokenInfoResponse> authorizationTokenInfoResponseResponse =
+			restTemplate.exchange(tokenInfoUri, HttpMethod.GET, httpEntity, AuthorizationTokenInfoResponse.class);
+
+		if (authorizationTokenInfoResponseResponse.getStatusCode().isError()) {
+			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
+		}
+
+		return authorizationTokenInfoResponseResponse;
 	}
 }
