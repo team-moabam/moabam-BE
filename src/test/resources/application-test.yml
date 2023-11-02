@@ -9,9 +9,9 @@ oauth2:
       - profile_image
 
   provider:
-    authorization_uri: https://test.com/test/test
-    redirect_uri: http://test:8080/test
-    token_uri: https://test.test.com/test/test
+    authorization_uri: https://authorization.com/test/test
+    redirect_uri: http://redirect:8080/test
+    token_uri: https://token.com/test/test
 
 # Spring
 spring:
