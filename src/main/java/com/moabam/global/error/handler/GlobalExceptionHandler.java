@@ -56,13 +56,13 @@ public class GlobalExceptionHandler {
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(FcmException.class)
-	protected ErrorResponse handleFirebaseException(MoabamException moabamException) {
+	protected ErrorResponse handleFcmException(MoabamException moabamException) {
 		return new ErrorResponse(moabamException.getMessage(), null);
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(NullPointerException.class)
-	protected ErrorResponse handleFirebaseException(NullPointerException exception) {
+	protected ErrorResponse handleNullPointerException(NullPointerException exception) {
 		return new ErrorResponse(exception.getMessage(), null);
 	}
 

@@ -27,9 +27,11 @@ public class NotificationService {
 	public void sendKnockNotification(MemberTest member, Long targetId) {
 		validateFcmToken(targetId);
 		validateKnockNotification(member.memberId(), targetId);
+
 		String fcmToken = notificationRepository.findFcmTokenByMemberId(targetId);
 		Notification notification = NotificationMapper.toKnockNotificationEntity(member.memberId());
 		Message message = NotificationMapper.toMessageEntity(notification, fcmToken);
+
 		firebaseMessaging.sendAsync(message);
 		notificationRepository.saveKnockNotification(member.memberId(), targetId);
 	}
