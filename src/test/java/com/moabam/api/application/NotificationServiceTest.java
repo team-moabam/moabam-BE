@@ -43,15 +43,16 @@ class NotificationServiceTest {
 	void notificationService_sendKnockNotification() {
 		// Given
 		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(true);
-		given(notificationRepository.existsKnockByMemberId(any(Long.class), any(Long.class))).willReturn(false);
+		given(notificationRepository.existsKnockByMemberId(any(Long.class), any(Long.class), any(Long.class)))
+			.willReturn(false);
 		given(notificationRepository.findFcmTokenByMemberId(any(Long.class))).willReturn("FCM-TOKEN");
 
 		// When
-		notificationService.sendKnockNotification(memberTest, 2L);
+		notificationService.sendKnockNotification(memberTest, 2L, 1L);
 
 		// Then
 		verify(firebaseMessaging).sendAsync(any(Message.class));
-		verify(notificationRepository).saveKnockNotification(any(Long.class), any(Long.class));
+		verify(notificationRepository).saveKnockNotification(any(Long.class), any(Long.class), any(Long.class));
 	}
 
 	@DisplayName("콕 찌를 상대의 FCM 토큰이 존재하지 않을 때, - NotFoundException")
@@ -61,7 +62,7 @@ class NotificationServiceTest {
 		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(false);
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnockNotification(memberTest, 1L))
+		assertThatThrownBy(() -> notificationService.sendKnockNotification(memberTest, 1L, 1L))
 			.isInstanceOf(NotFoundException.class)
 			.hasMessage(ErrorMessage.FCM_TOKEN_NOT_FOUND.getMessage());
 	}
@@ -71,10 +72,11 @@ class NotificationServiceTest {
 	void notificationService_sendKnockNotification_ConflictException() {
 		// Given
 		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(true);
-		given(notificationRepository.existsKnockByMemberId(any(Long.class), any(Long.class))).willReturn(true);
+		given(notificationRepository.existsKnockByMemberId(any(Long.class), any(Long.class), any(Long.class)))
+			.willReturn(true);
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnockNotification(memberTest, 1L))
+		assertThatThrownBy(() -> notificationService.sendKnockNotification(memberTest, 1L, 1L))
 			.isInstanceOf(ConflictException.class)
 			.hasMessage(ErrorMessage.KNOCK_CONFLICT.getMessage());
 	}

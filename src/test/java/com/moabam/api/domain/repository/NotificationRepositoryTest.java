@@ -47,7 +47,7 @@ class NotificationRepositoryTest {
 	@Test
 	void notificationRepository_saveKnockNotification() {
 		// When
-		notificationRepository.saveKnockNotification(1L, 2L);
+		notificationRepository.saveKnockNotification(1L, 2L, 1L);
 
 		// Then
 		verify(stringRedisRepository).save(any(String.class), any(String.class), any(Duration.class));
@@ -57,7 +57,7 @@ class NotificationRepositoryTest {
 	@Test
 	void notificationRepository_saveKnockNotification_NullPointerException() {
 		// When & Then
-		assertThatThrownBy(() -> notificationRepository.saveKnockNotification(null, 2L))
+		assertThatThrownBy(() -> notificationRepository.saveKnockNotification(null, 2L, 1L))
 			.isInstanceOf(NullPointerException.class);
 	}
 
@@ -119,7 +119,7 @@ class NotificationRepositoryTest {
 	@Test
 	void notificationRepository_existsKnockByMemberId() {
 		// When
-		notificationRepository.existsKnockByMemberId(1L, 2L);
+		notificationRepository.existsKnockByMemberId(1L, 2L, 1L);
 
 		// Then
 		verify(stringRedisRepository).hasKey(any(String.class));
@@ -129,7 +129,7 @@ class NotificationRepositoryTest {
 	@Test
 	void notificationRepository_existsKnockByMemberId_NullPointerException() {
 		// When & Then
-		assertThatThrownBy(() -> notificationRepository.existsKnockByMemberId(null, 2L))
+		assertThatThrownBy(() -> notificationRepository.existsKnockByMemberId(null, 2L, 1L))
 			.isInstanceOf(NullPointerException.class);
 	}
 }
