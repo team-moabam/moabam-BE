@@ -73,7 +73,7 @@ public class RoomService {
 
 		room.increaseCurrentUserCount();
 		memberService.increaseRoomCount(memberId, room.getRoomType());
-		
+
 		Participant participant = Participant.builder()
 			.room(room)
 			.memberId(memberId)

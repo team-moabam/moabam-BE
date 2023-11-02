@@ -45,6 +45,7 @@ public class MemberService {
 
 		if (roomType.equals(MORNING)) {
 			member.enterMorningRoom();
+			return;
 		}
 
 		member.enterNightRoom();
