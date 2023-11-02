@@ -15,7 +15,7 @@ public enum ErrorMessage {
 	PARTICIPANT_NOT_FOUND("방에 대한 참여자의 정보가 없습니다."),
 
 	LOGIN_FAILED("로그인에 실패했습니다."),
-	REQUEST_FAILED("네트우크 접근 실패입니다."),
+	REQUEST_FAILED("네트워크 접근 실패입니다."),
 	GRANT_FAILED("인가 코드 실패"),
 	MEMBER_NOT_FOUND("존재하지 않는 회원입니다."),
 
