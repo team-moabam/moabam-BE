@@ -22,7 +22,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
@@ -48,7 +47,6 @@ import com.moabam.global.error.handler.RestTemplateResponseHandler;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 class MemberControllerTest {
 
 	@Autowired

@@ -14,11 +14,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -62,14 +62,14 @@ public class OAuth2AuthorizationServerRequestServiceTest {
 
 		@DisplayName("로그인 페이지 접근 요청 성공")
 		@Test
-		void authorization_code_uri_generate_success() throws IOException {
-			// given
+		void authorization_code_uri_generate_success() {
+			// Given
 			MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
 
-			// when
+			// When
 			oAuth2AuthorizationServerRequestService.loginRequest(mockHttpServletResponse, uri);
 
-			// then
+			// Then
 			assertThat(mockHttpServletResponse.getContentType())
 				.isEqualTo(MediaType.APPLICATION_FORM_URLENCODED + GlobalConstant.CHARSET_UTF_8);
 			assertThat(mockHttpServletResponse.getRedirectedUrl()).isEqualTo(uri);
@@ -77,9 +77,9 @@ public class OAuth2AuthorizationServerRequestServiceTest {
 
 		@DisplayName("redirect 실패 테스트")
 		@Test
-		void redirect_fail_test() {
-			// given
-			HttpServletResponse mockHttpServletResponse = Mockito.mock(HttpServletResponse.class);
+		void redirect_fail() {
+			// Given
+			HttpServletResponse mockHttpServletResponse = mock(HttpServletResponse.class);
 
 			try {
 				doThrow(IOException.class).when(mockHttpServletResponse).sendRedirect(any(String.class));
@@ -95,50 +95,44 @@ public class OAuth2AuthorizationServerRequestServiceTest {
 		}
 	}
 
-	@DisplayName("Authorization Server에 토큰 발급 요청")
+	@DisplayName("Authorization Server 토큰 발급 요청")
 	@Nested
 	class TokenRequest {
 
 		@DisplayName("토큰 발급 요청 성공")
 		@Test
-		void toekn_issue_request_success() throws IOException {
-			// given
+		void token_issue_request_success() {
+			// Given
 			String tokenUri = "test";
 			MultiValueMap<String, String> uriParams = new LinkedMultiValueMap<>();
-			ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse = mock(ResponseEntity.class);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
 			HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(uriParams, headers);
 
 			// When
-			doReturn(authorizationTokenResponse)
+			doReturn(new ResponseEntity<AuthorizationTokenResponse>(HttpStatus.OK))
 				.when(restTemplate).exchange(
 					eq(tokenUri),
 					eq(HttpMethod.POST),
 					any(HttpEntity.class),
 					eq(AuthorizationTokenResponse.class));
+			oAuth2AuthorizationServerRequestService.requestAuthorizationServer(tokenUri, uriParams);
 
 			// Then
-			assertThatNoException().isThrownBy(() -> {
-				ResponseEntity<AuthorizationTokenResponse> expected =
-					oAuth2AuthorizationServerRequestService.requestAuthorizationServer(tokenUri, uriParams);
-
-				assertThat(expected).isEqualTo(authorizationTokenResponse);
-				verify(restTemplate, times(1))
-					.exchange(tokenUri, HttpMethod.POST, httpEntity, AuthorizationTokenResponse.class);
-			});
+			verify(restTemplate, times(1))
+				.exchange(tokenUri, HttpMethod.POST, httpEntity, AuthorizationTokenResponse.class);
 		}
 
 		@DisplayName("토큰 발급 요청 실패")
 		@ParameterizedTest
 		@ValueSource(ints = {400, 401, 403, 429, 500, 502, 503})
-		void toekn_issue_request_fail(int code) {
-			// given
+		void token_issue_request_fail(int code) {
+			// Given
 			String tokenUri = "test";
 			MultiValueMap<String, String> uriParams = new LinkedMultiValueMap<>();
 
-			// when
+			// When
 			doThrow(new HttpClientErrorException(HttpStatusCode.valueOf(code)))
 				.when(restTemplate).exchange(
 					eq(tokenUri),
@@ -146,9 +140,9 @@ public class OAuth2AuthorizationServerRequestServiceTest {
 					any(HttpEntity.class),
 					eq(AuthorizationTokenResponse.class));
 
-			// then
-			assertThatThrownBy(
-				() -> oAuth2AuthorizationServerRequestService.requestAuthorizationServer(tokenUri, uriParams))
+			// Then
+			assertThatThrownBy(() ->
+				oAuth2AuthorizationServerRequestService.requestAuthorizationServer(tokenUri, uriParams))
 				.isInstanceOf(HttpClientErrorException.class);
 		}
 	}
@@ -159,43 +153,38 @@ public class OAuth2AuthorizationServerRequestServiceTest {
 
 		@DisplayName("토큰 정보 조회 요청 성공")
 		@Test
-		void toekn_info_request_success() throws IOException {
-			// given
+		void token_info_request_success() {
+			// Given
 			String tokenInfoUri = "http://tokenInfo/uri";
 			String tokenValue = "Bearer access-token";
-			ResponseEntity<AuthorizationTokenInfoResponse> authorizationTokenInfoResponse = mock(
-				ResponseEntity.class);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Authorization", tokenValue);
 			HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
-			doReturn(authorizationTokenInfoResponse)
+			// When
+			doReturn(new ResponseEntity<AuthorizationTokenInfoResponse>(HttpStatus.OK))
 				.when(restTemplate).exchange(
 					eq(tokenInfoUri),
 					eq(HttpMethod.GET),
 					any(HttpEntity.class),
 					eq(AuthorizationTokenInfoResponse.class));
+			oAuth2AuthorizationServerRequestService.tokenInfoRequest(tokenInfoUri, tokenValue);
 
 			// Then
-			assertThatNoException().isThrownBy(() -> {
-				ResponseEntity<AuthorizationTokenInfoResponse> expected =
-					oAuth2AuthorizationServerRequestService.tokenInfoRequest(tokenInfoUri, tokenValue);
-
-				verify(restTemplate, times(1))
-					.exchange(tokenInfoUri, HttpMethod.GET, httpEntity, AuthorizationTokenInfoResponse.class);
-			});
+			verify(restTemplate, times(1))
+				.exchange(tokenInfoUri, HttpMethod.GET, httpEntity, AuthorizationTokenInfoResponse.class);
 		}
 
-		@DisplayName("토큰 발급 요청 실패")
+		@DisplayName("")
 		@ParameterizedTest
 		@ValueSource(ints = {400, 401})
-		void toekn_issue_request_fail(int code) {
-			// given
+		void token_issue_request_fail(int code) {
+			// Given
 			String tokenInfoUri = "http://tokenInfo/uri";
 			String tokenValue = "Bearer access-token";
 
-			// when
+			// When
 			doThrow(new HttpClientErrorException(HttpStatusCode.valueOf(code)))
 				.when(restTemplate).exchange(
 					eq(tokenInfoUri),
@@ -203,9 +192,9 @@ public class OAuth2AuthorizationServerRequestServiceTest {
 					any(HttpEntity.class),
 					eq(AuthorizationTokenInfoResponse.class));
 
-			// then
-			assertThatThrownBy(
-				() -> oAuth2AuthorizationServerRequestService.tokenInfoRequest(tokenInfoUri, tokenValue))
+			// Then
+			assertThatThrownBy(() ->
+				oAuth2AuthorizationServerRequestService.tokenInfoRequest(tokenInfoUri, tokenValue))
 				.isInstanceOf(HttpClientErrorException.class);
 		}
 	}

@@ -21,13 +21,13 @@ public class RestTemplateResponseHandler implements ResponseErrorHandler {
 	@Override
 	public void handleError(ClientHttpResponse response) throws IOException {
 		HttpStatusCode statusCode = response.getStatusCode();
-		
-		if (statusCode.is4xxClientError()) {
-			throw new BadRequestException(ErrorMessage.INVALID_REQUEST_FIELD);
-		}
 
 		if (statusCode.is5xxServerError()) {
 			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
+		}
+
+		if (statusCode.is4xxClientError()) {
+			throw new BadRequestException(ErrorMessage.INVALID_REQUEST_FIELD);
 		}
 	}
 }
