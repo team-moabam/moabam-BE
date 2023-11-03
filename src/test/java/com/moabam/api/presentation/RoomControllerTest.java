@@ -245,14 +245,20 @@ class RoomControllerTest {
 			.certifyTime(9)
 			.maxUserCount(5)
 			.build();
+
 		Participant participant = Participant.builder()
 			.room(room)
 			.memberId(1L)
 			.build();
 		participant.enableManager();
+
+		List<String> routines = new ArrayList<>();
+		routines.add("물 마시기");
+		routines.add("코테 풀기");
+
 		roomRepository.save(room);
 		participantRepository.save(participant);
-		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "1234", 10, 7);
+		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", null, routines, "1234", 10, 7);
 		String json = objectMapper.writeValueAsString(modifyRoomRequest);
 
 		// expected
@@ -274,13 +280,19 @@ class RoomControllerTest {
 			.certifyTime(9)
 			.maxUserCount(5)
 			.build();
+
 		Participant participant = Participant.builder()
 			.room(room)
 			.memberId(1L)
 			.build();
+
+		List<String> routines = new ArrayList<>();
+		routines.add("물 마시기");
+		routines.add("코테 풀기");
+
 		roomRepository.save(room);
 		participantRepository.save(participant);
-		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "1234", 10, 7);
+		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "방 공지", routines, "1234", 9, 7);
 		String json = objectMapper.writeValueAsString(modifyRoomRequest);
 		String message = "{\"message\":\"방장이 아닌 사용자는 방을 수정할 수 없습니다.\"}";
 
