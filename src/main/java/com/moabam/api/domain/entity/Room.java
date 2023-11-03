@@ -43,7 +43,6 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "id")
 	private Long id;
 
-	// TODO: 한글 10자도 맞나?
 	@Column(name = "title", nullable = false, length = 30)
 	private String title;
 
@@ -66,7 +65,6 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "max_user_count", nullable = false)
 	private int maxUserCount;
 
-	// TODO: 한글 길이 고려
 	@Column(name = "announcement", length = 255)
 	private String announcement;
 
@@ -109,6 +107,18 @@ public class Room extends BaseTimeEntity {
 		}
 
 		this.maxUserCount = maxUserCount;
+	}
+
+	public void increaseCurrentUserCount() {
+		this.currentUserCount += 1;
+
+		if (this.currentUserCount > this.maxUserCount) {
+			throw new BadRequestException(ROOM_MAX_USER_REACHED);
+		}
+	}
+
+	public void decreaseCurrentUserCount() {
+		this.currentUserCount -= 1;
 	}
 
 	public void upgradeRoomImage(String roomImage) {

@@ -33,7 +33,7 @@ public class Participant {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "room_id", updatable = false, nullable = false)
+	@JoinColumn(name = "room_id", updatable = false)
 	private Room room;
 
 	@Column(name = "member_id", updatable = false, nullable = false)
@@ -47,6 +47,9 @@ public class Participant {
 
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
+
+	@Column(name = "deleted_room_title", length = 30)
+	private String deletedRoomTitle;
 
 	@Builder
 	private Participant(Long id, Room room, Long memberId) {
@@ -67,5 +70,10 @@ public class Participant {
 
 	public void updateCertifyCount() {
 		this.certifyCount += 1;
+	}
+
+	public void removeRoom() {
+		this.deletedRoomTitle = this.room.getTitle();
+		this.room = null;
 	}
 }

@@ -1,0 +1,30 @@
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Redis
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+oauth2:
+  client:
+    provider: test
+    client-id: testtestetsttest
+    client-secret: testtestetsttest
+    authorization-grant-type: authorization_code
+    scope:
+      - profile_nickname
+      - profile_image
+
+  provider:
+    authorization_uri: https://authorization.com/test/test
+    redirect_uri: http://redirect:8080/test
+    token_uri: https://token.com/test/test

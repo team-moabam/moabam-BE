@@ -18,7 +18,7 @@ public class ParticipantSearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public Optional<Participant> findParticipant(Long roomId, Long memberId) {
+	public Optional<Participant> findParticipant(Long memberId, Long roomId) {
 		return Optional.ofNullable(
 			jpaQueryFactory.selectFrom(participant)
 				.where(
