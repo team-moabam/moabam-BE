@@ -22,6 +22,7 @@ import com.moabam.api.dto.CreateRoomRequest;
 import com.moabam.api.dto.EnterRoomRequest;
 import com.moabam.api.dto.ModifyRoomRequest;
 import com.moabam.api.dto.RoomMapper;
+import com.moabam.api.dto.RoutineMapper;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -42,7 +43,7 @@ public class RoomService {
 	@Transactional
 	public void createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
 		Room room = RoomMapper.toRoomEntity(createRoomRequest);
-		List<Routine> routines = RoomMapper.toRoutineEntity(room, createRoomRequest.routines());
+		List<Routine> routines = RoutineMapper.toRoutineEntities(room, createRoomRequest.routines());
 		Participant participant = Participant.builder()
 			.room(room)
 			.memberId(memberId)

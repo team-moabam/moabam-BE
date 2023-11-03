@@ -19,11 +19,4 @@ public final class RoutineMapper {
 				.build())
 			.toList();
 	}
-
-	public static RoutineResponse toRoutineResponse(Routine routine) {
-		return RoutineResponse.builder()
-			.routineId(routine.getId())
-			.content(routine.getContent())
-			.build();
-	}
 }
