@@ -1,3 +1,19 @@
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Redis
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
 oauth2:
   client:
     provider: test
@@ -13,3 +29,4 @@ oauth2:
     redirect_uri: http://redirect:8080/test
     token_uri: https://token.com/test/test
     token-info: https://api.token.com/test
+
