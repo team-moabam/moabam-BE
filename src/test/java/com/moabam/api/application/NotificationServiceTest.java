@@ -35,7 +35,7 @@ class NotificationServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		memberTest = new MemberTest(2L);
+		memberTest = new MemberTest(2L, "nickname");
 	}
 
 	@DisplayName("성공적으로 상대를 콕 찔렀을 때, - Void")

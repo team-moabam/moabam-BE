@@ -12,10 +12,10 @@ public class NotificationMapper {
 	private static final String TITLE = "모아밤";
 	private static final String KNOCK_BODY = "님이 콕 찔렀습니다.";
 
-	public static Notification toKnockNotificationEntity(Long memberId) {
+	public static Notification toKnockNotificationEntity(String nickname) {
 		return Notification.builder()
 			.setTitle(TITLE)
-			.setBody(memberId + KNOCK_BODY)
+			.setBody(nickname + KNOCK_BODY)
 			.build();
 	}
 

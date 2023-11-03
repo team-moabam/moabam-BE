@@ -13,9 +13,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class StringRedisRepositoryTest {
 

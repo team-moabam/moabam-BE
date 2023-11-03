@@ -1,5 +1,7 @@
 package com.moabam.global.config;
 
+import static com.moabam.global.common.util.GlobalConstant.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -22,8 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @EnableScheduling
 public class FcmConfig {
 
-	private static final String FIREBASE_PATH = "config/moabam-firebase.json";
-
 	@Bean
 	public FirebaseMessaging firebaseMessaging() {
 		try (InputStream inputStream = new ClassPathResource(FIREBASE_PATH).getInputStream()) {
@@ -31,6 +31,7 @@ public class FcmConfig {
 			FirebaseOptions firebaseOptions = FirebaseOptions.builder()
 				.setCredentials(credentials)
 				.build();
+
 			if (FirebaseApp.getApps().isEmpty()) {
 				FirebaseApp.initializeApp(firebaseOptions);
 				log.info("======= Firebase init start =======");
@@ -38,7 +39,7 @@ public class FcmConfig {
 
 			return FirebaseMessaging.getInstance();
 		} catch (IOException e) {
-			log.error("======= firebase moabam error =======" + e + "");
+			log.error("======= firebase moabam error =======\n" + e);
 			throw new FcmException(ErrorMessage.FCM_INIT_FAILED);
 		}
 	}

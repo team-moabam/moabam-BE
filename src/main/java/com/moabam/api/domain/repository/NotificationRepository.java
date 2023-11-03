@@ -15,10 +15,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationRepository {
 
-	private static final long EXPIRE_KNOCK = 12;
-	private static final long EXPIRE_FCM_TOKEN = 60;
-	private static final String TO = "_TO_";
-
 	private final StringRedisRepository stringRedisRepository;
 
 	// TODO : 세연님 로그인 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 저장하면 됩니다.
@@ -50,6 +46,7 @@ public class NotificationRepository {
 
 	public boolean existsKnockByMemberId(Long memberId, Long targetId, Long roomId) {
 		String key = requireNonNull(roomId) + UNDER_BAR + requireNonNull(memberId) + TO + requireNonNull(targetId);
+
 		return stringRedisRepository.hasKey(key);
 	}
 }

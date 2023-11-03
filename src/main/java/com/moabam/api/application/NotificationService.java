@@ -26,10 +26,10 @@ public class NotificationService {
 	@Transactional
 	public void sendKnockNotification(MemberTest member, Long targetId, Long roomId) {
 		validateFcmToken(targetId);
-		validateKnockNotification(member.memberId(), targetId, roomId);
+		validateConflictKnockNotification(member.memberId(), targetId, roomId);
 
 		String fcmToken = notificationRepository.findFcmTokenByMemberId(targetId);
-		Notification notification = NotificationMapper.toKnockNotificationEntity(member.memberId());
+		Notification notification = NotificationMapper.toKnockNotificationEntity(member.nickname());
 		Message message = NotificationMapper.toMessageEntity(notification, fcmToken);
 
 		firebaseMessaging.sendAsync(message);
@@ -42,7 +42,7 @@ public class NotificationService {
 		}
 	}
 
-	private void validateKnockNotification(Long memberId, Long targetId, Long roomId) {
+	private void validateConflictKnockNotification(Long memberId, Long targetId, Long roomId) {
 		if (notificationRepository.existsKnockByMemberId(memberId, targetId, roomId)) {
 			throw new ConflictException(ErrorMessage.KNOCK_CONFLICT);
 		}
