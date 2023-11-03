@@ -630,7 +630,7 @@ class RoomControllerTest {
 
 		roomRepository.save(room);
 		participantRepository.save(participant);
-		String message = "{\"message\":\"인원수가 2명 이상일때는 방장을 위임해야합니다.\"}";
+		String message = "{\"message\":\"인원수가 2명 이상일 때는 방장을 위임해야 합니다.\"}";
 
 		// expected
 		mockMvc.perform(delete("/rooms/" + room.getId()))
