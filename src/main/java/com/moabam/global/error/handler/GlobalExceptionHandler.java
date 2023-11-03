@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
+import com.moabam.global.error.exception.FcmException;
 import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.global.error.exception.MoabamException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -54,9 +55,21 @@ public class GlobalExceptionHandler {
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(FcmException.class)
+	protected ErrorResponse handleFcmException(MoabamException moabamException) {
+		return new ErrorResponse(moabamException.getMessage(), null);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(NullPointerException.class)
+	protected ErrorResponse handleNullPointerException(NullPointerException exception) {
+		return new ErrorResponse(exception.getMessage(), null);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException moabamException) {
-		List<FieldError> fieldErrors = moabamException.getBindingResult().getFieldErrors();
+	protected ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+		List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
 		Map<String, String> validation = new HashMap<>();
 
 		for (FieldError fieldError : fieldErrors) {
