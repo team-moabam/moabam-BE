@@ -33,7 +33,7 @@ public class Participant {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "room_id", updatable = false)
+	@JoinColumn(name = "room_id")
 	private Room room;
 
 	@Column(name = "member_id", updatable = false, nullable = false)
