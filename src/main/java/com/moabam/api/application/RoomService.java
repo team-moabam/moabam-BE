@@ -1,5 +1,6 @@
 package com.moabam.api.application;
 
+import static com.moabam.api.domain.entity.enums.RoomType.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 
 import java.util.List;
@@ -8,9 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.moabam.api.domain.entity.Member;
 import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.entity.Room;
 import com.moabam.api.domain.entity.Routine;
+import com.moabam.api.domain.entity.enums.RoomType;
 import com.moabam.api.domain.repository.ParticipantRepository;
 import com.moabam.api.domain.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.repository.RoomRepository;
@@ -72,7 +75,7 @@ public class RoomService {
 		validateRoomEnter(memberId, enterRoomRequest.password(), room);
 
 		room.increaseCurrentUserCount();
-		memberService.increaseRoomCount(memberId, room.getRoomType());
+		increaseRoomCount(memberId, room.getRoomType());
 
 		Participant participant = Participant.builder()
 			.room(room)
@@ -90,7 +93,7 @@ public class RoomService {
 			throw new BadRequestException(ROOM_EXIT_MANAGER_FAIL);
 		}
 
-		memberService.decreaseRoomCount(memberId, room.getRoomType());
+		decreaseRoomCount(memberId, room.getRoomType());
 		participant.removeRoom();
 		participantRepository.flush();
 		participantRepository.delete(participant);
@@ -120,7 +123,7 @@ public class RoomService {
 	}
 
 	private void validateRoomEnter(Long memberId, String requestPassword, Room room) {
-		if (!memberService.isEnterRoomAvailable(memberId, room.getRoomType())) {
+		if (!isEnterRoomAvailable(memberId, room.getRoomType())) {
 			throw new BadRequestException(MEMBER_ROOM_EXCEED);
 		}
 
@@ -131,5 +134,41 @@ public class RoomService {
 		if (room.getCurrentUserCount() == room.getMaxUserCount()) {
 			throw new BadRequestException(ROOM_MAX_USER_REACHED);
 		}
+	}
+
+	private boolean isEnterRoomAvailable(Long memberId, RoomType roomType) {
+		Member member = memberService.getById(memberId);
+
+		if (roomType.equals(MORNING) && member.getCurrentMorningCount() >= 3) {
+			return false;
+		}
+
+		if (roomType.equals(NIGHT) && member.getCurrentNightCount() >= 3) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private void increaseRoomCount(Long memberId, RoomType roomType) {
+		Member member = memberService.getById(memberId);
+
+		if (roomType.equals(MORNING)) {
+			member.enterMorningRoom();
+			return;
+		}
+
+		member.enterNightRoom();
+	}
+
+	private void decreaseRoomCount(Long memberId, RoomType roomType) {
+		Member member = memberService.getById(memberId);
+
+		if (roomType.equals(MORNING)) {
+			member.exitMorningRoom();
+			return;
+		}
+
+		member.exitNightRoom();
 	}
 }
