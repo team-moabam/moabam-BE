@@ -7,7 +7,7 @@ import com.moabam.api.domain.entity.Product;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ProductMapper {
 
 	public static ProductResponse toProductResponse(Product product) {
