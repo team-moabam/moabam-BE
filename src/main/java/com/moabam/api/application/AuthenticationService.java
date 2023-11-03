@@ -10,10 +10,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
 import com.moabam.api.dto.AuthorizationCodeResponse;
+import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenRequest;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.api.dto.OAuthMapper;
 import com.moabam.global.common.util.GlobalConstant;
+import com.moabam.global.common.util.TokenConstant;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -28,9 +30,31 @@ public class AuthenticationService {
 	private final OAuthConfig oAuthConfig;
 	private final OAuth2AuthorizationServerRequestService oauth2AuthorizationServerRequestService;
 
+	public void redirectToLoginPage(HttpServletResponse httpServletResponse) {
+		String authorizationCodeUri = getAuthorizationCodeUri();
+		oauth2AuthorizationServerRequestService.loginRequest(httpServletResponse, authorizationCodeUri);
+	}
+
+	public AuthorizationTokenResponse requestToken(AuthorizationCodeResponse authorizationCodeResponse) {
+		validAuthorizationGrant(authorizationCodeResponse.code());
+		return issueTokenToAuthorizationServer(authorizationCodeResponse.code());
+	}
+
+	public AuthorizationTokenInfoResponse requestTokenInfo(AuthorizationTokenResponse authorizationTokenResponse) {
+		String tokenValue = generateTokenValue(authorizationTokenResponse.accessToken());
+		ResponseEntity<AuthorizationTokenInfoResponse> authorizationTokenInfoResponse
+			= oauth2AuthorizationServerRequestService.tokenInfoRequest(oAuthConfig.provider().tokenInfo(), tokenValue);
+
+		return authorizationTokenInfoResponse.getBody();
+	}
+
 	private String getAuthorizationCodeUri() {
 		AuthorizationCodeRequest authorizationCodeRequest = OAuthMapper.toAuthorizationCodeRequest(oAuthConfig);
 		return generateQueryParamsWith(authorizationCodeRequest);
+	}
+
+	private String generateTokenValue(String token) {
+		return TokenConstant.TOKEN_TYPE + GlobalConstant.SPACE + token;
 	}
 
 	private String generateQueryParamsWith(AuthorizationCodeRequest authorizationCodeRequest) {
@@ -77,16 +101,5 @@ public class AuthenticationService {
 		}
 
 		return contents;
-	}
-
-	public void redirectToLoginPage(HttpServletResponse httpServletResponse) {
-		String authorizationCodeUri = getAuthorizationCodeUri();
-		oauth2AuthorizationServerRequestService.loginRequest(httpServletResponse, authorizationCodeUri);
-	}
-
-	public void requestToken(AuthorizationCodeResponse authorizationCodeResponse) {
-		validAuthorizationGrant(authorizationCodeResponse.code());
-		issueTokenToAuthorizationServer(authorizationCodeResponse.code());
-		// TODO 발급한 토큰으로 사용자의 정보 얻어와야함 : 프로필 & 닉네임
 	}
 }

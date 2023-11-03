@@ -22,9 +22,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
 import com.moabam.api.dto.AuthorizationCodeResponse;
+import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenRequest;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.api.dto.OAuthMapper;
+import com.moabam.fixture.AuthorizationTokenInfoResponseFixture;
 import com.moabam.fixture.AuthorizationTokenResponseFixture;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;
@@ -46,14 +48,15 @@ class AuthenticationServiceTest {
 	@BeforeEach
 	public void initParams() {
 		oauthConfig = new OAuthConfig(
-			new OAuthConfig.Provider("https://authorization/url", "http://redirect/url", "http://token/url"),
+			new OAuthConfig.Provider("https://authorization/url", "http://redirect/url", "http://token/url",
+				"http://tokenInfo/url"),
 			new OAuthConfig.Client("provider", "testtestetsttest", "testtesttest", "authorization_code",
 				List.of("profile_nickname", "profile_image"))
 		);
 		ReflectionTestUtils.setField(authenticationService, "oAuthConfig", oauthConfig);
 
 		noOAuthConfig = new OAuthConfig(
-			new OAuthConfig.Provider(null, null, null),
+			new OAuthConfig.Provider(null, null, null, null),
 			new OAuthConfig.Client(null, null, null, null, null)
 		);
 		noPropertyService = new AuthenticationService(noOAuthConfig, oAuth2AuthorizationServerRequestService);
@@ -156,5 +159,22 @@ class AuthenticationServiceTest {
 			() -> assertThat(authorizationTokenRequest.redirectUri()).isEqualTo(oauthConfig.provider().redirectUri()),
 			() -> assertThat(authorizationTokenRequest.code()).isEqualTo(code)
 		);
+	}
+
+	@DisplayName("토큰 변경 성공")
+	@Test
+	void generate_token() {
+		// Given
+		AuthorizationTokenResponse tokenResponse = AuthorizationTokenResponseFixture.authorizationTokenResponse();
+		AuthorizationTokenInfoResponse tokenInfoResponse
+			= AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse();
+
+		// When
+		when(oAuth2AuthorizationServerRequestService.tokenInfoRequest(eq(oauthConfig.provider().tokenInfo()),
+			eq("Bearer " + tokenResponse.accessToken())))
+			.thenReturn(new ResponseEntity<>(tokenInfoResponse, HttpStatus.OK));
+
+		// Then
+		assertThatNoException().isThrownBy(() -> authenticationService.requestTokenInfo(tokenResponse));
 	}
 }

@@ -2,7 +2,7 @@ package com.moabam.fixture;
 
 import com.moabam.api.dto.AuthorizationTokenResponse;
 
-public class AuthorizationTokenResponseFixture {
+public final class AuthorizationTokenResponseFixture {
 
 	static final String tokenType = "tokenType";
 	static final String accessToken = "accessToken";

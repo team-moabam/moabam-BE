@@ -23,7 +23,8 @@ public record OAuthConfig(
 	public record Provider(
 		String authorizationUri,
 		String redirectUri,
-		String tokenUri
+		String tokenUri,
+		String tokenInfo
 	) {
 
 	}

@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "member")
 @SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where id = ?")
-@Where(clause = "deleted_at IS NOT NULL")
+@Where(clause = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 
@@ -103,7 +103,7 @@ public class Member extends BaseTimeEntity {
 	}
 
 	public void exitNightRoom() {
-		if (currentMorningCount > 0) {
+		if (currentNightCount > 0) {
 			currentNightCount--;
 		}
 	}
