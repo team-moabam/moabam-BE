@@ -104,6 +104,12 @@ public class RoomService {
 		roomRepository.delete(room);
 	}
 
+	public void validateRoomById(Long roomId) {
+		if (!roomRepository.existsById(roomId)) {
+			throw new NotFoundException(ROOM_NOT_FOUND);
+		}
+	}
+
 	private Participant getParticipant(Long memberId, Long roomId) {
 		return participantSearchRepository.findParticipant(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
