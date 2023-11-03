@@ -1,18 +1,11 @@
 package com.moabam.api.presentation;
 
-import static com.moabam.global.common.util.OAuthParameterNames.CLIENT_ID;
-import static com.moabam.global.common.util.OAuthParameterNames.CLIENT_SECRET;
-import static com.moabam.global.common.util.OAuthParameterNames.CODE;
-import static com.moabam.global.common.util.OAuthParameterNames.GRANT_TYPE;
-import static com.moabam.global.common.util.OAuthParameterNames.REDIRECT_URI;
-import static com.moabam.global.common.util.OAuthParameterNames.RESPONSE_TYPE;
-import static com.moabam.global.common.util.OAuthParameterNames.SCOPE;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static com.moabam.global.common.util.OAuthParameterNames.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +16,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
@@ -44,7 +36,6 @@ import com.moabam.global.config.OAuthConfig;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 class MemberControllerTest {
 
 	@Autowired
