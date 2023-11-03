@@ -25,7 +25,11 @@ public enum ErrorMessage {
 
 	INVALID_BUG_COUNT("벌레 개수는 0 이상이어야 합니다."),
 	INVALID_PRICE("가격은 0 이상이어야 합니다."),
-	INVALID_QUANTITY("수량은 1 이상이어야 합니다.");
+	INVALID_QUANTITY("수량은 1 이상이어야 합니다."),
+
+	FCM_INIT_FAILED("파이어베이스 설정을 실패했습니다."),
+	FCM_TOKEN_NOT_FOUND("해당 유저는 접속 중이 아닙니다."),
+	KNOCK_CONFLICT("이미 콕 알림을 보낸 대상입니다.");
 
 	private final String message;
 }

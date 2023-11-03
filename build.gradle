@@ -55,10 +55,15 @@ dependencies {
 
     // Configuration Binding
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-
+    
     // Apache Commons Lang 3
     implementation 'org.apache.commons:commons-lang3:3.13.0'
 
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Firebase Admin
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 tasks.named('test') {
