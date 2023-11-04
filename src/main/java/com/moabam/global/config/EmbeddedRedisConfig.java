@@ -48,14 +48,19 @@ public class EmbeddedRedisConfig {
 		try {
 			redisServer.start();
 		} catch (Exception e) {
+			stopRedis();
 			throw new MoabamException(e.getMessage());
 		}
 	}
 
 	@PreDestroy
 	public void stopRedis() {
-		if (redisServer != null) {
-			redisServer.stop();
+		try {
+			if (redisServer != null) {
+				redisServer.stop();
+			}
+		} catch (Exception e) {
+			throw new MoabamException(e.getMessage());
 		}
 	}
 

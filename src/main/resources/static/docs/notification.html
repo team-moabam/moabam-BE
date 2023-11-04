@@ -459,12 +459,26 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <h4 id="_요청" class="discrete">요청</h4>
-<div class="paragraph">
-<p>Unresolved directive in notification.adoc - include::/Users/hongyeongjune/kdt-programmers/moabam-server/build/generated-snippets/notifications/http-request.adoc[]</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /notifications/rooms/3/members/3 HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
 </div>
 <h4 id="_응답" class="discrete">응답</h4>
-<div class="paragraph">
-<p>Unresolved directive in notification.adoc - include::/Users/hongyeongjune/kdt-programmers/moabam-server/build/generated-snippets/notifications/http-response.adoc[]</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 64
+
+{
+  "message" : "이미 콕 알림을 보낸 대상입니다."
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -473,7 +487,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-03 17:37:58 +0900
+Last updated 2023-11-04 20:22:52 +0900
 </div>
 </div>
 </body>

@@ -43,8 +43,7 @@ class NotificationServiceTest {
 	void notificationService_sendKnockNotification() {
 		// Given
 		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(true);
-		given(notificationRepository.existsKnockByMemberId(any(Long.class), any(Long.class), any(Long.class)))
-			.willReturn(false);
+		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
 		given(notificationRepository.findFcmTokenByMemberId(any(Long.class))).willReturn("FCM-TOKEN");
 
 		// When
@@ -52,13 +51,14 @@ class NotificationServiceTest {
 
 		// Then
 		verify(firebaseMessaging).sendAsync(any(Message.class));
-		verify(notificationRepository).saveKnockNotification(any(Long.class), any(Long.class), any(Long.class));
+		verify(notificationRepository).saveKnockNotification(any(String.class));
 	}
 
 	@DisplayName("콕 찌를 상대의 FCM 토큰이 존재하지 않을 때, - NotFoundException")
 	@Test
 	void notificationService_sendKnockNotification_NotFoundException() {
 		// Given
+		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
 		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(false);
 
 		// When & Then
@@ -71,9 +71,7 @@ class NotificationServiceTest {
 	@Test
 	void notificationService_sendKnockNotification_ConflictException() {
 		// Given
-		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(true);
-		given(notificationRepository.existsKnockByMemberId(any(Long.class), any(Long.class), any(Long.class)))
-			.willReturn(true);
+		given(notificationRepository.existsByKey(any(String.class))).willReturn(true);
 
 		// When & Then
 		assertThatThrownBy(() -> notificationService.sendKnockNotification(memberTest, 1L, 1L))

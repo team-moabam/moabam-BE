@@ -8,8 +8,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.time.Duration;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,15 +57,13 @@ class NotificationControllerTest {
 
 	private Member target;
 	private Room room;
-
 	private String knockKey;
 
 	@BeforeEach
 	void setUp() {
-		Member member = memberRepository.save(MemberFixture.member());
 		target = memberRepository.save(MemberFixture.member("target123", "targetName"));
 		room = roomRepository.save(RoomFixture.room());
-		knockKey = room.getId() + UNDER_BAR + member.getId() + TO + target.getId();
+		knockKey = room.getId() + UNDER_BAR + 1 + TO + target.getId();
 
 		willReturn(null)
 			.given(firebaseMessaging)
@@ -112,7 +108,7 @@ class NotificationControllerTest {
 	void notificationController_sendKnockNotification_ConflictException() throws Exception {
 		// Given
 		notificationRepository.saveFcmToken(target.getId(), "FCM_TOKEN");
-		stringRedisRepository.save(knockKey, BLANK, Duration.ofHours(12));
+		notificationRepository.saveKnockNotification(knockKey);
 
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))

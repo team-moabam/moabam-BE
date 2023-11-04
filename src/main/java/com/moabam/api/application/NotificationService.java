@@ -1,5 +1,8 @@
 package com.moabam.api.application;
 
+import static com.moabam.global.common.util.GlobalConstant.*;
+import static java.util.Objects.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,15 +28,22 @@ public class NotificationService {
 
 	@Transactional
 	public void sendKnockNotification(MemberTest member, Long targetId, Long roomId) {
+		String knockKey = generateKnockKey(member.memberId(), targetId, roomId);
+		validateConflictKnockNotification(knockKey);
 		validateFcmToken(targetId);
-		validateConflictKnockNotification(member.memberId(), targetId, roomId);
 
 		String fcmToken = notificationRepository.findFcmTokenByMemberId(targetId);
 		Notification notification = NotificationMapper.toKnockNotificationEntity(member.nickname());
 		Message message = NotificationMapper.toMessageEntity(notification, fcmToken);
 
+		notificationRepository.saveKnockNotification(knockKey);
 		firebaseMessaging.sendAsync(message);
-		notificationRepository.saveKnockNotification(member.memberId(), targetId, roomId);
+	}
+
+	private void validateConflictKnockNotification(String knockKey) {
+		if (notificationRepository.existsByKey(knockKey)) {
+			throw new ConflictException(ErrorMessage.CONFLICT_KNOCK);
+		}
 	}
 
 	private void validateFcmToken(Long memberId) {
@@ -42,9 +52,7 @@ public class NotificationService {
 		}
 	}
 
-	private void validateConflictKnockNotification(Long memberId, Long targetId, Long roomId) {
-		if (notificationRepository.existsKnockByMemberId(memberId, targetId, roomId)) {
-			throw new ConflictException(ErrorMessage.CONFLICT_KNOCK);
-		}
+	private String generateKnockKey(Long memberId, Long targetId, Long roomId) {
+		return requireNonNull(roomId) + UNDER_BAR + requireNonNull(memberId) + TO + requireNonNull(targetId);
 	}
 }
