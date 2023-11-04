@@ -55,7 +55,7 @@ dependencies {
 
     // Configuration Binding
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-    
+
     // Apache Commons Lang 3
     implementation 'org.apache.commons:commons-lang3:3.13.0'
 
@@ -64,6 +64,11 @@ dependencies {
 
     // Firebase Admin
     implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 }
 
 tasks.named('test') {
