@@ -33,9 +33,9 @@ class InventorySearchRepositoryTest {
 	void find_items_success() {
 		// given
 		Long memberId = 1L;
-		Item morningSantaSkin = itemRepository.save(morningSantaSkin());
+		Item morningSantaSkin = itemRepository.save(morningSantaSkin().build());
 		inventoryRepository.save(inventory(memberId, morningSantaSkin));
-		Item morningKillerSkin = itemRepository.save(morningKillerSkin());
+		Item morningKillerSkin = itemRepository.save(morningKillerSkin().build());
 		inventoryRepository.save(inventory(memberId, morningKillerSkin));
 		Item nightMageSkin = itemRepository.save(nightMageSkin());
 		inventoryRepository.save(inventory(memberId, nightMageSkin));
@@ -53,9 +53,9 @@ class InventorySearchRepositoryTest {
 	void find_empty_success() {
 		// given
 		Long memberId = 1L;
-		Item morningSantaSkin = itemRepository.save(morningSantaSkin());
+		Item morningSantaSkin = itemRepository.save(morningSantaSkin().build());
 		inventoryRepository.save(inventory(memberId, morningSantaSkin));
-		Item morningKillerSkin = itemRepository.save(morningKillerSkin());
+		Item morningKillerSkin = itemRepository.save(morningKillerSkin().build());
 		inventoryRepository.save(inventory(memberId, morningKillerSkin));
 
 		// when
