@@ -3,6 +3,7 @@ package com.moabam.global.error.handler;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
@@ -77,5 +79,16 @@ public class GlobalExceptionHandler {
 		}
 
 		return new ErrorResponse(ErrorMessage.INVALID_REQUEST_FIELD.getMessage(), validation);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ErrorResponse handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
+		String typeName = Optional.ofNullable(exception.getRequiredType())
+			.map(Class::getSimpleName)
+			.orElse("");
+		String message = String.format("'%s' 값은 유효한 %s 값이 아닙니다.", exception.getValue(), typeName);
+
+		return new ErrorResponse(message, null);
 	}
 }
