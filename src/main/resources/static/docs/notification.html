@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.18">
-<title>MOABAM API 문서</title>
+<title>알림(Notification)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -435,179 +435,36 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/styles/github.min.css">
 </head>
-<body class="book toc2 toc-left">
+<body class="article">
 <div id="header">
-<h1>MOABAM API 문서</h1>
-<div class="details">
-<span id="revnumber">version 0.0.1-SNAPSHOT</span>
-</div>
-<div id="toc" class="toc2">
-<div id="toctitle">목차</div>
-<ul class="sectlevel1">
-<li><a href="#_개요">1. 개요</a>
-<ul class="sectlevel2">
-<li><a href="#_api_서버_경로">1.1. API 서버 경로</a></li>
-<li><a href="#_응답형식">1.2. 응답형식</a>
-<ul class="sectlevel3">
-<li><a href="#_정상2xx">1.2.1. 정상(2XX)</a></li>
-<li><a href="#_상태코드httpstatus">1.2.2. 상태코드(HttpStatus)</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_개요"><a class="link" href="#_개요">1. 개요</a></h2>
+<h2 id="_알림notification">알림(Notification)</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>이 API 문서는 'MOABAM' 프로젝트의 산출물입니다.</p>
-</div>
-<div class="sect2">
-<h3 id="_api_서버_경로"><a class="link" href="#_api_서버_경로">1.1. API 서버 경로</a></h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 50%;">
-<col style="width: 30%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">환경</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DNS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">비고</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">개발(dev)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="">dev-api.moabam.com</a></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">운영(prod)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="">api.moabam.com</a></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>해당 프로젝트 API 문서는 [특이사항]입니다.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>해당 프로젝트 API 문서는 [주의사항]입니다.</p>
-</div>
-</td>
-</tr>
-</table>
+<div class="literalblock">
+<div class="content">
+<pre>콕 찌르기 알림 기능을 제공합니다.</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_응답형식"><a class="link" href="#_응답형식">1.2. 응답형식</a></h3>
-<div class="paragraph">
-<p>프로젝트는 다음과 같은 응답형식을 제공합니다.</p>
-</div>
-<div class="sect3">
-<h4 id="_정상2xx"><a class="link" href="#_정상2xx">1.2.1. 정상(2XX)</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">응답데이터가 없는 경우</th>
-<th class="tableblock halign-left valign-top">응답데이터가 있는 경우</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<h3 id="_콕_찌르기_알림">콕 찌르기 알림</h3>
+<div class="literalblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-
-}</code></pre>
+<pre>1) 특정 방의 사용자가 다른 사용자를 콕 찌릅니다.
+2) 서버에서 콕 찌를 대상의 FCM Token 여부를 검증합니다.
+3) Firebase 서버에 FCM Push Messaing 알림을 비동기로 요청합니다.
+4) Firebase 서버에서 FCM Token으로 식별된 기기에 알림을 보냅니다.</pre>
 </div>
-</div></div></td>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "name": "Hong-Dosan"
-}</code></pre>
 </div>
-</div></div></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_상태코드httpstatus"><a class="link" href="#_상태코드httpstatus">1.2.2. 상태코드(HttpStatus)</a></h4>
+<h4 id="_요청" class="discrete">요청</h4>
 <div class="paragraph">
-<p>응답시 다음과 같은 응답상태 헤더, 응답코드 및 응답메시지를 제공합니다.</p>
+<p>Unresolved directive in notification.adoc - include::/Users/hongyeongjune/kdt-programmers/moabam-server/build/generated-snippets/notifications/http-request.adoc[]</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">HttpStatus</th>
-<th class="tableblock halign-left valign-top">설명</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>OK(200)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">정상 응답</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CREATED(201)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">새로운 리소스 생성</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BAD_REQUEST(400)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">요청값 누락, 잘못된 기입</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>UNAUTHORIZED(401)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">비인증 요청</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NOT_FOUND(404)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">요청값 누락, 잘못된 기입, 비인가 접속 등</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CONFLICT(409)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">요청값 중복</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>INTERNAL_SERVER_ERROR(500)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">알 수 없는 서버 에러가 발생했습니다. 관리자에게 문의하세요.</p></td>
-</tr>
-</tbody>
-</table>
+<h4 id="_응답" class="discrete">응답</h4>
+<div class="paragraph">
+<p>Unresolved directive in notification.adoc - include::/Users/hongyeongjune/kdt-programmers/moabam-server/build/generated-snippets/notifications/http-response.adoc[]</p>
 </div>
 </div>
 </div>
@@ -616,15 +473,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-04 19:36:08 +0900
+Last updated 2023-11-03 17:37:58 +0900
 </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
-<script>
-if (!hljs.initHighlighting.called) {
-  hljs.initHighlighting.called = true
-  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
-}
-</script>
 </body>
 </html>
