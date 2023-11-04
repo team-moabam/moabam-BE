@@ -1,6 +1,7 @@
 package com.moabam.api.presentation;
 
 import static java.nio.charset.StandardCharsets.*;
+import static java.util.Collections.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -18,15 +19,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.application.ProductService;
-import com.moabam.api.domain.entity.Product;
-import com.moabam.api.dto.ProductMapper;
-import com.moabam.api.dto.ProductsResponse;
-import com.moabam.fixture.ProductFixture;
+import com.moabam.api.application.ItemService;
+import com.moabam.api.domain.entity.Item;
+import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.dto.ItemMapper;
+import com.moabam.api.dto.ItemsResponse;
+import com.moabam.fixture.ItemFixture;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class ProductControllerTest {
+class ItemControllerTest {
 
 	@Autowired
 	MockMvc mockMvc;
@@ -35,25 +37,28 @@ class ProductControllerTest {
 	ObjectMapper objectMapper;
 
 	@MockBean
-	ProductService productService;
+	ItemService itemService;
 
-	@DisplayName("상품 목록을 조회한다.")
+	@DisplayName("아이템 목록을 조회한다.")
 	@Test
-	void get_products_success() throws Exception {
+	void get_items_success() throws Exception {
 		// given
-		Product product1 = ProductFixture.bugProduct();
-		Product product2 = ProductFixture.bugProduct();
-		ProductsResponse expected = ProductMapper.toProductsResponse(List.of(product1, product2));
-		given(productService.getProducts()).willReturn(expected);
+		Long memberId = 1L;
+		RoomType type = RoomType.MORNING;
+		Item item1 = ItemFixture.morningSantaSkin().build();
+		Item item2 = ItemFixture.morningKillerSkin().build();
+		ItemsResponse expected = ItemMapper.toItemsResponse(List.of(item1, item2), emptyList());
+		given(itemService.getItems(memberId, type)).willReturn(expected);
 
 		// expected
-		String content = mockMvc.perform(get("/products"))
+		String content = mockMvc.perform(get("/items")
+				.param("type", RoomType.MORNING.name()))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andReturn()
 			.getResponse()
 			.getContentAsString(UTF_8);
-		ProductsResponse actual = objectMapper.readValue(content, ProductsResponse.class);
+		ItemsResponse actual = objectMapper.readValue(content, ItemsResponse.class);
 		Assertions.assertThat(actual).isEqualTo(expected);
 	}
 }
