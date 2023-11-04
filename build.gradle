@@ -69,6 +69,9 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // Embedded-Redis
+    implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
+
     // Firebase Admin
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 
