@@ -12,11 +12,11 @@ import lombok.Getter;
 @ConfigurationProperties(prefix = "token")
 public class TokenConfig {
 
-	private String iss;
-	private long accessExpire;
-	private long refreshExpire;
-	private String secretKey;
-	private Key key;
+	private final String iss;
+	private final long accessExpire;
+	private final long refreshExpire;
+	private final String secretKey;
+	private final Key key;
 
 	public TokenConfig(String iss, long accessExpire, long refreshExpire, String secretKey) {
 		this.iss = iss;

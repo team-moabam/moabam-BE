@@ -9,15 +9,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.global.config.TokenConfig;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 
-@ExtendWith(MockitoExtension.class)
 class JwtProviderServiceTest {
 
 	String iss = "PARK";
