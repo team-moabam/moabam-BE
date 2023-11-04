@@ -10,4 +10,9 @@ public class MoabamException extends RuntimeException {
 		super(errorMessage.getMessage());
 		this.errorMessage = errorMessage;
 	}
+
+	public MoabamException(String message) {
+		super(message);
+		this.errorMessage = ErrorMessage.FAILED_MOABAM;
+	}
 }

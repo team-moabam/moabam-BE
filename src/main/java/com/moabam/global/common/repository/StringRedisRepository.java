@@ -33,7 +33,7 @@ public class StringRedisRepository {
 			.get(key);
 	}
 
-	public Boolean hasKey(String email) {
-		return stringRedisTemplate.hasKey(email);
+	public Boolean hasKey(String key) {
+		return stringRedisTemplate.hasKey(key);
 	}
 }

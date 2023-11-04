@@ -54,9 +54,15 @@ public class GlobalExceptionHandler {
 		return new ErrorResponse(moabamException.getMessage(), null);
 	}
 
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ExceptionHandler(FcmException.class)
 	protected ErrorResponse handleFcmException(MoabamException moabamException) {
+		return new ErrorResponse(moabamException.getMessage(), null);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MoabamException.class)
+	protected ErrorResponse handleMoabamException(MoabamException moabamException) {
 		return new ErrorResponse(moabamException.getMessage(), null);
 	}
 

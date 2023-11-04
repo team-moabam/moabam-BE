@@ -38,13 +38,13 @@ public class NotificationService {
 
 	private void validateFcmToken(Long memberId) {
 		if (!notificationRepository.existsFcmTokenByMemberId(memberId)) {
-			throw new NotFoundException(ErrorMessage.FCM_TOKEN_NOT_FOUND);
+			throw new NotFoundException(ErrorMessage.NOT_FOUND_FCM_TOKEN);
 		}
 	}
 
 	private void validateConflictKnockNotification(Long memberId, Long targetId, Long roomId) {
 		if (notificationRepository.existsKnockByMemberId(memberId, targetId, roomId)) {
-			throw new ConflictException(ErrorMessage.KNOCK_CONFLICT);
+			throw new ConflictException(ErrorMessage.CONFLICT_KNOCK);
 		}
 	}
 }

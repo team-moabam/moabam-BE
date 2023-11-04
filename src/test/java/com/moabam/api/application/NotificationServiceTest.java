@@ -64,7 +64,7 @@ class NotificationServiceTest {
 		// When & Then
 		assertThatThrownBy(() -> notificationService.sendKnockNotification(memberTest, 1L, 1L))
 			.isInstanceOf(NotFoundException.class)
-			.hasMessage(ErrorMessage.FCM_TOKEN_NOT_FOUND.getMessage());
+			.hasMessage(ErrorMessage.NOT_FOUND_FCM_TOKEN.getMessage());
 	}
 
 	@DisplayName("콕 찌를 상대가 이미 찌른 상대일 때, - ConflictException")
@@ -78,6 +78,6 @@ class NotificationServiceTest {
 		// When & Then
 		assertThatThrownBy(() -> notificationService.sendKnockNotification(memberTest, 1L, 1L))
 			.isInstanceOf(ConflictException.class)
-			.hasMessage(ErrorMessage.KNOCK_CONFLICT.getMessage());
+			.hasMessage(ErrorMessage.CONFLICT_KNOCK.getMessage());
 	}
 }
