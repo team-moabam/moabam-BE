@@ -3,6 +3,7 @@ package com.moabam.api.dto;
 import java.util.List;
 
 import com.moabam.api.domain.entity.Product;
+import com.moabam.global.common.util.StreamUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -22,9 +23,7 @@ public final class ProductMapper {
 
 	public static ProductsResponse toProductsResponse(List<Product> products) {
 		return ProductsResponse.builder()
-			.products(products.stream()
-				.map(ProductMapper::toProductResponse)
-				.toList())
+			.products(StreamUtils.map(products, ProductMapper::toProductResponse))
 			.build();
 	}
 }

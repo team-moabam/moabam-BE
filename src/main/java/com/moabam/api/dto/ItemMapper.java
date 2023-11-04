@@ -3,6 +3,7 @@ package com.moabam.api.dto;
 import java.util.List;
 
 import com.moabam.api.domain.entity.Item;
+import com.moabam.global.common.util.StreamUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -25,12 +26,8 @@ public final class ItemMapper {
 
 	public static ItemsResponse toItemsResponse(List<Item> purchasedItems, List<Item> notPurchasedItems) {
 		return ItemsResponse.builder()
-			.purchasedItems(purchasedItems.stream()
-				.map(ItemMapper::toItemResponse)
-				.toList())
-			.notPurchasedItems(notPurchasedItems.stream()
-				.map(ItemMapper::toItemResponse)
-				.toList())
+			.purchasedItems(StreamUtils.map(purchasedItems, ItemMapper::toItemResponse))
+			.notPurchasedItems(StreamUtils.map(notPurchasedItems, ItemMapper::toItemResponse))
 			.build();
 	}
 }
