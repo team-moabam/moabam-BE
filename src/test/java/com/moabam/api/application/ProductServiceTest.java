@@ -43,6 +43,6 @@ class ProductServiceTest {
 			.map(ProductResponse::name)
 			.toList();
 		assertThat(response.products()).hasSize(2);
-		assertThat(productNames).containsOnly(BUG_PRODUCT_NAME, BUG_PRODUCT_NAME);
+		assertThat(productNames).containsExactly(BUG_PRODUCT_NAME, BUG_PRODUCT_NAME);
 	}
 }
