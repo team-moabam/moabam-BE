@@ -4,9 +4,11 @@ import static com.moabam.api.domain.entity.QInventory.*;
 import static com.moabam.api.domain.entity.QItem.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.enums.RoomType;
 import com.moabam.global.common.util.DynamicQuery;
@@ -19,6 +21,26 @@ import lombok.RequiredArgsConstructor;
 public class InventorySearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
+
+	public Optional<Inventory> findOne(Long memberId, Long itemId) {
+		return Optional.ofNullable(
+			jpaQueryFactory.selectFrom(inventory)
+				.where(
+					DynamicQuery.generateEq(memberId, inventory.memberId::eq),
+					DynamicQuery.generateEq(itemId, inventory.item.id::eq))
+				.fetchOne()
+		);
+	}
+
+	public Optional<Inventory> findDefault(Long memberId) {
+		return Optional.ofNullable(
+			jpaQueryFactory.selectFrom(inventory)
+				.where(
+					DynamicQuery.generateEq(memberId, inventory.memberId::eq),
+					inventory.isDefault.isTrue())
+				.fetchOne()
+		);
+	}
 
 	public List<Item> findItems(Long memberId, RoomType type) {
 		return jpaQueryFactory.selectFrom(inventory)

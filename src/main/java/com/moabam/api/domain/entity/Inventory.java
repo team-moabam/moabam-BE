@@ -49,4 +49,12 @@ public class Inventory extends BaseTimeEntity {
 		this.item = requireNonNull(item);
 		this.isDefault = isDefault;
 	}
+
+	public void setDefault() {
+		this.isDefault = true;
+	}
+
+	public void unsetDefault() {
+		this.isDefault = false;
+	}
 }
