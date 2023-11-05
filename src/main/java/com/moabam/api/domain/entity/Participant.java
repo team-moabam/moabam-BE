@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.SQLDelete;
 
+import com.moabam.global.common.entity.BaseTimeEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "participant")
 @SQLDelete(sql = "UPDATE participant SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Participant {
+public class Participant extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
