@@ -3,24 +3,30 @@ package com.moabam.api.application;
 import static com.moabam.fixture.ItemFixture.*;
 import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.enums.RoomType;
 import com.moabam.api.domain.repository.InventorySearchRepository;
 import com.moabam.api.domain.repository.ItemSearchRepository;
 import com.moabam.api.dto.ItemResponse;
 import com.moabam.api.dto.ItemsResponse;
+import com.moabam.fixture.InventoryFixture;
 import com.moabam.global.common.util.StreamUtils;
+import com.moabam.global.error.exception.NotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
@@ -53,5 +59,45 @@ class ItemServiceTest {
 		assertThat(response.purchasedItems()).hasSize(2);
 		assertThat(purchasedItemNames).containsExactly(MORNING_SANTA_SKIN_NAME, MORNING_KILLER_SKIN_NAME);
 		assertThat(response.notPurchasedItems()).isEmpty();
+	}
+
+	@DisplayName("아이템을 적용한다.")
+	@Nested
+	class select_item {
+
+		@DisplayName("성공한다.")
+		@Test
+		void success() {
+			// given
+			Long memberId = 1L;
+			Long itemId = 1L;
+			Inventory inventory = InventoryFixture.inventory(memberId, nightMageSkin());
+			Inventory defaultInventory = InventoryFixture.inventory(memberId, nightMageSkin());
+			when(inventorySearchRepository.findOne(memberId, itemId)).thenReturn(Optional.of(inventory));
+			when(inventorySearchRepository.findDefault(memberId)).thenReturn(Optional.of(defaultInventory));
+
+			// when
+			itemService.selectItem(memberId, itemId);
+
+			// then
+			verify(inventorySearchRepository).findOne(memberId, itemId);
+			verify(inventorySearchRepository).findDefault(memberId);
+			assertFalse(defaultInventory.isDefault());
+			assertTrue(inventory.isDefault());
+		}
+
+		@DisplayName("인벤토리 아이템이 아니면 예외가 발생한다.")
+		@Test
+		void exception() {
+			// given
+			Long memberId = 1L;
+			Long itemId = 1L;
+			when(inventorySearchRepository.findOne(memberId, itemId)).thenReturn(Optional.empty());
+
+			// when, then
+			assertThatThrownBy(() -> itemService.selectItem(memberId, itemId))
+				.isInstanceOf(NotFoundException.class)
+				.hasMessage("구매하지 않은 아이템은 적용할 수 없습니다.");
+		}
 	}
 }
