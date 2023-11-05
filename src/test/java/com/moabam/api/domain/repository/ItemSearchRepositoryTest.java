@@ -9,24 +9,22 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.support.annotation.RepositoryTest;
 
-@SpringBootTest
-@Transactional(readOnly = true)
+@RepositoryTest
 class ItemSearchRepositoryTest {
+
+	@Autowired
+	ItemSearchRepository itemSearchRepository;
 
 	@Autowired
 	ItemRepository itemRepository;
 
 	@Autowired
 	InventoryRepository inventoryRepository;
-
-	@Autowired
-	ItemSearchRepository itemSearchRepository;
 
 	@DisplayName("타입으로 구매하지 않은 아이템 목록을 조회한다.")
 	@Test

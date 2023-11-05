@@ -9,24 +9,22 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.support.annotation.RepositoryTest;
 
-@SpringBootTest
-@Transactional(readOnly = true)
+@RepositoryTest
 class InventorySearchRepositoryTest {
+
+	@Autowired
+	InventorySearchRepository inventorySearchRepository;
 
 	@Autowired
 	ItemRepository itemRepository;
 
 	@Autowired
 	InventoryRepository inventoryRepository;
-
-	@Autowired
-	InventorySearchRepository inventorySearchRepository;
 
 	@DisplayName("타입으로 인벤토리에 있는 아이템 목록을 구매일 순으로 조회한다.")
 	@Test
