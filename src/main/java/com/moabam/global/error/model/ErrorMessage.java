@@ -16,6 +16,7 @@ public enum ErrorMessage {
 	PARTICIPANT_NOT_FOUND("방에 대한 참여자의 정보가 없습니다."),
 	WRONG_ROOM_PASSWORD("방의 비밀번호가 일치하지 않습니다."),
 	ROOM_MAX_USER_REACHED("방의 인원수가 찼습니다."),
+	ROOM_DETAILS_ERROR("방 정보를 불러오는데 실패했습니다."),
 
 	LOGIN_FAILED("로그인에 실패했습니다."),
 	REQUEST_FAILED("네트워크 접근 실패입니다."),
