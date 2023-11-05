@@ -508,9 +508,8 @@ class RoomControllerTest {
 
 		Member member = Member.builder()
 			.id(1L)
-			.socialId("test123")
+			.socialId(1L)
 			.nickname("nick")
-			.profileImage("testtests")
 			.bug(BugFixture.bug())
 			.build();
 

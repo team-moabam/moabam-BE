@@ -13,7 +13,7 @@ import com.moabam.global.common.util.BaseImageUrl;
 
 class MemberTest {
 
-	String socialId = "1";
+	long socialId = 1L;
 	String nickname = "밥세공기";
 	String profileImage = "kakao/profile/url";
 
@@ -24,7 +24,6 @@ class MemberTest {
 		assertThatNoException().isThrownBy(() -> Member.builder()
 			.socialId(socialId)
 			.nickname(nickname)
-			.profileImage(profileImage)
 			.bug(Bug.builder().build())
 			.build());
 	}
@@ -37,7 +36,6 @@ class MemberTest {
 			Member member = Member.builder()
 				.socialId(socialId)
 				.nickname(nickname)
-				.profileImage(null)
 				.bug(Bug.builder().build())
 				.build();
 
