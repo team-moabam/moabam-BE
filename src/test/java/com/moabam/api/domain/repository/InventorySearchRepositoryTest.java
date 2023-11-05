@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,40 +27,45 @@ class InventorySearchRepositoryTest {
 	@Autowired
 	InventoryRepository inventoryRepository;
 
-	@DisplayName("타입으로 인벤토리에 있는 아이템 목록을 구매일 순으로 조회한다.")
-	@Test
-	void find_items_success() {
-		// given
-		Long memberId = 1L;
-		Item morningSantaSkin = itemRepository.save(morningSantaSkin().build());
-		inventoryRepository.save(inventory(memberId, morningSantaSkin));
-		Item morningKillerSkin = itemRepository.save(morningKillerSkin().build());
-		inventoryRepository.save(inventory(memberId, morningKillerSkin));
-		Item nightMageSkin = itemRepository.save(nightMageSkin());
-		inventoryRepository.save(inventory(memberId, nightMageSkin));
+	@DisplayName("인벤토리 아이템 목록을 조회한다.")
+	@Nested
+	class find_items {
 
-		// when
-		List<Item> actual = inventorySearchRepository.findItems(memberId, RoomType.MORNING);
+		@DisplayName("해당 타입의 아이템 목록을 구매일 순으로 정렬한다.")
+		@Test
+		void sorted_by_created_at_success() {
+			// given
+			Long memberId = 1L;
+			Item morningSantaSkin = itemRepository.save(morningSantaSkin().build());
+			inventoryRepository.save(inventory(memberId, morningSantaSkin));
+			Item morningKillerSkin = itemRepository.save(morningKillerSkin().build());
+			inventoryRepository.save(inventory(memberId, morningKillerSkin));
+			Item nightMageSkin = itemRepository.save(nightMageSkin());
+			inventoryRepository.save(inventory(memberId, nightMageSkin));
 
-		// then
-		assertThat(actual).hasSize(2)
-			.containsExactly(morningKillerSkin, morningSantaSkin);
-	}
+			// when
+			List<Item> actual = inventorySearchRepository.findItems(memberId, RoomType.MORNING);
 
-	@DisplayName("인벤토리에 해당하는 타입의 아이템이 없으면 빈 목록을 조회한다.")
-	@Test
-	void find_empty_success() {
-		// given
-		Long memberId = 1L;
-		Item morningSantaSkin = itemRepository.save(morningSantaSkin().build());
-		inventoryRepository.save(inventory(memberId, morningSantaSkin));
-		Item morningKillerSkin = itemRepository.save(morningKillerSkin().build());
-		inventoryRepository.save(inventory(memberId, morningKillerSkin));
+			// then
+			assertThat(actual).hasSize(2)
+				.containsExactly(morningKillerSkin, morningSantaSkin);
+		}
 
-		// when
-		List<Item> actual = inventorySearchRepository.findItems(memberId, RoomType.NIGHT);
+		@DisplayName("해당 타입의 아이템이 없으면 빈 목록을 조회한다.")
+		@Test
+		void empty_success() {
+			// given
+			Long memberId = 1L;
+			Item morningSantaSkin = itemRepository.save(morningSantaSkin().build());
+			inventoryRepository.save(inventory(memberId, morningSantaSkin));
+			Item morningKillerSkin = itemRepository.save(morningKillerSkin().build());
+			inventoryRepository.save(inventory(memberId, morningKillerSkin));
 
-		// then
-		assertThat(actual).isEmpty();
+			// when
+			List<Item> actual = inventorySearchRepository.findItems(memberId, RoomType.NIGHT);
+
+			// then
+			assertThat(actual).isEmpty();
+		}
 	}
 }
