@@ -1,6 +1,6 @@
 package com.moabam.api.application;
 
-import static com.moabam.fixture.ItemFixture.*;
+import static com.moabam.support.fixture.ItemFixture.*;
 import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,9 +24,9 @@ import com.moabam.api.domain.repository.InventorySearchRepository;
 import com.moabam.api.domain.repository.ItemSearchRepository;
 import com.moabam.api.dto.ItemResponse;
 import com.moabam.api.dto.ItemsResponse;
-import com.moabam.fixture.InventoryFixture;
 import com.moabam.global.common.util.StreamUtils;
 import com.moabam.global.error.exception.NotFoundException;
+import com.moabam.support.fixture.InventoryFixture;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {

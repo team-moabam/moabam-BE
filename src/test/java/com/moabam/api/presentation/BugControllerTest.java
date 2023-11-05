@@ -1,6 +1,6 @@
 package com.moabam.api.presentation;
 
-import static com.moabam.fixture.BugFixture.*;
+import static com.moabam.support.fixture.BugFixture.*;
 import static java.nio.charset.StandardCharsets.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;

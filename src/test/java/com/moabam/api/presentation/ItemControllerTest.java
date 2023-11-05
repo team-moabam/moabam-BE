@@ -1,6 +1,6 @@
 package com.moabam.api.presentation;
 
-import static com.moabam.fixture.ItemFixture.*;
+import static com.moabam.support.fixture.ItemFixture.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;

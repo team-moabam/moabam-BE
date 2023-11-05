@@ -34,8 +34,8 @@ import com.moabam.api.domain.repository.RoutineRepository;
 import com.moabam.api.dto.CreateRoomRequest;
 import com.moabam.api.dto.EnterRoomRequest;
 import com.moabam.api.dto.ModifyRoomRequest;
-import com.moabam.fixture.BugFixture;
-import com.moabam.fixture.MemberFixture;
+import com.moabam.support.fixture.BugFixture;
+import com.moabam.support.fixture.MemberFixture;
 
 @Transactional
 @SpringBootTest

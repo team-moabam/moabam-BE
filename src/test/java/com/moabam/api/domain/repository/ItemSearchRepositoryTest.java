@@ -1,7 +1,7 @@
 package com.moabam.api.domain.repository;
 
-import static com.moabam.fixture.InventoryFixture.*;
-import static com.moabam.fixture.ItemFixture.*;
+import static com.moabam.support.fixture.InventoryFixture.*;
+import static com.moabam.support.fixture.ItemFixture.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;

@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.moabam.api.domain.entity.Bug;
 import com.moabam.api.domain.entity.Member;
 import com.moabam.api.dto.BugResponse;
-import com.moabam.fixture.MemberFixture;
+import com.moabam.support.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
 class BugServiceTest {
