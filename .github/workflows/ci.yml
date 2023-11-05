@@ -21,6 +21,10 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
+      - name: environment 세팅
+        run: |
+          echo "${{secrets.DEV_ENV_FILE }}" > ./.env
+
       - name: Gradle 캐싱
         uses: actions/cache@v3
         with:
@@ -33,6 +37,14 @@ jobs:
 
       - name: Gradle Grant 권한 부여
         run: chmod +x gradlew
+
+      - name: 테스트용 MySQL 도커 컨테이너 실행
+        run: |
+          sudo docker run -d -p 3306:3306 --env MYSQL_DATABASE=test --env MYSQL_ROOT_PASSWORD=test mysql:8.0.33
+
+      - name: 테스트용 Redis 도커 컨테이너 실행
+        run: |
+          sudo docker run --name redis-test -p 6379:6379 -d redis
 
       - name: SonarCloud 캐싱
         uses: actions/cache@v3
