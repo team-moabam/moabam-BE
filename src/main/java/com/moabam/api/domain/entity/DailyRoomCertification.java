@@ -1,5 +1,7 @@
 package com.moabam.api.domain.entity;
 
+import static java.util.Objects.*;
+
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -9,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +31,11 @@ public class DailyRoomCertification {
 
 	@Column(name = "certified_at", nullable = false, updatable = false)
 	private LocalDate certifiedAt;
+
+	@Builder
+	private DailyRoomCertification(Long id, Long roomId, LocalDate certifiedAt) {
+		this.id = id;
+		this.roomId = requireNonNull(roomId);
+		this.certifiedAt = requireNonNull(certifiedAt);
+	}
 }
