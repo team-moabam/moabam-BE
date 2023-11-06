@@ -20,7 +20,7 @@ public class ParticipantSearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public Optional<Participant> findByMemberIdAndRoomId(Long memberId, Long roomId) {
+	public Optional<Participant> findOne(Long memberId, Long roomId) {
 		return Optional.ofNullable(
 			jpaQueryFactory
 				.selectFrom(participant)

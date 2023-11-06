@@ -20,10 +20,12 @@ public final class RoutineMapper {
 			.toList();
 	}
 
-	public static RoutineResponse toRoutineResponse(Routine routine) {
-		return RoutineResponse.builder()
-			.routineId(routine.getId())
-			.content(routine.getContent())
-			.build();
+	public static List<RoutineResponse> toRoutineResponses(List<Routine> routines) {
+		return routines.stream()
+			.map(routine -> RoutineResponse.builder()
+				.routineId(routine.getId())
+				.content(routine.getContent())
+				.build())
+			.toList();
 	}
 }

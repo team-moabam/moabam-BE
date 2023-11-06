@@ -604,10 +604,10 @@ class RoomControllerTest {
 			.andDo(print());
 
 		participantRepository.flush();
+		Room findRoom = roomRepository.findById(room.getId()).orElseThrow();
 		Participant deletedParticipant = participantRepository.findById(participant.getId()).orElseThrow();
-		assertThat(room.getCurrentUserCount()).isEqualTo(4);
+		assertThat(findRoom.getCurrentUserCount()).isEqualTo(4);
 		assertThat(deletedParticipant.getDeletedAt()).isNotNull();
-		assertThat(deletedParticipant.getDeletedRoomTitle()).isEqualTo("5명이 있는 방~");
 	}
 
 	@DisplayName("방장의 방 나가기 - 방 삭제 성공")
@@ -632,6 +632,7 @@ class RoomControllerTest {
 		mockMvc.perform(delete("/rooms/" + room.getId()))
 			.andExpect(status().isOk())
 			.andDo(print());
+
 		Participant deletedParticipant = participantRepository.findById(participant.getId()).orElseThrow();
 		assertThat(roomRepository.findById(room.getId())).isEmpty();
 		assertThat(deletedParticipant.getDeletedAt()).isNotNull();

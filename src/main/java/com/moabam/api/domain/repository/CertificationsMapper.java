@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CertificationsMapper {
 
-	public static List<CertificationImageResponse> toCftImageResponses(Long memberId,
+	public static List<CertificationImageResponse> toCertificateImageResponses(Long memberId,
 		List<Certification> certifications) {
 		List<CertificationImageResponse> cftImageResponses = new ArrayList<>();
 		List<Certification> filteredCertifications = certifications.stream()
@@ -33,8 +33,9 @@ public final class CertificationsMapper {
 		return cftImageResponses;
 	}
 
-	public static TodayCertificateRankResponse toTodayCftRankResponse(int rank, Member member, int contributionPoint,
-		String awakeImage, String sleepImage, List<CertificationImageResponse> cftImageResponses) {
+	public static TodayCertificateRankResponse toTodayCertificateRankResponse(int rank, Member member,
+		int contributionPoint, String awakeImage, String sleepImage,
+		List<CertificationImageResponse> certificationImageResponses) {
 		return TodayCertificateRankResponse.builder()
 			.rank(rank)
 			.memberId(member.getId())
@@ -43,7 +44,7 @@ public final class CertificationsMapper {
 			.contributionPoint(contributionPoint)
 			.awakeImage(awakeImage)
 			.sleepImage(sleepImage)
-			.certificationImage(cftImageResponses)
+			.certificationImage(certificationImageResponses)
 			.build();
 	}
 }

@@ -6,7 +6,6 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,8 +79,9 @@ public class RoomService {
 			throw new ForbiddenException(ROOM_MODIFY_UNAUTHORIZED_REQUEST);
 		}
 
-		Room room = getRoom(roomId);
+		Room room = participant.getRoom();
 		room.changeTitle(modifyRoomRequest.title());
+		room.changeAnnouncement(modifyRoomRequest.announcement());
 		room.changePassword(modifyRoomRequest.password());
 		room.changeCertifyTime(modifyRoomRequest.certifyTime());
 		room.changeMaxCount(modifyRoomRequest.maxUserCount());
@@ -89,7 +89,7 @@ public class RoomService {
 
 	@Transactional
 	public void enterRoom(Long memberId, Long roomId, EnterRoomRequest enterRoomRequest) {
-		Room room = getRoom(roomId);
+		Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
 		validateRoomEnter(memberId, enterRoomRequest.password(), room);
 
 		room.increaseCurrentUserCount();
@@ -113,7 +113,6 @@ public class RoomService {
 
 		decreaseRoomCount(memberId, room.getRoomType());
 		participant.removeRoom();
-		participantRepository.flush();
 		participantRepository.delete(participant);
 
 		if (!participant.isManager()) {
@@ -130,8 +129,9 @@ public class RoomService {
 		Participant participant = getParticipant(memberId, roomId);
 		Room room = participant.getRoom();
 
-		String managerNickname = getRoomManagerNickname(roomId);
-		List<DailyMemberCertification> dailyMemberCertifications = getDailyMemberCertificationSorted(roomId, today);
+		String managerNickname = memberService.getManager(roomId).getNickname();
+		List<DailyMemberCertification> dailyMemberCertifications =
+			certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today);
 		List<RoutineResponse> routineResponses = getRoutineResponses(roomId);
 		List<TodayCertificateRankResponse> todayCertificateRankResponses = getTodayCertificateRankResponses(roomId,
 			routineResponses, dailyMemberCertifications, today);
@@ -150,12 +150,8 @@ public class RoomService {
 	}
 
 	private Participant getParticipant(Long memberId, Long roomId) {
-		return participantSearchRepository.findByMemberIdAndRoomId(memberId, roomId)
+		return participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
-	}
-
-	private Room getRoom(Long roomId) {
-		return roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
 	}
 
 	private void validateRoomEnter(Long memberId, String requestPassword, Room room) {
@@ -205,14 +201,10 @@ public class RoomService {
 		member.exitNightRoom();
 	}
 
-	private String getRoomManagerNickname(Long roomId) {
-		return memberService.getManager(roomId).getNickname();
-	}
-
 	private List<RoutineResponse> getRoutineResponses(Long roomId) {
 		List<Routine> roomRoutines = routineSearchRepository.findByRoomId(roomId);
 
-		return roomRoutines.stream().map(RoutineMapper::toRoutineResponse).toList();
+		return RoutineMapper.toRoutineResponses(roomRoutines);
 	}
 
 	private List<TodayCertificateRankResponse> getTodayCertificateRankResponses(Long roomId,
@@ -236,17 +228,6 @@ public class RoomService {
 		return responses;
 	}
 
-	private List<DailyMemberCertification> getDailyMemberCertificationSorted(Long roomId, LocalDate date) {
-		List<DailyMemberCertification> dailyMemberCertifications =
-			certificationsSearchRepository.findDailyMemberCertifications(roomId, date);
-
-		return dailyMemberCertifications.stream()
-			.sorted(Comparator.comparing(
-				dailyMemberCertification -> dailyMemberCertification.getParticipant().getCreatedAt())
-			)
-			.toList();
-	}
-
 	private void addCompletedMembers(List<TodayCertificateRankResponse> responses,
 		List<DailyMemberCertification> dailyMemberCertifications, List<Member> members,
 		List<Certification> certifications, List<Participant> participants, LocalDate today) {
@@ -260,12 +241,12 @@ public class RoomService {
 				.orElseThrow(() -> new NotFoundException(ROOM_DETAILS_ERROR));
 
 			int contributionPoint = calculateContributionPoint(member.getId(), participants, today);
-			List<CertificationImageResponse> cftImageResponses = CertificationsMapper.toCftImageResponses(
+			List<CertificationImageResponse> certificationImageResponses = CertificationsMapper.toCertificateImageResponses(
 				member.getId(),
 				certifications);
 
-			TodayCertificateRankResponse response = CertificationsMapper.toTodayCftRankResponse(
-				rank, member, contributionPoint, "https://~awake", "https://~sleep", cftImageResponses);
+			TodayCertificateRankResponse response = CertificationsMapper.toTodayCertificateRankResponse(
+				rank, member, contributionPoint, "https://~awake", "https://~sleep", certificationImageResponses);
 
 			rank += 1;
 			responses.add(response);
@@ -294,7 +275,7 @@ public class RoomService {
 
 			int contributionPoint = calculateContributionPoint(memberId, participants, today);
 
-			TodayCertificateRankResponse response = CertificationsMapper.toTodayCftRankResponse(
+			TodayCertificateRankResponse response = CertificationsMapper.toTodayCertificateRankResponse(
 				500, member, contributionPoint, "https://~awake", "https://~sleep", null);
 
 			responses.add(response);

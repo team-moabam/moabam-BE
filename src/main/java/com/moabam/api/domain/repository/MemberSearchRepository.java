@@ -8,8 +8,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import com.moabam.api.domain.entity.Member;
-import com.moabam.global.common.util.DynamicQuery;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -24,17 +22,10 @@ public class MemberSearchRepository {
 		return Optional.ofNullable(
 			jpaQueryFactory
 				.selectFrom(member)
+				.innerJoin(participant).on(member.id.eq(participant.memberId))
 				.where(
-					member.id.eq(
-						JPAExpressions
-							.select(participant.memberId)
-							.from(participant)
-							.where(
-								DynamicQuery.generateEq(true, participant.isManager::eq),
-								DynamicQuery.generateEq(member.id, participant.memberId::eq),
-								DynamicQuery.generateEq(roomId, participant.room.id::eq)
-							)
-					)
+					participant.isManager.eq(true),
+					participant.room.id.eq(roomId)
 				)
 				.fetchOne()
 		);

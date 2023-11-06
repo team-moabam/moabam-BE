@@ -42,13 +42,16 @@ public class CertificationsSearchRepository {
 			.fetch();
 	}
 
-	public List<DailyMemberCertification> findDailyMemberCertifications(Long roomId, LocalDate date) {
+	public List<DailyMemberCertification> findSortedDailyMemberCertifications(Long roomId, LocalDate date) {
 		return jpaQueryFactory
 			.selectFrom(dailyMemberCertification)
 			.join(dailyMemberCertification.participant, participant).fetchJoin()
 			.where(
 				dailyMemberCertification.roomId.eq(roomId),
 				dailyMemberCertification.createdAt.between(date.atStartOfDay(), date.atTime(LocalTime.MAX))
+			)
+			.orderBy(
+				dailyMemberCertification.createdAt.asc()
 			)
 			.fetch();
 	}
