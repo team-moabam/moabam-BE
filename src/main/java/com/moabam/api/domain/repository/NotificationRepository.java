@@ -1,6 +1,7 @@
 package com.moabam.api.domain.repository;
 
-import static com.moabam.global.common.util.GlobalConstant.*;
+import static com.moabam.global.common.constant.FcmConstant.*;
+import static com.moabam.global.common.constant.GlobalConstant.*;
 import static java.util.Objects.*;
 
 import java.time.Duration;
@@ -22,13 +23,16 @@ public class NotificationRepository {
 		stringRedisRepository.save(
 			String.valueOf(requireNonNull(key)),
 			requireNonNull(value),
-			requireNonNull(Duration.ofDays(EXPIRE_FCM_TOKEN))
+			Duration.ofDays(EXPIRE_FCM_TOKEN)
 		);
 	}
 
-	public void saveKnockNotification(Long memberId, Long targetId, Long roomId) {
-		String key = requireNonNull(roomId) + UNDER_BAR + requireNonNull(memberId) + TO + requireNonNull(targetId);
-		stringRedisRepository.save(key, BLANK, requireNonNull(Duration.ofHours(EXPIRE_KNOCK)));
+	public void saveKnockNotification(String key) {
+		stringRedisRepository.save(
+			requireNonNull(key),
+			BLANK,
+			Duration.ofHours(EXPIRE_KNOCK)
+		);
 	}
 
 	// TODO : 세연님 로그아웃 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 삭제하시면 됩니다.
@@ -40,13 +44,11 @@ public class NotificationRepository {
 		return stringRedisRepository.get(String.valueOf(requireNonNull(memberId)));
 	}
 
-	public boolean existsFcmTokenByMemberId(Long memberId) {
-		return stringRedisRepository.hasKey(String.valueOf(requireNonNull(memberId)));
+	public boolean existsByKey(String key) {
+		return stringRedisRepository.hasKey(requireNonNull(key));
 	}
 
-	public boolean existsKnockByMemberId(Long memberId, Long targetId, Long roomId) {
-		String key = requireNonNull(roomId) + UNDER_BAR + requireNonNull(memberId) + TO + requireNonNull(targetId);
-
-		return stringRedisRepository.hasKey(key);
+	public boolean existsFcmTokenByMemberId(Long memberId) {
+		return stringRedisRepository.hasKey(String.valueOf(requireNonNull(memberId)));
 	}
 }

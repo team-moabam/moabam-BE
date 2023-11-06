@@ -16,4 +16,13 @@ public final class MemberFixture {
 			.bug(BugFixture.bug())
 			.build();
 	}
+
+	public static Member member(String socialId, String nickname) {
+		return Member.builder()
+			.socialId(socialId)
+			.nickname(nickname)
+			.profileImage(PROFILE_IMAGE)
+			.bug(BugFixture.bug())
+			.build();
+	}
 }
