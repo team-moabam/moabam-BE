@@ -83,7 +83,7 @@ class JwtAuthenticationServiceTest {
 			.isInstanceOf(UnauthorizedException.class);
 	}
 
-	@DisplayName("")
+	@DisplayName("토큰 위조 값 검증 테스트")
 	@Test
 	void token_authenticate_failBy_key() {
 		// Givne

@@ -5,7 +5,8 @@ import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -37,6 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.AuthenticationService;
 import com.moabam.api.application.OAuth2AuthorizationServerRequestService;
 import com.moabam.api.dto.AuthorizationCodeResponse;
+import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.fixture.AuthorizationCodeResponseFixture;
 import com.moabam.fixture.AuthorizationTokenInfoResponseFixture;
@@ -103,9 +105,9 @@ class MemberControllerTest {
 			.andExpect(MockMvcResultMatchers.redirectedUrl(uri));
 	}
 
-	@DisplayName("Authorization Server에 토큰 발급 요청")
+	@DisplayName("소셜 로그인 및 회원가입 요청 성공")
 	@Test
-	void authorization_token_request_success() throws Exception {
+	void social_login_signUp_request_success() throws Exception {
 		// given
 		MultiValueMap<String, String> contentParams = new LinkedMultiValueMap<>();
 		contentParams.add(GRANT_TYPE, oAuthConfig.client().authorizationGrantType());
@@ -117,12 +119,11 @@ class MemberControllerTest {
 		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationCodeResponseFixture.successCodeResponse();
 		AuthorizationTokenResponse authorizationTokenResponse =
 			AuthorizationTokenResponseFixture.authorizationTokenResponse();
-
 		String response = objectMapper.writeValueAsString(authorizationTokenResponse);
 
-		// When
-		doReturn(AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse())
-			.when(authenticationService).requestTokenInfo(authorizationTokenResponse);
+		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
+			AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse();
+		String tokenInfoResponse = objectMapper.writeValueAsString(authorizationTokenInfoResponse);
 
 		// expected
 		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenUri()))
@@ -131,10 +132,25 @@ class MemberControllerTest {
 			.andExpect(method(HttpMethod.POST))
 			.andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
-		ResultActions result = mockMvc.perform(get("/members/login/kakao/oauth")
+		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenInfo()))
+			.andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+			.andExpect(MockRestRequestMatchers.header("Authorization", "Bearer accessToken"))
+			.andRespond(withSuccess(tokenInfoResponse, MediaType.APPLICATION_JSON));
+
+		mockMvc.perform(get("/members/login/kakao/oauth")
 				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
-			.andExpect(status().isOk())
-			.andDo(print());
+			.andExpectAll(
+				status().isOk(),
+				MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON),
+				header().string("token_type", "Bearer"),
+				cookie().exists("access_token"),
+				cookie().httpOnly("access_token", true),
+				cookie().secure("access_token", true),
+				cookie().exists("refresh_token"),
+				cookie().httpOnly("refresh_token", true),
+				cookie().secure("refresh_token", true)
+			)
+			.andExpect(jsonPath("$.isSignUp").value(true));
 	}
 
 	@DisplayName("Authorization Token 발급 실패")
@@ -158,30 +174,9 @@ class MemberControllerTest {
 			.andExpect(method(HttpMethod.POST))
 			.andRespond(withStatus(HttpStatusCode.valueOf(code)));
 
-		ResultActions result = mockMvc.perform(get("/members/login/kakao/oauth")
+		mockMvc.perform(get("/members/login/kakao/oauth")
 				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
 			.andExpect(status().isBadRequest());
-	}
-
-	@DisplayName("토큰 정보 조회 요청")
-	@Test
-	void token_info_request_success() throws Exception {
-		// given
-		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationCodeResponseFixture.successCodeResponse();
-
-		// When
-		doReturn(AuthorizationTokenResponseFixture.authorizationTokenResponse())
-			.when(authenticationService).requestToken(authorizationCodeResponse);
-
-		// expected
-		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenInfo()))
-			.andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
-			.andExpect(MockRestRequestMatchers.header("Authorization", "Bearer accessToken"))
-			.andRespond(withStatus(HttpStatusCode.valueOf(200)));
-
-		ResultActions result = mockMvc.perform(get("/members/login/kakao/oauth")
-				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
-			.andExpect(status().isOk());
 	}
 
 	@DisplayName("토큰 정보 요청 실패")
@@ -201,7 +196,7 @@ class MemberControllerTest {
 			.andExpect(MockRestRequestMatchers.header("Authorization", "Bearer accessToken"))
 			.andRespond(withStatus(HttpStatusCode.valueOf(code)));
 
-		ResultActions result = mockMvc.perform(get("/members/login/kakao/oauth")
+		mockMvc.perform(get("/members/login/kakao/oauth")
 				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
 			.andExpect(status().isBadRequest());
 	}

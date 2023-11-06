@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,12 +27,15 @@ import com.moabam.api.dto.AuthorizationCodeResponse;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenRequest;
 import com.moabam.api.dto.AuthorizationTokenResponse;
+import com.moabam.api.dto.LoginResponse;
 import com.moabam.api.dto.OAuthMapper;
 import com.moabam.fixture.AuthorizationTokenInfoResponseFixture;
 import com.moabam.fixture.AuthorizationTokenResponseFixture;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
+
+import jakarta.servlet.http.Cookie;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {
@@ -40,6 +45,12 @@ class AuthenticationServiceTest {
 
 	@Mock
 	OAuth2AuthorizationServerRequestService oAuth2AuthorizationServerRequestService;
+
+	@Mock
+	MemberService memberService;
+
+	@Mock
+	JwtProviderService jwtProviderService;
 
 	OAuthConfig oauthConfig;
 	AuthenticationService noPropertyService;
@@ -59,8 +70,8 @@ class AuthenticationServiceTest {
 			new OAuthConfig.Provider(null, null, null, null),
 			new OAuthConfig.Client(null, null, null, null, null)
 		);
-		noPropertyService = new AuthenticationService(noOAuthConfig, oAuth2AuthorizationServerRequestService);
-
+		noPropertyService = new AuthenticationService(noOAuthConfig, oAuth2AuthorizationServerRequestService,
+			memberService, jwtProviderService);
 	}
 
 	@DisplayName("인가코드 URI 생성 매퍼 실패")
@@ -170,11 +181,52 @@ class AuthenticationServiceTest {
 			= AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse();
 
 		// When
-		when(oAuth2AuthorizationServerRequestService.tokenInfoRequest(eq(oauthConfig.provider().tokenInfo()),
+		when(oAuth2AuthorizationServerRequestService.tokenInfoRequest(
+			anyString(),
 			eq("Bearer " + tokenResponse.accessToken())))
 			.thenReturn(new ResponseEntity<>(tokenInfoResponse, HttpStatus.OK));
 
 		// Then
 		assertThatNoException().isThrownBy(() -> authenticationService.requestTokenInfo(tokenResponse));
+	}
+
+	@DisplayName("회원 가입 및 로그인 성공 테스트")
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void signUp_success2(boolean isSignUp) {
+		// given
+		MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
+		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
+			AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse();
+		LoginResponse loginResponse = LoginResponse.builder()
+			.id(1L)
+			.isSignUp(isSignUp)
+			.build();
+
+		willReturn(loginResponse).given(memberService).login(authorizationTokenInfoResponse);
+
+		// when
+		LoginResponse result =
+			authenticationService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
+
+		// then
+		assertThat(loginResponse).isEqualTo(result);
+		assertThat(httpServletResponse.getHeader("token_type")).isEqualTo("Bearer");
+
+		Cookie accessCookie = httpServletResponse.getCookie("access_token");
+		assertThat(accessCookie).isNotNull();
+		assertAll(
+			() -> assertThat(accessCookie.getSecure()).isTrue(),
+			() -> assertThat(accessCookie.isHttpOnly()).isTrue(),
+			() -> assertThat(accessCookie.getPath()).isEqualTo("/")
+		);
+
+		Cookie refreshCookie = httpServletResponse.getCookie("refresh_token");
+		assertThat(refreshCookie).isNotNull();
+		assertAll(
+			() -> assertThat(refreshCookie.getSecure()).isTrue(),
+			() -> assertThat(refreshCookie.isHttpOnly()).isTrue(),
+			() -> assertThat(refreshCookie.getPath()).isEqualTo("/")
+		);
 	}
 }
