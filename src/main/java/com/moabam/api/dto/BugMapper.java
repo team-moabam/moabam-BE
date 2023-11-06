@@ -5,7 +5,7 @@ import com.moabam.api.domain.entity.Bug;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BugMapper {
 
 	public static BugResponse toBugResponse(Bug bug) {

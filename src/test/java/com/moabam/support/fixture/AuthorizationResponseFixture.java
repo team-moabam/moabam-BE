@@ -1,8 +1,10 @@
 package com.moabam.support.fixture;
 
+import com.moabam.api.dto.AuthorizationCodeResponse;
+import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 
-public class AuthorizationTokenResponseFixture {
+public final class AuthorizationResponseFixture {
 
 	static final String tokenType = "tokenType";
 	static final String accessToken = "accessToken";
@@ -11,6 +13,14 @@ public class AuthorizationTokenResponseFixture {
 	static final String refreshToken = "ref";
 	static final String refreshTokenExpiresIn = "refs";
 	static final String scope = "scope";
+
+	public static AuthorizationCodeResponse successCodeResponse() {
+		return new AuthorizationCodeResponse("test", null, null, null);
+	}
+
+	public static AuthorizationTokenInfoResponse authorizationTokenInfoResponse() {
+		return new AuthorizationTokenInfoResponse(1L, "expiresIn", "appId");
+	}
 
 	public static AuthorizationTokenResponse authorizationTokenResponse() {
 		return new AuthorizationTokenResponse(tokenType, accessToken, idToken,

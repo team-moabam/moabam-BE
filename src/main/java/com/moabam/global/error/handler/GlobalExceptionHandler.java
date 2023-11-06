@@ -1,5 +1,7 @@
 package com.moabam.global.error.handler;
 
+import static com.moabam.global.error.model.ErrorMessage.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,6 @@ import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.global.error.exception.MoabamException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.exception.UnauthorizedException;
-import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.global.error.model.ErrorResponse;
 
 @RestControllerAdvice
@@ -78,7 +79,18 @@ public class GlobalExceptionHandler {
 			validation.put(fieldError.getField(), fieldError.getDefaultMessage());
 		}
 
-		return new ErrorResponse(ErrorMessage.INVALID_REQUEST_FIELD.getMessage(), validation);
+		return new ErrorResponse(INVALID_REQUEST_FIELD.getMessage(), validation);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ErrorResponse handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
+		String typeName = Optional.ofNullable(exception.getRequiredType())
+			.map(Class::getSimpleName)
+			.orElse("");
+		String message = String.format(INVALID_REQUEST_VALUE_TYPE_FORMAT.getMessage(), exception.getValue(), typeName);
+
+		return new ErrorResponse(message, null);
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)

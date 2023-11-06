@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.ItemService;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.api.dto.ItemsResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class ItemController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ItemsResponse getItems(@RequestParam RoomType type) {
+	public ItemsResponse getItems(@RequestParam ItemType type) {
 		return itemService.getItems(1L, type);
 	}
 

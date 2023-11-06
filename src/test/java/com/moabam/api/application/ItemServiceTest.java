@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.api.domain.repository.InventorySearchRepository;
 import com.moabam.api.domain.repository.ItemSearchRepository;
 import com.moabam.api.dto.ItemResponse;
@@ -45,7 +45,7 @@ class ItemServiceTest {
 	void get_products_success() {
 		// given
 		Long memberId = 1L;
-		RoomType type = RoomType.MORNING;
+		ItemType type = ItemType.MORNING;
 		Item item1 = morningSantaSkin().build();
 		Item item2 = morningKillerSkin().build();
 		given(inventorySearchRepository.findItems(memberId, type)).willReturn(List.of(item1, item2));
@@ -73,7 +73,7 @@ class ItemServiceTest {
 			Long itemId = 1L;
 			Inventory inventory = InventoryFixture.inventory(memberId, nightMageSkin());
 			Inventory defaultInventory = InventoryFixture.inventory(memberId, nightMageSkin());
-			RoomType itemType = inventory.getItemType();
+			ItemType itemType = inventory.getItemType();
 			when(inventorySearchRepository.findOne(memberId, itemId)).thenReturn(Optional.of(inventory));
 			when(inventorySearchRepository.findDefault(memberId, itemType)).thenReturn(Optional.of(defaultInventory));
 

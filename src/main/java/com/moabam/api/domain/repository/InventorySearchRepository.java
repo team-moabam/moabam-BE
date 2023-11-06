@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.global.common.util.DynamicQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -32,7 +32,7 @@ public class InventorySearchRepository {
 		);
 	}
 
-	public Optional<Inventory> findDefault(Long memberId, RoomType type) {
+	public Optional<Inventory> findDefault(Long memberId, ItemType type) {
 		return Optional.ofNullable(
 			jpaQueryFactory.selectFrom(inventory)
 				.where(
@@ -43,7 +43,7 @@ public class InventorySearchRepository {
 		);
 	}
 
-	public List<Item> findItems(Long memberId, RoomType type) {
+	public List<Item> findItems(Long memberId, ItemType type) {
 		return jpaQueryFactory.selectFrom(inventory)
 			.join(inventory.item, item)
 			.where(

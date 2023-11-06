@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.api.domain.repository.InventorySearchRepository;
 import com.moabam.api.domain.repository.ItemSearchRepository;
 import com.moabam.api.dto.ItemMapper;
@@ -26,7 +26,7 @@ public class ItemService {
 	private final ItemSearchRepository itemSearchRepository;
 	private final InventorySearchRepository inventorySearchRepository;
 
-	public ItemsResponse getItems(Long memberId, RoomType type) {
+	public ItemsResponse getItems(Long memberId, ItemType type) {
 		List<Item> purchasedItems = inventorySearchRepository.findItems(memberId, type);
 		List<Item> notPurchasedItems = itemSearchRepository.findNotPurchasedItems(memberId, type);
 
