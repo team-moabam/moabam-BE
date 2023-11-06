@@ -26,8 +26,7 @@ import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenRequest;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.api.dto.OAuthMapper;
-import com.moabam.fixture.AuthorizationTokenInfoResponseFixture;
-import com.moabam.fixture.AuthorizationTokenResponseFixture;
+import com.moabam.fixture.AuthorizationResponseFixture;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -118,7 +117,7 @@ class AuthenticationServiceTest {
 		AuthorizationCodeResponse authorizationCodeResponse = new AuthorizationCodeResponse("test", null,
 			null, null);
 		AuthorizationTokenResponse authorizationTokenResponse =
-			AuthorizationTokenResponseFixture.authorizationTokenResponse();
+			AuthorizationResponseFixture.authorizationTokenResponse();
 
 		// When
 		when(oAuth2AuthorizationServerRequestService.requestAuthorizationServer(anyString(), any())).thenReturn(
@@ -165,9 +164,9 @@ class AuthenticationServiceTest {
 	@Test
 	void generate_token() {
 		// Given
-		AuthorizationTokenResponse tokenResponse = AuthorizationTokenResponseFixture.authorizationTokenResponse();
+		AuthorizationTokenResponse tokenResponse = AuthorizationResponseFixture.authorizationTokenResponse();
 		AuthorizationTokenInfoResponse tokenInfoResponse
-			= AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse();
+			= AuthorizationResponseFixture.authorizationTokenInfoResponse();
 
 		// When
 		when(oAuth2AuthorizationServerRequestService.tokenInfoRequest(eq(oauthConfig.provider().tokenInfo()),

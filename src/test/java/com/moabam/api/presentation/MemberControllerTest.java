@@ -38,9 +38,7 @@ import com.moabam.api.application.AuthenticationService;
 import com.moabam.api.application.OAuth2AuthorizationServerRequestService;
 import com.moabam.api.dto.AuthorizationCodeResponse;
 import com.moabam.api.dto.AuthorizationTokenResponse;
-import com.moabam.fixture.AuthorizationCodeResponseFixture;
-import com.moabam.fixture.AuthorizationTokenInfoResponseFixture;
-import com.moabam.fixture.AuthorizationTokenResponseFixture;
+import com.moabam.fixture.AuthorizationResponseFixture;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
@@ -98,7 +96,7 @@ class MemberControllerTest {
 		ResultActions result = mockMvc.perform(get("/members"));
 
 		result.andExpect(status().is3xxRedirection())
-			.andExpect(header().string("Content-type",
+			.andExpect(MockMvcResultMatchers.header().string("Content-type",
 				MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8))
 			.andExpect(MockMvcResultMatchers.redirectedUrl(uri));
 	}
@@ -114,14 +112,14 @@ class MemberControllerTest {
 		contentParams.add(CODE, "test");
 		contentParams.add(CLIENT_SECRET, oAuthConfig.client().clientSecret());
 
-		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationCodeResponseFixture.successCodeResponse();
+		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
 		AuthorizationTokenResponse authorizationTokenResponse =
-			AuthorizationTokenResponseFixture.authorizationTokenResponse();
+			AuthorizationResponseFixture.authorizationTokenResponse();
 
 		String response = objectMapper.writeValueAsString(authorizationTokenResponse);
 
 		// When
-		doReturn(AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse())
+		doReturn(AuthorizationResponseFixture.authorizationTokenInfoResponse())
 			.when(authenticationService).requestTokenInfo(authorizationTokenResponse);
 
 		// expected
@@ -149,7 +147,7 @@ class MemberControllerTest {
 		contentParams.add(CODE, "test");
 		contentParams.add(CLIENT_SECRET, oAuthConfig.client().clientSecret());
 
-		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationCodeResponseFixture.successCodeResponse();
+		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
 
 		// expected
 		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenUri()))
@@ -167,10 +165,10 @@ class MemberControllerTest {
 	@Test
 	void token_info_request_success() throws Exception {
 		// given
-		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationCodeResponseFixture.successCodeResponse();
+		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
 
 		// When
-		doReturn(AuthorizationTokenResponseFixture.authorizationTokenResponse())
+		doReturn(AuthorizationResponseFixture.authorizationTokenResponse())
 			.when(authenticationService).requestToken(authorizationCodeResponse);
 
 		// expected
@@ -189,10 +187,10 @@ class MemberControllerTest {
 	@ValueSource(ints = {400, 401})
 	void token_info_response_fail(int code) throws Exception {
 		// given
-		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationCodeResponseFixture.successCodeResponse();
+		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
 
 		// when
-		doReturn(AuthorizationTokenResponseFixture.authorizationTokenResponse())
+		doReturn(AuthorizationResponseFixture.authorizationTokenResponse())
 			.when(authenticationService).requestToken(authorizationCodeResponse);
 
 		// expected
