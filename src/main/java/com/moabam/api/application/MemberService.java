@@ -4,6 +4,7 @@ import static com.moabam.global.common.constant.GlobalConstant.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.domain.entity.Member;
 import com.moabam.api.domain.repository.MemberRepository;
+import com.moabam.api.domain.repository.MemberSearchRepository;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.LoginResponse;
 import com.moabam.api.dto.MemberMapper;
@@ -25,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
+	private final MemberSearchRepository memberSearchRepository;
 
 	public Member getById(Long memberId) {
 		return memberRepository.findById(memberId)
@@ -56,5 +59,14 @@ public class MemberService {
 
 	private String createRandomNickName() {
 		return RandomStringUtils.randomAlphanumeric(RANDOM_NICKNAME_SIZE) + UNDER_BAR + LocalDate.now();
+	}
+
+	public Member getManager(Long roomId) {
+		return memberSearchRepository.findManager(roomId)
+			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
+	}
+
+	public List<Member> getRoomMembers(List<Long> memberIds) {
+		return memberRepository.findAllById(memberIds);
 	}
 }

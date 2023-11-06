@@ -1,7 +1,9 @@
 package com.moabam.api.domain.repository;
 
 import static com.moabam.api.domain.entity.QParticipant.*;
+import static com.moabam.api.domain.entity.QRoom.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -18,13 +20,25 @@ public class ParticipantSearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public Optional<Participant> findParticipant(Long memberId, Long roomId) {
+	public Optional<Participant> findOne(Long memberId, Long roomId) {
 		return Optional.ofNullable(
-			jpaQueryFactory.selectFrom(participant)
+			jpaQueryFactory
+				.selectFrom(participant)
+				.join(participant.room, room).fetchJoin()
 				.where(
 					DynamicQuery.generateEq(roomId, participant.room.id::eq),
 					DynamicQuery.generateEq(memberId, participant.memberId::eq)
-				).fetchOne()
+				)
+				.fetchOne()
 		);
+	}
+
+	public List<Participant> findParticipants(Long roomId) {
+		return jpaQueryFactory
+			.selectFrom(participant)
+			.where(
+				participant.room.id.eq(roomId)
+			)
+			.fetch();
 	}
 }
