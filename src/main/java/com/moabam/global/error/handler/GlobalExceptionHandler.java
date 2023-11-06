@@ -92,15 +92,4 @@ public class GlobalExceptionHandler {
 
 		return new ErrorResponse(message, null);
 	}
-
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
-	public ErrorResponse handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
-		String typeName = Optional.ofNullable(exception.getRequiredType())
-			.map(Class::getSimpleName)
-			.orElse("");
-		String message = String.format("'%s' 값은 유효한 %s 값이 아닙니다.", exception.getValue(), typeName);
-
-		return new ErrorResponse(message, null);
-	}
 }
