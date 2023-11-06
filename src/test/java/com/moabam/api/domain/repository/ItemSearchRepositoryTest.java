@@ -29,7 +29,7 @@ class ItemSearchRepositoryTest {
 
 	@DisplayName("구매하지 않은 아이템 목록을 조회한다.")
 	@Nested
-	class find_not_purchased_items {
+	class FindNotPurchasedItems {
 
 		@DisplayName("해당 타입의 구매하지 않은 아이템 목록을 조회한다.")
 		@Test
