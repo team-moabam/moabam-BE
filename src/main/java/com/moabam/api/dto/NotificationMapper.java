@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class NotificationMapper {
+public final class NotificationMapper {
 
 	private static final String TITLE = "모아밤";
 	private static final String KNOCK_BODY = "님이 콕 찔렀습니다.";

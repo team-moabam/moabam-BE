@@ -2,6 +2,7 @@ package com.moabam.api.presentation;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,6 +15,7 @@ import com.moabam.api.application.RoomService;
 import com.moabam.api.dto.CreateRoomRequest;
 import com.moabam.api.dto.EnterRoomRequest;
 import com.moabam.api.dto.ModifyRoomRequest;
+import com.moabam.api.dto.RoomDetailsResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +50,11 @@ public class RoomController {
 	@ResponseStatus(HttpStatus.OK)
 	public void exitRoom(@PathVariable("roomId") Long roomId) {
 		roomService.exitRoom(1L, roomId);
+	}
+
+	@GetMapping("/{roomId}")
+	@ResponseStatus(HttpStatus.OK)
+	public RoomDetailsResponse getRoomDetails(@PathVariable("roomId") Long roomId) {
+		return roomService.getRoomDetails(1L, roomId);
 	}
 }
