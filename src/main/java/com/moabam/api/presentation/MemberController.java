@@ -35,6 +35,7 @@ public class MemberController {
 		AuthorizationTokenResponse tokenResponse = authenticationService.requestToken(authorizationCodeResponse);
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
 			authenticationService.requestTokenInfo(tokenResponse);
+
 		return authenticationService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
 	}
 }

@@ -29,8 +29,7 @@ import com.moabam.api.dto.AuthorizationTokenRequest;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.api.dto.LoginResponse;
 import com.moabam.api.dto.OAuthMapper;
-import com.moabam.fixture.AuthorizationTokenInfoResponseFixture;
-import com.moabam.fixture.AuthorizationTokenResponseFixture;
+import com.moabam.fixture.AuthorizationResponseFixture;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -129,7 +128,7 @@ class AuthenticationServiceTest {
 		AuthorizationCodeResponse authorizationCodeResponse = new AuthorizationCodeResponse("test", null,
 			null, null);
 		AuthorizationTokenResponse authorizationTokenResponse =
-			AuthorizationTokenResponseFixture.authorizationTokenResponse();
+			AuthorizationResponseFixture.authorizationTokenResponse();
 
 		// When
 		when(oAuth2AuthorizationServerRequestService.requestAuthorizationServer(anyString(), any())).thenReturn(
@@ -176,13 +175,12 @@ class AuthenticationServiceTest {
 	@Test
 	void generate_token() {
 		// Given
-		AuthorizationTokenResponse tokenResponse = AuthorizationTokenResponseFixture.authorizationTokenResponse();
+		AuthorizationTokenResponse tokenResponse = AuthorizationResponseFixture.authorizationTokenResponse();
 		AuthorizationTokenInfoResponse tokenInfoResponse
-			= AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse();
+			= AuthorizationResponseFixture.authorizationTokenInfoResponse();
 
 		// When
-		when(oAuth2AuthorizationServerRequestService.tokenInfoRequest(
-			anyString(),
+		when(oAuth2AuthorizationServerRequestService.tokenInfoRequest(eq(oauthConfig.provider().tokenInfo()),
 			eq("Bearer " + tokenResponse.accessToken())))
 			.thenReturn(new ResponseEntity<>(tokenInfoResponse, HttpStatus.OK));
 
@@ -197,7 +195,7 @@ class AuthenticationServiceTest {
 		// given
 		MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
-			AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse();
+			AuthorizationResponseFixture.authorizationTokenInfoResponse();
 		LoginResponse loginResponse = LoginResponse.builder()
 			.id(1L)
 			.isSignUp(isSignUp)

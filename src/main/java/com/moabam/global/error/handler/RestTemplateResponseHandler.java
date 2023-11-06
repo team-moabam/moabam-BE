@@ -14,14 +14,25 @@ import com.moabam.global.error.model.ErrorMessage;
 public class RestTemplateResponseHandler implements ResponseErrorHandler {
 
 	@Override
-	public boolean hasError(ClientHttpResponse response) throws IOException {
-		return response.getStatusCode().isError();
+	public boolean hasError(ClientHttpResponse response) {
+		try {
+			return response.getStatusCode().isError();
+		} catch (IOException ioException) {
+			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
+		}
 	}
 
 	@Override
-	public void handleError(ClientHttpResponse response) throws IOException {
-		HttpStatusCode statusCode = response.getStatusCode();
+	public void handleError(ClientHttpResponse response) {
+		try {
+			HttpStatusCode statusCode = response.getStatusCode();
+			validResponse(statusCode);
+		} catch (IOException ioException) {
+			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
+		}
+	}
 
+	private void validResponse(HttpStatusCode statusCode) {
 		if (statusCode.is5xxServerError()) {
 			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
 		}

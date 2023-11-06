@@ -42,6 +42,7 @@ public class AuthenticationService {
 
 	public AuthorizationTokenResponse requestToken(AuthorizationCodeResponse authorizationCodeResponse) {
 		validAuthorizationGrant(authorizationCodeResponse.code());
+
 		return issueTokenToAuthorizationServer(authorizationCodeResponse.code());
 	}
 
@@ -65,6 +66,10 @@ public class AuthenticationService {
 	private String getAuthorizationCodeUri() {
 		AuthorizationCodeRequest authorizationCodeRequest = OAuthMapper.toAuthorizationCodeRequest(oAuthConfig);
 		return generateQueryParamsWith(authorizationCodeRequest);
+	}
+
+	private String generateTokenValue(String token) {
+		return TokenConstant.TOKEN_TYPE + GlobalConstant.SPACE + token;
 	}
 
 	private String generateQueryParamsWith(AuthorizationCodeRequest authorizationCodeRequest) {
@@ -111,10 +116,6 @@ public class AuthenticationService {
 		}
 
 		return contents;
-	}
-
-	private String generateTokenValue(String token) {
-		return TokenConstant.TOKEN_TYPE + GlobalConstant.SPACE + token;
 	}
 
 	private void issueServiceToken(HttpServletResponse response, Long id) {

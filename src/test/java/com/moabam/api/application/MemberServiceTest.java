@@ -16,7 +16,7 @@ import com.moabam.api.domain.entity.Member;
 import com.moabam.api.domain.repository.MemberRepository;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.LoginResponse;
-import com.moabam.fixture.AuthorizationTokenInfoResponseFixture;
+import com.moabam.fixture.AuthorizationResponseFixture;
 import com.moabam.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +33,7 @@ class MemberServiceTest {
 	void member_exist_and_login_success() {
 		// given
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
-			AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse();
+			AuthorizationResponseFixture.authorizationTokenInfoResponse();
 		Member member = MemberFixture.member();
 		willReturn(Optional.of(member))
 			.given(memberRepository).findBySocialId(authorizationTokenInfoResponse.id());
@@ -51,7 +51,7 @@ class MemberServiceTest {
 	void signUp_success() {
 		// given
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
-			AuthorizationTokenInfoResponseFixture.authorizationTokenInfoResponse();
+			AuthorizationResponseFixture.authorizationTokenInfoResponse();
 		willReturn(Optional.empty())
 			.given(memberRepository).findBySocialId(authorizationTokenInfoResponse.id());
 
