@@ -28,3 +28,5 @@ oauth2:
     authorization_uri: https://authorization.com/test/test
     redirect_uri: http://redirect:8080/test
     token_uri: https://token.com/test/test
+    token-info: https://api.token.com/test
+

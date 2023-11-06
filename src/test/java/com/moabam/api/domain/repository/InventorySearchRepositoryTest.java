@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.Member;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.support.annotation.RepositoryTest;
 
 @RepositoryTest
@@ -51,7 +51,7 @@ class InventorySearchRepositoryTest {
 			inventoryRepository.save(inventory(memberId, nightMageSkin));
 
 			// when
-			List<Item> actual = inventorySearchRepository.findItems(memberId, RoomType.MORNING);
+			List<Item> actual = inventorySearchRepository.findItems(memberId, ItemType.MORNING);
 
 			// then
 			assertThat(actual).hasSize(2)
@@ -69,7 +69,7 @@ class InventorySearchRepositoryTest {
 			inventoryRepository.save(inventory(memberId, morningKillerSkin));
 
 			// when
-			List<Item> actual = inventorySearchRepository.findItems(memberId, RoomType.NIGHT);
+			List<Item> actual = inventorySearchRepository.findItems(memberId, ItemType.NIGHT);
 
 			// then
 			assertThat(actual).isEmpty();

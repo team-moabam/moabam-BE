@@ -1,20 +1,26 @@
 package com.moabam.api.presentation;
 
 import static com.moabam.global.common.util.OAuthParameterNames.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -28,11 +34,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moabam.api.application.AuthenticationService;
 import com.moabam.api.application.OAuth2AuthorizationServerRequestService;
 import com.moabam.api.dto.AuthorizationCodeResponse;
+import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
-import com.moabam.support.fixture.AuthorizationTokenResponseFixture;
+import com.moabam.global.error.handler.RestTemplateResponseHandler;
+import com.moabam.support.fixture.AuthorizationResponseFixture;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -47,21 +56,26 @@ class MemberControllerTest {
 	@Autowired
 	OAuth2AuthorizationServerRequestService oAuth2AuthorizationServerRequestService;
 
+	@SpyBean
+	AuthenticationService authenticationService;
+
 	@Autowired
 	OAuthConfig oAuthConfig;
 
-	static RestTemplate restTemplate;
+	static RestTemplateBuilder restTemplateBuilder;
 
 	MockRestServiceServer mockRestServiceServer;
 
 	@BeforeAll
 	static void allSetUp() {
-		restTemplate = new RestTemplate();
+		restTemplateBuilder = new RestTemplateBuilder()
+			.errorHandler(new RestTemplateResponseHandler());
 	}
 
 	@BeforeEach
 	void setUp() {
 		// TODO 추후 RestTemplate -> REstTemplateBuilder & Bean등록하여 테스트 코드도 일부 변경됨
+		RestTemplate restTemplate = restTemplateBuilder.build();
 		ReflectionTestUtils.setField(oAuth2AuthorizationServerRequestService, "restTemplate", restTemplate);
 		mockRestServiceServer = MockRestServiceServer.createServer(restTemplate);
 	}
@@ -82,7 +96,7 @@ class MemberControllerTest {
 		ResultActions result = mockMvc.perform(get("/members"));
 
 		result.andExpect(status().is3xxRedirection())
-			.andExpect(header().string("Content-type",
+			.andExpect(MockMvcResultMatchers.header().string("Content-type",
 				MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8))
 			.andExpect(MockMvcResultMatchers.redirectedUrl(uri));
 	}
@@ -98,19 +112,95 @@ class MemberControllerTest {
 		contentParams.add(CODE, "test");
 		contentParams.add(CLIENT_SECRET, oAuthConfig.client().clientSecret());
 
-		String response = objectMapper.writeValueAsString(
-			AuthorizationTokenResponseFixture.authorizationTokenResponse());
-		AuthorizationCodeResponse authorizationCodeResponse = new AuthorizationCodeResponse("test", null, null, null);
+		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
+		AuthorizationTokenResponse authorizationTokenResponse =
+			AuthorizationResponseFixture.authorizationTokenResponse();
 
+		String response = objectMapper.writeValueAsString(authorizationTokenResponse);
+
+		// When
+		doReturn(AuthorizationResponseFixture.authorizationTokenInfoResponse())
+			.when(authenticationService).requestTokenInfo(authorizationTokenResponse);
+
+		// expected
 		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenUri()))
 			.andExpect(MockRestRequestMatchers.content().formData(contentParams))
 			.andExpect(MockRestRequestMatchers.content().contentType("application/x-www-form-urlencoded;charset=UTF-8"))
 			.andExpect(method(HttpMethod.POST))
 			.andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
+		ResultActions result = mockMvc.perform(get("/members/login/kakao/oauth")
+				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("Authorization Token 발급 실패")
+	@ParameterizedTest
+	@ValueSource(ints = {400, 401, 403, 429, 500, 502, 503})
+	void authorization_token_request_fail(int code) throws Exception {
+		// given
+		MultiValueMap<String, String> contentParams = new LinkedMultiValueMap<>();
+		contentParams.add(GRANT_TYPE, oAuthConfig.client().authorizationGrantType());
+		contentParams.add(CLIENT_ID, oAuthConfig.client().clientId());
+		contentParams.add(REDIRECT_URI, oAuthConfig.provider().redirectUri());
+		contentParams.add(CODE, "test");
+		contentParams.add(CLIENT_SECRET, oAuthConfig.client().clientSecret());
+
+		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
+
 		// expected
+		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenUri()))
+			.andExpect(MockRestRequestMatchers.content().formData(contentParams))
+			.andExpect(MockRestRequestMatchers.content().contentType("application/x-www-form-urlencoded;charset=UTF-8"))
+			.andExpect(method(HttpMethod.POST))
+			.andRespond(withStatus(HttpStatusCode.valueOf(code)));
+
+		ResultActions result = mockMvc.perform(get("/members/login/kakao/oauth")
+				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
+			.andExpect(status().isBadRequest());
+	}
+
+	@DisplayName("토큰 정보 조회 요청")
+	@Test
+	void token_info_request_success() throws Exception {
+		// given
+		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
+
+		// When
+		doReturn(AuthorizationResponseFixture.authorizationTokenResponse())
+			.when(authenticationService).requestToken(authorizationCodeResponse);
+
+		// expected
+		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenInfo()))
+			.andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+			.andExpect(MockRestRequestMatchers.header("Authorization", "Bearer accessToken"))
+			.andRespond(withStatus(HttpStatusCode.valueOf(200)));
+
 		ResultActions result = mockMvc.perform(get("/members/login/kakao/oauth")
 				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
 			.andExpect(status().isOk());
+	}
+
+	@DisplayName("토큰 정보 요청 실패")
+	@ParameterizedTest
+	@ValueSource(ints = {400, 401})
+	void token_info_response_fail(int code) throws Exception {
+		// given
+		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
+
+		// when
+		doReturn(AuthorizationResponseFixture.authorizationTokenResponse())
+			.when(authenticationService).requestToken(authorizationCodeResponse);
+
+		// expected
+		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenInfo()))
+			.andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+			.andExpect(MockRestRequestMatchers.header("Authorization", "Bearer accessToken"))
+			.andRespond(withStatus(HttpStatusCode.valueOf(code)));
+
+		ResultActions result = mockMvc.perform(get("/members/login/kakao/oauth")
+				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
+			.andExpect(status().isBadRequest());
 	}
 }

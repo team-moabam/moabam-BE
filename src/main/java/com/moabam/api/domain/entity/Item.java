@@ -6,7 +6,7 @@ import static java.util.Objects.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.moabam.api.domain.entity.enums.ItemCategory;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.global.common.entity.BaseTimeEntity;
 import com.moabam.global.error.exception.BadRequestException;
 
@@ -36,7 +36,7 @@ public class Item extends BaseTimeEntity {
 
 	@Enumerated(value = EnumType.STRING)
 	@Column(name = "type", nullable = false)
-	private RoomType type;
+	private ItemType type;
 
 	@Enumerated(value = EnumType.STRING)
 	@Column(name = "category", nullable = false)
@@ -61,7 +61,7 @@ public class Item extends BaseTimeEntity {
 	private int unlockLevel;
 
 	@Builder
-	private Item(RoomType type, ItemCategory category, String name, String image, int bugPrice, int goldenBugPrice,
+	private Item(ItemType type, ItemCategory category, String name, String image, int bugPrice, int goldenBugPrice,
 		Integer unlockLevel) {
 		this.type = requireNonNull(type);
 		this.category = requireNonNull(category);

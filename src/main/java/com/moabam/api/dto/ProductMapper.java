@@ -8,7 +8,7 @@ import com.moabam.global.common.util.StreamUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ProductMapper {
 
 	public static ProductResponse toProductResponse(Product product) {
