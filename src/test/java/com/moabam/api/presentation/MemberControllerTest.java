@@ -5,8 +5,6 @@ import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -100,7 +98,7 @@ class MemberControllerTest {
 		ResultActions result = mockMvc.perform(get("/members"));
 
 		result.andExpect(status().is3xxRedirection())
-			.andExpect(header().string("Content-type",
+			.andExpect(MockMvcResultMatchers.header().string("Content-type",
 				MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8))
 			.andExpect(MockMvcResultMatchers.redirectedUrl(uri));
 	}
@@ -142,7 +140,7 @@ class MemberControllerTest {
 			.andExpectAll(
 				status().isOk(),
 				MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON),
-				header().string("token_type", "Bearer"),
+				MockMvcResultMatchers.header().string("token_type", "Bearer"),
 				cookie().exists("access_token"),
 				cookie().httpOnly("access_token", true),
 				cookie().secure("access_token", true),
@@ -150,7 +148,7 @@ class MemberControllerTest {
 				cookie().httpOnly("refresh_token", true),
 				cookie().secure("refresh_token", true)
 			)
-			.andExpect(jsonPath("$.isSignUp").value(true));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.isSignUp").value(true));
 	}
 
 	@DisplayName("Authorization Token 발급 실패")

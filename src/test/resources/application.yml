@@ -35,4 +35,3 @@ token:
   access-expire: 100000
   refresh-expire: 150000
   secret-key: testestestestestestestestestesttestestestestestestestestestest
-  

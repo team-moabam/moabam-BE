@@ -22,7 +22,7 @@ public final class MemberMapper {
 			.id(memberId)
 			.build();
 	}
-	
+
 	public static LoginResponse toLoginResponse(Long memberId, boolean isSignUp) {
 		return LoginResponse.builder()
 			.id(memberId)

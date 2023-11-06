@@ -27,7 +27,7 @@ class MemberServiceTest {
 
 	@Mock
 	MemberRepository memberRepository;
-	
+
 	@DisplayName("회원 존재하고 로그인 성공")
 	@Test
 	void member_exist_and_login_success() {
@@ -68,5 +68,3 @@ class MemberServiceTest {
 		assertThat(result.isSignUp()).isTrue();
 	}
 }
-
-
