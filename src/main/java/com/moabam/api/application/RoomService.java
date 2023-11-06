@@ -241,9 +241,8 @@ public class RoomService {
 				.orElseThrow(() -> new NotFoundException(ROOM_DETAILS_ERROR));
 
 			int contributionPoint = calculateContributionPoint(member.getId(), participants, today);
-			List<CertificationImageResponse> certificationImageResponses = CertificationsMapper.toCertificateImageResponses(
-				member.getId(),
-				certifications);
+			List<CertificationImageResponse> certificationImageResponses =
+				CertificationsMapper.toCertificateImageResponses(member.getId(), certifications);
 
 			TodayCertificateRankResponse response = CertificationsMapper.toTodayCertificateRankResponse(
 				rank, member, contributionPoint, "https://~awake", "https://~sleep", certificationImageResponses);
