@@ -1,8 +1,6 @@
 package com.moabam.api.application;
 
 import static com.moabam.global.common.constant.FcmConstant.*;
-import static com.moabam.global.common.constant.GlobalConstant.*;
-import static java.util.Objects.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +52,6 @@ public class NotificationService {
 	}
 
 	private String generateKnockKey(Long memberId, Long targetId, Long roomId) {
-		return requireNonNull(roomId) + UNDER_BAR + requireNonNull(memberId) + TO + requireNonNull(targetId);
+		return String.format(KNOCK_KEY, roomId, memberId, targetId);
 	}
 }

@@ -1,7 +1,6 @@
 package com.moabam.api.presentation;
 
 import static com.moabam.global.common.constant.FcmConstant.*;
-import static com.moabam.global.common.constant.GlobalConstant.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
@@ -64,7 +63,7 @@ class NotificationControllerTest {
 	void setUp() {
 		target = memberRepository.save(MemberFixture.member("target123", "targetName"));
 		room = roomRepository.save(RoomFixture.room());
-		knockKey = room.getId() + UNDER_BAR + 1 + TO + target.getId();
+		knockKey = String.format(KNOCK_KEY, room.getId(), 1, target.getId());
 
 		willReturn(null)
 			.given(firebaseMessaging)
