@@ -10,6 +10,7 @@ public class GlobalConstant {
 	public static final String COMMA = ",";
 	public static final String UNDER_BAR = "_";
 	public static final String CHARSET_UTF_8 = ";charset=UTF-8";
+	public static final String SPACE = " ";
 
 	public static final String TO = "_TO_";
 	public static final long EXPIRE_KNOCK = 12;

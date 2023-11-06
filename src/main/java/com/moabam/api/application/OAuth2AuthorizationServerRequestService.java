@@ -2,6 +2,7 @@ package com.moabam.api.application;
 
 import java.io.IOException;
 
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,9 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.global.common.util.GlobalConstant;
+import com.moabam.global.common.util.TokenConstant;
 import com.moabam.global.error.exception.BadRequestException;
+import com.moabam.global.error.handler.RestTemplateResponseHandler;
 import com.moabam.global.error.model.ErrorMessage;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +28,9 @@ public class OAuth2AuthorizationServerRequestService {
 	private final RestTemplate restTemplate;
 
 	public OAuth2AuthorizationServerRequestService() {
-		restTemplate = new RestTemplate();
+		restTemplate = new RestTemplateBuilder()
+			.errorHandler(new RestTemplateResponseHandler())
+			.build();
 	}
 
 	public void loginRequest(HttpServletResponse httpServletResponse, String authorizationCodeUri) {
@@ -43,13 +49,14 @@ public class OAuth2AuthorizationServerRequestService {
 			MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8);
 		HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(uriParams, headers);
 
-		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse = restTemplate.exchange(tokenUri,
-			HttpMethod.POST, httpEntity, AuthorizationTokenResponse.class);
+		return restTemplate.exchange(tokenUri, HttpMethod.POST, httpEntity, AuthorizationTokenResponse.class);
+	}
 
-		if (authorizationTokenResponse.getStatusCode().isError()) {
-			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
-		}
+	public ResponseEntity<AuthorizationTokenInfoResponse> tokenInfoRequest(String tokenInfoUri, String tokenValue) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(TokenConstant.AUTHORIZATION, tokenValue);
+		HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
-		return authorizationTokenResponse;
+		return restTemplate.exchange(tokenInfoUri, HttpMethod.GET, httpEntity, AuthorizationTokenInfoResponse.class);
 	}
 }

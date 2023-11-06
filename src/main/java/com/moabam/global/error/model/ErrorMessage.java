@@ -9,6 +9,7 @@ public enum ErrorMessage {
 
 	FAILED_MOABAM("모아밤 서버 실행 중 오류가 발생했습니다."),
 	INVALID_REQUEST_FIELD("올바른 요청 정보가 아닙니다."),
+	INVALID_REQUEST_VALUE_TYPE_FORMAT("'%s' 값은 유효한 %s 값이 아닙니다."),
 	NOT_FOUND_AVAILABLE_PORT("사용 가능한 포트를 찾을 수 없습니다. (10000 ~ 65535)"),
 	ERROR_EXECUTING_EMBEDDED_REDIS("Embedded Redis 실행 중 오류가 발생했습니다."),
 
@@ -29,6 +30,7 @@ public enum ErrorMessage {
 	INVALID_BUG_COUNT("벌레 개수는 0 이상이어야 합니다."),
 	INVALID_PRICE("가격은 0 이상이어야 합니다."),
 	INVALID_QUANTITY("수량은 1 이상이어야 합니다."),
+	INVALID_LEVEL("레벨은 1 이상이어야 합니다."),
 
 	FAILED_FCM_INIT("파이어베이스 설정을 실패했습니다."),
 	NOT_FOUND_FCM_TOKEN("해당 유저는 접속 중이 아닙니다."),
