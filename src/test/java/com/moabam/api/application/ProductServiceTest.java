@@ -17,6 +17,7 @@ import com.moabam.api.domain.entity.Product;
 import com.moabam.api.domain.repository.ProductRepository;
 import com.moabam.api.dto.ProductResponse;
 import com.moabam.api.dto.ProductsResponse;
+import com.moabam.global.common.util.StreamUtils;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -39,10 +40,8 @@ class ProductServiceTest {
 		ProductsResponse response = productService.getProducts();
 
 		// then
-		List<String> productNames = response.products().stream()
-			.map(ProductResponse::name)
-			.toList();
+		List<String> productNames = StreamUtils.map(response.products(), ProductResponse::name);
 		assertThat(response.products()).hasSize(2);
-		assertThat(productNames).containsOnly(BUG_PRODUCT_NAME, BUG_PRODUCT_NAME);
+		assertThat(productNames).containsExactly(BUG_PRODUCT_NAME, BUG_PRODUCT_NAME);
 	}
 }
