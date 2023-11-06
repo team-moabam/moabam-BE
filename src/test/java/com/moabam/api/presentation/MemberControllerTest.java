@@ -39,7 +39,7 @@ import com.moabam.api.application.OAuth2AuthorizationServerRequestService;
 import com.moabam.api.dto.AuthorizationCodeResponse;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.fixture.AuthorizationResponseFixture;
-import com.moabam.global.common.util.GlobalConstant;
+import com.moabam.global.common.constant.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
 

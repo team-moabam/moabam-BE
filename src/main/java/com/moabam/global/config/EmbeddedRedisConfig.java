@@ -1,6 +1,6 @@
 package com.moabam.global.config;
 
-import static com.moabam.global.common.util.GlobalConstant.*;
+import static com.moabam.global.common.constant.RedisConstant.*;
 
 import java.io.BufferedReader;
 import java.io.File;

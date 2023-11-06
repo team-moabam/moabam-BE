@@ -1,6 +1,7 @@
 package com.moabam.api.domain.repository;
 
-import static com.moabam.global.common.util.GlobalConstant.*;
+import static com.moabam.global.common.constant.FcmConstant.*;
+import static com.moabam.global.common.constant.GlobalConstant.*;
 import static java.util.Objects.*;
 
 import java.time.Duration;

@@ -1,6 +1,7 @@
 package com.moabam.api.presentation;
 
-import static com.moabam.global.common.util.GlobalConstant.*;
+import static com.moabam.global.common.constant.FcmConstant.*;
+import static com.moabam.global.common.constant.GlobalConstant.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;

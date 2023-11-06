@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenResponse;
-import com.moabam.global.common.util.GlobalConstant;
+import com.moabam.global.common.constant.GlobalConstant;
 import com.moabam.global.common.util.TokenConstant;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
