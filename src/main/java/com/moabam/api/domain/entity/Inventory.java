@@ -4,6 +4,7 @@ import static java.util.Objects.*;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.moabam.api.domain.entity.enums.RoomType;
 import com.moabam.global.common.entity.BaseTimeEntity;
 
 import jakarta.persistence.Column;
@@ -48,6 +49,10 @@ public class Inventory extends BaseTimeEntity {
 		this.memberId = requireNonNull(memberId);
 		this.item = requireNonNull(item);
 		this.isDefault = isDefault;
+	}
+
+	public RoomType getItemType() {
+		return this.item.getType();
 	}
 
 	public void setDefault() {

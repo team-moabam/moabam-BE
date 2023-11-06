@@ -32,11 +32,12 @@ public class InventorySearchRepository {
 		);
 	}
 
-	public Optional<Inventory> findDefault(Long memberId) {
+	public Optional<Inventory> findDefault(Long memberId, RoomType type) {
 		return Optional.ofNullable(
 			jpaQueryFactory.selectFrom(inventory)
 				.where(
 					DynamicQuery.generateEq(memberId, inventory.memberId::eq),
+					DynamicQuery.generateEq(type, inventory.item.type::eq),
 					inventory.isDefault.isTrue())
 				.fetchOne()
 		);

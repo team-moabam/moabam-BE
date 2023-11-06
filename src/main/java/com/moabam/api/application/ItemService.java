@@ -33,10 +33,11 @@ public class ItemService {
 		return ItemMapper.toItemsResponse(purchasedItems, notPurchasedItems);
 	}
 
+	@Transactional
 	public void selectItem(Long memberId, Long itemId) {
 		Inventory inventory = getInventory(memberId, itemId);
 
-		inventorySearchRepository.findDefault(memberId)
+		inventorySearchRepository.findDefault(memberId, inventory.getItemType())
 			.ifPresent(Inventory::unsetDefault);
 		inventory.setDefault();
 	}

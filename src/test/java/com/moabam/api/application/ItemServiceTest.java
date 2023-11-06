@@ -63,7 +63,7 @@ class ItemServiceTest {
 
 	@DisplayName("아이템을 적용한다.")
 	@Nested
-	class select_item {
+	class SelectItem {
 
 		@DisplayName("성공한다.")
 		@Test
@@ -73,15 +73,16 @@ class ItemServiceTest {
 			Long itemId = 1L;
 			Inventory inventory = InventoryFixture.inventory(memberId, nightMageSkin());
 			Inventory defaultInventory = InventoryFixture.inventory(memberId, nightMageSkin());
+			RoomType itemType = inventory.getItemType();
 			when(inventorySearchRepository.findOne(memberId, itemId)).thenReturn(Optional.of(inventory));
-			when(inventorySearchRepository.findDefault(memberId)).thenReturn(Optional.of(defaultInventory));
+			when(inventorySearchRepository.findDefault(memberId, itemType)).thenReturn(Optional.of(defaultInventory));
 
 			// when
 			itemService.selectItem(memberId, itemId);
 
 			// then
 			verify(inventorySearchRepository).findOne(memberId, itemId);
-			verify(inventorySearchRepository).findDefault(memberId);
+			verify(inventorySearchRepository).findDefault(memberId, itemType);
 			assertFalse(defaultInventory.isDefault());
 			assertTrue(inventory.isDefault());
 		}
