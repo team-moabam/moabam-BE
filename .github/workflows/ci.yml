@@ -42,10 +42,6 @@ jobs:
         run: |
           sudo docker run -d -p 3306:3306 --env MYSQL_DATABASE=test --env MYSQL_ROOT_PASSWORD=test mysql:8.0.33
 
-      #      - name: 테스트용 Redis 도커 컨테이너 실행
-      #        run: |
-      #          sudo docker run --name redis-test -p 6379:6379 -d redis
-
       - name: SonarCloud 캐싱
         uses: actions/cache@v3
         with:
