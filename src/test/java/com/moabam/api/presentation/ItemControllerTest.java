@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.ItemService;
 import com.moabam.api.domain.entity.Item;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.api.dto.ItemMapper;
 import com.moabam.api.dto.ItemsResponse;
 import com.moabam.fixture.ItemFixture;
@@ -44,7 +44,7 @@ class ItemControllerTest {
 	void get_items_success() throws Exception {
 		// given
 		Long memberId = 1L;
-		RoomType type = RoomType.MORNING;
+		ItemType type = ItemType.MORNING;
 		Item item1 = ItemFixture.morningSantaSkin().build();
 		Item item2 = ItemFixture.morningKillerSkin().build();
 		ItemsResponse expected = ItemMapper.toItemsResponse(List.of(item1, item2), emptyList());
@@ -52,7 +52,7 @@ class ItemControllerTest {
 
 		// expected
 		String content = mockMvc.perform(get("/items")
-				.param("type", RoomType.MORNING.name()))
+				.param("type", ItemType.MORNING.name()))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andReturn()

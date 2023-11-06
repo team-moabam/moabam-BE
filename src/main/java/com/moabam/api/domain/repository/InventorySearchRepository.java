@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.moabam.api.domain.entity.Item;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.global.common.util.DynamicQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -20,7 +20,7 @@ public class InventorySearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public List<Item> findItems(Long memberId, RoomType type) {
+	public List<Item> findItems(Long memberId, ItemType type) {
 		return jpaQueryFactory.selectFrom(inventory)
 			.join(inventory.item, item)
 			.where(

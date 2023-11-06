@@ -2,7 +2,7 @@ package com.moabam.fixture;
 
 import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.enums.ItemCategory;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 
 public class ItemFixture {
 
@@ -15,7 +15,7 @@ public class ItemFixture {
 
 	public static Item.ItemBuilder morningSantaSkin() {
 		return Item.builder()
-			.type(RoomType.MORNING)
+			.type(ItemType.MORNING)
 			.category(ItemCategory.SKIN)
 			.name(MORNING_SANTA_SKIN_NAME)
 			.image(MORNING_SANTA_SKIN_IMAGE);
@@ -23,7 +23,7 @@ public class ItemFixture {
 
 	public static Item.ItemBuilder morningKillerSkin() {
 		return Item.builder()
-			.type(RoomType.MORNING)
+			.type(ItemType.MORNING)
 			.category(ItemCategory.SKIN)
 			.name(MORNING_KILLER_SKIN_NAME)
 			.image(MORNING_KILLER_SKIN_IMAGE);
@@ -31,7 +31,7 @@ public class ItemFixture {
 
 	public static Item nightMageSkin() {
 		return Item.builder()
-			.type(RoomType.NIGHT)
+			.type(ItemType.NIGHT)
 			.category(ItemCategory.SKIN)
 			.name(NIGHT_MAGE_SKIN_NAME)
 			.image(NIGHT_MAGE_SKIN_IMAGE)

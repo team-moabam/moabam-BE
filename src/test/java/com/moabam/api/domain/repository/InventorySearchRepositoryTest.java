@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.domain.entity.Item;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 
 @SpringBootTest
 @Transactional(readOnly = true)
@@ -41,7 +41,7 @@ class InventorySearchRepositoryTest {
 		inventoryRepository.save(inventory(memberId, nightMageSkin));
 
 		// when
-		List<Item> actual = inventorySearchRepository.findItems(memberId, RoomType.MORNING);
+		List<Item> actual = inventorySearchRepository.findItems(memberId, ItemType.MORNING);
 
 		// then
 		assertThat(actual).hasSize(2)
@@ -59,7 +59,7 @@ class InventorySearchRepositoryTest {
 		inventoryRepository.save(inventory(memberId, morningKillerSkin));
 
 		// when
-		List<Item> actual = inventorySearchRepository.findItems(memberId, RoomType.NIGHT);
+		List<Item> actual = inventorySearchRepository.findItems(memberId, ItemType.NIGHT);
 
 		// then
 		assertThat(actual).isEmpty();

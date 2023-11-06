@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.domain.entity.Item;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.entity.enums.ItemType;
 
 @SpringBootTest
 @Transactional(readOnly = true)
@@ -39,7 +39,7 @@ class ItemSearchRepositoryTest {
 		itemRepository.save(nightMageSkin());
 
 		// when
-		List<Item> actual = itemSearchRepository.findNotPurchasedItems(memberId, RoomType.MORNING);
+		List<Item> actual = itemSearchRepository.findNotPurchasedItems(memberId, ItemType.MORNING);
 
 		// then
 		assertThat(actual).hasSize(1)
@@ -55,7 +55,7 @@ class ItemSearchRepositoryTest {
 		Item morningKillerSkin = itemRepository.save(morningKillerSkin().unlockLevel(1).build());
 
 		// when
-		List<Item> actual = itemSearchRepository.findNotPurchasedItems(memberId, RoomType.MORNING);
+		List<Item> actual = itemSearchRepository.findNotPurchasedItems(memberId, ItemType.MORNING);
 
 		// then
 		assertThat(actual).hasSize(2)
@@ -71,7 +71,7 @@ class ItemSearchRepositoryTest {
 		Item morningKillerSkin = itemRepository.save(morningKillerSkin().bugPrice(20).build());
 
 		// when
-		List<Item> actual = itemSearchRepository.findNotPurchasedItems(memberId, RoomType.MORNING);
+		List<Item> actual = itemSearchRepository.findNotPurchasedItems(memberId, ItemType.MORNING);
 
 		// then
 		assertThat(actual).hasSize(2)
@@ -87,7 +87,7 @@ class ItemSearchRepositoryTest {
 		Item morningKillerSkin = itemRepository.save(morningKillerSkin().build());
 
 		// when
-		List<Item> actual = itemSearchRepository.findNotPurchasedItems(memberId, RoomType.MORNING);
+		List<Item> actual = itemSearchRepository.findNotPurchasedItems(memberId, ItemType.MORNING);
 
 		// then
 		assertThat(actual).hasSize(2)
