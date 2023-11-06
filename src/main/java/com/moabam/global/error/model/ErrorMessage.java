@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorMessage {
 
 	INVALID_REQUEST_FIELD("올바른 요청 정보가 아닙니다."),
+	INVALID_REQUEST_VALUE_TYPE_FORMAT("'%s' 값은 유효한 %s 값이 아닙니다."),
 
 	ROOM_NOT_FOUND("존재하지 않는 방 입니다."),
 	ROOM_MAX_USER_COUNT_MODIFY_FAIL("잘못된 최대 인원수 설정입니다."),
