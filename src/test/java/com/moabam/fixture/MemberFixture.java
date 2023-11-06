@@ -14,4 +14,12 @@ public final class MemberFixture {
 			.bug(BugFixture.bug())
 			.build();
 	}
+
+	public static Member member(Long socialId, String nickname) {
+		return Member.builder()
+			.socialId(socialId)
+			.nickname(nickname)
+			.bug(BugFixture.bug())
+			.build();
+	}
 }

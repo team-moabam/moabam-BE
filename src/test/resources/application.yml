@@ -3,6 +3,11 @@ logging:
     org.hibernate.SQL: debug
 
 spring:
+
+  # Profile
+  profiles:
+    active: test
+
   jpa:
     properties:
       hibernate:
