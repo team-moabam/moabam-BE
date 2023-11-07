@@ -4,14 +4,12 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -20,15 +18,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.moabam.api.domain.entity.Participant;
-import com.moabam.api.domain.entity.Room;
 import com.moabam.api.domain.repository.NotificationRepository;
 import com.moabam.api.domain.repository.ParticipantSearchRepository;
 import com.moabam.global.common.annotation.MemberTest;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
-import com.moabam.support.fixture.ParticipantFixture;
-import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
@@ -111,7 +106,7 @@ class NotificationServiceTest {
 	}
 
 	@DisplayName("특정 인증 시간에 해당하는 방 사용자들에게 알림을 성공적으로 보낼 때, - Void")
-	@MethodSource("provideParticipants")
+	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideParticipants")
 	@ParameterizedTest
 	void notificationService_sendCertificationTimeNotification(List<Participant> participants) {
 		// Given
@@ -126,7 +121,7 @@ class NotificationServiceTest {
 	}
 
 	@DisplayName("특정 인증 시간에 해당하는 방 사용자들의 토큰값이 없을 때, - Void")
-	@MethodSource("provideParticipants")
+	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideParticipants")
 	@ParameterizedTest
 	void notificationService_sendCertificationTimeNotification_NoFirebaseMessaging(List<Participant> participants) {
 		// Given
@@ -138,15 +133,5 @@ class NotificationServiceTest {
 
 		// Then
 		verify(firebaseMessaging, times(0)).sendAsync(any(Message.class));
-	}
-
-	static Stream<Arguments> provideParticipants() {
-		Room room = RoomFixture.room(10);
-
-		return Stream.of(Arguments.of(List.of(
-			ParticipantFixture.participant(room, 1L),
-			ParticipantFixture.participant(room, 2L),
-			ParticipantFixture.participant(room, 3L)
-		)));
 	}
 }
