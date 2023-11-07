@@ -16,8 +16,8 @@ import com.moabam.api.domain.entity.Member;
 import com.moabam.api.domain.repository.MemberRepository;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.LoginResponse;
-import com.moabam.fixture.AuthorizationResponseFixture;
-import com.moabam.fixture.MemberFixture;
+import com.moabam.support.fixture.AuthorizationResponseFixture;
+import com.moabam.support.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
