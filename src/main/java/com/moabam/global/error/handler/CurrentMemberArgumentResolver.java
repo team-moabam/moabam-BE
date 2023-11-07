@@ -1,6 +1,10 @@
 package com.moabam.global.error.handler;
 
+import static com.moabam.global.common.util.AuthorizationThreadLocal.*;
+
 import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -20,8 +24,8 @@ public class CurrentMemberArgumentResolver implements HandlerMethodArgumentResol
 	}
 
 	@Override
-	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-		NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-		return null;
+	public Object resolveArgument(@Nullable MethodParameter parameter, ModelAndViewContainer mavContainer,
+		@Nullable NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+		return getAuthorizationMember();
 	}
 }
