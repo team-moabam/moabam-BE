@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.moabam.api.domain.entity.enums.Role;
-import com.moabam.fixture.MemberFixture;
 import com.moabam.global.common.util.BaseImageUrl;
+import com.moabam.support.fixture.MemberFixture;
 
 class MemberTest {
 

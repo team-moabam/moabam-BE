@@ -1,4 +1,4 @@
-package com.moabam.fixture;
+package com.moabam.support.fixture;
 
 import com.moabam.api.domain.entity.Product;
 import com.moabam.api.domain.entity.enums.ProductType;

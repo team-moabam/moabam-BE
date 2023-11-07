@@ -27,9 +27,9 @@ import com.moabam.api.domain.entity.Room;
 import com.moabam.api.domain.repository.MemberRepository;
 import com.moabam.api.domain.repository.NotificationRepository;
 import com.moabam.api.domain.repository.RoomRepository;
-import com.moabam.fixture.MemberFixture;
 import com.moabam.fixture.RoomFixture;
 import com.moabam.global.common.repository.StringRedisRepository;
+import com.moabam.support.fixture.MemberFixture;
 
 @Transactional
 @SpringBootTest
