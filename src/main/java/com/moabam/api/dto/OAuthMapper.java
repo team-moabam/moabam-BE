@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class OAuthMapper {
+public final class OAuthMapper {
 
 	public static AuthorizationCodeRequest toAuthorizationCodeRequest(OAuthConfig oAuthConfig) {
 		return AuthorizationCodeRequest.builder()

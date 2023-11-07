@@ -3,11 +3,16 @@ logging:
     org.hibernate.SQL: debug
 
 spring:
+
+  # Profile
+  profiles:
+    active: test
+
   jpa:
     properties:
       hibernate:
         format_sql: true
-
+        highlight_sql: true
   # Redis
   data:
     redis:

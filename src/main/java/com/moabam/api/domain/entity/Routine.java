@@ -30,7 +30,7 @@ public class Routine extends BaseTimeEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "room_id", nullable = false, updatable = false)
+	@JoinColumn(name = "room_id", updatable = false)
 	private Room room;
 
 	@Column(name = "content", nullable = false, length = 60)
