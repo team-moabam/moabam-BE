@@ -21,6 +21,7 @@ public enum ErrorMessage {
 	WRONG_ROOM_PASSWORD("방의 비밀번호가 일치하지 않습니다."),
 	ROOM_MAX_USER_REACHED("방의 인원수가 찼습니다."),
 	ROOM_DETAILS_ERROR("방 정보를 불러오는데 실패했습니다."),
+	ROUTINE_LENGTH_ERROR("루틴의 길이가 잘못 되었습니다."),
 
 	LOGIN_FAILED("로그인에 실패했습니다."),
 	REQUEST_FAILED("네트워크 접근 실패입니다."),
@@ -28,6 +29,8 @@ public enum ErrorMessage {
 	AUTHENTICATIE_FAIL("인증 실패"),
 	MEMBER_NOT_FOUND("존재하지 않는 회원입니다."),
 	MEMBER_ROOM_EXCEED("참여할 수 있는 방의 개수가 모두 찼습니다."),
+
+	INVENTORY_NOT_FOUND("구매하지 않은 아이템은 적용할 수 없습니다."),
 
 	INVALID_BUG_COUNT("벌레 개수는 0 이상이어야 합니다."),
 	INVALID_PRICE("가격은 0 이상이어야 합니다."),

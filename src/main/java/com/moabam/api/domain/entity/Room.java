@@ -43,7 +43,7 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "title", nullable = false, length = 30)
+	@Column(name = "title", nullable = false, length = 20)
 	private String title;
 
 	@Column(name = "password", length = 8)

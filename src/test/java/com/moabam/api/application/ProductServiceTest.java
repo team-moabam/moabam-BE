@@ -1,6 +1,6 @@
 package com.moabam.api.application;
 
-import static com.moabam.fixture.ProductFixture.*;
+import static com.moabam.support.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 

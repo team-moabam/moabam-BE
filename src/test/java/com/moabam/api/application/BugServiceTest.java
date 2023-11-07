@@ -1,5 +1,6 @@
 package com.moabam.api.application;
 
+import static com.moabam.support.fixture.MemberFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -13,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.moabam.api.domain.entity.Bug;
 import com.moabam.api.domain.entity.Member;
 import com.moabam.api.dto.BugResponse;
-import com.moabam.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
 class BugServiceTest {
@@ -29,7 +29,7 @@ class BugServiceTest {
 	void get_bug_success() {
 		// given
 		Long memberId = 1L;
-		Member member = MemberFixture.member();
+		Member member = member();
 		given(memberService.getById(memberId)).willReturn(member);
 
 		// when

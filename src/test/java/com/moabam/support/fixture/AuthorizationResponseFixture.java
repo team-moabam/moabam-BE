@@ -1,4 +1,4 @@
-package com.moabam.fixture;
+package com.moabam.support.fixture;
 
 import com.moabam.api.dto.AuthorizationCodeResponse;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;

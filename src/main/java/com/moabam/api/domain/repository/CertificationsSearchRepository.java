@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import com.moabam.api.domain.entity.Certification;
 import com.moabam.api.domain.entity.DailyMemberCertification;
 import com.moabam.api.domain.entity.DailyRoomCertification;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -25,18 +24,10 @@ public class CertificationsSearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public List<Certification> findCertifications(List<Long> routineIds, LocalDate date) {
-		BooleanExpression expression = null;
-
-		for (Long routineId : routineIds) {
-			BooleanExpression routineExpression = certification.routine.id.eq(routineId);
-			expression = expression == null ? routineExpression : expression.or(routineExpression);
-		}
-
-		return jpaQueryFactory
-			.selectFrom(certification)
+	public List<Certification> findCertifications(Long roomId, LocalDate date) {
+		return jpaQueryFactory.selectFrom(certification)
 			.where(
-				expression,
+				certification.routine.room.id.eq(roomId),
 				certification.createdAt.between(date.atStartOfDay(), date.atTime(LocalTime.MAX))
 			)
 			.fetch();

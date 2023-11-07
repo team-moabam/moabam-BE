@@ -21,7 +21,6 @@ import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.entity.Room;
 import com.moabam.api.domain.entity.Routine;
 import com.moabam.api.domain.entity.enums.RoomType;
-import com.moabam.api.domain.repository.CertificationsMapper;
 import com.moabam.api.domain.repository.CertificationsSearchRepository;
 import com.moabam.api.domain.repository.ParticipantRepository;
 import com.moabam.api.domain.repository.ParticipantSearchRepository;
@@ -29,6 +28,7 @@ import com.moabam.api.domain.repository.RoomRepository;
 import com.moabam.api.domain.repository.RoutineRepository;
 import com.moabam.api.domain.repository.RoutineSearchRepository;
 import com.moabam.api.dto.CertificationImageResponse;
+import com.moabam.api.dto.CertificationsMapper;
 import com.moabam.api.dto.CreateRoomRequest;
 import com.moabam.api.dto.EnterRoomRequest;
 import com.moabam.api.dto.ModifyRoomRequest;
@@ -57,7 +57,7 @@ public class RoomService {
 	private final MemberService memberService;
 
 	@Transactional
-	public void createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
+	public Long createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
 		Room room = RoomMapper.toRoomEntity(createRoomRequest);
 		List<Routine> routines = RoutineMapper.toRoutineEntities(room, createRoomRequest.routines());
 		Participant participant = Participant.builder()
@@ -66,9 +66,11 @@ public class RoomService {
 			.build();
 
 		participant.enableManager();
-		roomRepository.save(room);
+		Room savedRoom = roomRepository.save(room);
 		routineRepository.saveAll(routines);
 		participantRepository.save(participant);
+
+		return savedRoom.getId();
 	}
 
 	@Transactional
@@ -85,6 +87,12 @@ public class RoomService {
 		room.changePassword(modifyRoomRequest.password());
 		room.changeCertifyTime(modifyRoomRequest.certifyTime());
 		room.changeMaxCount(modifyRoomRequest.maxUserCount());
+
+		List<Routine> routines = routineSearchRepository.findByRoomId(roomId);
+		routineRepository.deleteAll(routines);
+
+		List<Routine> newRoutines = RoutineMapper.toRoutineEntities(room, modifyRoomRequest.routines());
+		routineRepository.saveAll(newRoutines);
 	}
 
 	@Transactional
@@ -134,7 +142,7 @@ public class RoomService {
 			certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today);
 		List<RoutineResponse> routineResponses = getRoutineResponses(roomId);
 		List<TodayCertificateRankResponse> todayCertificateRankResponses = getTodayCertificateRankResponses(roomId,
-			routineResponses, dailyMemberCertifications, today);
+			dailyMemberCertifications, today);
 		List<LocalDate> certifiedDates = getCertifiedDates(roomId, today);
 		double completePercentage = calculateCompletePercentage(dailyMemberCertifications.size(),
 			room.getCurrentUserCount());
@@ -208,15 +216,10 @@ public class RoomService {
 	}
 
 	private List<TodayCertificateRankResponse> getTodayCertificateRankResponses(Long roomId,
-		List<RoutineResponse> routines, List<DailyMemberCertification> dailyMemberCertifications, LocalDate today) {
+		List<DailyMemberCertification> dailyMemberCertifications, LocalDate today) {
 
 		List<TodayCertificateRankResponse> responses = new ArrayList<>();
-		List<Long> routineIds = routines.stream()
-			.map(RoutineResponse::routineId)
-			.toList();
-		List<Certification> certifications = certificationsSearchRepository.findCertifications(
-			routineIds,
-			today);
+		List<Certification> certifications = certificationsSearchRepository.findCertifications(roomId, today);
 		List<Participant> participants = participantSearchRepository.findParticipants(roomId);
 		List<Member> members = memberService.getRoomMembers(participants.stream()
 			.map(Participant::getMemberId)
