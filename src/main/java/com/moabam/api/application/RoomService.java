@@ -134,7 +134,7 @@ public class RoomService {
 			certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today);
 		List<RoutineResponse> routineResponses = getRoutineResponses(roomId);
 		List<TodayCertificateRankResponse> todayCertificateRankResponses = getTodayCertificateRankResponses(roomId,
-			routineResponses, dailyMemberCertifications, today);
+			dailyMemberCertifications, today);
 		List<LocalDate> certifiedDates = getCertifiedDates(roomId, today);
 		double completePercentage = calculateCompletePercentage(dailyMemberCertifications.size(),
 			room.getCurrentUserCount());
@@ -208,15 +208,10 @@ public class RoomService {
 	}
 
 	private List<TodayCertificateRankResponse> getTodayCertificateRankResponses(Long roomId,
-		List<RoutineResponse> routines, List<DailyMemberCertification> dailyMemberCertifications, LocalDate today) {
+		List<DailyMemberCertification> dailyMemberCertifications, LocalDate today) {
 
 		List<TodayCertificateRankResponse> responses = new ArrayList<>();
-		List<Long> routineIds = routines.stream()
-			.map(RoutineResponse::routineId)
-			.toList();
-		List<Certification> certifications = certificationsSearchRepository.findCertifications(
-			routineIds,
-			today);
+		List<Certification> certifications = certificationsSearchRepository.findCertifications(roomId, today);
 		List<Participant> participants = participantSearchRepository.findParticipants(roomId);
 		List<Member> members = memberService.getRoomMembers(participants.stream()
 			.map(Participant::getMemberId)
