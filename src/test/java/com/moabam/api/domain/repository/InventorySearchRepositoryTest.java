@@ -17,9 +17,9 @@ import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.Member;
 import com.moabam.api.domain.entity.enums.ItemType;
-import com.moabam.support.annotation.RepositoryTest;
+import com.moabam.support.annotation.QuerydslRepositoryTest;
 
-@RepositoryTest
+@QuerydslRepositoryTest
 class InventorySearchRepositoryTest {
 
 	@Autowired
@@ -98,7 +98,7 @@ class InventorySearchRepositoryTest {
 		Member member = memberRepository.save(member());
 		Item item = itemRepository.save(nightMageSkin());
 		Inventory inventory = inventoryRepository.save(inventory(member.getId(), item));
-		inventory.setDefault();
+		inventory.select();
 
 		// when
 		Optional<Inventory> actual = inventorySearchRepository.findDefault(member.getId(), inventory.getItemType());
