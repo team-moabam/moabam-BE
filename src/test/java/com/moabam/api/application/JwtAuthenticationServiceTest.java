@@ -31,15 +31,15 @@ class JwtAuthenticationServiceTest {
 	long originAccessExpire = 100000;
 	long originRefreshExpire = 150000;
 
-	TokenConfig tokenConfige;
+	TokenConfig tokenConfig;
 	JwtAuthenticationService jwtAuthenticationService;
 	JwtProviderService jwtProviderService;
 
 	@BeforeEach
 	void initConfig() {
-		tokenConfige = new TokenConfig(originIss, originAccessExpire, originRefreshExpire, originSecretKey);
-		jwtProviderService = new JwtProviderService(tokenConfige);
-		jwtAuthenticationService = new JwtAuthenticationService(tokenConfige);
+		tokenConfig = new TokenConfig(originIss, originAccessExpire, originRefreshExpire, originSecretKey);
+		jwtProviderService = new JwtProviderService(tokenConfig);
+		jwtAuthenticationService = new JwtAuthenticationService(tokenConfig);
 	}
 
 	@DisplayName("토큰 인증 시간 만료 테스트")

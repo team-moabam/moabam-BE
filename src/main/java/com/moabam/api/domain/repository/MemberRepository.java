@@ -8,5 +8,5 @@ import com.moabam.api.domain.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-	Optional<Member> findBySocialId(long id);
+	Optional<Member> findBySocialId(Long id);
 }

@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.global.common.constant.GlobalConstant;
-import com.moabam.global.common.util.TokenConstant;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
 import com.moabam.global.error.model.ErrorMessage;
@@ -54,7 +53,7 @@ public class OAuth2AuthorizationServerRequestService {
 
 	public ResponseEntity<AuthorizationTokenInfoResponse> tokenInfoRequest(String tokenInfoUri, String tokenValue) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(TokenConstant.AUTHORIZATION, tokenValue);
+		headers.add("Authorization", tokenValue);
 		HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
 		return restTemplate.exchange(tokenInfoUri, HttpMethod.GET, httpEntity, AuthorizationTokenInfoResponse.class);

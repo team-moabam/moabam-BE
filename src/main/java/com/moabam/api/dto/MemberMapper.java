@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberMapper {
 
-	public static Member toMember(Long id, String nickName) {
+	public static Member toMember(Long socialId, String nickName) {
 		return Member.builder()
-			.socialId(id)
+			.socialId(socialId)
 			.nickname(nickName)
 			.bug(Bug.builder().build())
 			.build();

@@ -83,7 +83,7 @@ class JwtProviderServiceTest {
 		assertThat(iat).isLessThan(exp);
 	}
 
-	@DisplayName("access 토큰 생성 실패")
+	@DisplayName("access 토큰 만료시간에 따른 생성 실패")
 	@Test
 	void create_access_token_fail() {
 		// given
@@ -103,11 +103,11 @@ class JwtProviderServiceTest {
 		).isInstanceOf(ExpiredJwtException.class);
 	}
 
-	@DisplayName("refresh 토큰 생성 실패")
+	@DisplayName("refresh 토큰 만료시간에 따른 생성 실패")
 	@Test
 	void create_token_fail() {
 		// given
-		long refreshExpire = 15000L;
+		long refreshExpire = -1L;
 
 		TokenConfig tokenConfig = new TokenConfig("PARK", 0L, refreshExpire, secretKey);
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);

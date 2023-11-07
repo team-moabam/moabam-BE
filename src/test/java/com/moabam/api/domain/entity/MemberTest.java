@@ -13,7 +13,7 @@ import com.moabam.support.fixture.MemberFixture;
 
 class MemberTest {
 
-	long socialId = 1L;
+	Long socialId = 1L;
 	String nickname = "밥세공기";
 	String profileImage = "kakao/profile/url";
 

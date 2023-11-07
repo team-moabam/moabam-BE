@@ -40,7 +40,7 @@ public class Member extends BaseTimeEntity {
 	private Long id;
 
 	@Column(name = "social_id", nullable = false, unique = true)
-	private long socialId;
+	private Long socialId;
 
 	@Column(name = "nickname", nullable = false, unique = true)
 	private String nickname;
@@ -79,7 +79,7 @@ public class Member extends BaseTimeEntity {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	private Member(Long id, long socialId, String nickname, Bug bug) {
+	private Member(Long id, Long socialId, String nickname, Bug bug) {
 		this.id = id;
 		this.socialId = socialId;
 		this.nickname = requireNonNull(nickname);

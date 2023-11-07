@@ -1,7 +1,5 @@
 package com.moabam.api.application;
 
-import static com.moabam.global.common.util.OAuthParameterNames.*;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +16,6 @@ import com.moabam.api.dto.LoginResponse;
 import com.moabam.api.dto.OAuthMapper;
 import com.moabam.global.common.constant.GlobalConstant;
 import com.moabam.global.common.util.CookieUtils;
-import com.moabam.global.common.util.TokenConstant;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -69,19 +66,19 @@ public class AuthenticationService {
 	}
 
 	private String generateTokenValue(String token) {
-		return TokenConstant.TOKEN_TYPE + GlobalConstant.SPACE + token;
+		return "Bearer" + GlobalConstant.SPACE + token;
 	}
 
 	private String generateQueryParamsWith(AuthorizationCodeRequest authorizationCodeRequest) {
 		UriComponentsBuilder authorizationCodeUri = UriComponentsBuilder.fromUriString(
 				oAuthConfig.provider().authorizationUri())
-			.queryParam(RESPONSE_TYPE, CODE)
-			.queryParam(CLIENT_ID, authorizationCodeRequest.clientId())
-			.queryParam(REDIRECT_URI, authorizationCodeRequest.redirectUri());
+			.queryParam("response_type", "code")
+			.queryParam("client_id", authorizationCodeRequest.clientId())
+			.queryParam("redirect_uri", authorizationCodeRequest.redirectUri());
 
 		if (!authorizationCodeRequest.scope().isEmpty()) {
-			String scopes = String.join(GlobalConstant.COMMA, authorizationCodeRequest.scope());
-			authorizationCodeUri.queryParam(SCOPE, scopes);
+			String scopes = String.join(",", authorizationCodeRequest.scope());
+			authorizationCodeUri.queryParam("scope", scopes);
 		}
 
 		return authorizationCodeUri.toUriString();
@@ -106,13 +103,13 @@ public class AuthenticationService {
 
 	private MultiValueMap<String, String> generateTokenRequest(AuthorizationTokenRequest authorizationTokenRequest) {
 		MultiValueMap<String, String> contents = new LinkedMultiValueMap<>();
-		contents.add(GRANT_TYPE, authorizationTokenRequest.grantType());
-		contents.add(CLIENT_ID, authorizationTokenRequest.clientId());
-		contents.add(REDIRECT_URI, authorizationTokenRequest.redirectUri());
-		contents.add(CODE, authorizationTokenRequest.code());
+		contents.add("grant_type", authorizationTokenRequest.grantType());
+		contents.add("client_id", authorizationTokenRequest.clientId());
+		contents.add("redirect_uri", authorizationTokenRequest.redirectUri());
+		contents.add("code", authorizationTokenRequest.code());
 
 		if (authorizationTokenRequest.clientSecret() != null) {
-			contents.add(CLIENT_SECRET, authorizationTokenRequest.clientSecret());
+			contents.add("client_secret", authorizationTokenRequest.clientSecret());
 		}
 
 		return contents;

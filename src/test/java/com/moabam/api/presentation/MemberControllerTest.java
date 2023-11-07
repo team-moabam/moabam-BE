@@ -1,6 +1,5 @@
 package com.moabam.api.presentation;
 
-import static com.moabam.global.common.util.OAuthParameterNames.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
@@ -86,10 +85,10 @@ class MemberControllerTest {
 		// given
 		String uri = UriComponentsBuilder
 			.fromUriString(oAuthConfig.provider().authorizationUri())
-			.queryParam(RESPONSE_TYPE, "code")
-			.queryParam(CLIENT_ID, oAuthConfig.client().clientId())
-			.queryParam(REDIRECT_URI, oAuthConfig.provider().redirectUri())
-			.queryParam(SCOPE, String.join(",", oAuthConfig.client().scope()))
+			.queryParam("response_type", "code")
+			.queryParam("client_id", oAuthConfig.client().clientId())
+			.queryParam("redirect_uri", oAuthConfig.provider().redirectUri())
+			.queryParam("scope", String.join(",", oAuthConfig.client().scope()))
 			.toUriString();
 
 		// expected
@@ -106,11 +105,11 @@ class MemberControllerTest {
 	void social_login_signUp_request_success() throws Exception {
 		// given
 		MultiValueMap<String, String> contentParams = new LinkedMultiValueMap<>();
-		contentParams.add(GRANT_TYPE, oAuthConfig.client().authorizationGrantType());
-		contentParams.add(CLIENT_ID, oAuthConfig.client().clientId());
-		contentParams.add(REDIRECT_URI, oAuthConfig.provider().redirectUri());
-		contentParams.add(CODE, "test");
-		contentParams.add(CLIENT_SECRET, oAuthConfig.client().clientSecret());
+		contentParams.add("grant_type", oAuthConfig.client().authorizationGrantType());
+		contentParams.add("client_id", oAuthConfig.client().clientId());
+		contentParams.add("redirect_uri", oAuthConfig.provider().redirectUri());
+		contentParams.add("code", "test");
+		contentParams.add("client_secret", oAuthConfig.client().clientSecret());
 
 		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
 		AuthorizationTokenResponse authorizationTokenResponse =
@@ -155,11 +154,11 @@ class MemberControllerTest {
 	void authorization_token_request_fail(int code) throws Exception {
 		// given
 		MultiValueMap<String, String> contentParams = new LinkedMultiValueMap<>();
-		contentParams.add(GRANT_TYPE, oAuthConfig.client().authorizationGrantType());
-		contentParams.add(CLIENT_ID, oAuthConfig.client().clientId());
-		contentParams.add(REDIRECT_URI, oAuthConfig.provider().redirectUri());
-		contentParams.add(CODE, "test");
-		contentParams.add(CLIENT_SECRET, oAuthConfig.client().clientSecret());
+		contentParams.add("grant_type", oAuthConfig.client().authorizationGrantType());
+		contentParams.add("client_id", oAuthConfig.client().clientId());
+		contentParams.add("redirect_uri", oAuthConfig.provider().redirectUri());
+		contentParams.add("code", "test");
+		contentParams.add("client_secret", oAuthConfig.client().clientSecret());
 
 		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
 

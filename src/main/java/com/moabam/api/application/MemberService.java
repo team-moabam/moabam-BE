@@ -1,6 +1,5 @@
 package com.moabam.api.application;
 
-import static com.moabam.global.common.constant.GlobalConstant.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 
 import java.security.SecureRandom;
@@ -14,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.moabam.api.domain.entity.Member;
 import com.moabam.api.domain.repository.MemberRepository;
 import com.moabam.api.domain.repository.MemberSearchRepository;
+import com.moabam.api.domain.repository.NotificationRepository;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.LoginResponse;
 import com.moabam.api.dto.MemberMapper;
@@ -28,37 +28,30 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final MemberSearchRepository memberSearchRepository;
+	private final NotificationRepository notificationRepository;
 
 	public Member getById(Long memberId) {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
 	}
 
-	public boolean isExistMember(Long memberId) {
-		return memberRepository.existsById(memberId);
-	}
-
 	@Transactional
 	public LoginResponse login(AuthorizationTokenInfoResponse authorizationTokenInfoResponse) {
 		Optional<Member> member = memberRepository.findBySocialId(authorizationTokenInfoResponse.id());
+		Member loginMember = member.orElse(signUp(authorizationTokenInfoResponse.id()));
 
-		if (member.isEmpty()) {
-			Member signUpMember = signUp(authorizationTokenInfoResponse.id());
-			return MemberMapper.toLoginResponse(signUpMember.getId(), true);
-		}
-
-		return MemberMapper.toLoginResponse(member.get().getId());
+		return MemberMapper.toLoginResponse(loginMember.getId(), member.isEmpty());
 	}
 
-	private Member signUp(long socialId) {
-		String randomNick = createRandomNickName();
-		Member member = MemberMapper.toMember(socialId, randomNick);
+	private Member signUp(Long socialId) {
+		String randomNickName = createRandomNickName();
+		Member member = MemberMapper.toMember(socialId, randomNickName);
 
 		return memberRepository.save(member);
 	}
 
 	private String createRandomNickName() {
-		return RandomStringUtils.random(RANDOM_NICKNAME_SIZE, 0, 0, true, true, null,
+		return RandomStringUtils.random(6, 0, 0, true, true, null,
 			new SecureRandom());
 	}
 

@@ -180,7 +180,8 @@ class AuthenticationServiceTest {
 			= AuthorizationResponseFixture.authorizationTokenInfoResponse();
 
 		// When
-		when(oAuth2AuthorizationServerRequestService.tokenInfoRequest(eq(oauthConfig.provider().tokenInfo()),
+		when(oAuth2AuthorizationServerRequestService.tokenInfoRequest(
+			any(String.class),
 			eq("Bearer " + tokenResponse.accessToken())))
 			.thenReturn(new ResponseEntity<>(tokenInfoResponse, HttpStatus.OK));
 
@@ -191,7 +192,7 @@ class AuthenticationServiceTest {
 	@DisplayName("회원 가입 및 로그인 성공 테스트")
 	@ParameterizedTest
 	@ValueSource(booleans = {true, false})
-	void signUp_success2(boolean isSignUp) {
+	void signUp_success(boolean isSignUp) {
 		// given
 		MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
