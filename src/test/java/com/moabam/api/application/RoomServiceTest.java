@@ -1,6 +1,7 @@
 package com.moabam.api.application;
 
 import static com.moabam.api.domain.entity.enums.RoomType.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import com.moabam.api.domain.repository.ParticipantRepository;
 import com.moabam.api.domain.repository.RoomRepository;
 import com.moabam.api.domain.repository.RoutineRepository;
 import com.moabam.api.dto.CreateRoomRequest;
+import com.moabam.api.dto.RoomMapper;
 
 @ExtendWith(MockitoExtension.class)
 class RoomServiceTest {
@@ -52,13 +54,18 @@ class RoomServiceTest {
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"재윤과 앵맹이의 방임", null, routines, MORNING, 10, 4);
 
+		Room expectedRoom = RoomMapper.toRoomEntity(createRoomRequest);
+		given(roomRepository.save(any(Room.class))).willReturn(expectedRoom);
+
 		// when
-		roomService.createRoom(1L, createRoomRequest);
+		Long result = roomService.createRoom(1L, createRoomRequest);
 
 		// then
 		verify(roomRepository).save(any(Room.class));
 		verify(routineRepository).saveAll(ArgumentMatchers.<Routine>anyList());
 		verify(participantRepository).save(any(Participant.class));
+		assertThat(result).isEqualTo(expectedRoom.getId());
+		assertThat(expectedRoom.getPassword()).isNull();
 	}
 
 	@DisplayName("비밀번호 있는 방 생성 성공")
@@ -72,12 +79,17 @@ class RoomServiceTest {
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"재윤과 앵맹이의 방임", "1234", routines, MORNING, 10, 4);
 
+		Room expectedRoom = RoomMapper.toRoomEntity(createRoomRequest);
+		given(roomRepository.save(any(Room.class))).willReturn(expectedRoom);
+
 		// when
-		roomService.createRoom(1L, createRoomRequest);
+		Long result = roomService.createRoom(1L, createRoomRequest);
 
 		// then
 		verify(roomRepository).save(any(Room.class));
 		verify(routineRepository).saveAll(ArgumentMatchers.<Routine>anyList());
 		verify(participantRepository).save(any(Participant.class));
+		assertThat(result).isEqualTo(expectedRoom.getId());
+		assertThat(expectedRoom.getPassword()).isEqualTo("1234");
 	}
 }

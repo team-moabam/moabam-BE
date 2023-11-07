@@ -131,7 +131,7 @@ class RoomControllerTest {
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
-			"비번 있는 재윤과 앵맹이의 방임", password, routines, MORNING, 10, 4);
+			"비번 있는 재맹의 방임", password, routines, MORNING, 10, 4);
 		String json = objectMapper.writeValueAsString(createRoomRequest);
 
 		// expected
@@ -141,7 +141,7 @@ class RoomControllerTest {
 			.andExpect(status().isCreated())
 			.andDo(print());
 		assertThat(roomRepository.findAll()).hasSize(1);
-		assertThat(roomRepository.findAll().get(0).getTitle()).isEqualTo("비번 있는 재윤과 앵맹이의 방임");
+		assertThat(roomRepository.findAll().get(0).getTitle()).isEqualTo("비번 있는 재맹의 방임");
 		assertThat(roomRepository.findAll().get(0).getPassword()).isEqualTo(password);
 	}
 
