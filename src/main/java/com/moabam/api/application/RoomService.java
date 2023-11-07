@@ -21,7 +21,7 @@ import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.entity.Room;
 import com.moabam.api.domain.entity.Routine;
 import com.moabam.api.domain.entity.enums.RoomType;
-import com.moabam.api.domain.repository.CertificationsMapper;
+import com.moabam.api.dto.CertificationsMapper;
 import com.moabam.api.domain.repository.CertificationsSearchRepository;
 import com.moabam.api.domain.repository.ParticipantRepository;
 import com.moabam.api.domain.repository.ParticipantSearchRepository;
