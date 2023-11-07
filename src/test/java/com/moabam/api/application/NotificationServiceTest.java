@@ -37,13 +37,16 @@ class NotificationServiceTest {
 	private NotificationService notificationService;
 
 	@Mock
+	private RoomService roomService;
+
+	@Mock
+	private FirebaseMessaging firebaseMessaging;
+
+	@Mock
 	private NotificationRepository notificationRepository;
 
 	@Mock
 	private ParticipantSearchRepository participantSearchRepository;
-
-	@Mock
-	private FirebaseMessaging firebaseMessaging;
 
 	private MemberTest memberTest;
 
@@ -56,6 +59,7 @@ class NotificationServiceTest {
 	@Test
 	void notificationService_sendKnockNotification() {
 		// Given
+		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(true);
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
 		given(notificationRepository.findFcmTokenByMemberId(any(Long.class))).willReturn("FCM-TOKEN");
@@ -68,10 +72,22 @@ class NotificationServiceTest {
 		verify(notificationRepository).saveKnockNotification(any(String.class));
 	}
 
+	@DisplayName("콕 찌를 상대의 방이 존재하지 않을 때, - NotFoundException")
+	@Test
+	void notificationService_sendKnockNotification_Room_NotFoundException() {
+		// Given
+		willThrow(NotFoundException.class).given(roomService).validateRoomById(any(Long.class));
+
+		// When & Then
+		assertThatThrownBy(() -> notificationService.sendKnockNotification(memberTest, 1L, 1L))
+			.isInstanceOf(NotFoundException.class);
+	}
+
 	@DisplayName("콕 찌를 상대의 FCM 토큰이 존재하지 않을 때, - NotFoundException")
 	@Test
-	void notificationService_sendKnockNotification_NotFoundException() {
+	void notificationService_sendKnockNotification_FcmToken_NotFoundException() {
 		// Given
+		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
 		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(false);
 
@@ -85,6 +101,7 @@ class NotificationServiceTest {
 	@Test
 	void notificationService_sendKnockNotification_ConflictException() {
 		// Given
+		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(true);
 
 		// When & Then

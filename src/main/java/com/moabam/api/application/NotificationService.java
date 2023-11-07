@@ -29,12 +29,15 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class NotificationService {
 
+	private final RoomService roomService;
 	private final FirebaseMessaging firebaseMessaging;
 	private final NotificationRepository notificationRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
 
 	@Transactional
 	public void sendKnockNotification(MemberTest member, Long targetId, Long roomId) {
+		roomService.validateRoomById(roomId);
+		
 		String knockKey = generateKnockKey(member.memberId(), targetId, roomId);
 		validateConflictKnockNotification(knockKey);
 		validateFcmToken(targetId);
