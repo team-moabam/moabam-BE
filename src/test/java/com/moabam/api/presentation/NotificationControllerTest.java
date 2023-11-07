@@ -61,7 +61,7 @@ class NotificationControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		target = memberRepository.save(MemberFixture.member("target123", "targetName"));
+		target = memberRepository.save(MemberFixture.member(123L, "targetName"));
 		room = roomRepository.save(RoomFixture.room());
 		knockKey = String.format(KNOCK_KEY, room.getId(), 1, target.getId());
 

@@ -18,7 +18,7 @@ public class NotificationRepository {
 
 	private final StringRedisRepository stringRedisRepository;
 
-	// TODO : 세연님 로그인 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 저장하면 됩니다.
+	// TODO : 세연님 로그인 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 저장하면 됩니다. Front와 상의 후 삭제예정
 	public void saveFcmToken(Long key, String value) {
 		stringRedisRepository.save(
 			String.valueOf(requireNonNull(key)),

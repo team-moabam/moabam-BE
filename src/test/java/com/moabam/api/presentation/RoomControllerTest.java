@@ -525,9 +525,8 @@ class RoomControllerTest {
 
 		Member member = Member.builder()
 			.id(1L)
-			.socialId("test123")
+			.socialId(1L)
 			.nickname("nick")
-			.profileImage("testtests")
 			.bug(BugFixture.bug())
 			.build();
 
@@ -771,16 +770,14 @@ class RoomControllerTest {
 		participant1.enableManager();
 
 		Member member2 = Member.builder()
-			.socialId("SOCIAL_2")
+			.socialId(2L)
 			.nickname("NICKNAME_2")
-			.profileImage("PROFILE_IMAGE_2")
 			.bug(BugFixture.bug())
 			.build();
 
 		Member member3 = Member.builder()
-			.socialId("SOCIAL_3")
+			.socialId(3L)
 			.nickname("NICKNAME_3")
-			.profileImage("PROFILE_IMAGE_3")
 			.bug(BugFixture.bug())
 			.build();
 
