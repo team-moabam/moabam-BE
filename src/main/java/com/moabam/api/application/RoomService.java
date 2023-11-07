@@ -21,7 +21,6 @@ import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.entity.Room;
 import com.moabam.api.domain.entity.Routine;
 import com.moabam.api.domain.entity.enums.RoomType;
-import com.moabam.api.dto.CertificationsMapper;
 import com.moabam.api.domain.repository.CertificationsSearchRepository;
 import com.moabam.api.domain.repository.ParticipantRepository;
 import com.moabam.api.domain.repository.ParticipantSearchRepository;
@@ -29,6 +28,7 @@ import com.moabam.api.domain.repository.RoomRepository;
 import com.moabam.api.domain.repository.RoutineRepository;
 import com.moabam.api.domain.repository.RoutineSearchRepository;
 import com.moabam.api.dto.CertificationImageResponse;
+import com.moabam.api.dto.CertificationsMapper;
 import com.moabam.api.dto.CreateRoomRequest;
 import com.moabam.api.dto.EnterRoomRequest;
 import com.moabam.api.dto.ModifyRoomRequest;
@@ -85,6 +85,12 @@ public class RoomService {
 		room.changePassword(modifyRoomRequest.password());
 		room.changeCertifyTime(modifyRoomRequest.certifyTime());
 		room.changeMaxCount(modifyRoomRequest.maxUserCount());
+
+		List<Routine> routines = routineSearchRepository.findByRoomId(roomId);
+		routineRepository.deleteAll(routines);
+
+		List<Routine> newRoutines = RoutineMapper.toRoutineEntities(room, modifyRoomRequest.routines());
+		routineRepository.saveAll(newRoutines);
 	}
 
 	@Transactional
