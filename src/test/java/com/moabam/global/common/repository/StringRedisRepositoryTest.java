@@ -10,11 +10,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
+import com.moabam.global.common.config.TestConfig;
 import com.moabam.global.config.EmbeddedRedisConfig;
 import com.moabam.global.config.RedisConfig;
 
 @SpringBootTest(classes = {RedisConfig.class, EmbeddedRedisConfig.class, StringRedisRepository.class})
+@Import(TestConfig.class)
 class StringRedisRepositoryTest {
 
 	@Autowired

@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +16,8 @@ import org.springframework.util.StringUtils;
 import com.moabam.global.error.exception.MoabamException;
 import com.moabam.global.error.model.ErrorMessage;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import redis.embedded.RedisServer;
 
@@ -30,17 +29,24 @@ public class EmbeddedRedisConfig {
 	@Value("${spring.data.redis.port}")
 	private int redisPort;
 
+	private int availablePort;
 	private RedisServer redisServer;
 
-	@PostConstruct
-	public void startRedis() {
-		int port = isRedisRunning() ? findAvailablePort() : redisPort;
+	public EmbeddedRedisConfig(@Value("${spring.data.redis.port}") int redisPort) {
+		this.redisPort = redisPort;
 
-		if (isArmMac()) {
-			redisServer = new RedisServer(getRedisFileForArcMac(), port);
+		startRedis();
+	}
+
+	public void startRedis() {
+		Os os = Os.createOs();
+		availablePort = findPort(os);
+
+		if (os.isMac()) {
+			redisServer = new RedisServer(getRedisFileForArcMac(), availablePort);
 		} else {
 			redisServer = RedisServer.builder()
-				.port(port)
+				.port(availablePort)
 				.setting(REDIS_SERVER_MAX_MEMORY)
 				.build();
 		}
@@ -64,9 +70,21 @@ public class EmbeddedRedisConfig {
 		}
 	}
 
-	public int findAvailablePort() {
+	public int getAvailablePort() {
+		return availablePort;
+	}
+
+	private int findPort(Os os) {
+		if (!isRunning(os.executeCommand(redisPort))) {
+			return redisPort;
+		}
+
+		return findAvailablePort(os);
+	}
+
+	private int findAvailablePort(Os os) {
 		for (int port = 10000; port <= 65535; port++) {
-			Process process = executeGrepProcessCommand(port);
+			Process process = os.executeCommand(port);
 
 			if (!isRunning(process)) {
 				return port;
@@ -74,21 +92,6 @@ public class EmbeddedRedisConfig {
 		}
 
 		throw new MoabamException(ErrorMessage.NOT_FOUND_AVAILABLE_PORT);
-	}
-
-	private boolean isRedisRunning() {
-		return isRunning(executeGrepProcessCommand(redisPort));
-	}
-
-	private Process executeGrepProcessCommand(int redisPort) {
-		String command = String.format(FIND_LISTEN_PROCESS_COMMAND, redisPort);
-		String[] shell = {SHELL_PATH, SHELL_COMMAND_OPTION, command};
-
-		try {
-			return Runtime.getRuntime().exec(shell);
-		} catch (IOException e) {
-			throw new MoabamException(e.getMessage());
-		}
 	}
 
 	private boolean isRunning(Process process) {
@@ -106,16 +109,81 @@ public class EmbeddedRedisConfig {
 		return StringUtils.hasText(pidInfo.toString());
 	}
 
-	private boolean isArmMac() {
-		return Objects.equals(System.getProperty(OS_ARCHITECTURE), ARM_ARCHITECTURE)
-			&& Objects.equals(System.getProperty(OS_NAME), MAC_OS_NAME);
-	}
-
 	private File getRedisFileForArcMac() {
 		try {
 			return new ClassPathResource(REDIS_BINARY_PATH).getFile();
 		} catch (Exception e) {
 			throw new MoabamException(e.getMessage());
+		}
+	}
+
+	private static final class Os {
+
+		enum Type {
+			MAC,
+			WIN,
+			LINUX
+		}
+
+		private final String shellPath;
+		private final String optionOperator;
+		private final String command;
+		private final Type type;
+
+		@Builder
+		private Os(String shellPath, String optionOperator, String command, Type type) {
+			this.shellPath = shellPath;
+			this.optionOperator = optionOperator;
+			this.command = command;
+			this.type = type;
+		}
+
+		public Process executeCommand(int port) {
+			String command = String.format(this.command, port);
+			String[] script = {shellPath, optionOperator, command};
+
+			try {
+				return Runtime.getRuntime().exec(script);
+			} catch (IOException e) {
+				throw new MoabamException(e.getMessage());
+			}
+		}
+
+		public boolean isMac() {
+			return type == Type.MAC;
+		}
+
+		public static Os createOs() {
+			String osArchitecture = System.getProperty(OS_ARCHITECTURE);
+			String osName = System.getProperty(OS_NAME);
+
+			if (osArchitecture.equals(ARM_ARCHITECTURE) && osName.equals(MAC_OS_NAME)) {
+				return linuxOs(Type.MAC);
+			}
+
+			if (osArchitecture.equals(AMD_ARCHITECTURE) && osName.contains(WINDOW_OS_NAME)) {
+				return windowOs();
+			}
+
+			return linuxOs(Type.LINUX);
+		}
+
+		private static Os linuxOs(Type type) {
+			return Os.builder()
+				.shellPath(SHELL_PATH)
+				.optionOperator(SHELL_COMMAND_OPTION)
+				.command(FIND_LISTEN_PROCESS_COMMAND)
+				.type(type)
+				.build();
+		}
+
+		private static Os windowOs() {
+			return Os.builder()
+				.shellPath(WIN_SHELL_PATH)
+				.optionOperator(WIN_OPTION_OPERATOR)
+				.command(WIN_LISTEN_PROCESS_COMMAND)
+				.type(Type.WIN)
+				.build();
 		}
 	}
 }

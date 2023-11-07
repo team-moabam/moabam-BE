@@ -1,4 +1,4 @@
-package com.moabam.global.config;
+package com.moabam.global.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -9,19 +9,18 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.moabam.global.config.EmbeddedRedisConfig;
+
 @Configuration
-@Profile("!test")
-public class RedisConfig {
+@Profile("test")
+public class TestConfig {
 
 	@Value("${spring.data.redis.host}")
 	private String redisHost;
 
-	@Value("${spring.data.redis.port}")
-	private int redisPort;
-
 	@Bean
-	public RedisConnectionFactory redisConnectionFactory() {
-		return new LettuceConnectionFactory(redisHost, redisPort);
+	public RedisConnectionFactory redisConnectionFactory(EmbeddedRedisConfig embeddedRedisConfig) {
+		return new LettuceConnectionFactory(redisHost, embeddedRedisConfig.getAvailablePort());
 	}
 
 	@Bean
