@@ -26,10 +26,10 @@ import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenRequest;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.api.dto.OAuthMapper;
-import com.moabam.fixture.AuthorizationResponseFixture;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
+import com.moabam.support.fixture.AuthorizationResponseFixture;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {
