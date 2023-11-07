@@ -74,8 +74,8 @@ class ItemServiceTest {
 			Inventory inventory = InventoryFixture.inventory(memberId, nightMageSkin());
 			Inventory defaultInventory = InventoryFixture.inventory(memberId, nightMageSkin());
 			ItemType itemType = inventory.getItemType();
-			when(inventorySearchRepository.findOne(memberId, itemId)).thenReturn(Optional.of(inventory));
-			when(inventorySearchRepository.findDefault(memberId, itemType)).thenReturn(Optional.of(defaultInventory));
+			given(inventorySearchRepository.findOne(memberId, itemId)).willReturn(Optional.of(inventory));
+			given(inventorySearchRepository.findDefault(memberId, itemType)).willReturn(Optional.of(defaultInventory));
 
 			// when
 			itemService.selectItem(memberId, itemId);
@@ -93,7 +93,7 @@ class ItemServiceTest {
 			// given
 			Long memberId = 1L;
 			Long itemId = 1L;
-			when(inventorySearchRepository.findOne(memberId, itemId)).thenReturn(Optional.empty());
+			given(inventorySearchRepository.findOne(memberId, itemId)).willReturn(Optional.empty());
 
 			// when, then
 			assertThatThrownBy(() -> itemService.selectItem(memberId, itemId))
