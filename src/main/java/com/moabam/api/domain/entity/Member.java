@@ -68,7 +68,7 @@ public class Member extends BaseTimeEntity {
 	private int currentMorningCount;
 
 	@Embedded
-	private Bug bug;
+	private Wallet wallet;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
@@ -79,12 +79,12 @@ public class Member extends BaseTimeEntity {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	private Member(Long id, String socialId, String nickname, String profileImage, Bug bug) {
+	private Member(Long id, String socialId, String nickname, String profileImage, Wallet wallet) {
 		this.id = id;
 		this.socialId = requireNonNull(socialId);
 		this.nickname = requireNonNull(nickname);
 		this.profileImage = requireNonNullElse(profileImage, BaseImageUrl.PROFILE_URL);
-		this.bug = requireNonNull(bug);
+		this.wallet = requireNonNull(wallet);
 		this.role = Role.USER;
 	}
 
@@ -106,5 +106,9 @@ public class Member extends BaseTimeEntity {
 		if (currentNightCount > 0) {
 			currentNightCount--;
 		}
+	}
+
+	public int getLevel() {
+		return (int)(totalCertifyCount / 10);
 	}
 }

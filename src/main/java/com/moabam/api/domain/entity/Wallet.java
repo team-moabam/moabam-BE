@@ -4,6 +4,7 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.moabam.api.domain.entity.enums.BugType;
 import com.moabam.global.error.exception.BadRequestException;
 
 import jakarta.persistence.Column;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Bug {
+public class Wallet {
 
 	@Column(name = "morning_bug", nullable = false)
 	@ColumnDefault("0")
@@ -31,7 +32,7 @@ public class Bug {
 	private int goldenBug;
 
 	@Builder
-	private Bug(int morningBug, int nightBug, int goldenBug) {
+	private Wallet(int morningBug, int nightBug, int goldenBug) {
 		this.morningBug = validateBugCount(morningBug);
 		this.nightBug = validateBugCount(nightBug);
 		this.goldenBug = validateBugCount(goldenBug);
@@ -43,5 +44,33 @@ public class Bug {
 		}
 
 		return bug;
+	}
+
+	public void use(BugType bugType, int price) {
+		int currentBug = getBug(bugType);
+		validateEnoughBug(currentBug, price);
+		decrementBug(bugType, price);
+	}
+
+	private int getBug(BugType bugType) {
+		return switch (bugType) {
+			case MORNING -> this.morningBug;
+			case NIGHT -> this.nightBug;
+			case GOLDEN -> this.goldenBug;
+		};
+	}
+
+	private void validateEnoughBug(int currentBug, int price) {
+		if (price > currentBug) {
+			throw new BadRequestException(BUG_NOT_ENOUGH);
+		}
+	}
+
+	private void decrementBug(BugType bugType, int price) {
+		switch (bugType) {
+			case MORNING -> this.morningBug -= price;
+			case NIGHT -> this.nightBug -= price;
+			case GOLDEN -> this.goldenBug -= price;
+		}
 	}
 }

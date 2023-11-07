@@ -45,10 +45,17 @@ public class Inventory extends BaseTimeEntity {
 	private boolean isDefault;
 
 	@Builder
-	private Inventory(Long memberId, Item item, boolean isDefault) {
+	private Inventory(Long memberId, Item item, Boolean isDefault) {
 		this.memberId = requireNonNull(memberId);
 		this.item = requireNonNull(item);
 		this.isDefault = isDefault;
+	}
+
+	public static Inventory create(Long memberId, Item item) {
+		return Inventory.builder()
+			.memberId(memberId)
+			.item(item)
+			.build();
 	}
 
 	public ItemType getItemType() {

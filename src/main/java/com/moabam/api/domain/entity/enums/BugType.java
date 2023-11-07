@@ -5,4 +5,8 @@ public enum BugType {
 	MORNING,
 	NIGHT,
 	GOLDEN;
+
+	public boolean isGoldenBug() {
+		return this == GOLDEN;
+	}
 }

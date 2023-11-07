@@ -5,6 +5,7 @@ import static java.util.Objects.*;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.moabam.api.domain.entity.enums.BugType;
 import com.moabam.api.domain.entity.enums.ItemCategory;
 import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.global.common.entity.BaseTimeEntity;
@@ -86,5 +87,26 @@ public class Item extends BaseTimeEntity {
 		}
 
 		return level;
+	}
+
+	public void validatePurchasable(BugType bugType, int memberLevel) {
+		validateUnlocked(memberLevel);
+		validatePurchasableByBugType(bugType);
+	}
+
+	private void validateUnlocked(int memberLevel) {
+		if (this.unlockLevel > memberLevel) {
+			throw new BadRequestException(ITEM_UNLOCK_LEVEL_HIGH);
+		}
+	}
+
+	private void validatePurchasableByBugType(BugType bugType) {
+		if (!this.type.isPurchasableBy(bugType)) {
+			throw new BadRequestException(ITEM_NOT_PURCHASABLE_BY_BUG_TYPE);
+		}
+	}
+
+	public int getPrice(BugType bugType) {
+		return bugType.isGoldenBug() ? this.goldenBugPrice : this.bugPrice;
 	}
 }

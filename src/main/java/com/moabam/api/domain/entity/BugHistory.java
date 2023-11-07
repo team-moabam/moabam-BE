@@ -59,4 +59,13 @@ public class BugHistory extends BaseTimeEntity {
 
 		return quantity;
 	}
+
+	public static BugHistory createUseBugHistory(Long memberId, BugType bugType, int quantity) {
+		return BugHistory.builder()
+			.memberId(memberId)
+			.bugType(bugType)
+			.actionType(BugActionType.USE)
+			.quantity(quantity)
+			.build();
+	}
 }
