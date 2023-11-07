@@ -4,6 +4,9 @@ import static com.moabam.global.common.util.GlobalConstant.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import com.google.firebase.messaging.Notification;
 import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.repository.NotificationRepository;
 import com.moabam.api.domain.repository.ParticipantSearchRepository;
+import com.moabam.api.dto.KnockNotificationStatusResponse;
 import com.moabam.api.dto.NotificationMapper;
 import com.moabam.global.common.annotation.MemberTest;
 import com.moabam.global.error.exception.ConflictException;
@@ -56,6 +60,24 @@ public class NotificationService {
 			Notification notification = NotificationMapper.toCertifyAuthNotificationEntity(roomTitle);
 			sendAsyncFcm(participant.getMemberId(), notification);
 		});
+	}
+
+	/**
+	 * TODO : 영명-재윤님 방 조회하실 때, 특정 사용자의 방 내 참여자들에 대한 콕 찌르기 여부를 반환해주는 메서드이니 사용하시기 바랍니다.
+	 */
+	public KnockNotificationStatusResponse checkMyKnockNotificationStatusInRoom(MemberTest member, Long roomId) {
+		List<Participant> participants = participantSearchRepository.findOtherParticipantsInRoom(member.memberId(),
+			roomId);
+
+		Predicate<Long> knockPredicate = targetId ->
+			notificationRepository.existsByKey(generateKnockKey(member.memberId(), targetId, roomId));
+
+		Map<Boolean, List<Long>> knockNotificationStatus = participants.stream()
+			.map(Participant::getMemberId)
+			.collect(Collectors.partitioningBy(knockPredicate));
+
+		return NotificationMapper
+			.toKnockNotificationStatusResponse(knockNotificationStatus.get(true), knockNotificationStatus.get(false));
 	}
 
 	private void sendAsyncFcm(Long fcmTokenKey, Notification notification) {

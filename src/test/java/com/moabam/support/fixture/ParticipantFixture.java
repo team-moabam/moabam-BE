@@ -22,8 +22,8 @@ public final class ParticipantFixture {
 
 		return Stream.of(Arguments.of(List.of(
 			ParticipantFixture.participant(room, 1L),
-			ParticipantFixture.participant(room, 2L),
-			ParticipantFixture.participant(room, 3L)
+			ParticipantFixture.participant(room, 3L),
+			ParticipantFixture.participant(room, 7L)
 		)));
 	}
 
