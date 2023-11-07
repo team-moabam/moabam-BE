@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record ModifyRoomRequest(
-	@NotBlank String title,
+	@NotBlank @Length(max = 20) String title,
 	@Length(max = 255, message = "방 공지의 길이가 너무 깁니다.") String announcement,
 	@NotNull @Size(min = 1, max = 4) List<String> routines,
 	@Pattern(regexp = "^(|\\d{4,8})$") String password,

@@ -1,4 +1,4 @@
-package com.moabam.api.domain.repository;
+package com.moabam.api.dto;
 
 import java.util.ArrayList;
 import java.util.List;

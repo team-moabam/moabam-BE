@@ -131,7 +131,7 @@ class RoomControllerTest {
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
-			"비번 있는 재윤과 앵맹이의 방임", password, routines, MORNING, 10, 4);
+			"비번 있는 재맹의 방임", password, routines, MORNING, 10, 4);
 		String json = objectMapper.writeValueAsString(createRoomRequest);
 
 		// expected
@@ -141,7 +141,7 @@ class RoomControllerTest {
 			.andExpect(status().isCreated())
 			.andDo(print());
 		assertThat(roomRepository.findAll()).hasSize(1);
-		assertThat(roomRepository.findAll().get(0).getTitle()).isEqualTo("비번 있는 재윤과 앵맹이의 방임");
+		assertThat(roomRepository.findAll().get(0).getTitle()).isEqualTo("비번 있는 재맹의 방임");
 		assertThat(roomRepository.findAll().get(0).getPassword()).isEqualTo(password);
 	}
 
@@ -525,9 +525,8 @@ class RoomControllerTest {
 
 		Member member = Member.builder()
 			.id(1L)
-			.socialId("test123")
+			.socialId(1L)
 			.nickname("nick")
-			.profileImage("testtests")
 			.bug(BugFixture.bug())
 			.build();
 
@@ -771,16 +770,14 @@ class RoomControllerTest {
 		participant1.enableManager();
 
 		Member member2 = Member.builder()
-			.socialId("SOCIAL_2")
+			.socialId(2L)
 			.nickname("NICKNAME_2")
-			.profileImage("PROFILE_IMAGE_2")
 			.bug(BugFixture.bug())
 			.build();
 
 		Member member3 = Member.builder()
-			.socialId("SOCIAL_3")
+			.socialId(3L)
 			.nickname("NICKNAME_3")
-			.profileImage("PROFILE_IMAGE_3")
 			.bug(BugFixture.bug())
 			.build();
 
