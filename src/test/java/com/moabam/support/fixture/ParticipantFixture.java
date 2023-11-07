@@ -35,7 +35,9 @@ public final class ParticipantFixture {
 			List.of(
 				ParticipantFixture.participant(room, 1L),
 				ParticipantFixture.participant(room, 2L),
-				ParticipantFixture.participant(room, 3L)
+				ParticipantFixture.participant(room, 3L),
+				ParticipantFixture.participant(room, 5L),
+				ParticipantFixture.participant(room, 7L)
 			))
 		);
 	}

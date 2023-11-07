@@ -40,6 +40,21 @@ class ParticipantSearchRepositoryTest {
 		List<Participant> actual = participantSearchRepository.findAllByRoomCertifyTime(10);
 
 		// Then
-		assertThat(actual).hasSize(3);
+		assertThat(actual).hasSize(5);
+	}
+
+	@DisplayName("특정 방에서 본인을 제외한 참여자 조회를 성공적으로 했을 때, - List<Participant>")
+	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideRoomAndParticipants")
+	@ParameterizedTest
+	void participantSearchRepository_findOtherParticipantsInRoom(Room room, List<Participant> participants) {
+		// Given
+		roomRepository.save(room);
+		participantRepository.saveAll(participants);
+
+		// When
+		List<Participant> actual = participantSearchRepository.findOtherParticipantsInRoom(7L, room.getId());
+
+		// Then
+		assertThat(actual).hasSize(4);
 	}
 }
