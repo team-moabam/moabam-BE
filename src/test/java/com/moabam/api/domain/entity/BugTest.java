@@ -18,12 +18,12 @@ class BugTest {
 		"10, 10, -10",
 	})
 	void validate_bug_count_exception(int morningBug, int nightBug, int goldenBug) {
-		Bug.BugBuilder bugBuilder = Bug.builder()
+		Wallet.WalletBuilder walletBuilder = Wallet.builder()
 			.morningBug(morningBug)
 			.nightBug(nightBug)
 			.goldenBug(goldenBug);
 
-		assertThatThrownBy(bugBuilder::build)
+		assertThatThrownBy(walletBuilder::build)
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage("벌레 개수는 0 이상이어야 합니다.");
 	}

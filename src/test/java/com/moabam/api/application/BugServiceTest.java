@@ -11,8 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.domain.entity.Bug;
 import com.moabam.api.domain.entity.Member;
+import com.moabam.api.domain.entity.Wallet;
 import com.moabam.api.dto.BugResponse;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,9 +36,9 @@ class BugServiceTest {
 		BugResponse response = bugService.getBug(memberId);
 
 		// then
-		Bug bug = member.getBug();
-		assertThat(response.morningBug()).isEqualTo(bug.getMorningBug());
-		assertThat(response.nightBug()).isEqualTo(bug.getNightBug());
-		assertThat(response.goldenBug()).isEqualTo(bug.getGoldenBug());
+		Wallet wallet = member.getWallet();
+		assertThat(response.morningBug()).isEqualTo(wallet.getMorningBug());
+		assertThat(response.nightBug()).isEqualTo(wallet.getNightBug());
+		assertThat(response.goldenBug()).isEqualTo(wallet.getGoldenBug());
 	}
 }
