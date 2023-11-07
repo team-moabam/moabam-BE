@@ -57,7 +57,7 @@ public class RoomService {
 	private final MemberService memberService;
 
 	@Transactional
-	public void createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
+	public Long createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
 		Room room = RoomMapper.toRoomEntity(createRoomRequest);
 		List<Routine> routines = RoutineMapper.toRoutineEntities(room, createRoomRequest.routines());
 		Participant participant = Participant.builder()
@@ -66,9 +66,11 @@ public class RoomService {
 			.build();
 
 		participant.enableManager();
-		roomRepository.save(room);
+		Room savedRoom = roomRepository.save(room);
 		routineRepository.saveAll(routines);
 		participantRepository.save(participant);
+
+		return savedRoom.getId();
 	}
 
 	@Transactional
