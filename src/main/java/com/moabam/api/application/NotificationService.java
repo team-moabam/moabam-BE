@@ -1,7 +1,6 @@
 package com.moabam.api.application;
 
-import static com.moabam.global.common.constant.FcmConstant.*;
-import static com.moabam.global.common.constant.GlobalConstant.*;
+import static com.moabam.global.common.util.GlobalConstant.*;
 
 import java.time.LocalDateTime;
 import java.util.List;

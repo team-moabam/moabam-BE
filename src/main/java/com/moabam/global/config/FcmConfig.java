@@ -1,6 +1,6 @@
 package com.moabam.global.config;
 
-import static com.moabam.global.common.constant.FcmConstant.*;
+import static com.moabam.global.common.util.GlobalConstant.*;
 
 import java.io.IOException;
 import java.io.InputStream;

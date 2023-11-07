@@ -1,7 +1,6 @@
 package com.moabam.api.domain.repository;
 
-import static com.moabam.global.common.constant.FcmConstant.*;
-import static com.moabam.global.common.constant.GlobalConstant.*;
+import static com.moabam.global.common.util.GlobalConstant.*;
 import static java.util.Objects.*;
 
 import java.time.Duration;
@@ -15,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class NotificationRepository {
+
+	private static final long EXPIRE_KNOCK = 12;
+	private static final long EXPIRE_FCM_TOKEN = 60;
 
 	private final StringRedisRepository stringRedisRepository;
 

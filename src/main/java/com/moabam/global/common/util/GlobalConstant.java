@@ -1,4 +1,4 @@
-package com.moabam.global.common.constant;
+package com.moabam.global.common.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -12,4 +12,6 @@ public class GlobalConstant {
 	public static final String SPACE = " ";
 	public static final int ONE_HOUR = 1;
 	public static final int HOURS_IN_A_DAY = 24;
+	public static final String KNOCK_KEY = "room_%s_member_%s_knocks_%s";
+	public static final String FIREBASE_PATH = "config/moabam-firebase.json";
 }

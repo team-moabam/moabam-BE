@@ -1,7 +1,5 @@
 package com.moabam.api.dto;
 
-import static com.moabam.global.common.constant.FcmConstant.*;
-
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 
@@ -10,6 +8,10 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NotificationMapper {
+
+	private static final String NOTIFICATION_TITLE = "모아밤";
+	private static final String KNOCK_BODY = "님이 콕 찔렀습니다.";
+	private static final String CERTIFY_TIME_BODY = "방 인증 시간입니다.";
 
 	public static Notification toKnockNotificationEntity(String nickname) {
 		return Notification.builder()

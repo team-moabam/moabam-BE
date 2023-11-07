@@ -15,9 +15,9 @@ import org.springframework.context.annotation.Import;
 
 import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.entity.Room;
-import com.moabam.fixture.ParticipantFixture;
-import com.moabam.fixture.RoomFixture;
 import com.moabam.global.config.JpaConfig;
+import com.moabam.support.fixture.ParticipantFixture;
+import com.moabam.support.fixture.RoomFixture;
 
 @DataJpaTest
 @Import({JpaConfig.class, ParticipantSearchRepository.class})

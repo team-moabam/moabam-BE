@@ -1,6 +1,6 @@
 package com.moabam.api.presentation;
 
-import static com.moabam.global.common.constant.FcmConstant.*;
+import static com.moabam.global.common.util.GlobalConstant.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
@@ -27,9 +27,9 @@ import com.moabam.api.domain.entity.Room;
 import com.moabam.api.domain.repository.MemberRepository;
 import com.moabam.api.domain.repository.NotificationRepository;
 import com.moabam.api.domain.repository.RoomRepository;
-import com.moabam.fixture.RoomFixture;
 import com.moabam.global.common.repository.StringRedisRepository;
 import com.moabam.support.fixture.MemberFixture;
+import com.moabam.support.fixture.RoomFixture;
 
 @Transactional
 @SpringBootTest

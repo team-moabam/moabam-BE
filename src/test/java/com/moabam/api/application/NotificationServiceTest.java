@@ -23,12 +23,12 @@ import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.entity.Room;
 import com.moabam.api.domain.repository.NotificationRepository;
 import com.moabam.api.domain.repository.ParticipantSearchRepository;
-import com.moabam.fixture.ParticipantFixture;
-import com.moabam.fixture.RoomFixture;
 import com.moabam.global.common.annotation.MemberTest;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
+import com.moabam.support.fixture.ParticipantFixture;
+import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
