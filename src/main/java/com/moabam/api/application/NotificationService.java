@@ -37,7 +37,7 @@ public class NotificationService {
 	@Transactional
 	public void sendKnockNotification(MemberTest member, Long targetId, Long roomId) {
 		roomService.validateRoomById(roomId);
-		
+
 		String knockKey = generateKnockKey(member.memberId(), targetId, roomId);
 		validateConflictKnockNotification(knockKey);
 		validateFcmToken(targetId);
