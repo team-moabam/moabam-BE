@@ -1,14 +1,21 @@
 package com.moabam.api.application;
 
 import static com.moabam.global.common.constant.FcmConstant.*;
+import static com.moabam.global.common.constant.GlobalConstant.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.repository.NotificationRepository;
+import com.moabam.api.domain.repository.ParticipantSearchRepository;
 import com.moabam.api.dto.NotificationMapper;
 import com.moabam.global.common.annotation.MemberTest;
 import com.moabam.global.error.exception.ConflictException;
@@ -24,6 +31,7 @@ public class NotificationService {
 
 	private final FirebaseMessaging firebaseMessaging;
 	private final NotificationRepository notificationRepository;
+	private final ParticipantSearchRepository participantSearchRepository;
 
 	@Transactional
 	public void sendKnockNotification(MemberTest member, Long targetId, Long roomId) {
@@ -31,11 +39,27 @@ public class NotificationService {
 		validateConflictKnockNotification(knockKey);
 		validateFcmToken(targetId);
 
-		String fcmToken = notificationRepository.findFcmTokenByMemberId(targetId);
 		Notification notification = NotificationMapper.toKnockNotificationEntity(member.nickname());
+		sendAsyncFcm(targetId, notification);
+		notificationRepository.saveKnockNotification(knockKey);
+	}
+
+	@Scheduled(cron = CRON_CERTIFY_TIME_EXPRESSION)
+	public void sendCertificationTimeNotification() {
+		int certificationTime = (LocalDateTime.now().getHour() + ONE) % HOURS_IN_A_DAY;
+		List<Participant> participants = participantSearchRepository.findAllByRoomCertifyTime(certificationTime);
+
+		participants.parallelStream().forEach(participant -> {
+			String roomTitle = participant.getRoom().getTitle();
+			Notification notification = NotificationMapper.toCertifyAuthNotificationEntity(roomTitle);
+			sendAsyncFcm(participant.getMemberId(), notification);
+		});
+	}
+
+	private void sendAsyncFcm(Long fcmTokenKey, Notification notification) {
+		String fcmToken = notificationRepository.findFcmTokenByMemberId(fcmTokenKey);
 		Message message = NotificationMapper.toMessageEntity(notification, fcmToken);
 
-		notificationRepository.saveKnockNotification(knockKey);
 		firebaseMessaging.sendAsync(message);
 	}
 
