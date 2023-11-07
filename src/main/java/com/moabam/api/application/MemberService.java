@@ -3,7 +3,7 @@ package com.moabam.api.application;
 import static com.moabam.global.common.constant.GlobalConstant.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 
-import java.time.LocalDate;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +58,8 @@ public class MemberService {
 	}
 
 	private String createRandomNickName() {
-		return RandomStringUtils.randomAlphanumeric(RANDOM_NICKNAME_SIZE) + UNDER_BAR + LocalDate.now();
+		return RandomStringUtils.random(RANDOM_NICKNAME_SIZE, 0, 0, true, true, null,
+			new SecureRandom());
 	}
 
 	public Member getManager(Long roomId) {

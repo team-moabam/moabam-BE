@@ -100,7 +100,7 @@ class JwtProviderServiceTest {
 			.setSigningKey(tokenConfig.getKey())
 			.build()
 			.parseClaimsJwt(accessToken)
-		).isExactlyInstanceOf(ExpiredJwtException.class);
+		).isInstanceOf(ExpiredJwtException.class);
 	}
 
 	@DisplayName("refresh 토큰 생성 실패")

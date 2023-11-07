@@ -139,8 +139,8 @@ public class EmbeddedRedisConfig {
 		}
 
 		public Process executeCommand(int port) {
-			String command = String.format(this.command, port);
-			String[] script = {shellPath, optionOperator, command};
+			String osCommand = String.format(this.command, port);
+			String[] script = {shellPath, optionOperator, osCommand};
 
 			try {
 				return Runtime.getRuntime().exec(script);
