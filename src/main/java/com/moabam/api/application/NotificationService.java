@@ -44,9 +44,9 @@ public class NotificationService {
 		notificationRepository.saveKnockNotification(knockKey);
 	}
 
-	@Scheduled(cron = CRON_CERTIFY_TIME_EXPRESSION)
+	@Scheduled(cron = "0 50 * * * *")
 	public void sendCertificationTimeNotification() {
-		int certificationTime = (LocalDateTime.now().getHour() + ONE) % HOURS_IN_A_DAY;
+		int certificationTime = (LocalDateTime.now().getHour() + ONE_HOUR) % HOURS_IN_A_DAY;
 		List<Participant> participants = participantSearchRepository.findAllByRoomCertifyTime(certificationTime);
 
 		participants.parallelStream().forEach(participant -> {
@@ -58,9 +58,11 @@ public class NotificationService {
 
 	private void sendAsyncFcm(Long fcmTokenKey, Notification notification) {
 		String fcmToken = notificationRepository.findFcmTokenByMemberId(fcmTokenKey);
-		Message message = NotificationMapper.toMessageEntity(notification, fcmToken);
 
-		firebaseMessaging.sendAsync(message);
+		if (fcmToken != null) {
+			Message message = NotificationMapper.toMessageEntity(notification, fcmToken);
+			firebaseMessaging.sendAsync(message);
+		}
 	}
 
 	private void validateConflictKnockNotification(String knockKey) {

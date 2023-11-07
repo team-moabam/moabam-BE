@@ -108,6 +108,21 @@ class NotificationServiceTest {
 		verify(firebaseMessaging, times(3)).sendAsync(any(Message.class));
 	}
 
+	@DisplayName("특정 인증 시간에 해당하는 방 사용자들의 토큰값이 없을 때, - Void")
+	@MethodSource("provideParticipants")
+	@ParameterizedTest
+	void notificationService_sendCertificationTimeNotification_NoFirebaseMessaging(List<Participant> participants) {
+		// Given
+		given(participantSearchRepository.findAllByRoomCertifyTime(any(Integer.class))).willReturn(participants);
+		given(notificationRepository.findFcmTokenByMemberId(any(Long.class))).willReturn(null);
+
+		// When
+		notificationService.sendCertificationTimeNotification();
+
+		// Then
+		verify(firebaseMessaging, times(0)).sendAsync(any(Message.class));
+	}
+
 	static Stream<Arguments> provideParticipants() {
 		Room room = RoomFixture.room(10);
 
