@@ -59,9 +59,12 @@ public class Coupon extends BaseTimeEntity {
 	@Column(name = "end_at", nullable = false)
 	private LocalDateTime endAt;
 
+	@Column(name = "admin_id", updatable = false, nullable = false)
+	private Long adminId;
+
 	@Builder
 	private Coupon(String name, int point, String description, CouponType type, int stock, LocalDateTime startAt,
-		LocalDateTime endAt) {
+		LocalDateTime endAt, Long adminId) {
 		this.name = requireNonNull(name);
 		this.point = validatePoint(point);
 		this.description = description;
@@ -69,6 +72,7 @@ public class Coupon extends BaseTimeEntity {
 		this.stock = validateStock(stock);
 		this.startAt = requireNonNull(startAt);
 		this.endAt = requireNonNull(endAt);
+		this.adminId = requireNonNull(adminId);
 	}
 
 	private int validatePoint(int point) {
