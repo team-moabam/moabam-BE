@@ -62,7 +62,7 @@ class JwtProviderServiceTest {
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);
 
 		// when
-		String refreshToken = jwtProviderService.provideRefreshToken(id);
+		String refreshToken = jwtProviderService.provideRefreshToken();
 
 		String[] parts = refreshToken.split("\\.");
 		String headers = new String(Base64.getDecoder().decode(parts[0]));

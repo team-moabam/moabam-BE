@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.moabam.global.config.TokenConfig;
 
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +17,25 @@ public class JwtProviderService {
 
 	private final TokenConfig tokenConfig;
 
-	public String provideAccessToken(long id) {
-		return generateToken(id, tokenConfig.getAccessExpire());
+	public String provideAccessToken(Long id) {
+		return generateIdToken(id, tokenConfig.getAccessExpire());
 	}
 
-	public String provideRefreshToken(long id) {
-		return generateToken(id, tokenConfig.getRefreshExpire());
+	public String provideRefreshToken() {
+		return generateCommonInfo(tokenConfig.getRefreshExpire());
 	}
 
-	private String generateToken(long id, long expireTime) {
+	private String generateIdToken(Long id, long expireTime) {
+		return commonInfo(expireTime)
+			.claim("id", id)
+			.compact();
+	}
+
+	private String generateCommonInfo(long expireTime) {
+		return commonInfo(expireTime).compact();
+	}
+
+	private JwtBuilder commonInfo(long expireTime) {
 		Date issueDate = new Date();
 		Date expireDate = new Date(issueDate.getTime() + expireTime);
 
@@ -34,8 +45,6 @@ public class JwtProviderService {
 			.setIssuer(tokenConfig.getIss())
 			.setIssuedAt(issueDate)
 			.setExpiration(expireDate)
-			.claim("id", id)
-			.signWith(tokenConfig.getKey(), SignatureAlgorithm.HS256)
-			.compact();
+			.signWith(tokenConfig.getKey(), SignatureAlgorithm.HS256);
 	}
 }

@@ -37,10 +37,10 @@ import com.moabam.support.fixture.AuthorizationResponseFixture;
 import jakarta.servlet.http.Cookie;
 
 @ExtendWith(MockitoExtension.class)
-class AuthenticationServiceTest {
+class AuthorizationServiceTest {
 
 	@InjectMocks
-	AuthenticationService authenticationService;
+	AuthorizationService authorizationService;
 
 	@Mock
 	OAuth2AuthorizationServerRequestService oAuth2AuthorizationServerRequestService;
@@ -52,7 +52,7 @@ class AuthenticationServiceTest {
 	JwtProviderService jwtProviderService;
 
 	OAuthConfig oauthConfig;
-	AuthenticationService noPropertyService;
+	AuthorizationService noPropertyService;
 	OAuthConfig noOAuthConfig;
 
 	@BeforeEach
@@ -63,13 +63,13 @@ class AuthenticationServiceTest {
 			new OAuthConfig.Client("provider", "testtestetsttest", "testtesttest", "authorization_code",
 				List.of("profile_nickname", "profile_image"))
 		);
-		ReflectionTestUtils.setField(authenticationService, "oAuthConfig", oauthConfig);
+		ReflectionTestUtils.setField(authorizationService, "oAuthConfig", oauthConfig);
 
 		noOAuthConfig = new OAuthConfig(
 			new OAuthConfig.Provider(null, null, null, null),
 			new OAuthConfig.Client(null, null, null, null, null)
 		);
-		noPropertyService = new AuthenticationService(noOAuthConfig, oAuth2AuthorizationServerRequestService,
+		noPropertyService = new AuthorizationService(noOAuthConfig, oAuth2AuthorizationServerRequestService,
 			memberService, jwtProviderService);
 	}
 
@@ -102,7 +102,7 @@ class AuthenticationServiceTest {
 		MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
 
 		// when
-		authenticationService.redirectToLoginPage(mockHttpServletResponse);
+		authorizationService.redirectToLoginPage(mockHttpServletResponse);
 
 		// then
 		verify(oAuth2AuthorizationServerRequestService).loginRequest(eq(mockHttpServletResponse), anyString());
@@ -116,7 +116,7 @@ class AuthenticationServiceTest {
 			"errorDescription", null);
 
 		// When + Then
-		assertThatThrownBy(() -> authenticationService.requestToken(authorizationCodeResponse))
+		assertThatThrownBy(() -> authorizationService.requestToken(authorizationCodeResponse))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.GRANT_FAILED.getMessage());
 	}
@@ -135,7 +135,7 @@ class AuthenticationServiceTest {
 			new ResponseEntity<>(authorizationTokenResponse, HttpStatus.OK));
 
 		// When + Then
-		assertThatNoException().isThrownBy(() -> authenticationService.requestToken(authorizationCodeResponse));
+		assertThatNoException().isThrownBy(() -> authorizationService.requestToken(authorizationCodeResponse));
 	}
 
 	@DisplayName("토큰 요청 매퍼 실패 - code null")
@@ -186,7 +186,7 @@ class AuthenticationServiceTest {
 			.thenReturn(new ResponseEntity<>(tokenInfoResponse, HttpStatus.OK));
 
 		// Then
-		assertThatNoException().isThrownBy(() -> authenticationService.requestTokenInfo(tokenResponse));
+		assertThatNoException().isThrownBy(() -> authorizationService.requestTokenInfo(tokenResponse));
 	}
 
 	@DisplayName("회원 가입 및 로그인 성공 테스트")
@@ -206,7 +206,7 @@ class AuthenticationServiceTest {
 
 		// when
 		LoginResponse result =
-			authenticationService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
+			authorizationService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
 
 		// then
 		assertThat(loginResponse).isEqualTo(result);

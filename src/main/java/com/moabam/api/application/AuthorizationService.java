@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class AuthorizationService {
 
 	private final OAuthConfig oAuthConfig;
 	private final OAuth2AuthorizationServerRequestService oauth2AuthorizationServerRequestService;
@@ -115,9 +115,9 @@ public class AuthenticationService {
 		return contents;
 	}
 
-	private void issueServiceToken(HttpServletResponse response, Long id) {
+	public void issueServiceToken(HttpServletResponse response, Long id) {
 		response.addHeader("token_type", "Bearer");
 		response.addCookie(CookieUtils.tokenCookie("access_token", jwtProviderService.provideAccessToken(id)));
-		response.addCookie(CookieUtils.tokenCookie("refresh_token", jwtProviderService.provideRefreshToken(id)));
+		response.addCookie(CookieUtils.tokenCookie("refresh_token", jwtProviderService.provideRefreshToken()));
 	}
 }

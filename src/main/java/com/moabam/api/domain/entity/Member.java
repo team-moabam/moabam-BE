@@ -81,7 +81,7 @@ public class Member extends BaseTimeEntity {
 	@Builder
 	private Member(Long id, Long socialId, String nickname, Bug bug) {
 		this.id = id;
-		this.socialId = socialId;
+		this.socialId = requireNonNull(socialId);
 		this.nickname = requireNonNull(nickname);
 		this.profileImage = BaseImageUrl.PROFILE_URL;
 		this.bug = requireNonNull(bug);

@@ -53,10 +53,10 @@ class JwtAuthenticationServiceTest {
 
 		// When
 		assertThatNoException().isThrownBy(() -> {
-			boolean result = jwtAuthenticationService.isTokenValid(token);
+			boolean result = jwtAuthenticationService.isTokenExpire(token);
 
 			// Then
-			assertThat(result).isFalse();
+			assertThat(result).isTrue();
 		});
 	}
 
@@ -79,7 +79,7 @@ class JwtAuthenticationServiceTest {
 			parts[2]);
 
 		// Then
-		Assertions.assertThatThrownBy(() -> jwtAuthenticationService.isTokenValid(newToken))
+		Assertions.assertThatThrownBy(() -> jwtAuthenticationService.isTokenExpire(newToken))
 			.isInstanceOf(UnauthorizedException.class);
 	}
 
@@ -102,7 +102,7 @@ class JwtAuthenticationServiceTest {
 			.compact();
 
 		// When + Then
-		assertThatThrownBy(() -> jwtAuthenticationService.isTokenValid(token))
+		assertThatThrownBy(() -> jwtAuthenticationService.isTokenExpire(token))
 			.isExactlyInstanceOf(UnauthorizedException.class);
 	}
 }
