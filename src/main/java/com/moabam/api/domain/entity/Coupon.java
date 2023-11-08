@@ -35,21 +35,21 @@ public class Coupon extends BaseTimeEntity {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "name", nullable = false, unique = true)
+	@Column(name = "name", nullable = false, unique = true, length = 20)
 	private String name;
 
-	@ColumnDefault("0")
+	@ColumnDefault("1")
 	@Column(name = "point", nullable = false)
 	private int point;
 
-	@Column(name = "description")
+	@Column(name = "description", length = 50)
 	private String description;
 
 	@Enumerated(value = EnumType.STRING)
 	@Column(name = "type", nullable = false)
 	private CouponType type;
 
-	@ColumnDefault("0")
+	@ColumnDefault("1")
 	@Column(name = "stock", nullable = false)
 	private int stock;
 
@@ -72,7 +72,7 @@ public class Coupon extends BaseTimeEntity {
 	}
 
 	private int validatePoint(int point) {
-		if (point < 0) {
+		if (point < 1) {
 			throw new BadRequestException(INVALID_COUPON_POINT);
 		}
 
@@ -80,7 +80,7 @@ public class Coupon extends BaseTimeEntity {
 	}
 
 	private int validateStock(int stock) {
-		if (stock < 0) {
+		if (stock < 1) {
 			throw new BadRequestException(INVALID_COUPON_STOCK);
 		}
 

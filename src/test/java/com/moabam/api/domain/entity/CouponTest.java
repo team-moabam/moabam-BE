@@ -15,7 +15,7 @@ class CouponTest {
 	@Test
 	void coupon_validatePoint_Point_BadRequestException() {
 		// When& Then
-		assertThatThrownBy(() -> CouponFixture.coupon(-1, 0))
+		assertThatThrownBy(() -> CouponFixture.coupon(0, 1))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.INVALID_COUPON_POINT.getMessage());
 	}
@@ -24,7 +24,7 @@ class CouponTest {
 	@Test
 	void coupon_validatePoint_Stock_BadRequestException() {
 		// When& Then
-		assertThatThrownBy(() -> CouponFixture.coupon(0, -1))
+		assertThatThrownBy(() -> CouponFixture.coupon(1, 0))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.INVALID_COUPON_STOCK.getMessage());
 	}
