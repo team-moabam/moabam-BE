@@ -11,7 +11,7 @@ import com.moabam.support.fixture.CouponFixture;
 
 class CouponTest {
 
-	@DisplayName("쿠폰 보너스 포인트가 0보다 작을 때, - BadRequestException")
+	@DisplayName("쿠폰 보너스 포인트가 1보다 작다. - BadRequestException")
 	@Test
 	void coupon_validatePoint_Point_BadRequestException() {
 		// When& Then
@@ -20,7 +20,7 @@ class CouponTest {
 			.hasMessage(ErrorMessage.INVALID_COUPON_POINT.getMessage());
 	}
 
-	@DisplayName("쿠폰 재고가 0보다 작을 때, - BadRequestException")
+	@DisplayName("쿠폰 재고가 1보다 작다. - BadRequestException")
 	@Test
 	void coupon_validatePoint_Stock_BadRequestException() {
 		// When& Then

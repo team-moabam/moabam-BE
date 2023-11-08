@@ -10,7 +10,7 @@ import com.moabam.global.error.model.ErrorMessage;
 
 class CouponTypeTest {
 
-	@DisplayName("존재하는 쿠폰을 가져오려고 할 때, - CouponType")
+	@DisplayName("존재하는 쿠폰을 가져온다. - CouponType")
 	@Test
 	void couponType_from() {
 		// When
@@ -20,7 +20,7 @@ class CouponTypeTest {
 		assertThat(actual).isEqualTo(CouponType.GOLDEN_COUPON);
 	}
 
-	@DisplayName("존재하지 않는 쿠폰을 가져오려고 할 때, - NotFoundException")
+	@DisplayName("존재하지 않는 쿠폰을 가져온다. - NotFoundException")
 	@Test
 	void couponType_from_NotFoundException() {
 		// When & Then
