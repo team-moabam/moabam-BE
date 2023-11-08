@@ -42,6 +42,16 @@ public class ParticipantSearchRepository {
 			.fetch();
 	}
 
+	public List<Participant> findOtherParticipantsInRoom(Long memberId, Long roomId) {
+		return jpaQueryFactory
+			.selectFrom(participant)
+			.where(
+				participant.room.id.eq(roomId),
+				participant.memberId.ne(memberId)
+			)
+			.fetch();
+	}
+
 	public List<Participant> findAllByRoomCertifyTime(int certifyTime) {
 		return jpaQueryFactory
 			.selectFrom(participant)

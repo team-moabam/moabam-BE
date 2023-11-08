@@ -20,6 +20,7 @@ import com.google.firebase.messaging.Message;
 import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.repository.NotificationRepository;
 import com.moabam.api.domain.repository.ParticipantSearchRepository;
+import com.moabam.api.dto.KnockNotificationStatusResponse;
 import com.moabam.global.common.annotation.MemberTest;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -133,5 +134,41 @@ class NotificationServiceTest {
 
 		// Then
 		verify(firebaseMessaging, times(0)).sendAsync(any(Message.class));
+	}
+
+	@DisplayName("특정 방에서 나 이외의 모든 사용자를 콕 찔렀을 때, - KnockNotificationStatusResponse")
+	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideParticipants")
+	@ParameterizedTest
+	void notificationService_knocked_checkMyKnockNotificationStatusInRoom(List<Participant> participants) {
+		// Given
+		given(participantSearchRepository.findOtherParticipantsInRoom(any(Long.class), any(Long.class)))
+			.willReturn(participants);
+		given(notificationRepository.existsByKey(any(String.class))).willReturn(true);
+
+		// When
+		KnockNotificationStatusResponse actual =
+			notificationService.checkMyKnockNotificationStatusInRoom(memberTest, 1L);
+
+		// Then
+		assertThat(actual.knockedMembersId()).hasSize(3);
+		assertThat(actual.notKnockedMembersId()).isEmpty();
+	}
+
+	@DisplayName("특정 방에서 나 이외의 모든 사용자를 콕 안 찔렀을 때, - KnockNotificationStatusResponse")
+	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideParticipants")
+	@ParameterizedTest
+	void notificationService_notKnocked_checkMyKnockNotificationStatusInRoom(List<Participant> participants) {
+		// Given
+		given(participantSearchRepository.findOtherParticipantsInRoom(any(Long.class), any(Long.class)))
+			.willReturn(participants);
+		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
+
+		// When
+		KnockNotificationStatusResponse actual =
+			notificationService.checkMyKnockNotificationStatusInRoom(memberTest, 1L);
+
+		// Then
+		assertThat(actual.knockedMembersId()).isEmpty();
+		assertThat(actual.notKnockedMembersId()).hasSize(3);
 	}
 }
