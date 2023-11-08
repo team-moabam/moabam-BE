@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Wallet {
+public class Bug {
 
 	@Column(name = "morning_bug", nullable = false)
 	@ColumnDefault("0")
@@ -32,7 +32,7 @@ public class Wallet {
 	private int goldenBug;
 
 	@Builder
-	private Wallet(int morningBug, int nightBug, int goldenBug) {
+	private Bug(int morningBug, int nightBug, int goldenBug) {
 		this.morningBug = validateBugCount(morningBug);
 		this.nightBug = validateBugCount(nightBug);
 		this.goldenBug = validateBugCount(goldenBug);

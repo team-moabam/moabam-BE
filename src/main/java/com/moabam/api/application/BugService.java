@@ -19,6 +19,6 @@ public class BugService {
 	public BugResponse getBug(Long memberId) {
 		Member member = memberService.getById(memberId);
 
-		return BugMapper.toBugResponse(member.getWallet());
+		return BugMapper.toBugResponse(member.getBug());
 	}
 }

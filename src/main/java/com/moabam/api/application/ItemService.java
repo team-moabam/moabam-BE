@@ -7,11 +7,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.moabam.api.domain.entity.Bug;
 import com.moabam.api.domain.entity.BugHistory;
 import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.Member;
-import com.moabam.api.domain.entity.Wallet;
 import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.api.domain.repository.BugHistoryRepository;
 import com.moabam.api.domain.repository.InventoryRepository;
@@ -53,10 +53,10 @@ public class ItemService {
 		validateAlreadyPurchased(memberId, itemId);
 		item.validatePurchasable(request.bugType(), member.getLevel());
 
-		Wallet wallet = member.getWallet();
+		Bug bug = member.getBug();
 		int price = item.getPrice(request.bugType());
 
-		wallet.use(request.bugType(), price);
+		bug.use(request.bugType(), price);
 		inventoryRepository.save(Inventory.create(memberId, item));
 		bugHistoryRepository.save(BugHistory.createUseBugHistory(memberId, request.bugType(), price));
 	}
