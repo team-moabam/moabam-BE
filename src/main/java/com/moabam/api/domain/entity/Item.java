@@ -91,7 +91,7 @@ public class Item extends BaseTimeEntity {
 
 	public void validatePurchasable(BugType bugType, int memberLevel) {
 		validateUnlocked(memberLevel);
-		validatePurchasableByBugType(bugType);
+		validateBugTypeMatch(bugType);
 	}
 
 	private void validateUnlocked(int memberLevel) {
@@ -100,7 +100,7 @@ public class Item extends BaseTimeEntity {
 		}
 	}
 
-	private void validatePurchasableByBugType(BugType bugType) {
+	private void validateBugTypeMatch(BugType bugType) {
 		if (!this.type.isPurchasableBy(bugType)) {
 			throw new BadRequestException(ITEM_NOT_PURCHASABLE_BY_BUG_TYPE);
 		}
