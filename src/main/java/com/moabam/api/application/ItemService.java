@@ -66,8 +66,8 @@ public class ItemService {
 		Inventory inventory = getInventory(memberId, itemId);
 
 		inventorySearchRepository.findDefault(memberId, inventory.getItemType())
-			.ifPresent(Inventory::unsetDefault);
-		inventory.setDefault();
+			.ifPresent(Inventory::deselect);
+		inventory.select();
 	}
 
 	private Item getItem(Long itemId) {

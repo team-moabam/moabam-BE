@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +25,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moabam.api.domain.entity.Certification;
+import com.moabam.api.domain.entity.DailyMemberCertification;
+import com.moabam.api.domain.entity.DailyRoomCertification;
 import com.moabam.api.domain.entity.Member;
 import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.entity.Room;
+import com.moabam.api.domain.entity.Routine;
+import com.moabam.api.domain.repository.CertificationRepository;
+import com.moabam.api.domain.repository.DailyMemberCertificationRepository;
+import com.moabam.api.domain.repository.DailyRoomCertificationRepository;
 import com.moabam.api.domain.repository.MemberRepository;
 import com.moabam.api.domain.repository.ParticipantRepository;
 import com.moabam.api.domain.repository.RoomRepository;
@@ -60,6 +68,15 @@ class RoomControllerTest {
 
 	@Autowired
 	private MemberRepository memberRepository;
+
+	@Autowired
+	private CertificationRepository certificationRepository;
+
+	@Autowired
+	private DailyMemberCertificationRepository dailyMemberCertificationRepository;
+
+	@Autowired
+	private DailyRoomCertificationRepository dailyRoomCertificationRepository;
 
 	Member member;
 
@@ -114,7 +131,7 @@ class RoomControllerTest {
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
-			"비번 있는 재윤과 앵맹이의 방임", password, routines, MORNING, 10, 4);
+			"비번 있는 재맹의 방임", password, routines, MORNING, 10, 4);
 		String json = objectMapper.writeValueAsString(createRoomRequest);
 
 		// expected
@@ -124,7 +141,7 @@ class RoomControllerTest {
 			.andExpect(status().isCreated())
 			.andDo(print());
 		assertThat(roomRepository.findAll()).hasSize(1);
-		assertThat(roomRepository.findAll().get(0).getTitle()).isEqualTo("비번 있는 재윤과 앵맹이의 방임");
+		assertThat(roomRepository.findAll().get(0).getTitle()).isEqualTo("비번 있는 재맹의 방임");
 		assertThat(roomRepository.findAll().get(0).getPassword()).isEqualTo(password);
 	}
 
@@ -508,9 +525,8 @@ class RoomControllerTest {
 
 		Member member = Member.builder()
 			.id(1L)
-			.socialId("test123")
+			.socialId(1L)
 			.nickname("nick")
-			.profileImage("testtests")
 			.bug(BugFixture.bug())
 			.build();
 
@@ -587,10 +603,10 @@ class RoomControllerTest {
 			.andDo(print());
 
 		participantRepository.flush();
+		Room findRoom = roomRepository.findById(room.getId()).orElseThrow();
 		Participant deletedParticipant = participantRepository.findById(participant.getId()).orElseThrow();
-		assertThat(room.getCurrentUserCount()).isEqualTo(4);
+		assertThat(findRoom.getCurrentUserCount()).isEqualTo(4);
 		assertThat(deletedParticipant.getDeletedAt()).isNotNull();
-		assertThat(deletedParticipant.getDeletedRoomTitle()).isEqualTo("5명이 있는 방~");
 	}
 
 	@DisplayName("방장의 방 나가기 - 방 삭제 성공")
@@ -615,6 +631,7 @@ class RoomControllerTest {
 		mockMvc.perform(delete("/rooms/" + room.getId()))
 			.andExpect(status().isOk())
 			.andDo(print());
+
 		Participant deletedParticipant = participantRepository.findById(participant.getId()).orElseThrow();
 		assertThat(roomRepository.findById(room.getId())).isEmpty();
 		assertThat(deletedParticipant.getDeletedAt()).isNotNull();
@@ -719,5 +736,104 @@ class RoomControllerTest {
 
 		// then
 		assertThat(getMember.getCurrentNightCount()).isEqualTo(2);
+	}
+
+	@DisplayName("방 상세 정보 조회 성공 테스트")
+	@Test
+	void get_room_details_test() throws Exception {
+		// given
+		Room room = Room.builder()
+			.title("방 제목")
+			.password("1234")
+			.roomType(NIGHT)
+			.certifyTime(23)
+			.maxUserCount(5)
+			.build();
+
+		room.increaseCurrentUserCount();
+		room.increaseCurrentUserCount();
+
+		Routine routine1 = Routine.builder()
+			.room(room)
+			.content("물 마시기")
+			.build();
+
+		Routine routine2 = Routine.builder()
+			.room(room)
+			.content("코테 풀기")
+			.build();
+
+		Participant participant1 = Participant.builder()
+			.room(room)
+			.memberId(1L)
+			.build();
+		participant1.enableManager();
+
+		Member member2 = Member.builder()
+			.socialId(2L)
+			.nickname("NICKNAME_2")
+			.bug(BugFixture.bug())
+			.build();
+
+		Member member3 = Member.builder()
+			.socialId(3L)
+			.nickname("NICKNAME_3")
+			.bug(BugFixture.bug())
+			.build();
+
+		roomRepository.save(room);
+		routineRepository.save(routine1);
+		routineRepository.save(routine2);
+		memberRepository.save(member2);
+		memberRepository.save(member3);
+
+		Participant participant2 = Participant.builder()
+			.room(room)
+			.memberId(member2.getId())
+			.build();
+
+		Participant participant3 = Participant.builder()
+			.room(room)
+			.memberId(member3.getId())
+			.build();
+
+		participantRepository.save(participant1);
+		participantRepository.save(participant2);
+		participantRepository.save(participant3);
+
+		Certification certification1 = Certification.builder()
+			.routine(routine1)
+			.memberId(member.getId())
+			.image("member1Image")
+			.build();
+
+		Certification certification2 = Certification.builder()
+			.routine(routine2)
+			.memberId(member.getId())
+			.image("member2Image")
+			.build();
+
+		certificationRepository.save(certification1);
+		certificationRepository.save(certification2);
+
+		DailyMemberCertification dailyMemberCertification = DailyMemberCertification.builder()
+			.memberId(member.getId())
+			.roomId(room.getId())
+			.participant(participant1)
+			.build();
+
+		dailyMemberCertificationRepository.save(dailyMemberCertification);
+
+		DailyRoomCertification dailyRoomCertification = DailyRoomCertification.builder()
+			.roomId(room.getId())
+			.certifiedAt(LocalDate.now())
+			.build();
+
+		dailyRoomCertificationRepository.save(dailyRoomCertification);
+
+		// expected
+		mockMvc.perform(get("/rooms/" + room.getId()))
+			.andExpect(status().isOk())
+			.andDo(print());
 	}
 }

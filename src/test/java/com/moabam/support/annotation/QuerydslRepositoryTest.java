@@ -8,12 +8,12 @@ import java.lang.annotation.Target;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import com.moabam.support.config.TestQueryDslConfig;
+import com.moabam.support.config.TestQuerydslConfig;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import(TestQueryDslConfig.class)
+@Import(TestQuerydslConfig.class)
 @DataJpaTest
-public @interface RepositoryTest {
+public @interface QuerydslRepositoryTest {
 
 }

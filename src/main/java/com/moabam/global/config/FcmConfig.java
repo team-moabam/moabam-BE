@@ -40,7 +40,7 @@ public class FcmConfig {
 			return FirebaseMessaging.getInstance();
 		} catch (IOException e) {
 			log.error("======= firebase moabam error =======\n" + e);
-			throw new FcmException(ErrorMessage.FCM_INIT_FAILED);
+			throw new FcmException(ErrorMessage.FAILED_FCM_INIT);
 		}
 	}
 }

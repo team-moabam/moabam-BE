@@ -15,20 +15,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationRepository {
 
+	private static final long EXPIRE_KNOCK = 12;
+	private static final long EXPIRE_FCM_TOKEN = 60;
+
 	private final StringRedisRepository stringRedisRepository;
 
-	// TODO : 세연님 로그인 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 저장하면 됩니다.
+	// TODO : 세연님 로그인 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 저장하면 됩니다. Front와 상의 후 삭제예정
 	public void saveFcmToken(Long key, String value) {
 		stringRedisRepository.save(
 			String.valueOf(requireNonNull(key)),
 			requireNonNull(value),
-			requireNonNull(Duration.ofDays(EXPIRE_FCM_TOKEN))
+			Duration.ofDays(EXPIRE_FCM_TOKEN)
 		);
 	}
 
-	public void saveKnockNotification(Long memberId, Long targetId, Long roomId) {
-		String key = requireNonNull(roomId) + UNDER_BAR + requireNonNull(memberId) + TO + requireNonNull(targetId);
-		stringRedisRepository.save(key, BLANK, requireNonNull(Duration.ofHours(EXPIRE_KNOCK)));
+	public void saveKnockNotification(String key) {
+		stringRedisRepository.save(
+			requireNonNull(key),
+			BLANK,
+			Duration.ofHours(EXPIRE_KNOCK)
+		);
 	}
 
 	// TODO : 세연님 로그아웃 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 삭제하시면 됩니다.
@@ -40,13 +46,11 @@ public class NotificationRepository {
 		return stringRedisRepository.get(String.valueOf(requireNonNull(memberId)));
 	}
 
-	public boolean existsFcmTokenByMemberId(Long memberId) {
-		return stringRedisRepository.hasKey(String.valueOf(requireNonNull(memberId)));
+	public boolean existsByKey(String key) {
+		return stringRedisRepository.hasKey(requireNonNull(key));
 	}
 
-	public boolean existsKnockByMemberId(Long memberId, Long targetId, Long roomId) {
-		String key = requireNonNull(roomId) + UNDER_BAR + requireNonNull(memberId) + TO + requireNonNull(targetId);
-
-		return stringRedisRepository.hasKey(key);
+	public boolean existsFcmTokenByMemberId(Long memberId) {
+		return stringRedisRepository.hasKey(String.valueOf(requireNonNull(memberId)));
 	}
 }

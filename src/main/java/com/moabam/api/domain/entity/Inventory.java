@@ -55,11 +55,11 @@ public class Inventory extends BaseTimeEntity {
 		return this.item.getType();
 	}
 
-	public void setDefault() {
+	public void select() {
 		this.isDefault = true;
 	}
 
-	public void unsetDefault() {
+	public void deselect() {
 		this.isDefault = false;
 	}
 }

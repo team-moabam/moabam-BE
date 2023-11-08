@@ -5,6 +5,7 @@ plugins {
     id 'org.sonarqube' version '4.4.1.3373'
     id 'jacoco'
     id 'checkstyle'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'com.moabam'
@@ -14,7 +15,13 @@ java {
     sourceCompatibility = '17'
 }
 
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
 configurations {
+    asciidoctorExtensions
+
     compileOnly {
         extendsFrom annotationProcessor
     }
@@ -62,8 +69,25 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // Embedded-Redis
+    implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
+
     // Firebase Admin
     implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // JSON parser
+    implementation 'org.json:json:20230618'
+
+    // Asciidoctor
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
+    // RestDocs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
 tasks.named('test') {
@@ -131,4 +155,32 @@ sonar {
                 ',**/*ErrorMessage*.java, **/*Mapper*.java, **/*DynamicQuery*, **/*BaseTimeEntity*, **/*HealthCheckController*'
         property 'sonar.java.checkstyle.reportPaths', 'build/reports/checkstyle/main.xml'
     }
+}
+
+test {
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    configurations 'asciidoctorExtensions'
+    inputs.dir snippetsDir
+    dependsOn test
+}
+
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
+tasks.register('copyDocument', Copy) {
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+bootJar {
+    dependsOn copyDocument
+}
+
+build {
+    dependsOn copyDocument
 }

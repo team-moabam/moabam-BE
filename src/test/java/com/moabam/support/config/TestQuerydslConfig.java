@@ -13,7 +13,7 @@ import jakarta.persistence.PersistenceContext;
 
 @EnableJpaAuditing
 @TestConfiguration
-public class TestQueryDslConfig {
+public class TestQuerydslConfig {
 
 	@PersistenceContext
 	private EntityManager entityManager;

@@ -1,15 +1,15 @@
 package com.moabam.api.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.moabam.api.domain.entity.Room;
-import com.moabam.api.domain.entity.Routine;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public abstract class RoomMapper {
+public final class RoomMapper {
 
 	public static Room toRoomEntity(CreateRoomRequest createRoomRequest) {
 		return Room.builder()
@@ -21,12 +21,24 @@ public abstract class RoomMapper {
 			.build();
 	}
 
-	public static List<Routine> toRoutineEntity(Room room, List<String> routinesRequest) {
-		return routinesRequest.stream()
-			.map(routine -> Routine.builder()
-				.room(room)
-				.content(routine)
-				.build())
-			.toList();
+	public static RoomDetailsResponse toRoomDetailsResponse(Room room, String managerNickname,
+		List<RoutineResponse> routineResponses, List<LocalDate> certifiedDates,
+		List<TodayCertificateRankResponse> todayCertificateRankResponses, double completePercentage) {
+		return RoomDetailsResponse.builder()
+			.roomId(room.getId())
+			.title(room.getTitle())
+			.managerNickName(managerNickname)
+			.roomImage(room.getRoomImage())
+			.level(room.getLevel())
+			.roomType(room.getRoomType().name())
+			.certifyTime(room.getCertifyTime())
+			.currentUserCount(room.getCurrentUserCount())
+			.maxUserCount(room.getMaxUserCount())
+			.announcement(room.getAnnouncement())
+			.completePercentage(completePercentage)
+			.certifiedDates(certifiedDates)
+			.routine(routineResponses)
+			.todayCertificateRank(todayCertificateRankResponses)
+			.build();
 	}
 }

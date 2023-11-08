@@ -1,8 +1,12 @@
 package com.moabam.api.domain.entity;
 
+import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.moabam.global.common.entity.BaseTimeEntity;
+import com.moabam.global.error.exception.BadRequestException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,20 +34,28 @@ public class Routine extends BaseTimeEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "room_id", nullable = false, updatable = false)
+	@JoinColumn(name = "room_id", updatable = false)
 	private Room room;
 
-	@Column(name = "content", nullable = false, length = 60)
+	@Column(name = "content", nullable = false, length = 20)
 	private String content;
 
 	@Builder
 	private Routine(Long id, Room room, String content) {
 		this.id = id;
 		this.room = requireNonNull(room);
-		this.content = requireNonNull(content);
+		this.content = validateContent(content);
 	}
 
 	public void changeContent(String content) {
 		this.content = content;
+	}
+
+	private String validateContent(String content) {
+		if (StringUtils.isBlank(content) || content.length() > 20) {
+			throw new BadRequestException(ROUTINE_LENGTH_ERROR);
+		}
+
+		return content;
 	}
 }

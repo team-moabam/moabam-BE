@@ -1,0 +1,20 @@
+== 알림(Notification)
+
+ 콕 찌르기 알림 기능을 제공합니다.
+
+=== 콕 찌르기 알림
+
+ 1) 특정 방의 사용자가 다른 사용자를 콕 찌릅니다.
+ 2) 서버에서 콕 찌를 대상의 FCM Token 여부를 검증합니다.
+ 3) Firebase 서버에 FCM Push Messaing 알림을 비동기로 요청합니다.
+ 4) Firebase 서버에서 FCM Token으로 식별된 기기에 알림을 보냅니다.
+
+[discrete]
+==== 요청
+
+include::{snippets}/notifications/http-request.adoc[]
+
+[discrete]
+==== 응답
+
+include::{snippets}/notifications/http-response.adoc[]

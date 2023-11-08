@@ -41,7 +41,7 @@ public class Member extends BaseTimeEntity {
 	private Long id;
 
 	@Column(name = "social_id", nullable = false, unique = true)
-	private String socialId;
+	private Long socialId;
 
 	@Column(name = "nickname", nullable = false, unique = true)
 	private String nickname;
@@ -80,11 +80,11 @@ public class Member extends BaseTimeEntity {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	private Member(Long id, String socialId, String nickname, String profileImage, Bug bug) {
+	private Member(Long id, Long socialId, String nickname, Bug bug) {
 		this.id = id;
-		this.socialId = requireNonNull(socialId);
+		this.socialId = socialId;
 		this.nickname = requireNonNull(nickname);
-		this.profileImage = requireNonNullElse(profileImage, BaseImageUrl.PROFILE_URL);
+		this.profileImage = BaseImageUrl.PROFILE_URL;
 		this.bug = requireNonNull(bug);
 		this.role = Role.USER;
 	}

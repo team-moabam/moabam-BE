@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.enums.ItemType;
-import com.moabam.support.annotation.RepositoryTest;
+import com.moabam.support.annotation.QuerydslRepositoryTest;
 
-@RepositoryTest
+@QuerydslRepositoryTest
 class ItemSearchRepositoryTest {
 
 	@Autowired
