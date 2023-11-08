@@ -51,13 +51,6 @@ public class Inventory extends BaseTimeEntity {
 		this.isDefault = isDefault;
 	}
 
-	public static Inventory create(Long memberId, Item item) {
-		return Inventory.builder()
-			.memberId(memberId)
-			.item(item)
-			.build();
-	}
-
 	public ItemType getItemType() {
 		return this.item.getType();
 	}

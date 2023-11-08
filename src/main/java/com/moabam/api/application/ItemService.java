@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.domain.entity.Bug;
-import com.moabam.api.domain.entity.BugHistory;
 import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.Member;
@@ -18,6 +17,7 @@ import com.moabam.api.domain.repository.InventoryRepository;
 import com.moabam.api.domain.repository.InventorySearchRepository;
 import com.moabam.api.domain.repository.ItemRepository;
 import com.moabam.api.domain.repository.ItemSearchRepository;
+import com.moabam.api.dto.BugMapper;
 import com.moabam.api.dto.ItemMapper;
 import com.moabam.api.dto.ItemsResponse;
 import com.moabam.api.dto.PurchaseItemRequest;
@@ -57,8 +57,8 @@ public class ItemService {
 		int price = item.getPrice(request.bugType());
 
 		bug.use(request.bugType(), price);
-		inventoryRepository.save(Inventory.create(memberId, item));
-		bugHistoryRepository.save(BugHistory.createUseBugHistory(memberId, request.bugType(), price));
+		inventoryRepository.save(ItemMapper.toInventory(memberId, item));
+		bugHistoryRepository.save(BugMapper.toUseBugHistory(memberId, request.bugType(), price));
 	}
 
 	@Transactional
@@ -70,14 +70,14 @@ public class ItemService {
 		inventory.setDefault();
 	}
 
-	private Inventory getInventory(Long memberId, Long itemId) {
-		return inventorySearchRepository.findOne(memberId, itemId)
-			.orElseThrow(() -> new NotFoundException(INVENTORY_NOT_FOUND));
-	}
-
 	private Item getItem(Long itemId) {
 		return itemRepository.findById(itemId)
 			.orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND));
+	}
+
+	private Inventory getInventory(Long memberId, Long itemId) {
+		return inventorySearchRepository.findOne(memberId, itemId)
+			.orElseThrow(() -> new NotFoundException(INVENTORY_NOT_FOUND));
 	}
 
 	private void validateAlreadyPurchased(Long memberId, Long itemId) {
