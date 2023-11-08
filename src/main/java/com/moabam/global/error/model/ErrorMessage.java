@@ -39,7 +39,10 @@ public enum ErrorMessage {
 
 	FAILED_FCM_INIT("파이어베이스 설정을 실패했습니다."),
 	NOT_FOUND_FCM_TOKEN("해당 유저는 접속 중이 아닙니다."),
-	CONFLICT_KNOCK("이미 콕 알림을 보낸 대상입니다.");
+	CONFLICT_KNOCK("이미 콕 알림을 보낸 대상입니다."),
+
+	INVALID_COUPON_POINT("쿠폰의 보너스 포인트는 0 이상이어야 합니다."),
+	INVALID_COUPON_STOCK("쿠폰의 재고는 0 이상이어야 합니다.");
 
 	private final String message;
 }
