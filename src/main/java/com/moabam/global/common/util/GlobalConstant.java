@@ -16,4 +16,6 @@ public class GlobalConstant {
 	public static final long EXPIRE_KNOCK = 12;
 	public static final long EXPIRE_FCM_TOKEN = 60;
 	public static final String FIREBASE_PATH = "config/moabam-firebase.json";
+
+	public static final int LEVEL_DIVISOR = 10;
 }
