@@ -41,7 +41,7 @@ public class Coupon extends BaseTimeEntity {
 	@ColumnDefault("1")
 	@Column(name = "point", nullable = false)
 	private int point;
-
+	
 	@Column(name = "description", length = 50)
 	private String description;
 

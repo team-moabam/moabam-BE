@@ -14,8 +14,9 @@ public final class CouponFixture {
 			.point(point)
 			.type(CouponType.MORNING_COUPON)
 			.stock(stock)
-			.startAt(LocalDateTime.now())
-			.endAt(LocalDateTime.now())
+			.startAt(LocalDateTime.of(2000, 1, 22, 10, 30, 0))
+			.endAt(LocalDateTime.of(2000, 1, 22, 11, 0, 0))
+			.adminId(1L)
 			.build();
 	}
 
