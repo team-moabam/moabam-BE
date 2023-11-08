@@ -49,7 +49,7 @@ public class Bug {
 	public void use(BugType bugType, int price) {
 		int currentBug = getBug(bugType);
 		validateEnoughBug(currentBug, price);
-		decrementBug(bugType, price);
+		decreaseBug(bugType, price);
 	}
 
 	private int getBug(BugType bugType) {
@@ -66,7 +66,7 @@ public class Bug {
 		}
 	}
 
-	private void decrementBug(BugType bugType, int price) {
+	private void decreaseBug(BugType bugType, int price) {
 		switch (bugType) {
 			case MORNING -> this.morningBug -= price;
 			case NIGHT -> this.nightBug -= price;
