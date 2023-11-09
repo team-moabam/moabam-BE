@@ -11,6 +11,7 @@ import com.moabam.api.dto.CouponMapper;
 import com.moabam.api.dto.CreateCouponRequest;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
+import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,13 @@ public class CouponService {
 
 		Coupon coupon = CouponMapper.toEntity(adminId, request);
 		couponRepository.save(coupon);
+	}
+
+	@Transactional
+	public void deleteCoupon(Long adminId, Long couponId) {
+		Coupon coupon = couponRepository.findById(couponId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
+		couponRepository.delete(coupon);
 	}
 
 	private void validateConflictCouponName(String name) {

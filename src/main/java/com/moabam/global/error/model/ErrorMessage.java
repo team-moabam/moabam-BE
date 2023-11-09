@@ -49,9 +49,10 @@ public enum ErrorMessage {
 
 	INVALID_COUPON_POINT("쿠폰의 보너스 포인트는 0 이상이어야 합니다."),
 	INVALID_COUPON_STOCK("쿠폰의 재고는 0 이상이어야 합니다."),
+	INVALID_COUPON_PERIOD("쿠폰 발급 종료 시각은 시작 시각보다 이후여야 합니다."),
 	CONFLICT_COUPON_NAME("쿠폰의 이름이 중복되었습니다."),
 	NOT_FOUND_COUPON_TYPE("존재하지 않는 쿠폰 종류입니다."),
-	INVALID_COUPON_PERIOD("쿠폰 발급 종료 시각은 시작 시각보다 이후여야 합니다.");
+	NOT_FOUND_COUPON("존재하지 않는 쿠폰입니다.");
 
 	private final String message;
 }
