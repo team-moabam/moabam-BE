@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moabam.api.domain.entity.Coupon;
 import com.moabam.api.domain.entity.enums.CouponType;
 import com.moabam.api.domain.repository.CouponRepository;
 import com.moabam.api.dto.CouponMapper;
@@ -51,11 +52,11 @@ class CouponControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andDo(print())
-			.andDo(document("coupons",
+			.andDo(document("admins/coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				CouponSnippetFixture.CREATE_COUPON_REQUEST))
-			.andExpect(status().isOk());
+			.andExpect(status().isCreated());
 	}
 
 	@DisplayName("쿠폰명이 중복된 쿠폰을 발행한다. - ConflictException")
@@ -71,10 +72,37 @@ class CouponControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andDo(print())
-			.andDo(document("coupons",
+			.andDo(document("admins/coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				CouponSnippetFixture.CREATE_COUPON_REQUEST))
 			.andExpect(status().isConflict());
+	}
+
+	@DisplayName("쿠폰을 성공적으로 삭제한다. - Void")
+	@Test
+	void couponController_deleteCoupon() throws Exception {
+		// Given
+		Coupon coupon = couponRepository.save(CouponFixture.coupon(10, 100));
+
+		// When & Then
+		mockMvc.perform(delete("/admins/coupons/" + coupon.getId()))
+			.andDo(print())
+			.andDo(document("admins/coupons/couponId",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint())))
+			.andExpect(status().isOk());
+	}
+
+	@DisplayName("존재하지 않는 쿠폰을 삭제한다. - NotFoundException")
+	@Test
+	void couponController_deleteCoupon_NotFoundException() throws Exception {
+		// When & Then
+		mockMvc.perform(delete("/admins/coupons/77777777777"))
+			.andDo(print())
+			.andDo(document("admins/coupons/couponId",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint())))
+			.andExpect(status().isNotFound());
 	}
 }

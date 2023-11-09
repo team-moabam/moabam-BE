@@ -3,6 +3,8 @@ package com.moabam.api.application;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -85,5 +87,31 @@ class CouponServiceTest {
 		assertThatThrownBy(() -> couponService.createCoupon(1L, request))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD.getMessage());
+	}
+
+	@DisplayName("쿠폰 아이디와 일치하는 쿠폰을 삭제한다. - Void")
+	@Test
+	void couponService_deleteCoupon() {
+		// Given
+		Coupon coupon = CouponFixture.coupon(10, 100);
+		given(couponRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
+
+		// When
+		couponService.deleteCoupon(1L, 1L);
+
+		// Then
+		verify(couponRepository).delete(coupon);
+	}
+
+	@DisplayName("존재하지 않는 쿠폰 아이디를 삭제하려고 시도한다. - NotFoundException")
+	@Test
+	void couponService_deleteCoupon_NotFoundException() {
+		// Given
+		given(couponRepository.findById(any(Long.class))).willReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.deleteCoupon(1L, 1L))
+			.isInstanceOf(NotFoundException.class)
+			.hasMessage(ErrorMessage.NOT_FOUND_COUPON.getMessage());
 	}
 }
