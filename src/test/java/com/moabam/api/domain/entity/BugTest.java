@@ -59,4 +59,21 @@ class BugTest {
 				.hasMessage("보유한 벌레가 부족합니다.");
 		}
 	}
+
+	@DisplayName("해당 벌레 타입의 개수를 증가한다.")
+	@Test
+	void increase_bug_success() {
+		// given
+		Bug bug = bug();
+
+		// when
+		bug.increaseBug(BugType.MORNING, 5);
+		bug.increaseBug(BugType.NIGHT, 5);
+		bug.increaseBug(BugType.GOLDEN, 5);
+
+		// then
+		assertThat(bug.getMorningBug()).isEqualTo(15);
+		assertThat(bug.getNightBug()).isEqualTo(25);
+		assertThat(bug.getGoldenBug()).isEqualTo(35);
+	}
 }

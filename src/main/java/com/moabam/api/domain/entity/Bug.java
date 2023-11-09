@@ -74,7 +74,7 @@ public class Bug {
 		}
 	}
 
-	private void increaseBug(BugType bugType, int bug) {
+	public void increaseBug(BugType bugType, int bug) {
 		switch (bugType) {
 			case MORNING -> this.morningBug += bug;
 			case NIGHT -> this.nightBug += bug;
