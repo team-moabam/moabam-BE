@@ -66,11 +66,19 @@ public class Bug {
 		}
 	}
 
-	private void decreaseBug(BugType bugType, int price) {
+	private void decreaseBug(BugType bugType, int bug) {
 		switch (bugType) {
-			case MORNING -> this.morningBug -= price;
-			case NIGHT -> this.nightBug -= price;
-			case GOLDEN -> this.goldenBug -= price;
+			case MORNING -> this.morningBug -= bug;
+			case NIGHT -> this.nightBug -= bug;
+			case GOLDEN -> this.goldenBug -= bug;
+		}
+	}
+
+	private void increaseBug(BugType bugType, int bug) {
+		switch (bugType) {
+			case MORNING -> this.morningBug += bug;
+			case NIGHT -> this.nightBug += bug;
+			case GOLDEN -> this.goldenBug += bug;
 		}
 	}
 }
