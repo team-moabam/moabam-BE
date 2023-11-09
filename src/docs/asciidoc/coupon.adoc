@@ -9,16 +9,26 @@
 [discrete]
 ==== 요청
 
-include::{snippets}/coupons/http-request.adoc[]
+include::{snippets}/admins/coupons/http-request.adoc[]
 
 [discrete]
 ==== 응답
 
-include::{snippets}/coupons/http-response.adoc[]
+include::{snippets}/admins/coupons/http-response.adoc[]
 
 === 쿠폰 삭제 (진행 중)
 
- 관리자가 쿠폰을 삭제합니다.
+ 관리자가 쿠폰 ID와 일치하는 쿠폰을 삭제합니다.
+
+[discrete]
+==== 요청
+
+include::{snippets}/admins/coupons/couponId/http-request.adoc[]
+
+[discrete]
+==== 응답
+
+include::{snippets}/admins/coupons/couponId/http-response.adoc[]
 
 === 쿠폰 조회 (진행 중)
 

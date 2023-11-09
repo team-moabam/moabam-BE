@@ -23,7 +23,7 @@ class NotificationRepositoryTest {
 	@Mock
 	private StringRedisRepository stringRedisRepository;
 
-	@DisplayName("FCM 토큰이 성공적으로 저장 될 때, - Void")
+	@DisplayName("FCM 토큰이 성공적으로 저장된다. - Void")
 	@Test
 	void notificationRepository_saveFcmToken() {
 		// When
@@ -33,7 +33,7 @@ class NotificationRepositoryTest {
 		verify(stringRedisRepository).save(any(String.class), any(String.class), any(Duration.class));
 	}
 
-	@DisplayName("FCM 토큰 저장 시, 필요한 값이 NULL 일 때, - NullPointerException")
+	@DisplayName("FCM 토큰 저장 시, 필요한 값이 NULL 이다. - NullPointerException")
 	@Test
 	void notificationRepository_save_NullPointerException() {
 		// When & Then
@@ -41,7 +41,7 @@ class NotificationRepositoryTest {
 			.isInstanceOf(NullPointerException.class);
 	}
 
-	@DisplayName("콕 알림이 성공적으로 저장 될 때, - Void")
+	@DisplayName("콕 알림이 성공적으로 저장된다. - Void")
 	@Test
 	void notificationRepository_saveKnockNotification() {
 		// When
@@ -51,7 +51,7 @@ class NotificationRepositoryTest {
 		verify(stringRedisRepository).save(any(String.class), any(String.class), any(Duration.class));
 	}
 
-	@DisplayName("콕 알림 저장 시, 필요한 값이 NULL 일 때, - NullPointerException")
+	@DisplayName("콕 알림 저장 시, 필요한 값이 NULL 이다. - NullPointerException")
 	@Test
 	void notificationRepository_saveKnockNotification_NullPointerException() {
 		// When & Then
@@ -59,7 +59,7 @@ class NotificationRepositoryTest {
 			.isInstanceOf(NullPointerException.class);
 	}
 
-	@DisplayName("FCM 토큰이 성공적으로 삭제 될 때, - Void")
+	@DisplayName("FCM 토큰이 성공적으로 삭제된다. - Void")
 	@Test
 	void notificationRepository_deleteFcmTokenByMemberId() {
 		// When
@@ -69,7 +69,7 @@ class NotificationRepositoryTest {
 		verify(stringRedisRepository).delete(any(String.class));
 	}
 
-	@DisplayName("FCM 토큰 삭제 시, 필요한 값이 NULL 일 때, - NullPointerException")
+	@DisplayName("FCM 토큰 삭제 시, 필요한 값이 NULL 이다. - NullPointerException")
 	@Test
 	void notificationRepository_deleteFcmTokenByMemberId_NullPointerException() {
 		// When & Then
@@ -77,7 +77,7 @@ class NotificationRepositoryTest {
 			.isInstanceOf(NullPointerException.class);
 	}
 
-	@DisplayName("FCM 토큰을 성공적으로 조회할 때, - (String) FCM TOKEN")
+	@DisplayName("FCM 토큰을 성공적으로 조회된다. - (String) FCM TOKEN")
 	@Test
 	void notificationRepository_findFcmTokenByMemberId() {
 		// When
@@ -87,7 +87,7 @@ class NotificationRepositoryTest {
 		verify(stringRedisRepository).get(any(String.class));
 	}
 
-	@DisplayName("FCM 토큰 조회 시, 필요한 값이 NULL 일 때, - NullPointerException")
+	@DisplayName("FCM 토큰 조회 시, 필요한 값이 NULL 이다. - NullPointerException")
 	@Test
 	void notificationRepository_findFcmTokenByMemberId_NullPointerException() {
 		// When & Then
@@ -95,7 +95,7 @@ class NotificationRepositoryTest {
 			.isInstanceOf(NullPointerException.class);
 	}
 
-	@DisplayName("FCM 토큰 존재 여부를 성공적으로 확인 할 때, - Boolean")
+	@DisplayName("FCM 토큰 존재 여부를 성공적으로 확인한다. - Boolean")
 	@Test
 	void notificationRepository_existsFcmTokenByMemberId() {
 		// When
@@ -105,7 +105,7 @@ class NotificationRepositoryTest {
 		verify(stringRedisRepository).hasKey(any(String.class));
 	}
 
-	@DisplayName("FCM 토큰 존재 여부 체크 시, 필요한 값이 NULL 일 때, - NullPointerException")
+	@DisplayName("FCM 토큰 존재 여부 체크 시, 필요한 값이 NULL 이다. - NullPointerException")
 	@Test
 	void notificationRepository_existsFcmTokenByMemberId_NullPointerException() {
 		// When & Then
@@ -113,7 +113,7 @@ class NotificationRepositoryTest {
 			.isInstanceOf(NullPointerException.class);
 	}
 
-	@DisplayName("콕 알림 여부 체크를 정상적으로 확인할 때, - Boolean")
+	@DisplayName("콕 알림 여부 체크를 정상적으로 확인한다. - Boolean")
 	@Test
 	void notificationRepository_existsKnockByMemberId() {
 		// When
@@ -123,7 +123,7 @@ class NotificationRepositoryTest {
 		verify(stringRedisRepository).hasKey(any(String.class));
 	}
 
-	@DisplayName("콕 알림 여부 체크 시, 필요한 값이 NULL 일 때, - NullPointerException")
+	@DisplayName("콕 알림 여부 체크 시, 필요한 값이 NULL 이다. - NullPointerException")
 	@Test
 	void notificationRepository_existsKnockByMemberId_NullPointerException() {
 		// When & Then
