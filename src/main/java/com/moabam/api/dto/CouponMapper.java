@@ -2,7 +2,6 @@ package com.moabam.api.dto;
 
 import com.moabam.api.domain.entity.Coupon;
 import com.moabam.api.domain.entity.enums.CouponType;
-import com.moabam.api.presentation.CouponResponse;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

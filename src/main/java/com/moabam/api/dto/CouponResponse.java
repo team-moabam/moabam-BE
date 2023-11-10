@@ -1,4 +1,4 @@
-package com.moabam.api.presentation;
+package com.moabam.api.dto;
 
 import java.time.LocalDateTime;
 

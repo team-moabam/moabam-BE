@@ -56,7 +56,7 @@ public class CouponSearchRepository {
 
 		if (request.couponOngoing()) {
 			return coupon.startAt.loe(now)
-				.or(coupon.endAt.goe(now));
+				.and(coupon.endAt.goe(now));
 		}
 
 		return Expressions.FALSE;

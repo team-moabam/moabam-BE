@@ -92,4 +92,9 @@ public class Coupon extends BaseTimeEntity {
 
 		return stock;
 	}
+
+	@Override
+	public String toString() {
+		return "Coupon{startAt=" + startAt + ", endAt=" + endAt + '}';
+	}
 }
