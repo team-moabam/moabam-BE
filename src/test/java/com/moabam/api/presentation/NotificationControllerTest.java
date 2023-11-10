@@ -76,7 +76,7 @@ class NotificationControllerTest {
 		stringRedisRepository.delete(knockKey);
 	}
 
-	@DisplayName("GET - 성공적으로 상대를 찔렀을 때, - Void")
+	@DisplayName("GET - 성공적으로 상대에게 콕 알림을 보낸다. - Void")
 	@Test
 	void notificationController_sendKnockNotification() throws Exception {
 		// Given
@@ -85,25 +85,25 @@ class NotificationControllerTest {
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))
 			.andDo(print())
-			.andDo(document("notifications",
+			.andDo(document("notifications/rooms/roomId/members/memberId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint())))
 			.andExpect(status().isOk());
 	}
 
-	@DisplayName("GET - 찌른 상대가 접속 중이 아닐 때, - NotFoundException")
+	@DisplayName("GET - 콕 알림을 보낸 상대가 접속 중이 아니다. - NotFoundException")
 	@Test
 	void notificationController_sendKnockNotification_NotFoundException() throws Exception {
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))
 			.andDo(print())
-			.andDo(document("notifications",
+			.andDo(document("notifications/rooms/roomId/members/memberId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint())))
 			.andExpect(status().isNotFound());
 	}
 
-	@DisplayName("GET - 이미 찌른 대상일 때, - ConflictException")
+	@DisplayName("GET - 이미 콕 알림을 보낸 대상이다. - ConflictException")
 	@Test
 	void notificationController_sendKnockNotification_ConflictException() throws Exception {
 		// Given
@@ -113,7 +113,7 @@ class NotificationControllerTest {
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))
 			.andDo(print())
-			.andDo(document("notifications",
+			.andDo(document("notifications/rooms/roomId/members/memberId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint())))
 			.andExpect(status().isConflict());

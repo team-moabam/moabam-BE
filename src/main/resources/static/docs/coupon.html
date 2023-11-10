@@ -494,7 +494,29 @@ Content-Length: 62
 <h3 id="_쿠폰_삭제_진행_중">쿠폰 삭제 (진행 중)</h3>
 <div class="literalblock">
 <div class="content">
-<pre>관리자가 쿠폰을 삭제합니다.</pre>
+<pre>관리자가 쿠폰 ID와 일치하는 쿠폰을 삭제합니다.</pre>
+</div>
+</div>
+<h4 id="_요청_2" class="discrete">요청</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admins/coupons/77777777777 HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<h4 id="_응답_2" class="discrete">응답</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 56
+
+{
+  "message" : "존재하지 않는 쿠폰입니다."
+}</code></pre>
 </div>
 </div>
 </div>
@@ -533,7 +555,7 @@ Content-Length: 62
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-09 03:27:13 +0900
+Last updated 2023-11-10 02:32:55 +0900
 </div>
 </div>
 </body>

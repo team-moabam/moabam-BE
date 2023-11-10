@@ -34,14 +34,14 @@ class StringRedisRepositoryTest {
 		stringRedisRepository.delete(key);
 	}
 
-	@DisplayName("레디스에 문자열 데이터가 성공적으로 저장될 때, - Void")
+	@DisplayName("레디스에 문자열 데이터가 성공적으로 저장된다. - Void")
 	@Test
 	void string_redis_repository_save() {
 		// Then
 		assertThat(stringRedisRepository.get(key)).isEqualTo(value);
 	}
 
-	@DisplayName("레디스의 특정 데이터가 성공적으로 삭제될 때, - Void")
+	@DisplayName("레디스의 특정 데이터가 성공적으로 삭제된다. - Void")
 	@Test
 	void string_redis_repository_delete() {
 		// When
@@ -51,7 +51,7 @@ class StringRedisRepositoryTest {
 		assertThat(stringRedisRepository.hasKey(key)).isFalse();
 	}
 
-	@DisplayName("레디스의 특정 데이터가 성공적으로 조회될 때, - String(Value)")
+	@DisplayName("레디스의 특정 데이터가 성공적으로 조회된다. - String(Value)")
 	@Test
 	void string_redis_repository_get() {
 		// When
@@ -61,7 +61,7 @@ class StringRedisRepositoryTest {
 		assertThat(actual).isEqualTo(stringRedisRepository.get(key));
 	}
 
-	@DisplayName("레디스의 특정 데이터 존재 여부를 성공적으로 체크할 때, - Boolean")
+	@DisplayName("레디스의 특정 데이터 존재 여부를 성공적으로 체크한다. - Boolean")
 	@Test
 	void string_redis_repository_hasKey() {
 		// When & Then
