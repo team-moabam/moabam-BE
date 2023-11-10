@@ -4,6 +4,7 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.moabam.api.domain.entity.enums.BugType;
 import com.moabam.global.error.exception.BadRequestException;
 
 import jakarta.persistence.Column;
@@ -43,5 +44,41 @@ public class Bug {
 		}
 
 		return bug;
+	}
+
+	public void use(BugType bugType, int price) {
+		int currentBug = getBug(bugType);
+		validateEnoughBug(currentBug, price);
+		decreaseBug(bugType, price);
+	}
+
+	private int getBug(BugType bugType) {
+		return switch (bugType) {
+			case MORNING -> this.morningBug;
+			case NIGHT -> this.nightBug;
+			case GOLDEN -> this.goldenBug;
+		};
+	}
+
+	private void validateEnoughBug(int currentBug, int price) {
+		if (price > currentBug) {
+			throw new BadRequestException(BUG_NOT_ENOUGH);
+		}
+	}
+
+	private void decreaseBug(BugType bugType, int bug) {
+		switch (bugType) {
+			case MORNING -> this.morningBug -= bug;
+			case NIGHT -> this.nightBug -= bug;
+			case GOLDEN -> this.goldenBug -= bug;
+		}
+	}
+
+	public void increaseBug(BugType bugType, int bug) {
+		switch (bugType) {
+			case MORNING -> this.morningBug += bug;
+			case NIGHT -> this.nightBug += bug;
+			case GOLDEN -> this.goldenBug += bug;
+		}
 	}
 }

@@ -1,24 +1,26 @@
 package com.moabam.global.config;
 
-import static com.moabam.global.common.constant.RedisConstant.*;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.StringUtils;
 
 import com.moabam.global.error.exception.MoabamException;
 import com.moabam.global.error.model.ErrorMessage;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import redis.embedded.RedisServer;
 
@@ -27,21 +29,45 @@ import redis.embedded.RedisServer;
 @Profile("test")
 public class EmbeddedRedisConfig {
 
-	@Value("${spring.data.redis.port}")
-	private int redisPort;
+	private final int redisPort;
+	private final String redisHost;
 
+	private int availablePort;
 	private RedisServer redisServer;
 
-	@PostConstruct
-	public void startRedis() {
-		int port = isRedisRunning() ? findAvailablePort() : redisPort;
+	public EmbeddedRedisConfig(@Value("${spring.data.redis.port}") int redisPort,
+		@Value("${spring.data.redis.host}") String redisHost) {
+		this.redisPort = redisPort;
+		this.redisHost = redisHost;
 
-		if (isArmMac()) {
-			redisServer = new RedisServer(getRedisFileForArcMac(), port);
+		startRedis();
+	}
+
+	@Bean
+	public RedisConnectionFactory redisConnectionFactory(EmbeddedRedisConfig embeddedRedisConfig) {
+		return new LettuceConnectionFactory(redisHost, embeddedRedisConfig.getAvailablePort());
+	}
+
+	@Bean
+	public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+		StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
+		stringRedisTemplate.setKeySerializer(new StringRedisSerializer());
+		stringRedisTemplate.setValueSerializer(new StringRedisSerializer());
+		stringRedisTemplate.setConnectionFactory(redisConnectionFactory);
+
+		return stringRedisTemplate;
+	}
+
+	public void startRedis() {
+		Os os = Os.createOs();
+		availablePort = findPort(os);
+
+		if (os.isMac()) {
+			redisServer = new RedisServer(getRedisFileForArcMac(), availablePort);
 		} else {
 			redisServer = RedisServer.builder()
-				.port(port)
-				.setting(REDIS_SERVER_MAX_MEMORY)
+				.port(availablePort)
+				.setting("maxmemory 128M")
 				.build();
 		}
 
@@ -64,9 +90,21 @@ public class EmbeddedRedisConfig {
 		}
 	}
 
-	public int findAvailablePort() {
+	public int getAvailablePort() {
+		return availablePort;
+	}
+
+	private int findPort(Os os) {
+		if (!isRunning(os.executeCommand(redisPort))) {
+			return redisPort;
+		}
+
+		return findAvailablePort(os);
+	}
+
+	private int findAvailablePort(Os os) {
 		for (int port = 10000; port <= 65535; port++) {
-			Process process = executeGrepProcessCommand(port);
+			Process process = os.executeCommand(port);
 
 			if (!isRunning(process)) {
 				return port;
@@ -74,21 +112,6 @@ public class EmbeddedRedisConfig {
 		}
 
 		throw new MoabamException(ErrorMessage.NOT_FOUND_AVAILABLE_PORT);
-	}
-
-	private boolean isRedisRunning() {
-		return isRunning(executeGrepProcessCommand(redisPort));
-	}
-
-	private Process executeGrepProcessCommand(int redisPort) {
-		String command = String.format(FIND_LISTEN_PROCESS_COMMAND, redisPort);
-		String[] shell = {SHELL_PATH, SHELL_COMMAND_OPTION, command};
-
-		try {
-			return Runtime.getRuntime().exec(shell);
-		} catch (IOException e) {
-			throw new MoabamException(e.getMessage());
-		}
 	}
 
 	private boolean isRunning(Process process) {
@@ -106,16 +129,83 @@ public class EmbeddedRedisConfig {
 		return StringUtils.hasText(pidInfo.toString());
 	}
 
-	private boolean isArmMac() {
-		return Objects.equals(System.getProperty(OS_ARCHITECTURE), ARM_ARCHITECTURE)
-			&& Objects.equals(System.getProperty(OS_NAME), MAC_OS_NAME);
-	}
-
 	private File getRedisFileForArcMac() {
 		try {
-			return new ClassPathResource(REDIS_BINARY_PATH).getFile();
+			return new ClassPathResource("binary/redis/redis-server-arm64").getFile();
 		} catch (Exception e) {
 			throw new MoabamException(e.getMessage());
+		}
+	}
+
+	private static final class Os {
+
+		enum Type {
+			MAC,
+			WIN,
+			LINUX
+		}
+
+		private final String shellPath;
+		private final String optionOperator;
+		private final String command;
+		private final Type type;
+
+		@Builder
+		private Os(String shellPath, String optionOperator, String command, Type type) {
+			this.shellPath = shellPath;
+			this.optionOperator = optionOperator;
+			this.command = command;
+			this.type = type;
+		}
+
+		public Process executeCommand(int port) {
+			String osCommand = String.format(this.command, port);
+			String[] script = {shellPath, optionOperator, osCommand};
+
+			try {
+				return Runtime.getRuntime().exec(script);
+			} catch (IOException e) {
+				throw new MoabamException(e.getMessage());
+			}
+		}
+
+		public boolean isMac() {
+			return type == Type.MAC;
+		}
+
+		public static Os createOs() {
+			String osArchitecture = System.getProperty("os.arch");
+			String osName = System.getProperty("os.name");
+
+			if (osArchitecture.equals("aarch64") && osName.equals("Mac OS X")) {
+				return linuxOs(Type.MAC);
+			}
+
+			if (osArchitecture.equals("amd64") && osName.contains("Windows")) {
+				return windowOs();
+			}
+
+			return linuxOs(Type.LINUX);
+		}
+
+		// 변경 전
+		private static Os linuxOs(Type type) {
+			return Os.builder()
+				.shellPath("/bin/sh")
+				.optionOperator("-c")
+				.command("netstat -nat | grep LISTEN | grep %d")
+				.type(type)
+				.build();
+		}
+
+		// 변경 후
+		private static Os windowOs() {
+			return Os.builder()
+				.shellPath("cmd.exe")
+				.optionOperator("/c")
+				.command("netstat -ano | findstr LISTEN | findstr %d")
+				.type(Type.WIN)
+				.build();
 		}
 	}
 }

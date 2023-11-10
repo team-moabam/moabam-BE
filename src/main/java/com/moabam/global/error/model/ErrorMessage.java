@@ -26,10 +26,17 @@ public enum ErrorMessage {
 	LOGIN_FAILED("로그인에 실패했습니다."),
 	REQUEST_FAILED("네트워크 접근 실패입니다."),
 	GRANT_FAILED("인가 코드 실패"),
+	AUTHENTICATIE_FAIL("인증 실패"),
 	MEMBER_NOT_FOUND("존재하지 않는 회원입니다."),
 	MEMBER_ROOM_EXCEED("참여할 수 있는 방의 개수가 모두 찼습니다."),
 
+	BUG_NOT_ENOUGH("보유한 벌레가 부족합니다."),
+
+	ITEM_NOT_FOUND("존재하지 않는 아이템입니다."),
+	ITEM_UNLOCK_LEVEL_HIGH("아이템 해금 레벨이 높습니다."),
+	ITEM_NOT_PURCHASABLE_BY_BUG_TYPE("해당 벌레 타입으로는 구매할 수 없는 아이템입니다."),
 	INVENTORY_NOT_FOUND("구매하지 않은 아이템은 적용할 수 없습니다."),
+	INVENTORY_CONFLICT("이미 구매한 아이템입니다."),
 
 	INVALID_BUG_COUNT("벌레 개수는 0 이상이어야 합니다."),
 	INVALID_PRICE("가격은 0 이상이어야 합니다."),
@@ -38,7 +45,13 @@ public enum ErrorMessage {
 
 	FAILED_FCM_INIT("파이어베이스 설정을 실패했습니다."),
 	NOT_FOUND_FCM_TOKEN("해당 유저는 접속 중이 아닙니다."),
-	CONFLICT_KNOCK("이미 콕 알림을 보낸 대상입니다.");
+	CONFLICT_KNOCK("이미 콕 알림을 보낸 대상입니다."),
+
+	INVALID_COUPON_POINT("쿠폰의 보너스 포인트는 0 이상이어야 합니다."),
+	INVALID_COUPON_STOCK("쿠폰의 재고는 0 이상이어야 합니다."),
+	CONFLICT_COUPON_NAME("쿠폰의 이름이 중복되었습니다."),
+	NOT_FOUND_COUPON_TYPE("존재하지 않는 쿠폰 종류입니다."),
+	INVALID_COUPON_PERIOD("쿠폰 발급 종료 시각은 시작 시각보다 이후여야 합니다.");
 
 	private final String message;
 }

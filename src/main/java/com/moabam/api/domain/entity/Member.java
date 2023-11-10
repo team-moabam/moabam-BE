@@ -1,5 +1,6 @@
 package com.moabam.api.domain.entity;
 
+import static com.moabam.global.common.util.GlobalConstant.*;
 import static java.util.Objects.*;
 
 import java.time.LocalDateTime;
@@ -40,7 +41,7 @@ public class Member extends BaseTimeEntity {
 	private Long id;
 
 	@Column(name = "social_id", nullable = false, unique = true)
-	private String socialId;
+	private Long socialId;
 
 	@Column(name = "nickname", nullable = false, unique = true)
 	private String nickname;
@@ -79,11 +80,11 @@ public class Member extends BaseTimeEntity {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	private Member(Long id, String socialId, String nickname, String profileImage, Bug bug) {
+	private Member(Long id, Long socialId, String nickname, Bug bug) {
 		this.id = id;
-		this.socialId = requireNonNull(socialId);
+		this.socialId = socialId;
 		this.nickname = requireNonNull(nickname);
-		this.profileImage = requireNonNullElse(profileImage, BaseImageUrl.PROFILE_URL);
+		this.profileImage = BaseImageUrl.PROFILE_URL;
 		this.bug = requireNonNull(bug);
 		this.role = Role.USER;
 	}
@@ -106,5 +107,9 @@ public class Member extends BaseTimeEntity {
 		if (currentNightCount > 0) {
 			currentNightCount--;
 		}
+	}
+
+	public int getLevel() {
+		return (int)(totalCertifyCount / LEVEL_DIVISOR) + 1;
 	}
 }

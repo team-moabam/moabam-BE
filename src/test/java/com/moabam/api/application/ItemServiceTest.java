@@ -1,6 +1,8 @@
 package com.moabam.api.application;
 
+import static com.moabam.support.fixture.InventoryFixture.*;
 import static com.moabam.support.fixture.ItemFixture.*;
+import static com.moabam.support.fixture.MemberFixture.*;
 import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,16 +19,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.domain.entity.BugHistory;
 import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
+import com.moabam.api.domain.entity.Member;
+import com.moabam.api.domain.entity.enums.BugType;
 import com.moabam.api.domain.entity.enums.ItemType;
+import com.moabam.api.domain.repository.BugHistoryRepository;
+import com.moabam.api.domain.repository.InventoryRepository;
 import com.moabam.api.domain.repository.InventorySearchRepository;
+import com.moabam.api.domain.repository.ItemRepository;
 import com.moabam.api.domain.repository.ItemSearchRepository;
 import com.moabam.api.dto.ItemResponse;
 import com.moabam.api.dto.ItemsResponse;
+import com.moabam.api.dto.PurchaseItemRequest;
 import com.moabam.global.common.util.StreamUtils;
+import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
-import com.moabam.support.fixture.InventoryFixture;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
@@ -35,10 +44,22 @@ class ItemServiceTest {
 	ItemService itemService;
 
 	@Mock
+	MemberService memberService;
+
+	@Mock
+	ItemRepository itemRepository;
+
+	@Mock
 	ItemSearchRepository itemSearchRepository;
 
 	@Mock
+	InventoryRepository inventoryRepository;
+
+	@Mock
 	InventorySearchRepository inventorySearchRepository;
+
+	@Mock
+	BugHistoryRepository bugHistoryRepository;
 
 	@DisplayName("아이템 목록을 조회한다.")
 	@Test
@@ -61,6 +82,68 @@ class ItemServiceTest {
 		assertThat(response.notPurchasedItems()).isEmpty();
 	}
 
+	@DisplayName("아이템을 구매한다.")
+	@Nested
+	class PurchaseItem {
+
+		@DisplayName("성공한다.")
+		@Test
+		void success() {
+			// given
+			Long memberId = 1L;
+			Long itemId = 1L;
+			PurchaseItemRequest request = new PurchaseItemRequest(BugType.GOLDEN);
+			Member member = member();
+			Item item = nightMageSkin();
+			given(memberService.getById(memberId)).willReturn(member);
+			given(itemRepository.findById(itemId)).willReturn(Optional.of(item));
+			given(inventorySearchRepository.findOne(memberId, itemId)).willReturn(Optional.empty());
+
+			// When
+			itemService.purchaseItem(memberId, itemId, request);
+
+			// Then
+			verify(memberService).getById(memberId);
+			verify(itemRepository).findById(itemId);
+			verify(inventorySearchRepository).findOne(memberId, itemId);
+			verify(inventoryRepository).save(any(Inventory.class));
+			verify(bugHistoryRepository).save(any(BugHistory.class));
+		}
+
+		@DisplayName("해당 아이템이 존재하지 않으면 예외가 발생한다.")
+		@Test
+		void item_not_found_exception() {
+			// given
+			Long memberId = 1L;
+			Long itemId = 1L;
+			PurchaseItemRequest request = new PurchaseItemRequest(BugType.GOLDEN);
+			given(itemRepository.findById(itemId)).willReturn(Optional.empty());
+
+			// when, then
+			assertThatThrownBy(() -> itemService.purchaseItem(memberId, itemId, request))
+				.isInstanceOf(NotFoundException.class)
+				.hasMessage("존재하지 않는 아이템입니다.");
+		}
+
+		@DisplayName("이미 구매한 아이템이면 예외가 발생한다.")
+		@Test
+		void inventory_conflict_exception() {
+			// given
+			Long memberId = 1L;
+			Long itemId = 1L;
+			PurchaseItemRequest request = new PurchaseItemRequest(BugType.GOLDEN);
+			Item item = nightMageSkin();
+			Inventory inventory = inventory(memberId, item);
+			given(itemRepository.findById(itemId)).willReturn(Optional.of(item));
+			given(inventorySearchRepository.findOne(memberId, itemId)).willReturn(Optional.of(inventory));
+
+			// when, then
+			assertThatThrownBy(() -> itemService.purchaseItem(memberId, itemId, request))
+				.isInstanceOf(ConflictException.class)
+				.hasMessage("이미 구매한 아이템입니다.");
+		}
+	}
+
 	@DisplayName("아이템을 적용한다.")
 	@Nested
 	class SelectItem {
@@ -71,8 +154,8 @@ class ItemServiceTest {
 			// given
 			Long memberId = 1L;
 			Long itemId = 1L;
-			Inventory inventory = InventoryFixture.inventory(memberId, nightMageSkin());
-			Inventory defaultInventory = InventoryFixture.inventory(memberId, nightMageSkin());
+			Inventory inventory = inventory(memberId, nightMageSkin());
+			Inventory defaultInventory = inventory(memberId, nightMageSkin());
 			ItemType itemType = inventory.getItemType();
 			given(inventorySearchRepository.findOne(memberId, itemId)).willReturn(Optional.of(inventory));
 			given(inventorySearchRepository.findDefault(memberId, itemType)).willReturn(Optional.of(defaultInventory));

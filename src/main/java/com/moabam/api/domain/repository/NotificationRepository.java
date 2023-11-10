@@ -1,7 +1,6 @@
 package com.moabam.api.domain.repository;
 
-import static com.moabam.global.common.constant.FcmConstant.*;
-import static com.moabam.global.common.constant.GlobalConstant.*;
+import static com.moabam.global.common.util.GlobalConstant.*;
 import static java.util.Objects.*;
 
 import java.time.Duration;
@@ -16,9 +15,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationRepository {
 
+	private static final long EXPIRE_KNOCK = 12;
+	private static final long EXPIRE_FCM_TOKEN = 60;
+
 	private final StringRedisRepository stringRedisRepository;
 
-	// TODO : 세연님 로그인 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 저장하면 됩니다.
+	// TODO : 세연님 로그인 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 저장하면 됩니다. Front와 상의 후 삭제예정
 	public void saveFcmToken(Long key, String value) {
 		stringRedisRepository.save(
 			String.valueOf(requireNonNull(key)),
