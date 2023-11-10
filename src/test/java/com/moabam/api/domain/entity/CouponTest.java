@@ -34,7 +34,7 @@ class CouponTest {
 
 		// Then
 		assertThat(actual.getName()).isEqualTo("couponName");
-		assertThat(actual.getDescription()).isNull();
+		assertThat(actual.getDescription()).isBlank();
 		assertThat(actual.getPoint()).isEqualTo(10);
 		assertThat(actual.getStock()).isEqualTo(100);
 		assertThat(actual.getCouponType()).isEqualTo(CouponType.MORNING_COUPON);

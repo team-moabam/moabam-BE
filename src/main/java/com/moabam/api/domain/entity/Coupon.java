@@ -1,9 +1,11 @@
 package com.moabam.api.domain.entity;
 
+import static com.moabam.global.common.util.GlobalConstant.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -69,7 +71,7 @@ public class Coupon extends BaseTimeEntity {
 		LocalDateTime endAt, Long adminId) {
 		this.name = requireNonNull(name);
 		this.point = validatePoint(point);
-		this.description = description;
+		this.description = Optional.ofNullable(description).orElse(BLANK);
 		this.couponType = requireNonNull(couponType);
 		this.stock = validateStock(stock);
 		this.startAt = requireNonNull(startAt);

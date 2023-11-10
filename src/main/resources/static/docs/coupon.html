@@ -460,17 +460,17 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /admins/coupons HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Content-Length: 186
+Content-Length: 192
 Host: localhost:8080
 
 {
   "name" : "couponName",
   "description" : "coupon description",
-  "type" : "황금",
+  "couponType" : "황금",
   "point" : 10,
   "stock" : 10,
-  "startAt" : "2000-01-22T10:30",
-  "endAt" : "2000-02-22T11:00"
+  "startAt" : "2023-01-01T00:00",
+  "endAt" : "2023-02-01T00:00"
 }</code></pre>
 </div>
 </div>
@@ -521,12 +521,47 @@ Content-Length: 56
 </div>
 </div>
 <div class="sect2">
-<h3 id="_쿠폰_조회_진행_중">쿠폰 조회 (진행 중)</h3>
+<h3 id="_특정_쿠폰_조회">특정 쿠폰 조회</h3>
 <div class="literalblock">
 <div class="content">
-<pre>관리자 혹은 사용자가 쿠폰들을 조회합니다.</pre>
+<pre>관리자 혹은 사용자가 특정 ID와 일치하는 쿠폰을 조회합니다.</pre>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_요청_3">요청</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /coupons/77777777777 HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<h4 id="_응답_3" class="discrete">응답</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 56
+
+{
+  "message" : "존재하지 않는 쿠폰입니다."
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_상태에_따른_쿠폰들을_조회_진행_중">상태에 따른 쿠폰들을 조회 (진행 중)</h3>
+<div class="literalblock">
+<div class="content">
+<pre>관리자 혹은 사용자가 날짜 상태에 따라 쿠폰들을 조회합니다.</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_특정_사용자의_쿠폰_보관함을_조회_진행_중">특정 사용자의 쿠폰 보관함을 조회 (진행 중)</h3>
 <div class="literalblock">
 <div class="content">
 <pre>사용자가 자신의 보관함에 있는 쿠폰들을 조회합니다.</pre>
@@ -555,7 +590,7 @@ Content-Length: 56
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-10 02:32:55 +0900
+Last updated 2023-11-10 20:23:57 +0900
 </div>
 </div>
 </body>
