@@ -448,6 +448,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre>쿠폰에 대해 생성/삭제/조회/발급/사용 기능을 제공합니다.</pre>
 </div>
 </div>
+<hr>
 <div class="sect2">
 <h3 id="_쿠폰_생성">쿠폰 생성</h3>
 <div class="literalblock">
@@ -489,9 +490,10 @@ Content-Length: 62
 }</code></pre>
 </div>
 </div>
+<hr>
 </div>
 <div class="sect2">
-<h3 id="_쿠폰_삭제_진행_중">쿠폰 삭제 (진행 중)</h3>
+<h3 id="_쿠폰_삭제">쿠폰 삭제</h3>
 <div class="literalblock">
 <div class="content">
 <pre>관리자가 쿠폰 ID와 일치하는 쿠폰을 삭제합니다.</pre>
@@ -519,6 +521,7 @@ Content-Length: 56
 }</code></pre>
 </div>
 </div>
+<hr>
 </div>
 <div class="sect2">
 <h3 id="_특정_쿠폰_조회">특정 쿠폰 조회</h3>
@@ -550,23 +553,56 @@ Content-Length: 56
 }</code></pre>
 </div>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_상태에_따른_쿠폰들을_조회_진행_중">상태에 따른 쿠폰들을 조회 (진행 중)</h3>
+<h3 id="_상태에_따른_쿠폰들을_조회">상태에 따른 쿠폰들을 조회</h3>
 <div class="literalblock">
 <div class="content">
 <pre>관리자 혹은 사용자가 날짜 상태에 따라 쿠폰들을 조회합니다.</pre>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_요청_4">요청</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /coupons/search HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 84
+Host: localhost:8080
+
+{
+  "couponOngoing" : false,
+  "couponNotStarted" : false,
+  "couponEnded" : false
+}</code></pre>
+</div>
+</div>
+<h4 id="_응답_4" class="discrete">응답</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 3
+
+[ ]</code></pre>
+</div>
+</div>
+<hr>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_특정_사용자의_쿠폰_보관함을_조회_진행_중">특정 사용자의 쿠폰 보관함을 조회 (진행 중)</h3>
+<h3 id="_특정_사용자의_쿠폰_보관함을_조회">특정 사용자의 쿠폰 보관함을 조회</h3>
 <div class="literalblock">
 <div class="content">
 <pre>사용자가 자신의 보관함에 있는 쿠폰들을 조회합니다.</pre>
 </div>
 </div>
+<hr>
 </div>
 <div class="sect2">
 <h3 id="_쿠폰_발급_진행_중">쿠폰 발급 (진행 중)</h3>
@@ -590,7 +626,7 @@ Content-Length: 56
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-10 20:23:57 +0900
+Last updated 2023-11-10 21:20:44 +0900
 </div>
 </div>
 </body>
