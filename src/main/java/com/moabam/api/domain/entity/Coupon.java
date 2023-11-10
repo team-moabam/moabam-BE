@@ -42,12 +42,13 @@ public class Coupon extends BaseTimeEntity {
 	@Column(name = "point", nullable = false)
 	private int point;
 
+	@ColumnDefault("''")
 	@Column(name = "description", length = 50)
 	private String description;
 
 	@Enumerated(value = EnumType.STRING)
-	@Column(name = "type", nullable = false)
-	private CouponType type;
+	@Column(name = "coupon_type", nullable = false)
+	private CouponType couponType;
 
 	@ColumnDefault("1")
 	@Column(name = "stock", nullable = false)
@@ -59,16 +60,17 @@ public class Coupon extends BaseTimeEntity {
 	@Column(name = "end_at", nullable = false)
 	private LocalDateTime endAt;
 
+	// TODO : 관리자 테이블 생기면 관리자 테이블이랑 다대일 관계 맺을 예정
 	@Column(name = "admin_id", updatable = false, nullable = false)
 	private Long adminId;
 
 	@Builder
-	private Coupon(String name, int point, String description, CouponType type, int stock, LocalDateTime startAt,
+	private Coupon(String name, int point, String description, CouponType couponType, int stock, LocalDateTime startAt,
 		LocalDateTime endAt, Long adminId) {
 		this.name = requireNonNull(name);
 		this.point = validatePoint(point);
 		this.description = description;
-		this.type = requireNonNull(type);
+		this.couponType = requireNonNull(couponType);
 		this.stock = validateStock(stock);
 		this.startAt = requireNonNull(startAt);
 		this.endAt = requireNonNull(endAt);
