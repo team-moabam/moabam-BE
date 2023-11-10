@@ -49,8 +49,13 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "password", length = 8)
 	private String password;
 
+	@ColumnDefault("0")
 	@Column(name = "level", nullable = false)
 	private int level;
+
+	@ColumnDefault("0")
+	@Column(name = "exp", nullable = false)
+	private int exp;
 
 	@Enumerated(value = EnumType.STRING)
 	@Column(name = "room_type")
@@ -65,7 +70,7 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "max_user_count", nullable = false)
 	private int maxUserCount;
 
-	@Column(name = "announcement", length = 255)
+	@Column(name = "announcement", length = 100)
 	private String announcement;
 
 	@ColumnDefault(ROOM_LEVEL_0_IMAGE)
@@ -78,6 +83,7 @@ public class Room extends BaseTimeEntity {
 		this.title = requireNonNull(title);
 		this.password = password;
 		this.level = 0;
+		this.exp = 0;
 		this.roomType = requireNonNull(roomType);
 		this.certifyTime = validateCertifyTime(roomType, certifyTime);
 		this.currentUserCount = 1;
@@ -87,6 +93,11 @@ public class Room extends BaseTimeEntity {
 
 	public void levelUp() {
 		this.level += 1;
+		this.exp = 0;
+	}
+
+	public void gainExp() {
+		this.exp += 1;
 	}
 
 	public void changeAnnouncement(String announcement) {

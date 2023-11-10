@@ -8,6 +8,7 @@ import static com.moabam.api.domain.entity.QParticipant.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -33,6 +34,18 @@ public class CertificationsSearchRepository {
 			.fetch();
 	}
 
+	public Optional<DailyMemberCertification> findDailyMemberCertification(Long memberId, Long roomId, LocalDate date) {
+		return Optional.ofNullable(jpaQueryFactory
+			.selectFrom(dailyMemberCertification)
+			.where(
+				dailyMemberCertification.memberId.eq(memberId),
+				dailyMemberCertification.roomId.eq(roomId),
+				dailyMemberCertification.createdAt.between(date.atStartOfDay(), date.atTime(LocalTime.MAX))
+			)
+			.fetchOne()
+		);
+	}
+
 	public List<DailyMemberCertification> findSortedDailyMemberCertifications(Long roomId, LocalDate date) {
 		return jpaQueryFactory
 			.selectFrom(dailyMemberCertification)
@@ -45,6 +58,16 @@ public class CertificationsSearchRepository {
 				dailyMemberCertification.createdAt.asc()
 			)
 			.fetch();
+	}
+
+	public Optional<DailyRoomCertification> findDailyRoomCertification(Long roomId, LocalDate date) {
+		return Optional.ofNullable(jpaQueryFactory
+			.selectFrom(dailyRoomCertification)
+			.where(
+				dailyRoomCertification.roomId.eq(roomId),
+				dailyRoomCertification.certifiedAt.eq(date)
+			)
+			.fetchOne());
 	}
 
 	public List<DailyRoomCertification> findDailyRoomCertifications(Long roomId, LocalDate date) {

@@ -1,17 +1,22 @@
 package com.moabam.api.application;
 
 import static com.moabam.api.domain.entity.enums.RoomType.*;
+import static com.moabam.api.domain.resizedimage.ImageType.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.moabam.api.domain.entity.Certification;
 import com.moabam.api.domain.entity.DailyMemberCertification;
@@ -20,8 +25,13 @@ import com.moabam.api.domain.entity.Member;
 import com.moabam.api.domain.entity.Participant;
 import com.moabam.api.domain.entity.Room;
 import com.moabam.api.domain.entity.Routine;
+import com.moabam.api.domain.entity.enums.BugType;
+import com.moabam.api.domain.entity.enums.RequireExp;
 import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.repository.CertificationRepository;
 import com.moabam.api.domain.repository.CertificationsSearchRepository;
+import com.moabam.api.domain.repository.DailyMemberCertificationRepository;
+import com.moabam.api.domain.repository.DailyRoomCertificationRepository;
 import com.moabam.api.domain.repository.ParticipantRepository;
 import com.moabam.api.domain.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.repository.RoomRepository;
@@ -37,6 +47,8 @@ import com.moabam.api.dto.RoomMapper;
 import com.moabam.api.dto.RoutineMapper;
 import com.moabam.api.dto.RoutineResponse;
 import com.moabam.api.dto.TodayCertificateRankResponse;
+import com.moabam.global.common.util.ClockHolder;
+import com.moabam.global.common.util.UrlSubstringParser;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -54,7 +66,12 @@ public class RoomService {
 	private final ParticipantRepository participantRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
 	private final CertificationsSearchRepository certificationsSearchRepository;
+	private final DailyMemberCertificationRepository dailyMemberCertificationRepository;
+	private final DailyRoomCertificationRepository dailyRoomCertificationRepository;
+	private final CertificationRepository certificationRepository;
 	private final MemberService memberService;
+	private final ImageService imageService;
+	private final ClockHolder clockHolder;
 
 	@Transactional
 	public Long createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
@@ -149,6 +166,110 @@ public class RoomService {
 
 		return RoomMapper.toRoomDetailsResponse(room, managerNickname, routineResponses, certifiedDates,
 			todayCertificateRankResponses, completePercentage);
+	}
+
+	@Transactional
+	public void certifyRoom(Long memberId, Long roomId, List<MultipartFile> multipartFiles) {
+		LocalDate today = LocalDate.now();
+
+		// 사용자가 방의 참여자인지 확인
+		Participant participant = getParticipant(memberId, roomId);
+		Room room = participant.getRoom();
+		Member member = memberService.getById(memberId);
+		BugType bugType = switch (room.getRoomType()) {
+			case MORNING -> BugType.MORNING;
+			case NIGHT -> BugType.NIGHT;
+		};
+		int roomLevel = room.getLevel();
+
+		// 인증시간 전후 10분 확인
+		validateCertifyTime(clockHolder.times(), room.getCertifyTime());
+
+		// DailyMemberCertification 있는지 확인 -> 있으면 예외
+		if (certificationsSearchRepository.findDailyMemberCertification(memberId, roomId, today).isPresent()) {
+			throw new BadRequestException(DUPLICATED_DAILY_MEMBER_CERTIFICATION);
+		}
+
+		DailyMemberCertification dailyMemberCertification = DailyMemberCertification.builder()
+			.memberId(memberId)
+			.roomId(roomId)
+			.participant(participant)
+			.build();
+
+		// DailyMemberCertification 만들기
+		dailyMemberCertificationRepository.save(dailyMemberCertification);
+		member.increaseTotalCertifyCount();
+
+		// 이미지 업로드 (result 는 이미지 url)
+		List<String> result = imageService.uploadImages(multipartFiles, CERTIFICATION);
+
+		// Certification 만들기
+		List<Certification> certifications = new ArrayList<>();
+
+		for (String imageUrl : result) {
+			Long routineId = Long.parseLong(UrlSubstringParser.parseUrl(imageUrl, "_"));
+			Routine routine = routineRepository.findById(routineId).orElseThrow(() -> new NotFoundException(
+				ROUTINE_NOT_FOUND));
+
+			Certification certification = Certification.builder()
+				.routine(routine)
+				.memberId(memberId)
+				.image(imageUrl)
+				.build();
+
+			certifications.add(certification);
+		}
+
+		// Certification DB에 저장
+		certificationRepository.saveAll(certifications);
+
+		Optional<DailyRoomCertification> dailyRoomCertification =
+			certificationsSearchRepository.findDailyRoomCertification(roomId, today);
+
+		// 이 방이 인증이 완료됐는지 확인, 완료 안됐으면 인증된 사람의 퍼센트 계산후 방의 인증 여부 확인
+		// -> 이번 인증으로 인해 방을 인증할 수 있으면 지금까지 인증한 유저에게 벌레 지급
+		if (dailyRoomCertification.isEmpty()) {
+			List<DailyMemberCertification> dailyMemberCertifications =
+				certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today);
+			double completePercentage = calculateCompletePercentage(dailyMemberCertifications.size(),
+				room.getCurrentUserCount());
+
+			if (completePercentage >= 75) {
+				DailyRoomCertification createDailyRoomCertification = DailyRoomCertification.builder()
+					.roomId(roomId)
+					.certifiedAt(today)
+					.build();
+
+				dailyRoomCertificationRepository.save(createDailyRoomCertification);
+
+				// 레벨업 관련 로직
+				int requireExp = RequireExp.of(roomLevel).getTotalExp();
+
+				room.gainExp();
+
+				if (room.getExp() == requireExp) {
+					room.levelUp();
+					roomLevel = room.getLevel();
+				}
+
+				// 벌레 지급
+				List<Long> memberIds = dailyMemberCertifications.stream()
+					.map(DailyMemberCertification::getMemberId)
+					.toList();
+
+				int increaseBug = roomLevel;
+
+				memberService.getRoomMembers(memberIds)
+					.forEach(completedMember -> completedMember.getBug().increaseBug(bugType, increaseBug));
+
+				return;
+			}
+		}
+
+		// 방이 이미 인증되어 있으면 지금 유저에게 벌레 지급
+		if (dailyRoomCertification.isPresent()) {
+			member.getBug().increaseBug(bugType, roomLevel);
+		}
 	}
 
 	public void validateRoomById(Long roomId) {
@@ -306,5 +427,15 @@ public class RoomService {
 		double completePercentage = ((double)certifiedMembersCount / currentsMembersCount) * 100;
 
 		return Math.round(completePercentage * 100) / 100.0;
+	}
+
+	private void validateCertifyTime(LocalDateTime now, int certifyTime) {
+		LocalTime targetTime = LocalTime.of(certifyTime, 0);
+		LocalDateTime minusTenMinutes = LocalDateTime.of(now.toLocalDate(), targetTime).minusMinutes(10);
+		LocalDateTime plusTenMinutes = LocalDateTime.of(now.toLocalDate(), targetTime).plusMinutes(10);
+
+		if (now.isBefore(minusTenMinutes) || now.isAfter(plusTenMinutes)) {
+			throw new BadRequestException(INVALID_CERTIFY_TIME);
+		}
 	}
 }
