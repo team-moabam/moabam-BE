@@ -7,7 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.moabam.global.common.util.PathResolver;
+import com.moabam.global.common.handler.PathResolver;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

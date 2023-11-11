@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.moabam.global.common.handler.CurrentMemberArgumentResolver;
-import com.moabam.global.common.util.PathResolver;
+import com.moabam.global.common.handler.PathResolver;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

@@ -39,11 +39,11 @@ public class WithFilterSupporter {
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
 			.apply(RestDocsFactory.restdocs(contextProvider))
 			.defaultRequest(get("/")
-				.cookie(CookieUtils.typeCookie("token_type", "Bearer", tokenConfig.getRefreshExpire()))
-				.cookie(CookieUtils.typeCookie("access_token",
+				.cookie(CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()))
+				.cookie(CookieUtils.tokenCookie("access_token",
 					jwtProviderService.provideAccessToken(PublicClaimFixture.publicClaim()),
 					tokenConfig.getRefreshExpire()))
-				.cookie(CookieUtils.typeCookie("refresh_token",
+				.cookie(CookieUtils.tokenCookie("refresh_token",
 					jwtProviderService.provideRefreshToken(),
 					tokenConfig.getRefreshExpire())))
 			.build();

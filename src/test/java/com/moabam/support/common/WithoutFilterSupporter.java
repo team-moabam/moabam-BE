@@ -12,7 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import com.moabam.api.application.AuthorizationService;
 import com.moabam.api.application.JwtAuthenticationService;
 import com.moabam.api.domain.entity.enums.Role;
-import com.moabam.global.common.util.PathResolver;
+import com.moabam.global.common.handler.PathResolver;
 
 @ExtendWith({FilterProcessExtension.class})
 public class WithoutFilterSupporter {

@@ -8,25 +8,20 @@ import lombok.NoArgsConstructor;
 public class CookieUtils {
 
 	public static Cookie tokenCookie(String name, String value, long expireTime) {
-		Cookie cookie = new Cookie(name, value);
-		basic(cookie, expireTime);
-		secure(cookie);
-		return cookie;
+		return basic(name, value, expireTime);
 	}
 
-	public static Cookie typeCookie(String name, String value, long expireTime) {
-		Cookie cookie = new Cookie(name, value);
-		basic(cookie, expireTime);
-		return cookie;
+	public static Cookie typeCookie(String value, long expireTime) {
+		return basic("token_type", value, expireTime);
 	}
 
-	private static void secure(Cookie cookie) {
+	private static Cookie basic(String name, String value, long expireTime) {
+		Cookie cookie = new Cookie(name, value);
 		cookie.setSecure(true);
-	}
-
-	private static void basic(Cookie cookie, long expireTime) {
 		cookie.setHttpOnly(true);
 		cookie.setPath("/");
 		cookie.setMaxAge((int)expireTime);
+
+		return cookie;
 	}
 }

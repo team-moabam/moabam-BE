@@ -121,8 +121,7 @@ public class AuthorizationService {
 
 	public void issueServiceToken(HttpServletResponse response, PublicClaim publicClaim) {
 		response.addCookie(
-			CookieUtils.typeCookie("token_type", "Bearer",
-				tokenConfig.getRefreshExpire()));
+			CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()));
 		response.addCookie(
 			CookieUtils.tokenCookie("access_token", jwtProviderService.provideAccessToken(publicClaim),
 				tokenConfig.getRefreshExpire()));

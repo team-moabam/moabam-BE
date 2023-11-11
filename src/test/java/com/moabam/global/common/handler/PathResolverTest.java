@@ -1,4 +1,4 @@
-package com.moabam.global.common.util;
+package com.moabam.global.common.handler;
 
 import static com.moabam.api.domain.entity.enums.Role.*;
 import static org.assertj.core.api.Assertions.*;
@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import com.moabam.global.common.handler.PathResolver;
 
 class PathResolverTest {
 

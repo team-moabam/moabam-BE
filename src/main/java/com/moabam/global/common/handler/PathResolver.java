@@ -1,4 +1,4 @@
-package com.moabam.global.common.util;
+package com.moabam.global.common.handler;
 
 import static java.util.Objects.*;
 
