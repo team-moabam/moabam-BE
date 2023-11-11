@@ -29,7 +29,7 @@ class CurrentMemberArgumentResolverTest {
 
 	@Nested
 	@DisplayName("제공 파라미터 검증")
-	class supportParameter {
+	class SupportParameter {
 
 		@DisplayName("파라미터 제공 성공")
 		@Test
