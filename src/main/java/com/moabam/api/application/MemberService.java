@@ -38,7 +38,7 @@ public class MemberService {
 		Optional<Member> member = memberRepository.findBySocialId(authorizationTokenInfoResponse.id());
 		Member loginMember = member.orElseGet(() -> signUp(authorizationTokenInfoResponse.id()));
 
-		return MemberMapper.toLoginResponse(loginMember.getId(), member.isEmpty());
+		return MemberMapper.toLoginResponse(loginMember, member.isEmpty());
 	}
 
 	private Member signUp(Long socialId) {

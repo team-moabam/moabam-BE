@@ -17,16 +17,18 @@ public final class MemberMapper {
 			.build();
 	}
 
-	public static LoginResponse toLoginResponse(Long memberId) {
+	public static LoginResponse toLoginResponse(Member member, boolean isSignUp) {
 		return LoginResponse.builder()
-			.id(memberId)
+			.publicClaim(PublicClaim.builder()
+				.id(member.getId())
+				.nickname(member.getNickname())
+				.role(member.getRole())
+				.build())
+			.isSignUp(isSignUp)
 			.build();
 	}
 
-	public static LoginResponse toLoginResponse(Long memberId, boolean isSignUp) {
-		return LoginResponse.builder()
-			.id(memberId)
-			.isSignUp(isSignUp)
-			.build();
+	public static AuthorizationMember toAuthorizationMember(PublicClaim publicClaim) {
+		return new AuthorizationMember(publicClaim.id(), publicClaim.nickname(), publicClaim.role());
 	}
 }

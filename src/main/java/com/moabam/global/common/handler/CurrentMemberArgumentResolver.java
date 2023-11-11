@@ -1,4 +1,4 @@
-package com.moabam.global.error.handler;
+package com.moabam.global.common.handler;
 
 import static com.moabam.global.common.util.AuthorizationThreadLocal.*;
 
@@ -20,7 +20,7 @@ public class CurrentMemberArgumentResolver implements HandlerMethodArgumentResol
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return Objects.nonNull(parameter.getParameterAnnotation(CurrentMember.class))
-			&& parameter.getParameterType().isInstance(AuthorizationMember.class);
+			&& parameter.getParameterType().equals(AuthorizationMember.class);
 	}
 
 	@Override

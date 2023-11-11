@@ -9,14 +9,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
 import com.moabam.api.dto.AuthorizationCodeResponse;
+import com.moabam.api.dto.AuthorizationMapper;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenRequest;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.api.dto.LoginResponse;
-import com.moabam.api.dto.OAuthMapper;
+import com.moabam.api.dto.PublicClaim;
 import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
+import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthorizationService {
 
 	private final OAuthConfig oAuthConfig;
+	private final TokenConfig tokenConfig;
 	private final OAuth2AuthorizationServerRequestService oauth2AuthorizationServerRequestService;
 	private final MemberService memberService;
 	private final JwtProviderService jwtProviderService;
@@ -55,13 +58,13 @@ public class AuthorizationService {
 	public LoginResponse signUpOrLogin(HttpServletResponse httpServletResponse,
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse) {
 		LoginResponse loginResponse = memberService.login(authorizationTokenInfoResponse);
-		issueServiceToken(httpServletResponse, loginResponse.id());
+		issueServiceToken(httpServletResponse, loginResponse.publicClaim());
 
 		return loginResponse;
 	}
 
 	private String getAuthorizationCodeUri() {
-		AuthorizationCodeRequest authorizationCodeRequest = OAuthMapper.toAuthorizationCodeRequest(oAuthConfig);
+		AuthorizationCodeRequest authorizationCodeRequest = AuthorizationMapper.toAuthorizationCodeRequest(oAuthConfig);
 		return generateQueryParamsWith(authorizationCodeRequest);
 	}
 
@@ -91,7 +94,8 @@ public class AuthorizationService {
 	}
 
 	private AuthorizationTokenResponse issueTokenToAuthorizationServer(String code) {
-		AuthorizationTokenRequest authorizationTokenRequest = OAuthMapper.toAuthorizationTokenRequest(oAuthConfig,
+		AuthorizationTokenRequest authorizationTokenRequest = AuthorizationMapper.toAuthorizationTokenRequest(
+			oAuthConfig,
 			code);
 		MultiValueMap<String, String> uriParams = generateTokenRequest(authorizationTokenRequest);
 		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse =
@@ -115,9 +119,15 @@ public class AuthorizationService {
 		return contents;
 	}
 
-	public void issueServiceToken(HttpServletResponse response, Long id) {
-		response.addHeader("token_type", "Bearer");
-		response.addCookie(CookieUtils.tokenCookie("access_token", jwtProviderService.provideAccessToken(id)));
-		response.addCookie(CookieUtils.tokenCookie("refresh_token", jwtProviderService.provideRefreshToken()));
+	public void issueServiceToken(HttpServletResponse response, PublicClaim publicClaim) {
+		response.addCookie(
+			CookieUtils.typeCookie("token_type", "Bearer",
+				tokenConfig.getRefreshExpire()));
+		response.addCookie(
+			CookieUtils.tokenCookie("access_token", jwtProviderService.provideAccessToken(publicClaim),
+				tokenConfig.getRefreshExpire()));
+		response.addCookie(
+			CookieUtils.tokenCookie("refresh_token", jwtProviderService.provideRefreshToken(),
+				tokenConfig.getRefreshExpire()));
 	}
 }

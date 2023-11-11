@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.springframework.stereotype.Service;
 
+import com.moabam.api.dto.PublicClaim;
 import com.moabam.global.config.TokenConfig;
 
 import io.jsonwebtoken.JwtBuilder;
@@ -17,17 +18,19 @@ public class JwtProviderService {
 
 	private final TokenConfig tokenConfig;
 
-	public String provideAccessToken(Long id) {
-		return generateIdToken(id, tokenConfig.getAccessExpire());
+	public String provideAccessToken(PublicClaim publicClaim) {
+		return generateIdToken(publicClaim, tokenConfig.getAccessExpire());
 	}
 
 	public String provideRefreshToken() {
 		return generateCommonInfo(tokenConfig.getRefreshExpire());
 	}
 
-	private String generateIdToken(Long id, long expireTime) {
+	private String generateIdToken(PublicClaim publicClaim, long expireTime) {
 		return commonInfo(expireTime)
-			.claim("id", id)
+			.claim("id", publicClaim.id())
+			.claim("nickname", publicClaim.nickname())
+			.claim("role", publicClaim.role())
 			.compact();
 	}
 
