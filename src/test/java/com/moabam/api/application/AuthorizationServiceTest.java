@@ -24,12 +24,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.moabam.api.dto.AuthorizationCodeRequest;
 import com.moabam.api.dto.AuthorizationCodeResponse;
+import com.moabam.api.dto.AuthorizationMapper;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenRequest;
 import com.moabam.api.dto.AuthorizationTokenResponse;
 import com.moabam.api.dto.LoginResponse;
-import com.moabam.api.dto.OAuthMapper;
+import com.moabam.api.dto.PublicClaim;
 import com.moabam.global.config.OAuthConfig;
+import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.fixture.AuthorizationResponseFixture;
@@ -52,11 +54,16 @@ class AuthorizationServiceTest {
 	JwtProviderService jwtProviderService;
 
 	OAuthConfig oauthConfig;
+	TokenConfig tokenConfig;
 	AuthorizationService noPropertyService;
 	OAuthConfig noOAuthConfig;
 
 	@BeforeEach
 	public void initParams() {
+		tokenConfig = new TokenConfig(null, 100000, 150000,
+			"testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttest");
+		ReflectionTestUtils.setField(authorizationService, "tokenConfig", tokenConfig);
+
 		oauthConfig = new OAuthConfig(
 			new OAuthConfig.Provider("https://authorization/url", "http://redirect/url", "http://token/url",
 				"http://tokenInfo/url"),
@@ -69,7 +76,8 @@ class AuthorizationServiceTest {
 			new OAuthConfig.Provider(null, null, null, null),
 			new OAuthConfig.Client(null, null, null, null, null)
 		);
-		noPropertyService = new AuthorizationService(noOAuthConfig, oAuth2AuthorizationServerRequestService,
+		noPropertyService = new AuthorizationService(noOAuthConfig, tokenConfig,
+			oAuth2AuthorizationServerRequestService,
 			memberService, jwtProviderService);
 	}
 
@@ -77,7 +85,7 @@ class AuthorizationServiceTest {
 	@Test
 	void authorization_code_request_mapping_fail() {
 		// When + Then
-		Assertions.assertThatThrownBy(() -> OAuthMapper.toAuthorizationCodeRequest(noOAuthConfig))
+		Assertions.assertThatThrownBy(() -> AuthorizationMapper.toAuthorizationCodeRequest(noOAuthConfig))
 			.isInstanceOf(NullPointerException.class);
 	}
 
@@ -85,7 +93,7 @@ class AuthorizationServiceTest {
 	@Test
 	void authorization_code_request_mapping_success() {
 		// Given
-		AuthorizationCodeRequest authorizationCodeRequest = OAuthMapper.toAuthorizationCodeRequest(oauthConfig);
+		AuthorizationCodeRequest authorizationCodeRequest = AuthorizationMapper.toAuthorizationCodeRequest(oauthConfig);
 
 		// When + Then
 		assertThat(authorizationCodeRequest).isNotNull();
@@ -142,7 +150,7 @@ class AuthorizationServiceTest {
 	@Test
 	void token_request_mapping_failBy_code() {
 		// When + Then
-		Assertions.assertThatThrownBy(() -> OAuthMapper.toAuthorizationTokenRequest(oauthConfig, null))
+		Assertions.assertThatThrownBy(() -> AuthorizationMapper.toAuthorizationTokenRequest(oauthConfig, null))
 			.isInstanceOf(NullPointerException.class);
 	}
 
@@ -150,7 +158,7 @@ class AuthorizationServiceTest {
 	@Test
 	void token_request_mapping_failBy_config() {
 		// When + Then
-		Assertions.assertThatThrownBy(() -> OAuthMapper.toAuthorizationTokenRequest(noOAuthConfig, "Test"))
+		Assertions.assertThatThrownBy(() -> AuthorizationMapper.toAuthorizationTokenRequest(noOAuthConfig, "Test"))
 			.isInstanceOf(NullPointerException.class);
 	}
 
@@ -159,7 +167,8 @@ class AuthorizationServiceTest {
 	void token_request_mapping_success() {
 		// Given
 		String code = "Test";
-		AuthorizationTokenRequest authorizationTokenRequest = OAuthMapper.toAuthorizationTokenRequest(oauthConfig,
+		AuthorizationTokenRequest authorizationTokenRequest = AuthorizationMapper.toAuthorizationTokenRequest(
+			oauthConfig,
 			code);
 
 		// When + Then
@@ -198,7 +207,10 @@ class AuthorizationServiceTest {
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
 			AuthorizationResponseFixture.authorizationTokenInfoResponse();
 		LoginResponse loginResponse = LoginResponse.builder()
-			.id(1L)
+			.publicClaim(PublicClaim.builder()
+				.id(1L)
+				.nickname("nickname")
+				.build())
 			.isSignUp(isSignUp)
 			.build();
 
@@ -210,7 +222,10 @@ class AuthorizationServiceTest {
 
 		// then
 		assertThat(loginResponse).isEqualTo(result);
-		assertThat(httpServletResponse.getHeader("token_type")).isEqualTo("Bearer");
+
+		Cookie tokenType = httpServletResponse.getCookie("token_type");
+		assertThat(tokenType).isNotNull();
+		assertThat(tokenType.getValue()).isEqualTo("Bearer");
 
 		Cookie accessCookie = httpServletResponse.getCookie("access_token");
 		assertThat(accessCookie).isNotNull();

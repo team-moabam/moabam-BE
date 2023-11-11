@@ -137,7 +137,7 @@ class MemberControllerTest {
 			.andExpectAll(
 				status().isOk(),
 				MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON),
-				MockMvcResultMatchers.header().string("token_type", "Bearer"),
+				cookie().value("token_type", "Bearer"),
 				cookie().exists("access_token"),
 				cookie().httpOnly("access_token", true),
 				cookie().secure("access_token", true),

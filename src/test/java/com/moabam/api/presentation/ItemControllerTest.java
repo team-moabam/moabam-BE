@@ -25,9 +25,11 @@ import com.moabam.api.domain.entity.Item;
 import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.api.dto.ItemMapper;
 import com.moabam.api.dto.ItemsResponse;
+import com.moabam.support.annotation.WithMember;
+import com.moabam.support.common.WithoutFilterSupporter;
 
-@WebMvcTest(ItemController.class)
-class ItemControllerTest {
+@WebMvcTest(controllers = ItemController.class)
+class ItemControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	MockMvc mockMvc;
@@ -39,6 +41,7 @@ class ItemControllerTest {
 	ItemService itemService;
 
 	@DisplayName("아이템 목록을 조회한다.")
+	@WithMember
 	@Test
 	void get_items_success() throws Exception {
 		// given
@@ -63,6 +66,7 @@ class ItemControllerTest {
 	}
 
 	@DisplayName("아이템을 적용한다.")
+	@WithMember
 	@Test
 	void select_item_success() throws Exception {
 		// given

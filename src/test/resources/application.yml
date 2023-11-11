@@ -1,6 +1,7 @@
 logging:
   level:
     org.hibernate.SQL: debug
+    org.springframework: DEBUG
 
 spring:
 

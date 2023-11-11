@@ -10,7 +10,9 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.moabam.api.dto.PublicClaim;
 import com.moabam.global.config.TokenConfig;
+import com.moabam.support.fixture.PublicClaimFixture;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -29,9 +31,10 @@ class JwtProviderServiceTest {
 
 		TokenConfig tokenConfig = new TokenConfig("PARK", accessExpire, 0L, secretKey);
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);
+		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
 
 		// when
-		String accessToken = jwtProviderService.provideAccessToken(id);
+		String accessToken = jwtProviderService.provideAccessToken(publicClaim);
 
 		String[] parts = accessToken.split("\\.");
 		String headers = new String(Base64.getDecoder().decode(parts[0]));
@@ -91,9 +94,10 @@ class JwtProviderServiceTest {
 
 		TokenConfig tokenConfig = new TokenConfig("PARK", accessExpire, 0L, secretKey);
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);
+		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
 
 		// when
-		String accessToken = jwtProviderService.provideAccessToken(id);
+		String accessToken = jwtProviderService.provideAccessToken(publicClaim);
 
 		// then
 		assertThatThrownBy(() -> Jwts.parserBuilder()
@@ -111,9 +115,10 @@ class JwtProviderServiceTest {
 
 		TokenConfig tokenConfig = new TokenConfig("PARK", 0L, refreshExpire, secretKey);
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);
+		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
 
 		// when
-		String accessToken = jwtProviderService.provideAccessToken(id);
+		String accessToken = jwtProviderService.provideAccessToken(publicClaim);
 
 		// then
 		assertThatThrownBy(() -> Jwts.parserBuilder()

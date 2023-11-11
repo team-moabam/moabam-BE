@@ -42,6 +42,7 @@ import com.moabam.api.domain.repository.RoutineRepository;
 import com.moabam.api.dto.CreateRoomRequest;
 import com.moabam.api.dto.EnterRoomRequest;
 import com.moabam.api.dto.ModifyRoomRequest;
+import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.BugFixture;
 import com.moabam.support.fixture.MemberFixture;
 
@@ -49,7 +50,7 @@ import com.moabam.support.fixture.MemberFixture;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RoomControllerTest {
+class RoomControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	private MockMvc mockMvc;

@@ -1,6 +1,7 @@
 package com.moabam.api.application;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -15,8 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.dto.PublicClaim;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
+import com.moabam.support.fixture.PublicClaimFixture;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -42,14 +45,26 @@ class JwtAuthenticationServiceTest {
 		jwtAuthenticationService = new JwtAuthenticationService(tokenConfig);
 	}
 
+	@DisplayName("토큰 인증 성공 테스트")
+	@Test
+	void token_authentication_success() {
+		// given
+		String token = jwtProviderService.provideAccessToken(PublicClaimFixture.publicClaim());
+
+		// when, then
+		assertThatNoException().isThrownBy(() ->
+			jwtAuthenticationService.isTokenExpire(token));
+	}
+
 	@DisplayName("토큰 인증 시간 만료 테스트")
 	@Test
 	void token_authentication_time_expire() {
 		// Given
+		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
 		TokenConfig tokenConfig = new TokenConfig(originIss, 0, 0, originSecretKey);
 		JwtAuthenticationService jwtAuthenticationService = new JwtAuthenticationService(tokenConfig);
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);
-		String token = jwtProviderService.provideAccessToken(originId);
+		String token = jwtProviderService.provideAccessToken(publicClaim);
 
 		// When
 		assertThatNoException().isThrownBy(() -> {
@@ -64,7 +79,9 @@ class JwtAuthenticationServiceTest {
 	@Test
 	void token_authenticate_failBy_payload() {
 		// Given
-		String token = jwtProviderService.provideAccessToken(originId);
+		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
+
+		String token = jwtProviderService.provideAccessToken(publicClaim);
 		String[] parts = token.split("\\.");
 		String claims = new String(Base64.getDecoder().decode(parts[1]));
 
@@ -104,5 +121,23 @@ class JwtAuthenticationServiceTest {
 		// When + Then
 		assertThatThrownBy(() -> jwtAuthenticationService.isTokenExpire(token))
 			.isExactlyInstanceOf(UnauthorizedException.class);
+	}
+
+	@DisplayName("토큰을 PublicClaim으로 변환 성공")
+	@Test
+	void token_parse_to_public_claim() {
+		// given
+		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
+		String token = jwtProviderService.provideAccessToken(publicClaim);
+
+		// when
+		PublicClaim parsedClaim = jwtAuthenticationService.parseClaim(token);
+
+		// then
+		assertAll(
+			() -> assertThat(publicClaim.id()).isEqualTo(parsedClaim.id()),
+			() -> assertThat(publicClaim.nickname()).isEqualTo(parsedClaim.nickname()),
+			() -> assertThat(publicClaim.role()).isEqualTo(parsedClaim.role())
+		);
 	}
 }
