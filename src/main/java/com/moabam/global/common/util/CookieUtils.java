@@ -22,10 +22,10 @@ public class CookieUtils {
 
 	private static void secure(Cookie cookie) {
 		cookie.setSecure(true);
-		cookie.setHttpOnly(true);
 	}
 
 	private static void basic(Cookie cookie, long expireTime) {
+		cookie.setHttpOnly(true);
 		cookie.setPath("/");
 		cookie.setMaxAge((int)expireTime);
 	}
