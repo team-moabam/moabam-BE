@@ -7,12 +7,26 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CookieUtils {
 
-	public static Cookie tokenCookie(String name, String value) {
+	public static Cookie tokenCookie(String name, String value, long expireTime) {
 		Cookie cookie = new Cookie(name, value);
+		basic(cookie, expireTime);
+		secure(cookie);
+		return cookie;
+	}
+
+	public static Cookie typeCookie(String name, String value, long expireTime) {
+		Cookie cookie = new Cookie(name, value);
+		basic(cookie, expireTime);
+		return cookie;
+	}
+
+	private static void secure(Cookie cookie) {
 		cookie.setSecure(true);
 		cookie.setHttpOnly(true);
-		cookie.setPath("/");
+	}
 
-		return cookie;
+	private static void basic(Cookie cookie, long expireTime) {
+		cookie.setPath("/");
+		cookie.setMaxAge((int)expireTime);
 	}
 }
