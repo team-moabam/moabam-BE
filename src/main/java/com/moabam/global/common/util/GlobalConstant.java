@@ -13,4 +13,6 @@ public class GlobalConstant {
 	public static final int HOURS_IN_A_DAY = 24;
 	public static final String KNOCK_KEY = "room_%s_member_%s_knocks_%s";
 	public static final String FIREBASE_PATH = "config/moabam-firebase.json";
+
+	public static final int LEVEL_DIVISOR = 10;
 }

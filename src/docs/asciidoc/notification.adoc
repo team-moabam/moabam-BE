@@ -12,9 +12,9 @@
 [discrete]
 ==== 요청
 
-include::{snippets}/notifications/http-request.adoc[]
+include::{snippets}/notifications/rooms/roomId/members/memberId/http-request.adoc[]
 
 [discrete]
 ==== 응답
 
-include::{snippets}/notifications/http-response.adoc[]
+include::{snippets}/notifications/rooms/roomId/members/memberId/http-response.adoc[]

@@ -22,9 +22,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.ItemService;
 import com.moabam.api.domain.entity.Item;
+import com.moabam.api.domain.entity.enums.BugType;
 import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.api.dto.ItemMapper;
 import com.moabam.api.dto.ItemsResponse;
+import com.moabam.api.dto.PurchaseItemRequest;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 
@@ -53,9 +55,8 @@ class ItemControllerTest extends WithoutFilterSupporter {
 		given(itemService.getItems(memberId, type)).willReturn(expected);
 
 		// when, then
-		String content = mockMvc.perform(get("/items")
-				.param("type", ItemType.MORNING.name())
-				.contentType(APPLICATION_JSON))
+		String content = mockMvc.perform(
+				get("/items").param("type", ItemType.MORNING.name()).contentType(APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andReturn()
@@ -63,6 +64,20 @@ class ItemControllerTest extends WithoutFilterSupporter {
 			.getContentAsString(UTF_8);
 		ItemsResponse actual = objectMapper.readValue(content, ItemsResponse.class);
 		assertThat(actual).isEqualTo(expected);
+	}
+
+	@DisplayName("아이템을 구매한다.")
+	@Test
+	void purchase_item_success() throws Exception {
+		// given
+		Long memberId = 1L;
+		Long itemId = 1L;
+		PurchaseItemRequest request = new PurchaseItemRequest(BugType.MORNING);
+
+		// when, then
+		mockMvc.perform(post("/items/{itemId}/purchase", itemId).contentType(APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(request))).andDo(print()).andExpect(status().isOk());
+		verify(itemService).purchaseItem(memberId, itemId, request);
 	}
 
 	@DisplayName("아이템을 적용한다.")
@@ -74,8 +89,7 @@ class ItemControllerTest extends WithoutFilterSupporter {
 		Long itemId = 1L;
 
 		// when, then
-		mockMvc.perform(post("/items/{itemId}/select", itemId)
-				.contentType(APPLICATION_JSON))
+		mockMvc.perform(post("/items/{itemId}/select", itemId).contentType(APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk());
 		verify(itemService).selectItem(memberId, itemId);

@@ -2,6 +2,7 @@ package com.moabam.api.dto;
 
 import java.util.List;
 
+import com.moabam.api.domain.entity.Inventory;
 import com.moabam.api.domain.entity.Item;
 import com.moabam.global.common.util.StreamUtils;
 
@@ -28,6 +29,13 @@ public final class ItemMapper {
 		return ItemsResponse.builder()
 			.purchasedItems(StreamUtils.map(purchasedItems, ItemMapper::toItemResponse))
 			.notPurchasedItems(StreamUtils.map(notPurchasedItems, ItemMapper::toItemResponse))
+			.build();
+	}
+
+	public static Inventory toInventory(Long memberId, Item item) {
+		return Inventory.builder()
+			.memberId(memberId)
+			.item(item)
 			.build();
 	}
 }

@@ -1,5 +1,6 @@
 package com.moabam.api.domain.entity;
 
+import static com.moabam.global.common.util.GlobalConstant.*;
 import static java.util.Objects.*;
 
 import java.time.LocalDateTime;
@@ -106,5 +107,9 @@ public class Member extends BaseTimeEntity {
 		if (currentNightCount > 0) {
 			currentNightCount--;
 		}
+	}
+
+	public int getLevel() {
+		return (int)(totalCertifyCount / LEVEL_DIVISOR) + 1;
 	}
 }
