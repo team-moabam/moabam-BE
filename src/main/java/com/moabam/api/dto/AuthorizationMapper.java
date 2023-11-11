@@ -36,4 +36,8 @@ public final class AuthorizationMapper {
 			.role(jsonObject.getEnum(Role.class, "role"))
 			.build();
 	}
+
+	public static AuthorizationMember toAuthorizationMember(PublicClaim publicClaim) {
+		return new AuthorizationMember(publicClaim.id(), publicClaim.nickname(), publicClaim.role());
+	}
 }

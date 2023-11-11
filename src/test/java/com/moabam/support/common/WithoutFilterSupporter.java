@@ -13,7 +13,6 @@ import com.moabam.api.application.AuthorizationService;
 import com.moabam.api.application.JwtAuthenticationService;
 import com.moabam.api.domain.entity.enums.Role;
 import com.moabam.global.common.util.PathResolver;
-import com.moabam.support.common.FilterProcessExtension;
 
 @ExtendWith({FilterProcessExtension.class})
 public class WithoutFilterSupporter {

@@ -12,7 +12,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import com.moabam.api.application.AuthorizationService;
 import com.moabam.api.application.JwtAuthenticationService;
-import com.moabam.api.dto.MemberMapper;
+import com.moabam.api.dto.AuthorizationMapper;
 import com.moabam.api.dto.PublicClaim;
 import com.moabam.global.common.util.AuthorizationThreadLocal;
 import com.moabam.global.error.exception.UnauthorizedException;
@@ -95,7 +95,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 			authorizationService.issueServiceToken(httpServletResponse, publicClaim);
 		}
 
-		AuthorizationThreadLocal.setAuthorizationMember(MemberMapper.toAuthorizationMember(publicClaim));
+		AuthorizationThreadLocal.setAuthorizationMember(AuthorizationMapper.toAuthorizationMember(publicClaim));
 	}
 
 	private Cookie[] getCookiesOrThrow(HttpServletRequest httpServletRequest) {

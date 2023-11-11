@@ -27,8 +27,4 @@ public final class MemberMapper {
 			.isSignUp(isSignUp)
 			.build();
 	}
-
-	public static AuthorizationMember toAuthorizationMember(PublicClaim publicClaim) {
-		return new AuthorizationMember(publicClaim.id(), publicClaim.nickname(), publicClaim.role());
-	}
 }
