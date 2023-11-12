@@ -31,10 +31,9 @@ public class ImageService {
 			.toList();
 
 		imageResizers.forEach(resizer -> {
-				resizer.resizeImageToFixedSize(imageType);
-				result.add(s3Manager.uploadImage(resizer.getResizedImage().getName(), resizer.getResizedImage()));
-			}
-		);
+			resizer.resizeImageToFixedSize(imageType);
+			result.add(s3Manager.uploadImage(resizer.getResizedImage().getName(), resizer.getResizedImage()));
+		});
 
 		return result;
 	}

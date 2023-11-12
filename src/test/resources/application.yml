@@ -19,6 +19,21 @@ spring:
       host: 127.0.0.1
       port: 6379
 
+  # AWS
+  cloud:
+    aws:
+      region:
+        static: ap-test-test
+      s3:
+        bucket: test
+        url: test
+      cloud-front:
+        url: test
+      credentials:
+        access-key: test
+        secret-key: test
+      max-request-size: 10MB # 요청 당 최대 사이즈
+
 oauth2:
   client:
     provider: test

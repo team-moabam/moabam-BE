@@ -27,6 +27,15 @@ public class RoomFixture {
 			.build();
 	}
 
+	public static Room room(int certifyTime) {
+		return Room.builder()
+			.title("testTitle")
+			.roomType(RoomType.MORNING)
+			.certifyTime(certifyTime)
+			.maxUserCount(8)
+			.build();
+	}
+
 	public static Participant participant(Room room, Long memberId) {
 		return Participant.builder()
 			.room(room)

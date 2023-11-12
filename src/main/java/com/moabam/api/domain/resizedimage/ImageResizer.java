@@ -1,10 +1,13 @@
 package com.moabam.api.domain.resizedimage;
 
-import static com.moabam.global.common.constant.GlobalConstant.*;
-import static com.moabam.global.error.model.ErrorMessage.*;
-import static java.util.Objects.*;
+import static com.moabam.global.common.util.GlobalConstant.DELIMITER;
+import static com.moabam.global.error.model.ErrorMessage.S3_INVALID_IMAGE;
+import static com.moabam.global.error.model.ErrorMessage.S3_INVALID_IMAGE_SIZE;
+import static com.moabam.global.error.model.ErrorMessage.S3_RESIZE_ERROR;
+import static java.util.Objects.requireNonNull;
 
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -100,7 +103,7 @@ public class ImageResizer {
 	}
 
 	private String getFormat() {
-		return image.getContentType().split(DELIMITER)[FORMAT_INDEX];
+		return requireNonNull(image.getContentType()).split(DELIMITER)[FORMAT_INDEX];
 	}
 
 	private BufferedImage getBufferedImage() {
