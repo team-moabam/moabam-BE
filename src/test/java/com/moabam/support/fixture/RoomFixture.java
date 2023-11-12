@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.mock.web.MockMultipartFile;
 
+import com.moabam.api.domain.entity.Certification;
 import com.moabam.api.domain.entity.DailyMemberCertification;
 import com.moabam.api.domain.entity.DailyRoomCertification;
 import com.moabam.api.domain.entity.Participant;
@@ -59,6 +60,14 @@ public class RoomFixture {
 		routines.add(routine2);
 
 		return routines;
+	}
+
+	public static Certification certification(Routine routine) {
+		return Certification.builder()
+			.routine(routine)
+			.memberId(1L)
+			.image("test1")
+			.build();
 	}
 
 	public static DailyMemberCertification dailyMemberCertification(Long memberId, Long roomId,
