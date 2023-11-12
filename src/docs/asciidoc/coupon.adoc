@@ -76,6 +76,8 @@ include::{snippets}/coupons/search/http-response.adoc[]
 
  사용자가 발급 가능한 쿠폰을 선착순으로 발급 받습니다.
 
+---
+
 === 쿠폰 사용 (진행 중)
 
  사용자가 자신의 보관함에 있는 쿠폰들을 사용합니다.

@@ -31,6 +31,7 @@ import com.moabam.api.dto.CreateCouponRequest;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.fixture.CouponFixture;
 import com.moabam.support.fixture.CouponSnippetFixture;
+import com.moabam.support.fixture.ErrorSnippetFixture;
 
 @Transactional
 @SpringBootTest
@@ -66,6 +67,28 @@ class CouponControllerTest {
 			.andExpect(status().isCreated());
 	}
 
+	@DisplayName("쿠폰 발급 종료기간 시작기간보다 이전인 쿠폰을 발행한다. - BadRequestException")
+	@Test
+	void couponController_createCoupon_BadRequestException() throws Exception {
+		// Given
+		String couponType = CouponType.GOLDEN_COUPON.getTypeName();
+		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 2, 1);
+
+		// When & Then
+		mockMvc.perform(post("/admins/coupons")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andDo(document("admins/coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				CouponSnippetFixture.CREATE_COUPON_REQUEST,
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
+	}
+
 	@DisplayName("쿠폰명이 중복된 쿠폰을 발행한다. - ConflictException")
 	@Test
 	void couponController_createCoupon_ConflictException() throws Exception {
@@ -82,7 +105,8 @@ class CouponControllerTest {
 			.andDo(document("admins/coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.CREATE_COUPON_REQUEST))
+				CouponSnippetFixture.CREATE_COUPON_REQUEST,
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isConflict())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_COUPON_NAME.getMessage()));
@@ -111,7 +135,8 @@ class CouponControllerTest {
 			.andDo(print())
 			.andDo(document("admins/coupons/couponId",
 				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint())))
+				preprocessResponse(prettyPrint()),
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isNotFound())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON.getMessage()));
@@ -143,7 +168,8 @@ class CouponControllerTest {
 			.andDo(print())
 			.andDo(document("coupons/couponId",
 				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint())))
+				preprocessResponse(prettyPrint()),
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isNotFound())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON.getMessage()));
