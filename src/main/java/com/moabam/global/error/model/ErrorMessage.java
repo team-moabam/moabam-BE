@@ -56,16 +56,12 @@ public enum ErrorMessage {
 	INVALID_COUPON_PERIOD("쿠폰 발급 종료 시각은 시작 시각보다 이후여야 합니다."),
 	CONFLICT_COUPON_NAME("쿠폰의 이름이 중복되었습니다."),
 	NOT_FOUND_COUPON_TYPE("존재하지 않는 쿠폰 종류입니다."),
-<<<<<<< HEAD
-	INVALID_COUPON_PERIOD("쿠폰 발급 종료 시각은 시작 시각보다 이후여야 합니다."),
+	NOT_FOUND_COUPON("존재하지 않는 쿠폰입니다."),
 
 	S3_UPLOAD_FAIL("S3 업로드를 실패했습니다."),
 	S3_INVALID_IMAGE("올바른 이미지(파일) 형식이 아닙니다."),
 	S3_INVALID_IMAGE_SIZE("파일의 용량이 너무 큽니다."),
 	S3_RESIZE_ERROR("이미지 리사이징에서 에러가 발생했습니다.");
-=======
-	NOT_FOUND_COUPON("존재하지 않는 쿠폰입니다.");
->>>>>>> develop
 
 	private final String message;
 }
