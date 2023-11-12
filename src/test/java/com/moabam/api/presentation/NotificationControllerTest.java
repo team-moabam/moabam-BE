@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,8 @@ import com.moabam.api.domain.repository.MemberRepository;
 import com.moabam.api.domain.repository.NotificationRepository;
 import com.moabam.api.domain.repository.RoomRepository;
 import com.moabam.global.common.repository.StringRedisRepository;
+import com.moabam.global.error.model.ErrorMessage;
+import com.moabam.support.fixture.ErrorSnippetFixture;
 import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.RoomFixture;
 
@@ -76,7 +79,7 @@ class NotificationControllerTest {
 		stringRedisRepository.delete(knockKey);
 	}
 
-	@DisplayName("GET - 성공적으로 상대를 찔렀을 때, - Void")
+	@DisplayName("GET - 성공적으로 상대에게 콕 알림을 보낸다. - Void")
 	@Test
 	void notificationController_sendKnockNotification() throws Exception {
 		// Given
@@ -85,25 +88,28 @@ class NotificationControllerTest {
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))
 			.andDo(print())
-			.andDo(document("notifications",
+			.andDo(document("notifications/rooms/roomId/members/memberId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint())))
 			.andExpect(status().isOk());
 	}
 
-	@DisplayName("GET - 찌른 상대가 접속 중이 아닐 때, - NotFoundException")
+	@DisplayName("GET - 콕 알림을 보낸 상대가 접속 중이 아니다. - NotFoundException")
 	@Test
 	void notificationController_sendKnockNotification_NotFoundException() throws Exception {
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))
 			.andDo(print())
-			.andDo(document("notifications",
+			.andDo(document("notifications/rooms/roomId/members/memberId",
 				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint())))
-			.andExpect(status().isNotFound());
+				preprocessResponse(prettyPrint()),
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isNotFound())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_FCM_TOKEN.getMessage()));
 	}
 
-	@DisplayName("GET - 이미 찌른 대상일 때, - ConflictException")
+	@DisplayName("GET - 이미 콕 알림을 보낸 대상이다. - ConflictException")
 	@Test
 	void notificationController_sendKnockNotification_ConflictException() throws Exception {
 		// Given
@@ -113,9 +119,12 @@ class NotificationControllerTest {
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))
 			.andDo(print())
-			.andDo(document("notifications",
+			.andDo(document("notifications/rooms/roomId/members/memberId",
 				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint())))
-			.andExpect(status().isConflict());
+				preprocessResponse(prettyPrint()),
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isConflict())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_KNOCK.getMessage()));
 	}
 }

@@ -51,7 +51,7 @@ class NotificationServiceTest {
 		memberTest = new MemberTest(2L, "nickname");
 	}
 
-	@DisplayName("성공적으로 상대를 콕 찔렀을 때, - Void")
+	@DisplayName("성공적으로 상대에게 콕 알림을 보낸다. - Void")
 	@Test
 	void notificationService_sendKnockNotification() {
 		// Given
@@ -68,7 +68,7 @@ class NotificationServiceTest {
 		verify(notificationRepository).saveKnockNotification(any(String.class));
 	}
 
-	@DisplayName("콕 찌를 상대의 방이 존재하지 않을 때, - NotFoundException")
+	@DisplayName("콕 찌를 상대의 방이 존재하지 않는다. - NotFoundException")
 	@Test
 	void notificationService_sendKnockNotification_Room_NotFoundException() {
 		// Given
@@ -79,7 +79,7 @@ class NotificationServiceTest {
 			.isInstanceOf(NotFoundException.class);
 	}
 
-	@DisplayName("콕 찌를 상대의 FCM 토큰이 존재하지 않을 때, - NotFoundException")
+	@DisplayName("콕 찌를 상대의 FCM 토큰이 존재하지 않는다. - NotFoundException")
 	@Test
 	void notificationService_sendKnockNotification_FcmToken_NotFoundException() {
 		// Given
@@ -93,7 +93,7 @@ class NotificationServiceTest {
 			.hasMessage(ErrorMessage.NOT_FOUND_FCM_TOKEN.getMessage());
 	}
 
-	@DisplayName("콕 찌를 상대가 이미 찌른 상대일 때, - ConflictException")
+	@DisplayName("콕 찌를 상대가 이미 찌른 상대이다. - ConflictException")
 	@Test
 	void notificationService_sendKnockNotification_ConflictException() {
 		// Given
@@ -106,7 +106,7 @@ class NotificationServiceTest {
 			.hasMessage(ErrorMessage.CONFLICT_KNOCK.getMessage());
 	}
 
-	@DisplayName("특정 인증 시간에 해당하는 방 사용자들에게 알림을 성공적으로 보낼 때, - Void")
+	@DisplayName("특정 인증 시간에 해당하는 방 사용자들에게 알림을 성공적으로 보낸다. - Void")
 	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideParticipants")
 	@ParameterizedTest
 	void notificationService_sendCertificationTimeNotification(List<Participant> participants) {
@@ -121,7 +121,7 @@ class NotificationServiceTest {
 		verify(firebaseMessaging, times(3)).sendAsync(any(Message.class));
 	}
 
-	@DisplayName("특정 인증 시간에 해당하는 방 사용자들의 토큰값이 없을 때, - Void")
+	@DisplayName("특정 인증 시간에 해당하는 방 사용자들의 토큰값이 없다. - Void")
 	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideParticipants")
 	@ParameterizedTest
 	void notificationService_sendCertificationTimeNotification_NoFirebaseMessaging(List<Participant> participants) {
@@ -136,7 +136,7 @@ class NotificationServiceTest {
 		verify(firebaseMessaging, times(0)).sendAsync(any(Message.class));
 	}
 
-	@DisplayName("특정 방에서 나 이외의 모든 사용자를 콕 찔렀을 때, - KnockNotificationStatusResponse")
+	@DisplayName("특정 방에서 나 이외의 모든 사용자에게 콕 알림을 보낸다. - KnockNotificationStatusResponse")
 	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideParticipants")
 	@ParameterizedTest
 	void notificationService_knocked_checkMyKnockNotificationStatusInRoom(List<Participant> participants) {
@@ -154,7 +154,7 @@ class NotificationServiceTest {
 		assertThat(actual.notKnockedMembersId()).isEmpty();
 	}
 
-	@DisplayName("특정 방에서 나 이외의 모든 사용자를 콕 안 찔렀을 때, - KnockNotificationStatusResponse")
+	@DisplayName("특정 방에서 나 이외의 모든 사용자에게 콕 알림을 보낸 적이 없다. - KnockNotificationStatusResponse")
 	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideParticipants")
 	@ParameterizedTest
 	void notificationService_notKnocked_checkMyKnockNotificationStatusInRoom(List<Participant> participants) {

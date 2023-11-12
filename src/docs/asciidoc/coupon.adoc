@@ -2,6 +2,8 @@
 
  쿠폰에 대해 생성/삭제/조회/발급/사용 기능을 제공합니다.
 
+---
+
 === 쿠폰 생성
 
  관리자가 쿠폰을 생성합니다.
@@ -9,26 +11,72 @@
 [discrete]
 ==== 요청
 
-include::{snippets}/coupons/http-request.adoc[]
+include::{snippets}/admins/coupons/http-request.adoc[]
 
 [discrete]
 ==== 응답
 
-include::{snippets}/coupons/http-response.adoc[]
+include::{snippets}/admins/coupons/http-response.adoc[]
 
-=== 쿠폰 삭제 (진행 중)
+---
 
- 관리자가 쿠폰을 삭제합니다.
+=== 쿠폰 삭제
 
-=== 쿠폰 조회 (진행 중)
+ 관리자가 쿠폰 ID와 일치하는 쿠폰을 삭제합니다.
 
- 관리자 혹은 사용자가 쿠폰들을 조회합니다.
+[discrete]
+==== 요청
+
+include::{snippets}/admins/coupons/couponId/http-request.adoc[]
+
+[discrete]
+==== 응답
+
+include::{snippets}/admins/coupons/couponId/http-response.adoc[]
+
+---
+
+=== 특정 쿠폰 조회
+
+ 관리자 혹은 사용자가 특정 ID와 일치하는 쿠폰을 조회합니다.
+
+==== 요청
+
+include::{snippets}/coupons/couponId/http-request.adoc[]
+
+[discrete]
+==== 응답
+
+include::{snippets}/coupons/couponId/http-response.adoc[]
+
+---
+
+=== 상태에 따른 쿠폰들을 조회
+
+ 관리자 혹은 사용자가 날짜 상태에 따라 쿠폰들을 조회합니다.
+
+==== 요청
+
+include::{snippets}/coupons/search/http-request.adoc[]
+
+[discrete]
+==== 응답
+
+include::{snippets}/coupons/search/http-response.adoc[]
+
+---
+
+=== 특정 사용자의 쿠폰 보관함을 조회
 
  사용자가 자신의 보관함에 있는 쿠폰들을 조회합니다.
+
+---
 
 === 쿠폰 발급 (진행 중)
 
  사용자가 발급 가능한 쿠폰을 선착순으로 발급 받습니다.
+
+---
 
 === 쿠폰 사용 (진행 중)
 
