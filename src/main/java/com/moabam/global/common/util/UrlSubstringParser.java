@@ -5,6 +5,10 @@ import static com.moabam.global.common.util.GlobalConstant.*;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UrlSubstringParser {
 
 	public static String parseUrl(String url, String distinctToken) {
