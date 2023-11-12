@@ -3,11 +3,15 @@ package com.moabam.api.application;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,6 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.moabam.api.domain.entity.Coupon;
 import com.moabam.api.domain.entity.enums.CouponType;
 import com.moabam.api.domain.repository.CouponRepository;
+import com.moabam.api.domain.repository.CouponSearchRepository;
+import com.moabam.api.dto.CouponResponse;
+import com.moabam.api.dto.CouponSearchRequest;
 import com.moabam.api.dto.CreateCouponRequest;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
@@ -30,6 +37,9 @@ class CouponServiceTest {
 
 	@Mock
 	private CouponRepository couponRepository;
+
+	@Mock
+	private CouponSearchRepository couponSearchRepository;
 
 	@DisplayName("쿠폰을 성공적으로 발행한다. - Void")
 	@Test
@@ -113,5 +123,48 @@ class CouponServiceTest {
 		assertThatThrownBy(() -> couponService.deleteCoupon(1L, 1L))
 			.isInstanceOf(NotFoundException.class)
 			.hasMessage(ErrorMessage.NOT_FOUND_COUPON.getMessage());
+	}
+
+	@DisplayName("특정 쿠폰을 조회한다. - CouponResponse")
+	@Test
+	void couponService_getCouponById() {
+		// Given
+		Coupon coupon = CouponFixture.coupon(10, 100);
+		given(couponSearchRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
+
+		// When
+		CouponResponse actual = couponService.getCouponById(1L);
+
+		// Then
+		assertThat(actual.point()).isEqualTo(coupon.getPoint());
+		assertThat(actual.stock()).isEqualTo(coupon.getStock());
+	}
+
+	@DisplayName("존재하지 않는 쿠폰을 조회한다. - NotFoundException")
+	@Test
+	void couponService_getCouponById_NotFoundException() {
+		// Given
+		given(couponSearchRepository.findById(any(Long.class))).willReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.getCouponById(1L))
+			.isInstanceOf(NotFoundException.class)
+			.hasMessage(ErrorMessage.NOT_FOUND_COUPON.getMessage());
+	}
+
+	@DisplayName("모든 쿠폰을 조회한다. - List<CouponResponse>")
+	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
+	@ParameterizedTest
+	void couponService_getCoupons(List<Coupon> coupons) {
+		// Given
+		CouponSearchRequest request = CouponFixture.couponSearchRequest(true, true, true);
+		given(couponSearchRepository.findAllByStatus(any(LocalDateTime.class), any(CouponSearchRequest.class)))
+			.willReturn(coupons);
+
+		// When
+		List<CouponResponse> actual = couponService.getCoupons(request);
+
+		// Then
+		assertThat(actual).hasSize(coupons.size());
 	}
 }
