@@ -1,7 +1,7 @@
 package com.moabam.support.fixture;
 
-import com.moabam.api.domain.entity.enums.Role;
-import com.moabam.api.dto.PublicClaim;
+import com.moabam.api.domain.member.Role;
+import com.moabam.global.auth.model.PublicClaim;
 
 public class PublicClaimFixture {
 

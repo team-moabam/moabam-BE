@@ -11,8 +11,8 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-import com.moabam.api.dto.AuthorizationMember;
-import com.moabam.global.common.util.AuthorizationThreadLocal;
+import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.support.annotation.WithMember;
 
 public class FilterProcessExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {

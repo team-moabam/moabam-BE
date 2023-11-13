@@ -6,10 +6,10 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.params.provider.Arguments;
 
-import com.moabam.api.domain.entity.Coupon;
-import com.moabam.api.domain.entity.enums.CouponType;
-import com.moabam.api.dto.CouponSearchRequest;
-import com.moabam.api.dto.CreateCouponRequest;
+import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.CouponType;
+import com.moabam.api.dto.coupon.CouponSearchRequest;
+import com.moabam.api.dto.coupon.CreateCouponRequest;
 
 public final class CouponFixture {
 

@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moabam.api.application.NotificationService;
-import com.moabam.global.common.annotation.MemberTest;
+import com.moabam.api.application.notification.NotificationService;
+import com.moabam.global.auth.annotation.MemberTest;
 
 import lombok.RequiredArgsConstructor;
 

@@ -20,13 +20,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.application.ItemService;
-import com.moabam.api.domain.entity.Item;
-import com.moabam.api.domain.entity.enums.BugType;
-import com.moabam.api.domain.entity.enums.ItemType;
-import com.moabam.api.dto.ItemMapper;
-import com.moabam.api.dto.ItemsResponse;
-import com.moabam.api.dto.PurchaseItemRequest;
+import com.moabam.api.application.item.ItemMapper;
+import com.moabam.api.application.item.ItemService;
+import com.moabam.api.domain.bug.BugType;
+import com.moabam.api.domain.item.Item;
+import com.moabam.api.domain.item.ItemType;
+import com.moabam.api.dto.item.ItemsResponse;
+import com.moabam.api.dto.item.PurchaseItemRequest;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 

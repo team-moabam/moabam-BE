@@ -7,7 +7,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.moabam.api.domain.entity.enums.Role;
+import com.moabam.api.domain.bug.Bug;
+import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.Role;
 import com.moabam.global.common.util.BaseImageUrl;
 import com.moabam.support.fixture.MemberFixture;
 

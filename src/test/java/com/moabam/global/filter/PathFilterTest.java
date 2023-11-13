@@ -19,7 +19,8 @@ import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.moabam.global.common.handler.PathResolver;
+import com.moabam.global.auth.filter.PathFilter;
+import com.moabam.global.auth.handler.PathResolver;
 
 import jakarta.servlet.ServletException;
 

@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moabam.api.application.BugService;
-import com.moabam.api.dto.BugResponse;
+import com.moabam.api.application.bug.BugService;
+import com.moabam.api.dto.bug.BugResponse;
 
 import lombok.RequiredArgsConstructor;
 
