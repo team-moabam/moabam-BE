@@ -17,9 +17,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.application.BugService;
-import com.moabam.api.dto.BugMapper;
-import com.moabam.api.dto.BugResponse;
+import com.moabam.api.application.bug.BugMapper;
+import com.moabam.api.application.bug.BugService;
+import com.moabam.api.dto.bug.BugResponse;
 import com.moabam.support.common.WithoutFilterSupporter;
 
 @WebMvcTest(controllers = BugController.class)

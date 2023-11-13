@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moabam.api.application.CouponService;
-import com.moabam.api.dto.CouponResponse;
-import com.moabam.api.dto.CouponSearchRequest;
-import com.moabam.api.dto.CreateCouponRequest;
+import com.moabam.api.application.coupon.CouponService;
+import com.moabam.api.dto.coupon.CouponResponse;
+import com.moabam.api.dto.coupon.CouponSearchRequest;
+import com.moabam.api.dto.coupon.CreateCouponRequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

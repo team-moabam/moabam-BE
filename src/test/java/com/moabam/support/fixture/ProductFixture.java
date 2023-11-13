@@ -1,7 +1,7 @@
 package com.moabam.support.fixture;
 
-import com.moabam.api.domain.entity.Product;
-import com.moabam.api.domain.entity.enums.ProductType;
+import com.moabam.api.domain.product.Product;
+import com.moabam.api.domain.product.ProductType;
 
 public class ProductFixture {
 

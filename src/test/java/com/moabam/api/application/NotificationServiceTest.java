@@ -17,11 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
-import com.moabam.api.domain.entity.Participant;
-import com.moabam.api.domain.repository.NotificationRepository;
-import com.moabam.api.domain.repository.ParticipantSearchRepository;
-import com.moabam.api.dto.KnockNotificationStatusResponse;
-import com.moabam.global.common.annotation.MemberTest;
+import com.moabam.api.application.notification.NotificationService;
+import com.moabam.api.application.room.RoomService;
+import com.moabam.api.domain.room.Participant;
+import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
+import com.moabam.api.dto.notification.KnockNotificationStatusResponse;
+import com.moabam.api.infrastructure.redis.NotificationRepository;
+import com.moabam.global.auth.annotation.MemberTest;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;

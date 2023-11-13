@@ -22,12 +22,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.domain.entity.Coupon;
-import com.moabam.api.domain.entity.enums.CouponType;
-import com.moabam.api.domain.repository.CouponRepository;
-import com.moabam.api.dto.CouponMapper;
-import com.moabam.api.dto.CouponSearchRequest;
-import com.moabam.api.dto.CreateCouponRequest;
+import com.moabam.api.application.coupon.CouponMapper;
+import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.CouponType;
+import com.moabam.api.domain.coupon.repository.CouponRepository;
+import com.moabam.api.dto.coupon.CouponSearchRequest;
+import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.CouponFixture;

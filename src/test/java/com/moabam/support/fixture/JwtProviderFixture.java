@@ -1,6 +1,6 @@
 package com.moabam.support.fixture;
 
-import com.moabam.api.application.JwtProviderService;
+import com.moabam.api.application.auth.JwtProviderService;
 import com.moabam.global.config.TokenConfig;
 
 public class JwtProviderFixture {

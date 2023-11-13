@@ -16,7 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.dto.PublicClaim;
+import com.moabam.api.application.auth.JwtAuthenticationService;
+import com.moabam.api.application.auth.JwtProviderService;
+import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.support.fixture.PublicClaimFixture;

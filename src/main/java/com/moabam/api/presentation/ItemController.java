@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moabam.api.application.ItemService;
-import com.moabam.api.domain.entity.enums.ItemType;
-import com.moabam.api.dto.ItemsResponse;
-import com.moabam.api.dto.PurchaseItemRequest;
+import com.moabam.api.application.item.ItemService;
+import com.moabam.api.domain.item.ItemType;
+import com.moabam.api.dto.item.ItemsResponse;
+import com.moabam.api.dto.item.PurchaseItemRequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

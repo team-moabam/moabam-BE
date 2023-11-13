@@ -13,10 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.domain.entity.Product;
-import com.moabam.api.domain.repository.ProductRepository;
-import com.moabam.api.dto.ProductResponse;
-import com.moabam.api.dto.ProductsResponse;
+import com.moabam.api.application.product.ProductService;
+import com.moabam.api.domain.product.Product;
+import com.moabam.api.domain.product.repository.ProductRepository;
+import com.moabam.api.dto.product.ProductResponse;
+import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.global.common.util.StreamUtils;
 
 @ExtendWith(MockitoExtension.class)

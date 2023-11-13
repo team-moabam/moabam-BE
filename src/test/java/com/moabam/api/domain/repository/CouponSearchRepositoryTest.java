@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import com.moabam.api.domain.entity.Coupon;
-import com.moabam.api.dto.CouponSearchRequest;
+import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.repository.CouponRepository;
+import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
+import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.global.config.JpaConfig;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;

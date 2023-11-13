@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moabam.api.application.ProductService;
-import com.moabam.api.dto.ProductsResponse;
+import com.moabam.api.application.product.ProductService;
+import com.moabam.api.dto.product.ProductsResponse;
 
 import lombok.RequiredArgsConstructor;
 

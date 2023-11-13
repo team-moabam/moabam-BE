@@ -12,10 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.domain.entity.Member;
-import com.moabam.api.domain.repository.MemberRepository;
-import com.moabam.api.dto.AuthorizationTokenInfoResponse;
-import com.moabam.api.dto.LoginResponse;
+import com.moabam.api.application.member.MemberService;
+import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.repository.MemberRepository;
+import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
+import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.support.fixture.AuthorizationResponseFixture;
 import com.moabam.support.fixture.MemberFixture;
 

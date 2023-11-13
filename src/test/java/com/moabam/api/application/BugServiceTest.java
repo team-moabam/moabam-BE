@@ -11,9 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.domain.entity.Bug;
-import com.moabam.api.domain.entity.Member;
-import com.moabam.api.dto.BugResponse;
+import com.moabam.api.application.bug.BugService;
+import com.moabam.api.application.member.MemberService;
+import com.moabam.api.domain.bug.Bug;
+import com.moabam.api.domain.member.Member;
+import com.moabam.api.dto.bug.BugResponse;
 
 @ExtendWith(MockitoExtension.class)
 class BugServiceTest {

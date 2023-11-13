@@ -1,8 +1,8 @@
 package com.moabam.support.fixture;
 
-import com.moabam.api.dto.AuthorizationCodeResponse;
-import com.moabam.api.dto.AuthorizationTokenInfoResponse;
-import com.moabam.api.dto.AuthorizationTokenResponse;
+import com.moabam.api.dto.auth.AuthorizationCodeResponse;
+import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
+import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 
 public final class AuthorizationResponseFixture {
 
