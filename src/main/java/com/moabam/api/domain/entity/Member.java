@@ -112,4 +112,8 @@ public class Member extends BaseTimeEntity {
 	public int getLevel() {
 		return (int)(totalCertifyCount / LEVEL_DIVISOR) + 1;
 	}
+
+	public void increaseTotalCertifyCount() {
+		this.totalCertifyCount++;
+	}
 }
