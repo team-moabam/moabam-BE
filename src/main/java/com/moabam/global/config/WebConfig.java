@@ -8,6 +8,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.moabam.api.dto.PathMapper;
 import com.moabam.global.common.handler.CurrentMemberArgumentResolver;
 import com.moabam.global.common.handler.PathResolver;
 
@@ -41,16 +42,10 @@ public class WebConfig implements WebMvcConfigurer {
 	@Bean
 	public PathResolver pathResolver() {
 		PathResolver.Paths path = PathResolver.Paths.builder()
-			.permitOne(
-				PathResolver.Path.builder()
-					.uri("/members")
-					.build()
-			)
-			.permitOne(
-				PathResolver.Path.builder()
-					.uri("/members/login/*/oauth")
-					.build()
-			)
+			.permitAll(List.of(
+				PathMapper.parsePath("/members"),
+				PathMapper.parsePath("/members/login/*/oauth")
+			))
 			.build();
 
 		return new PathResolver(path);

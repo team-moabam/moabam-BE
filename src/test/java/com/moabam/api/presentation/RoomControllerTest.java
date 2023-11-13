@@ -42,6 +42,7 @@ import com.moabam.api.domain.repository.RoutineRepository;
 import com.moabam.api.dto.CreateRoomRequest;
 import com.moabam.api.dto.EnterRoomRequest;
 import com.moabam.api.dto.ModifyRoomRequest;
+import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.BugFixture;
 import com.moabam.support.fixture.MemberFixture;
@@ -99,6 +100,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("비밀번호 없는 방 생성 성공")
+	@WithMember
 	@Test
 	void create_room_no_password_success() throws Exception {
 		// given
