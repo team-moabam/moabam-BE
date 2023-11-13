@@ -2,7 +2,6 @@ package com.moabam.global.common.util;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.ToIntFunction;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -14,11 +13,5 @@ public final class StreamUtils {
 		return list.stream()
 			.map(mapper)
 			.toList();
-	}
-
-	public static <T> int sum(List<T> list, ToIntFunction<T> mapper) {
-		return list.stream()
-			.mapToInt(mapper)
-			.sum();
 	}
 }

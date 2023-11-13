@@ -1,7 +1,5 @@
 package com.moabam.api.application;
 
-import static com.moabam.global.common.util.StreamUtils.*;
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -35,12 +33,18 @@ public class BugService {
 	}
 
 	public TodayBugResponse getTodayBug(Long memberId) {
-		List<BugHistory> morningBugHistory = bugHistorySearchRepository
-			.find(memberId, BugType.MORNING, BugActionType.REWARD, clockHolder.times());
-		List<BugHistory> nightBugHistory = bugHistorySearchRepository
-			.find(memberId, BugType.NIGHT, BugActionType.REWARD, clockHolder.times());
+		List<BugHistory> todayRewardHistory = bugHistorySearchRepository
+			.find(memberId, BugActionType.REWARD, clockHolder.times());
+		int morningBug = calculateBugQuantity(todayRewardHistory, BugType.MORNING);
+		int nightBug = calculateBugQuantity(todayRewardHistory, BugType.NIGHT);
 
-		return BugMapper.toTodayBugResponse(sum(morningBugHistory, BugHistory::getQuantity),
-			sum(nightBugHistory, BugHistory::getQuantity));
+		return BugMapper.toTodayBugResponse(morningBug, nightBug);
+	}
+
+	private int calculateBugQuantity(List<BugHistory> bugHistory, BugType bugType) {
+		return bugHistory.stream()
+			.filter(history -> history.getBugType() == bugType)
+			.mapToInt(BugHistory::getQuantity)
+			.sum();
 	}
 }
