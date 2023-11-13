@@ -29,6 +29,7 @@ import com.moabam.api.dto.CouponMapper;
 import com.moabam.api.dto.CouponSearchRequest;
 import com.moabam.api.dto.CreateCouponRequest;
 import com.moabam.global.error.model.ErrorMessage;
+import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.CouponFixture;
 import com.moabam.support.fixture.CouponSnippetFixture;
 import com.moabam.support.fixture.ErrorSnippetFixture;
@@ -37,7 +38,7 @@ import com.moabam.support.fixture.ErrorSnippetFixture;
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-class CouponControllerTest {
+class CouponControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	private MockMvc mockMvc;

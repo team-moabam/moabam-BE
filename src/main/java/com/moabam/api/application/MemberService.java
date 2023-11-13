@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.moabam.api.domain.entity.Member;
 import com.moabam.api.domain.repository.MemberRepository;
 import com.moabam.api.domain.repository.MemberSearchRepository;
-import com.moabam.api.domain.repository.NotificationRepository;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.LoginResponse;
 import com.moabam.api.dto.MemberMapper;
@@ -28,7 +27,6 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final MemberSearchRepository memberSearchRepository;
-	private final NotificationRepository notificationRepository;
 
 	public Member getById(Long memberId) {
 		return memberRepository.findById(memberId)
@@ -38,9 +36,9 @@ public class MemberService {
 	@Transactional
 	public LoginResponse login(AuthorizationTokenInfoResponse authorizationTokenInfoResponse) {
 		Optional<Member> member = memberRepository.findBySocialId(authorizationTokenInfoResponse.id());
-		Member loginMember = member.orElse(signUp(authorizationTokenInfoResponse.id()));
+		Member loginMember = member.orElseGet(() -> signUp(authorizationTokenInfoResponse.id()));
 
-		return MemberMapper.toLoginResponse(loginMember.getId(), member.isEmpty());
+		return MemberMapper.toLoginResponse(loginMember, member.isEmpty());
 	}
 
 	private Member signUp(Long socialId) {

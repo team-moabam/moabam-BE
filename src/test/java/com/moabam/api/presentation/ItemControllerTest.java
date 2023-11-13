@@ -27,9 +27,11 @@ import com.moabam.api.domain.entity.enums.ItemType;
 import com.moabam.api.dto.ItemMapper;
 import com.moabam.api.dto.ItemsResponse;
 import com.moabam.api.dto.PurchaseItemRequest;
+import com.moabam.support.annotation.WithMember;
+import com.moabam.support.common.WithoutFilterSupporter;
 
-@WebMvcTest(ItemController.class)
-class ItemControllerTest {
+@WebMvcTest(controllers = ItemController.class)
+class ItemControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	MockMvc mockMvc;
@@ -41,6 +43,7 @@ class ItemControllerTest {
 	ItemService itemService;
 
 	@DisplayName("아이템 목록을 조회한다.")
+	@WithMember
 	@Test
 	void get_items_success() throws Exception {
 		// given
@@ -52,9 +55,8 @@ class ItemControllerTest {
 		given(itemService.getItems(memberId, type)).willReturn(expected);
 
 		// when, then
-		String content = mockMvc.perform(get("/items")
-				.param("type", ItemType.MORNING.name())
-				.contentType(APPLICATION_JSON))
+		String content = mockMvc.perform(
+				get("/items").param("type", ItemType.MORNING.name()).contentType(APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andReturn()
@@ -73,15 +75,13 @@ class ItemControllerTest {
 		PurchaseItemRequest request = new PurchaseItemRequest(BugType.MORNING);
 
 		// when, then
-		mockMvc.perform(post("/items/{itemId}/purchase", itemId)
-				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
-			.andDo(print())
-			.andExpect(status().isOk());
+		mockMvc.perform(post("/items/{itemId}/purchase", itemId).contentType(APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(request))).andDo(print()).andExpect(status().isOk());
 		verify(itemService).purchaseItem(memberId, itemId, request);
 	}
 
 	@DisplayName("아이템을 적용한다.")
+	@WithMember
 	@Test
 	void select_item_success() throws Exception {
 		// given
@@ -89,8 +89,7 @@ class ItemControllerTest {
 		Long itemId = 1L;
 
 		// when, then
-		mockMvc.perform(post("/items/{itemId}/select", itemId)
-				.contentType(APPLICATION_JSON))
+		mockMvc.perform(post("/items/{itemId}/select", itemId).contentType(APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk());
 		verify(itemService).selectItem(memberId, itemId);
