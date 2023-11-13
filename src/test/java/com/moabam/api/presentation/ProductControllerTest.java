@@ -23,9 +23,10 @@ import com.moabam.api.application.ProductService;
 import com.moabam.api.domain.entity.Product;
 import com.moabam.api.dto.ProductMapper;
 import com.moabam.api.dto.ProductsResponse;
+import com.moabam.support.common.WithoutFilterSupporter;
 
-@WebMvcTest(ProductController.class)
-class ProductControllerTest {
+@WebMvcTest(controllers = ProductController.class)
+class ProductControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	MockMvc mockMvc;

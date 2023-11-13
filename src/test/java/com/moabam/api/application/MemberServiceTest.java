@@ -42,7 +42,7 @@ class MemberServiceTest {
 		LoginResponse result = memberService.login(authorizationTokenInfoResponse);
 
 		// then
-		assertThat(result.id()).isEqualTo(member.getId());
+		assertThat(result.publicClaim().id()).isEqualTo(member.getId());
 		assertThat(result.isSignUp()).isFalse();
 	}
 
@@ -64,7 +64,7 @@ class MemberServiceTest {
 		LoginResponse result = memberService.login(authorizationTokenInfoResponse);
 
 		// then
-		assertThat(authorizationTokenInfoResponse.id()).isEqualTo(result.id());
+		assertThat(authorizationTokenInfoResponse.id()).isEqualTo(result.publicClaim().id());
 		assertThat(result.isSignUp()).isTrue();
 	}
 }

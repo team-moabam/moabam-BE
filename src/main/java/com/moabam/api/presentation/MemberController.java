@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moabam.api.application.AuthenticationService;
+import com.moabam.api.application.AuthorizationService;
 import com.moabam.api.dto.AuthorizationCodeResponse;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.AuthorizationTokenResponse;
@@ -21,21 +21,21 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberController {
 
-	private final AuthenticationService authenticationService;
+	private final AuthorizationService authorizationService;
 
 	@GetMapping
 	public void socialLogin(HttpServletResponse httpServletResponse) {
-		authenticationService.redirectToLoginPage(httpServletResponse);
+		authorizationService.redirectToLoginPage(httpServletResponse);
 	}
 
 	@GetMapping("/login/kakao/oauth")
 	@ResponseStatus(HttpStatus.OK)
 	public LoginResponse authorizationTokenIssue(@ModelAttribute AuthorizationCodeResponse authorizationCodeResponse,
 		HttpServletResponse httpServletResponse) {
-		AuthorizationTokenResponse tokenResponse = authenticationService.requestToken(authorizationCodeResponse);
+		AuthorizationTokenResponse tokenResponse = authorizationService.requestToken(authorizationCodeResponse);
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
-			authenticationService.requestTokenInfo(tokenResponse);
+			authorizationService.requestTokenInfo(tokenResponse);
 
-		return authenticationService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
+		return authorizationService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
 	}
 }

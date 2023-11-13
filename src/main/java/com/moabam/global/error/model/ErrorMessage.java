@@ -30,7 +30,7 @@ public enum ErrorMessage {
 	LOGIN_FAILED("로그인에 실패했습니다."),
 	REQUEST_FAILED("네트워크 접근 실패입니다."),
 	GRANT_FAILED("인가 코드 실패"),
-	AUTHENTICATIE_FAIL("인증 실패"),
+	AUTHENTICATE_FAIL("인증 실패"),
 	MEMBER_NOT_FOUND("존재하지 않는 회원입니다."),
 	MEMBER_ROOM_EXCEED("참여할 수 있는 방의 개수가 모두 찼습니다."),
 
