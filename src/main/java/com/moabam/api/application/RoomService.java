@@ -171,8 +171,6 @@ public class RoomService {
 	@Transactional
 	public void certifyRoom(Long memberId, Long roomId, List<MultipartFile> multipartFiles) {
 		LocalDate today = LocalDate.now();
-
-		// 사용자가 방의 참여자인지 확인
 		Participant participant = getParticipant(memberId, roomId);
 		Room room = participant.getRoom();
 		Member member = memberService.getById(memberId);
@@ -182,52 +180,21 @@ public class RoomService {
 		};
 		int roomLevel = room.getLevel();
 
-		// 인증시간 전후 10분 확인
 		validateCertifyTime(clockHolder.times(), room.getCertifyTime());
+		validateAlreadyCertified(memberId, roomId, today);
 
-		// DailyMemberCertification 있는지 확인 -> 있으면 예외
-		if (certificationsSearchRepository.findDailyMemberCertification(memberId, roomId, today).isPresent()) {
-			throw new BadRequestException(DUPLICATED_DAILY_MEMBER_CERTIFICATION);
-		}
-
-		DailyMemberCertification dailyMemberCertification = DailyMemberCertification.builder()
-			.memberId(memberId)
-			.roomId(roomId)
-			.participant(participant)
-			.build();
-
-		// DailyMemberCertification 만들기
+		DailyMemberCertification dailyMemberCertification = CertificationsMapper.toDailyMemberCertification(memberId,
+			roomId, participant);
 		dailyMemberCertificationRepository.save(dailyMemberCertification);
+
 		member.increaseTotalCertifyCount();
 
-		// 이미지 업로드 (result 는 이미지 url)
 		List<String> result = imageService.uploadImages(multipartFiles, CERTIFICATION);
-
-		// Certification 만들기
-		List<Certification> certifications = new ArrayList<>();
-
-		for (String imageUrl : result) {
-			Long routineId = Long.parseLong(UrlSubstringParser.parseUrl(imageUrl, "_"));
-			Routine routine = routineRepository.findById(routineId).orElseThrow(() -> new NotFoundException(
-				ROUTINE_NOT_FOUND));
-
-			Certification certification = Certification.builder()
-				.routine(routine)
-				.memberId(memberId)
-				.image(imageUrl)
-				.build();
-
-			certifications.add(certification);
-		}
-
-		// Certification DB에 저장
-		certificationRepository.saveAll(certifications);
+		saveNewCertifications(result, memberId);
 
 		Optional<DailyRoomCertification> dailyRoomCertification =
 			certificationsSearchRepository.findDailyRoomCertification(roomId, today);
 
-		// 이 방이 인증이 완료됐는지 확인, 완료 안됐으면 인증된 사람의 퍼센트 계산후 방의 인증 여부 확인
-		// -> 이번 인증으로 인해 방을 인증할 수 있으면 지금까지 인증한 유저에게 벌레 지급
 		if (dailyRoomCertification.isEmpty()) {
 			List<DailyMemberCertification> dailyMemberCertifications =
 				certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today);
@@ -235,38 +202,24 @@ public class RoomService {
 				room.getCurrentUserCount());
 
 			if (completePercentage >= 75) {
-				DailyRoomCertification createDailyRoomCertification = DailyRoomCertification.builder()
-					.roomId(roomId)
-					.certifiedAt(today)
-					.build();
+				DailyRoomCertification createDailyRoomCertification = CertificationsMapper.toDailyRoomCertification(
+					roomId, today);
 
 				dailyRoomCertificationRepository.save(createDailyRoomCertification);
 
-				// 레벨업 관련 로직
-				int requireExp = RequireExp.of(roomLevel).getTotalExp();
+				int expAppliedRoomLevel = getRoomLevelAfterExpApply(roomLevel, room);
 
-				room.gainExp();
-
-				if (room.getExp() == requireExp) {
-					room.levelUp();
-					roomLevel = room.getLevel();
-				}
-
-				// 벌레 지급
 				List<Long> memberIds = dailyMemberCertifications.stream()
 					.map(DailyMemberCertification::getMemberId)
 					.toList();
 
-				int increaseBug = roomLevel;
-
 				memberService.getRoomMembers(memberIds)
-					.forEach(completedMember -> completedMember.getBug().increaseBug(bugType, increaseBug));
+					.forEach(completedMember -> completedMember.getBug().increaseBug(bugType, expAppliedRoomLevel));
 
 				return;
 			}
 		}
 
-		// 방이 이미 인증되어 있으면 지금 유저에게 벌레 지급
 		if (dailyRoomCertification.isPresent()) {
 			member.getBug().increaseBug(bugType, roomLevel);
 		}
@@ -437,5 +390,37 @@ public class RoomService {
 		if (now.isBefore(minusTenMinutes) || now.isAfter(plusTenMinutes)) {
 			throw new BadRequestException(INVALID_CERTIFY_TIME);
 		}
+	}
+
+	private void validateAlreadyCertified(Long memberId, Long roomId, LocalDate today) {
+		if (certificationsSearchRepository.findDailyMemberCertification(memberId, roomId, today).isPresent()) {
+			throw new BadRequestException(DUPLICATED_DAILY_MEMBER_CERTIFICATION);
+		}
+	}
+
+	private void saveNewCertifications(List<String> imageUrls, Long memberId) {
+		List<Certification> certifications = new ArrayList<>();
+
+		for (String imageUrl : imageUrls) {
+			Long routineId = Long.parseLong(UrlSubstringParser.parseUrl(imageUrl, "_"));
+			Routine routine = routineRepository.findById(routineId).orElseThrow(() -> new NotFoundException(
+				ROUTINE_NOT_FOUND));
+
+			Certification certification = CertificationsMapper.toCertification(routine, memberId, imageUrl);
+			certifications.add(certification);
+		}
+
+		certificationRepository.saveAll(certifications);
+	}
+
+	private int getRoomLevelAfterExpApply(int roomLevel, Room room) {
+		int requireExp = RequireExp.of(roomLevel).getTotalExp();
+		room.gainExp();
+
+		if (room.getExp() == requireExp) {
+			room.levelUp();
+		}
+
+		return room.getLevel();
 	}
 }
