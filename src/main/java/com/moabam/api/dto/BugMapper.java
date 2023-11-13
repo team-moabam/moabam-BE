@@ -19,6 +19,13 @@ public final class BugMapper {
 			.build();
 	}
 
+	public static TodayBugResponse toTodayBugResponse(int morningBug, int nightBug) {
+		return TodayBugResponse.builder()
+			.morningBug(morningBug)
+			.nightBug(nightBug)
+			.build();
+	}
+
 	public static BugHistory toUseBugHistory(Long memberId, BugType bugType, int quantity) {
 		return BugHistory.builder()
 			.memberId(memberId)

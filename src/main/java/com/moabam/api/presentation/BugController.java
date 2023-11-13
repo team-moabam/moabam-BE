@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.BugService;
 import com.moabam.api.dto.BugResponse;
+import com.moabam.api.dto.TodayBugResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,5 +23,11 @@ public class BugController {
 	@ResponseStatus(HttpStatus.OK)
 	public BugResponse getBug() {
 		return bugService.getBug(1L);
+	}
+
+	@GetMapping("/today")
+	@ResponseStatus(HttpStatus.OK)
+	public TodayBugResponse getTodayBug() {
+		return bugService.getTodayBug(1L);
 	}
 }
