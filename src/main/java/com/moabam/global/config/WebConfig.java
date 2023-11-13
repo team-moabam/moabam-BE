@@ -43,6 +43,7 @@ public class WebConfig implements WebMvcConfigurer {
 	public PathResolver pathResolver() {
 		PathResolver.Paths path = PathResolver.Paths.builder()
 			.permitAll(List.of(
+				PathMapper.parsePath("/"),
 				PathMapper.parsePath("/members"),
 				PathMapper.parsePath("/members/login/*/oauth")
 			))
