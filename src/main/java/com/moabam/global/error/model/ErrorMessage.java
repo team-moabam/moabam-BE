@@ -22,11 +22,15 @@ public enum ErrorMessage {
 	ROOM_MAX_USER_REACHED("방의 인원수가 찼습니다."),
 	ROOM_DETAILS_ERROR("방 정보를 불러오는데 실패했습니다."),
 	ROUTINE_LENGTH_ERROR("루틴의 길이가 잘못 되었습니다."),
+	DUPLICATED_DAILY_MEMBER_CERTIFICATION("이미 오늘의 인증을 완료하였습니다."),
+	ROUTINE_NOT_FOUND("루틴을 찾을 수 없습니다"),
+	INVALID_REQUEST_URL("잘못된 URL 요청입니다."),
+	INVALID_CERTIFY_TIME("현재 인증 시간이 아닙니다."),
 
 	LOGIN_FAILED("로그인에 실패했습니다."),
 	REQUEST_FAILED("네트워크 접근 실패입니다."),
 	GRANT_FAILED("인가 코드 실패"),
-	AUTHENTICATIE_FAIL("인증 실패"),
+	AUTHENTICATE_FAIL("인증 실패"),
 	MEMBER_NOT_FOUND("존재하지 않는 회원입니다."),
 	MEMBER_ROOM_EXCEED("참여할 수 있는 방의 개수가 모두 찼습니다."),
 
@@ -52,7 +56,12 @@ public enum ErrorMessage {
 	INVALID_COUPON_PERIOD("쿠폰 발급 종료 시각은 시작 시각보다 이후여야 합니다."),
 	CONFLICT_COUPON_NAME("쿠폰의 이름이 중복되었습니다."),
 	NOT_FOUND_COUPON_TYPE("존재하지 않는 쿠폰 종류입니다."),
-	NOT_FOUND_COUPON("존재하지 않는 쿠폰입니다.");
+	NOT_FOUND_COUPON("존재하지 않는 쿠폰입니다."),
+
+	S3_UPLOAD_FAIL("S3 업로드를 실패했습니다."),
+	S3_INVALID_IMAGE("올바른 이미지(파일) 형식이 아닙니다."),
+	S3_INVALID_IMAGE_SIZE("파일의 용량이 너무 큽니다."),
+	S3_RESIZE_ERROR("이미지 리사이징에서 에러가 발생했습니다.");
 
 	private final String message;
 }

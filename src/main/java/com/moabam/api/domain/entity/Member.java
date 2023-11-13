@@ -82,7 +82,7 @@ public class Member extends BaseTimeEntity {
 	@Builder
 	private Member(Long id, Long socialId, String nickname, Bug bug) {
 		this.id = id;
-		this.socialId = socialId;
+		this.socialId = requireNonNull(socialId);
 		this.nickname = requireNonNull(nickname);
 		this.profileImage = BaseImageUrl.PROFILE_URL;
 		this.bug = requireNonNull(bug);
@@ -111,5 +111,9 @@ public class Member extends BaseTimeEntity {
 
 	public int getLevel() {
 		return (int)(totalCertifyCount / LEVEL_DIVISOR) + 1;
+	}
+
+	public void increaseTotalCertifyCount() {
+		this.totalCertifyCount++;
 	}
 }

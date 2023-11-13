@@ -5,6 +5,8 @@ import java.util.Base64;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.moabam.api.dto.AuthorizationMapper;
+import com.moabam.api.dto.PublicClaim;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -19,25 +21,25 @@ public class JwtAuthenticationService {
 
 	private final TokenConfig tokenConfig;
 
-	public boolean isTokenValid(String token) {
+	public boolean isTokenExpire(String token) {
 		try {
 			Jwts.parserBuilder()
 				.setSigningKey(tokenConfig.getKey())
 				.build()
-				.parseClaimsJwt(token);
-			return true;
-		} catch (ExpiredJwtException expiredJwtException) {
+				.parseClaimsJws(token);
 			return false;
+		} catch (ExpiredJwtException expiredJwtException) {
+			return true;
 		} catch (Exception exception) {
-			throw new UnauthorizedException(ErrorMessage.AUTHENTICATIE_FAIL);
+			throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
 		}
 	}
 
-	public String parseEmail(String token) {
+	public PublicClaim parseClaim(String token) {
 		String claims = token.split("\\.")[1];
 		String decodeClaims = new String(Base64.getDecoder().decode(claims));
 		JSONObject jsonObject = new JSONObject(decodeClaims);
 
-		return (String)jsonObject.get("id");
+		return AuthorizationMapper.toPublicClaim(jsonObject);
 	}
 }

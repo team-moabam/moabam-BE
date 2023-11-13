@@ -30,6 +30,7 @@ import com.moabam.api.domain.repository.NotificationRepository;
 import com.moabam.api.domain.repository.RoomRepository;
 import com.moabam.global.common.repository.StringRedisRepository;
 import com.moabam.global.error.model.ErrorMessage;
+import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.ErrorSnippetFixture;
 import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.RoomFixture;
@@ -38,7 +39,7 @@ import com.moabam.support.fixture.RoomFixture;
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-class NotificationControllerTest {
+class NotificationControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	private MockMvc mockMvc;

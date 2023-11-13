@@ -20,9 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.BugService;
 import com.moabam.api.dto.BugMapper;
 import com.moabam.api.dto.BugResponse;
+import com.moabam.support.common.WithoutFilterSupporter;
 
-@WebMvcTest(BugController.class)
-class BugControllerTest {
+@WebMvcTest(controllers = BugController.class)
+class BugControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	MockMvc mockMvc;

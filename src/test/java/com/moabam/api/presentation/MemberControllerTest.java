@@ -32,7 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.application.AuthenticationService;
+import com.moabam.api.application.AuthorizationService;
 import com.moabam.api.application.OAuth2AuthorizationServerRequestService;
 import com.moabam.api.dto.AuthorizationCodeResponse;
 import com.moabam.api.dto.AuthorizationTokenInfoResponse;
@@ -56,7 +56,7 @@ class MemberControllerTest {
 	OAuth2AuthorizationServerRequestService oAuth2AuthorizationServerRequestService;
 
 	@SpyBean
-	AuthenticationService authenticationService;
+	AuthorizationService authorizationService;
 
 	@Autowired
 	OAuthConfig oAuthConfig;
@@ -137,7 +137,7 @@ class MemberControllerTest {
 			.andExpectAll(
 				status().isOk(),
 				MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON),
-				MockMvcResultMatchers.header().string("token_type", "Bearer"),
+				cookie().value("token_type", "Bearer"),
 				cookie().exists("access_token"),
 				cookie().httpOnly("access_token", true),
 				cookie().secure("access_token", true),
@@ -183,7 +183,7 @@ class MemberControllerTest {
 
 		// when
 		doReturn(AuthorizationResponseFixture.authorizationTokenResponse())
-			.when(authenticationService).requestToken(authorizationCodeResponse);
+			.when(authorizationService).requestToken(authorizationCodeResponse);
 
 		// expected
 		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenInfo()))
