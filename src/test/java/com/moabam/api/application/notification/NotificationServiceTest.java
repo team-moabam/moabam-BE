@@ -1,4 +1,4 @@
-package com.moabam.api.application;
+package com.moabam.api.application.notification;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
-import com.moabam.api.application.notification.NotificationService;
 import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
