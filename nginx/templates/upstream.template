@@ -1,0 +1,4 @@
+upstream backend {
+    server ${BLUE_CONTAINER}:${SERVER_PORT};
+    keepalive 1024;
+}
