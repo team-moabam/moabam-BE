@@ -77,4 +77,10 @@ public class RoomController {
 	public void mandateManager(@PathVariable("roomId") Long roomId, @PathVariable("memberId") Long memberId) {
 		roomService.mandateRoomManager(1L, roomId, memberId);
 	}
+
+	@DeleteMapping("/{roomId}/members/{memberId}")
+	@ResponseStatus(HttpStatus.OK)
+	public void deportParticipant(@PathVariable("roomId") Long roomId, @PathVariable("memberId") Long memberId) {
+		roomService.deportParticipant(1L, roomId, memberId);
+	}
 }

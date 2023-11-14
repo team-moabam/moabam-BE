@@ -37,6 +37,7 @@ import com.moabam.api.domain.room.repository.CertificationRepository;
 import com.moabam.api.domain.room.repository.DailyMemberCertificationRepository;
 import com.moabam.api.domain.room.repository.DailyRoomCertificationRepository;
 import com.moabam.api.domain.room.repository.ParticipantRepository;
+import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoutineRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
@@ -46,6 +47,7 @@ import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.BugFixture;
 import com.moabam.support.fixture.MemberFixture;
+import com.moabam.support.fixture.RoomFixture;
 
 @Transactional
 @SpringBootTest
@@ -79,6 +81,9 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	private DailyRoomCertificationRepository dailyRoomCertificationRepository;
+
+	@Autowired
+	private ParticipantSearchRepository participantSearchRepository;
 
 	Member member;
 
@@ -143,6 +148,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 				.content(json))
 			.andExpect(status().isCreated())
 			.andDo(print());
+
 		assertThat(roomRepository.findAll()).hasSize(1);
 		assertThat(roomRepository.findAll().get(0).getTitle()).isEqualTo("비번 있는 재맹의 방임");
 		assertThat(roomRepository.findAll().get(0).getPassword()).isEqualTo(password);
@@ -838,5 +844,37 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		mockMvc.perform(get("/rooms/" + room.getId()))
 			.andExpect(status().isOk())
 			.andDo(print());
+	}
+
+	@DisplayName("방 추방 성공")
+	@Test
+	void deport_member_success() throws Exception {
+		// given
+		Room room = RoomFixture.room();
+		Member member = MemberFixture.member(1234L, "참여자");
+		memberRepository.save(member);
+
+		Participant memberParticipant = RoomFixture.participant(room, member.getId());
+		Participant managerParticipant = RoomFixture.participant(room, 1L);
+		managerParticipant.enableManager();
+
+		room.increaseCurrentUserCount();
+
+		roomRepository.save(room);
+		participantRepository.save(memberParticipant);
+		participantRepository.save(managerParticipant);
+
+		// expected
+		mockMvc.perform(delete("/rooms/" + room.getId() + "/members/" + member.getId()))
+			.andExpect(status().isOk())
+			.andDo(print());
+		roomRepository.flush();
+
+		Room getRoom = roomRepository.findById(room.getId()).orElseThrow();
+		Participant getMemberParticipant = participantRepository.findById(memberParticipant.getId()).orElseThrow();
+
+		assertThat(getRoom.getCurrentUserCount()).isEqualTo(1);
+		assertThat(getMemberParticipant.getDeletedAt()).isNotNull();
+		assertThat(participantSearchRepository.findOne(3L, room.getId())).isEmpty();
 	}
 }
