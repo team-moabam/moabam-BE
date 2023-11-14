@@ -40,8 +40,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
           script: |
-            mkdir -p /home/ubuntu/moabam/nginx/conf.d
-            mkdir -p /home/ubuntu/moabam/nginx/templates
+            mkdir -p /home/ubuntu/moabam/
 
       - name: Docker env 파일 생성
         run:
@@ -54,7 +53,7 @@ jobs:
           port: 22
           username: ${{ secrets.EC2_INSTANCE_USERNAME }}
           key: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
-          source: "./.env, ./docker-compose-dev.yml, ./scripts/* ./nginx/*"
+          source: "./.env, ./docker-compose-dev.yml, ./scripts ./nginx"
           target: "/home/ubuntu/moabam"
 
       - name: 파일 세팅
