@@ -1,4 +1,4 @@
-package com.moabam.api.domain.repository;
+package com.moabam.api.domain.bug.repository;
 
 import static com.moabam.api.domain.bug.QBugHistory.*;
 

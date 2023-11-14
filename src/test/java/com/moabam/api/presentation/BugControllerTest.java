@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.bug.BugMapper;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.bug.repository.BugHistoryRepository;
-import com.moabam.api.domain.repository.BugHistorySearchRepository;
+import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
 import com.moabam.api.dto.TodayBugResponse;
 import com.moabam.api.dto.bug.BugResponse;
 import com.moabam.support.annotation.WithMember;
