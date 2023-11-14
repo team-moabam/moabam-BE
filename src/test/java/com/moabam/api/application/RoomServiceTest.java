@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoutineRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
+import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith(MockitoExtension.class)
 class RoomServiceTest {
@@ -96,5 +98,32 @@ class RoomServiceTest {
 		verify(participantRepository).save(any(Participant.class));
 		assertThat(result).isEqualTo(expectedRoom.getId());
 		assertThat(expectedRoom.getPassword()).isEqualTo("1234");
+	}
+
+	@DisplayName("방장 위임 성공")
+	@Test
+	void room_manager_mandate_success() {
+		// given
+		Long managerId = 1L;
+		Long memberId = 2L;
+
+		Room room = spy(RoomFixture.room());
+		given(room.getId()).willReturn(1L);
+
+		Participant memberParticipant = RoomFixture.participant(room, memberId);
+		Participant managerParticipant = RoomFixture.participant(room, managerId);
+		managerParticipant.enableManager();
+
+		given(participantSearchRepository.findOne(memberId, room.getId())).willReturn(
+			Optional.of(memberParticipant));
+		given(participantSearchRepository.findOne(managerId, room.getId())).willReturn(
+			Optional.of(managerParticipant));
+
+		// when
+		roomService.mandateRoomManager(managerId, room.getId(), memberId);
+
+		// then
+		assertThat(managerParticipant.isManager()).isFalse();
+		assertThat(memberParticipant.isManager()).isTrue();
 	}
 }
