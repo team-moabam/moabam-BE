@@ -17,7 +17,7 @@ public class RoutineSearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public List<Routine> findByRoomId(Long roomId) {
+	public List<Routine> findAllByRoomId(Long roomId) {
 		return jpaQueryFactory
 			.selectFrom(routine)
 			.where(
