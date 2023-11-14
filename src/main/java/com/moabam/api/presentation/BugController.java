@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.moabam.api.application.bug.BugService;
 import com.moabam.api.dto.TodayBugResponse;
 import com.moabam.api.dto.bug.BugResponse;
+import com.moabam.global.auth.annotation.CurrentMember;
+import com.moabam.global.auth.model.AuthorizationMember;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,13 +23,13 @@ public class BugController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public BugResponse getBug() {
-		return bugService.getBug(1L);
+	public BugResponse getBug(@CurrentMember AuthorizationMember member) {
+		return bugService.getBug(member.id());
 	}
 
 	@GetMapping("/today")
 	@ResponseStatus(HttpStatus.OK)
-	public TodayBugResponse getTodayBug() {
-		return bugService.getTodayBug(1L);
+	public TodayBugResponse getTodayBug(@CurrentMember AuthorizationMember member) {
+		return bugService.getTodayBug(member.id());
 	}
 }
