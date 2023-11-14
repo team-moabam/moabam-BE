@@ -23,7 +23,7 @@ jobs:
 
       - name: environment 세팅
         run: |
-          echo src/main/resources/config/dev.env > ./.env
+          cp src/main/resources/config/dev.env > ./.env
 
       - name: Gradle 캐싱
         uses: actions/cache@v3
