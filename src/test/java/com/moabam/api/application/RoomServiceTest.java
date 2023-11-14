@@ -27,6 +27,7 @@ import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoutineRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
+import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -125,5 +126,28 @@ class RoomServiceTest {
 		// then
 		assertThat(managerParticipant.isManager()).isFalse();
 		assertThat(memberParticipant.isManager()).isTrue();
+	}
+
+	@DisplayName("방장 위임 실패 - 방장이 아닌 유저가 요청할때")
+	@Test
+	void room_manager_mandate_fail() {
+		// given
+		Long managerId = 1L;
+		Long memberId = 2L;
+
+		Room room = spy(RoomFixture.room());
+		given(room.getId()).willReturn(1L);
+
+		Participant memberParticipant = RoomFixture.participant(room, memberId);
+		Participant managerParticipant = RoomFixture.participant(room, managerId);
+
+		given(participantSearchRepository.findOne(memberId, room.getId())).willReturn(
+			Optional.of(memberParticipant));
+		given(participantSearchRepository.findOne(managerId, room.getId())).willReturn(
+			Optional.of(managerParticipant));
+
+		// when, then
+		assertThatThrownBy(() -> roomService.mandateRoomManager(managerId, 1L, memberId))
+			.isInstanceOf(ForbiddenException.class);
 	}
 }
