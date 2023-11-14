@@ -3,8 +3,10 @@ package com.moabam.api.presentation;
 import static com.moabam.global.auth.model.AuthorizationThreadLocal.*;
 import static com.moabam.support.fixture.InventoryFixture.*;
 import static com.moabam.support.fixture.ItemFixture.*;
+import static com.moabam.support.fixture.MemberFixture.*;
 import static java.nio.charset.StandardCharsets.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -20,11 +22,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.item.ItemMapper;
+import com.moabam.api.application.member.MemberService;
+import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.ItemType;
 import com.moabam.api.domain.item.repository.InventoryRepository;
@@ -44,6 +49,9 @@ class ItemControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	ObjectMapper objectMapper;
+
+	@MockBean
+	MemberService memberService;
 
 	@Autowired
 	ItemRepository itemRepository;
@@ -92,20 +100,59 @@ class ItemControllerTest extends WithoutFilterSupporter {
 		}
 	}
 
-	@DisplayName("아이템 구매 요청 바디가 유효하지 않으면 예외가 발생한다.")
+	@Nested
+	@DisplayName("아이템을 구매한다.")
+	class PurchaseItem {
+
+		@DisplayName("성공한다.")
+		@WithMember
+		@Test
+		void success() throws Exception {
+			// given
+			Long memberId = getAuthorizationMember().id();
+			Item item = itemRepository.save(nightMageSkin());
+			PurchaseItemRequest request = new PurchaseItemRequest(BugType.NIGHT);
+			given(memberService.getById(memberId)).willReturn(member());
+
+			// expected
+			mockMvc.perform(post("/items/{itemId}/purchase", item.getId())
+					.contentType(APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk())
+				.andDo(print());
+		}
+
+		@DisplayName("아이템 구매 요청 바디가 유효하지 않으면 예외가 발생한다.")
+		@WithMember
+		@Test
+		void bad_request_body_exception() throws Exception {
+			// given
+			Long itemId = 1L;
+			PurchaseItemRequest request = new PurchaseItemRequest(null);
+
+			// expected
+			mockMvc.perform(post("/items/{itemId}/purchase", itemId)
+					.contentType(APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("올바른 요청 정보가 아닙니다."))
+				.andDo(print());
+		}
+	}
+
+	@DisplayName("아이템을 적용한다.")
 	@WithMember
 	@Test
-	void bad_request_body_exception() throws Exception {
+	void select_item_success() throws Exception {
 		// given
-		Long itemId = 1L;
-		PurchaseItemRequest request = new PurchaseItemRequest(null);
+		Long memberId = getAuthorizationMember().id();
+		Item item = itemRepository.save(nightMageSkin());
+		inventoryRepository.save(inventory(memberId, item));
 
-		// expected
-		mockMvc.perform(post("/items/{itemId}/purchase", itemId)
-				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.message").value("올바른 요청 정보가 아닙니다."))
+		// when, then
+		mockMvc.perform(post("/items/{itemId}/select", item.getId())
+				.contentType(APPLICATION_JSON))
+			.andExpect(status().isOk())
 			.andDo(print());
 	}
 }
