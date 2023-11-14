@@ -1,10 +1,10 @@
 package com.moabam.api.presentation;
 
+import static com.moabam.global.auth.model.AuthorizationThreadLocal.*;
+import static com.moabam.support.fixture.InventoryFixture.*;
 import static com.moabam.support.fixture.ItemFixture.*;
 import static java.nio.charset.StandardCharsets.*;
-import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -13,24 +13,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.item.ItemMapper;
-import com.moabam.api.application.item.ItemService;
-import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.ItemType;
+import com.moabam.api.domain.item.repository.InventoryRepository;
+import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.dto.item.ItemsResponse;
 import com.moabam.api.dto.item.PurchaseItemRequest;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 
-@WebMvcTest(controllers = ItemController.class)
+@Transactional
+@SpringBootTest
+@AutoConfigureMockMvc
 class ItemControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
@@ -39,59 +45,67 @@ class ItemControllerTest extends WithoutFilterSupporter {
 	@Autowired
 	ObjectMapper objectMapper;
 
-	@MockBean
-	ItemService itemService;
+	@Autowired
+	ItemRepository itemRepository;
+
+	@Autowired
+	InventoryRepository inventoryRepository;
 
 	@DisplayName("아이템 목록을 조회한다.")
-	@WithMember
-	@Test
-	void get_items_success() throws Exception {
-		// given
-		Long memberId = 1L;
-		ItemType type = ItemType.MORNING;
-		Item item1 = morningSantaSkin().build();
-		Item item2 = morningKillerSkin().build();
-		ItemsResponse expected = ItemMapper.toItemsResponse(List.of(item1, item2), emptyList());
-		given(itemService.getItems(memberId, type)).willReturn(expected);
+	@Nested
+	class GetItems {
 
-		// when, then
-		String content = mockMvc.perform(
-				get("/items").param("type", ItemType.MORNING.name()).contentType(APPLICATION_JSON))
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andReturn()
-			.getResponse()
-			.getContentAsString(UTF_8);
-		ItemsResponse actual = objectMapper.readValue(content, ItemsResponse.class);
-		assertThat(actual).isEqualTo(expected);
+		@DisplayName("성공한다.")
+		@WithMember
+		@Test
+		void success() throws Exception {
+			// given
+			Long memberId = getAuthorizationMember().id();
+			Item item1 = itemRepository.save(morningSantaSkin().build());
+			inventoryRepository.save(inventory(memberId, item1));
+			Item item2 = itemRepository.save(morningKillerSkin().build());
+			ItemsResponse expected = ItemMapper.toItemsResponse(List.of(item1), List.of(item2));
+
+			// expected
+			String content = mockMvc.perform(get("/items")
+					.param("type", ItemType.MORNING.name())
+					.contentType(APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andDo(print())
+				.andReturn()
+				.getResponse()
+				.getContentAsString(UTF_8);
+			ItemsResponse actual = objectMapper.readValue(content, ItemsResponse.class);
+			assertThat(actual).isEqualTo(expected);
+		}
+
+		@DisplayName("아이템 타입이 유효하지 않으면 예외가 발생한다.")
+		@WithMember
+		@ParameterizedTest
+		@ValueSource(strings = {"HI", ""})
+		void item_type_bad_request_exception(String itemType) throws Exception {
+			mockMvc.perform(get("/items")
+					.param("type", itemType)
+					.contentType(APPLICATION_JSON))
+				.andExpect(status().isBadRequest())
+				.andDo(print());
+		}
 	}
 
-	@DisplayName("아이템을 구매한다.")
-	@Test
-	void purchase_item_success() throws Exception {
-		// given
-		Long memberId = 1L;
-		Long itemId = 1L;
-		PurchaseItemRequest request = new PurchaseItemRequest(BugType.MORNING);
-
-		// when, then
-		mockMvc.perform(post("/items/{itemId}/purchase", itemId).contentType(APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(request))).andDo(print()).andExpect(status().isOk());
-		verify(itemService).purchaseItem(memberId, itemId, request);
-	}
-
-	@DisplayName("아이템을 적용한다.")
+	@DisplayName("아이템 구매 요청 바디가 유효하지 않으면 예외가 발생한다.")
 	@WithMember
 	@Test
-	void select_item_success() throws Exception {
+	void bad_request_body_exception() throws Exception {
 		// given
-		Long memberId = 1L;
 		Long itemId = 1L;
+		PurchaseItemRequest request = new PurchaseItemRequest(null);
 
-		// when, then
-		mockMvc.perform(post("/items/{itemId}/select", itemId).contentType(APPLICATION_JSON))
-			.andDo(print())
-			.andExpect(status().isOk());
-		verify(itemService).selectItem(memberId, itemId);
+		// expected
+		mockMvc.perform(post("/items/{itemId}/purchase", itemId)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("올바른 요청 정보가 아닙니다."))
+			.andDo(print());
 	}
 }
