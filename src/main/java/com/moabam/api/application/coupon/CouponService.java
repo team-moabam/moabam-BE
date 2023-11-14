@@ -9,9 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
+import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
+import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -28,16 +30,18 @@ public class CouponService {
 	private final CouponSearchRepository couponSearchRepository;
 
 	@Transactional
-	public void createCoupon(Long adminId, CreateCouponRequest request) {
+	public void createCoupon(AuthorizationMember admin, CreateCouponRequest request) {
+		validateAdminRole(admin);
 		validateConflictCouponName(request.name());
 		validateCouponPeriod(request.startAt(), request.endAt());
 
-		Coupon coupon = CouponMapper.toEntity(adminId, request);
+		Coupon coupon = CouponMapper.toEntity(admin.id(), request);
 		couponRepository.save(coupon);
 	}
 
 	@Transactional
-	public void deleteCoupon(Long adminId, Long couponId) {
+	public void deleteCoupon(AuthorizationMember admin, Long couponId) {
+		validateAdminRole(admin);
 		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 		couponRepository.delete(coupon);
@@ -57,6 +61,12 @@ public class CouponService {
 		return coupons.stream()
 			.map(CouponMapper::toDto)
 			.toList();
+	}
+
+	private void validateAdminRole(AuthorizationMember admin) {
+		if (!admin.role().equals(Role.ADMIN)) {
+			throw new NotFoundException(ErrorMessage.MEMBER_NOT_FOUND);
+		}
 	}
 
 	private void validateConflictCouponName(String name) {
