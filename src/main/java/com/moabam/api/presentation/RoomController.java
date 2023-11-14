@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.moabam.api.application.room.RoomCertificationService;
+import com.moabam.api.application.room.RoomSearchService;
 import com.moabam.api.application.room.RoomService;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
@@ -30,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class RoomController {
 
 	private final RoomService roomService;
+	private final RoomSearchService roomSearchService;
+	private final RoomCertificationService roomCertificationService;
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
@@ -59,12 +63,12 @@ public class RoomController {
 	@GetMapping("/{roomId}")
 	@ResponseStatus(HttpStatus.OK)
 	public RoomDetailsResponse getRoomDetails(@PathVariable("roomId") Long roomId) {
-		return roomService.getRoomDetails(1L, roomId);
+		return roomSearchService.getRoomDetails(1L, roomId);
 	}
 
 	@PostMapping("/{roomId}/certification")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void certifyRoom(@PathVariable("roomId") Long roomId, @RequestPart List<MultipartFile> multipartFiles) {
-		roomService.certifyRoom(1L, roomId, multipartFiles);
+		roomCertificationService.certifyRoom(1L, roomId, multipartFiles);
 	}
 }
