@@ -52,6 +52,12 @@ public class RoomService {
 			.memberId(memberId)
 			.build();
 
+		if (!isEnterRoomAvailable(memberId, room.getRoomType())) {
+			throw new BadRequestException(MEMBER_ROOM_EXCEED);
+		}
+
+		increaseRoomCount(memberId, room.getRoomType());
+
 		participant.enableManager();
 		Room savedRoom = roomRepository.save(room);
 		routineRepository.saveAll(routines);
@@ -124,6 +130,19 @@ public class RoomService {
 
 		managerParticipant.disableManager();
 		memberParticipant.enableManager();
+	}
+
+	@Transactional
+	public void deportParticipant(Long managerId, Long roomId, Long memberId) {
+		Participant managerParticipant = getParticipant(managerId, roomId);
+		Participant memberParticipant = getParticipant(memberId, roomId);
+		Room room = managerParticipant.getRoom();
+
+		validateManagerAuthorization(managerParticipant);
+
+		participantRepository.delete(memberParticipant);
+		room.decreaseCurrentUserCount();
+		decreaseRoomCount(memberId, room.getRoomType());
 	}
 
 	public void validateRoomById(Long roomId) {
