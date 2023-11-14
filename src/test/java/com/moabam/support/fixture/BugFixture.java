@@ -1,6 +1,6 @@
 package com.moabam.support.fixture;
 
-import com.moabam.api.domain.entity.Bug;
+import com.moabam.api.domain.bug.Bug;
 
 public final class BugFixture {
 

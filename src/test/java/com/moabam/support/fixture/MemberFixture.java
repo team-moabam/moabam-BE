@@ -1,6 +1,6 @@
 package com.moabam.support.fixture;
 
-import com.moabam.api.domain.entity.Member;
+import com.moabam.api.domain.member.Member;
 
 public final class MemberFixture {
 

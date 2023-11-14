@@ -4,9 +4,9 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-import com.moabam.api.domain.repository.CertificationsSearchRepository;
-import com.moabam.api.domain.repository.InventorySearchRepository;
-import com.moabam.api.domain.repository.ItemSearchRepository;
+import com.moabam.api.domain.item.repository.InventorySearchRepository;
+import com.moabam.api.domain.item.repository.ItemSearchRepository;
+import com.moabam.api.domain.room.repository.CertificationsSearchRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;

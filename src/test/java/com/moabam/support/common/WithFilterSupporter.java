@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.moabam.api.application.JwtProviderService;
+import com.moabam.api.application.auth.JwtProviderService;
 import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.support.fixture.PublicClaimFixture;

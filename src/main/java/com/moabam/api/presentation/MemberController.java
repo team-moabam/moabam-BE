@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moabam.api.application.AuthorizationService;
-import com.moabam.api.dto.AuthorizationCodeResponse;
-import com.moabam.api.dto.AuthorizationTokenInfoResponse;
-import com.moabam.api.dto.AuthorizationTokenResponse;
-import com.moabam.api.dto.LoginResponse;
+import com.moabam.api.application.auth.AuthorizationService;
+import com.moabam.api.dto.auth.AuthorizationCodeResponse;
+import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
+import com.moabam.api.dto.auth.AuthorizationTokenResponse;
+import com.moabam.api.dto.auth.LoginResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

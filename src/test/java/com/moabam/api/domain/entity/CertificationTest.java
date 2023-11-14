@@ -5,7 +5,10 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.room.Certification;
+import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.RoomType;
+import com.moabam.api.domain.room.Routine;
 
 class CertificationTest {
 

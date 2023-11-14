@@ -5,8 +5,8 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.params.provider.Arguments;
 
-import com.moabam.api.domain.entity.Participant;
-import com.moabam.api.domain.entity.Room;
+import com.moabam.api.domain.room.Participant;
+import com.moabam.api.domain.room.Room;
 
 public final class ParticipantFixture {
 

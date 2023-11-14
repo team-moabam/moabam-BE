@@ -1,8 +1,8 @@
 package com.moabam.support.fixture;
 
-import com.moabam.api.domain.entity.Item;
-import com.moabam.api.domain.entity.enums.ItemCategory;
-import com.moabam.api.domain.entity.enums.ItemType;
+import com.moabam.api.domain.item.Item;
+import com.moabam.api.domain.item.ItemCategory;
+import com.moabam.api.domain.item.ItemType;
 
 public class ItemFixture {
 

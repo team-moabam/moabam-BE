@@ -32,11 +32,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.application.AuthorizationService;
-import com.moabam.api.application.OAuth2AuthorizationServerRequestService;
-import com.moabam.api.dto.AuthorizationCodeResponse;
-import com.moabam.api.dto.AuthorizationTokenInfoResponse;
-import com.moabam.api.dto.AuthorizationTokenResponse;
+import com.moabam.api.application.auth.AuthorizationService;
+import com.moabam.api.application.auth.OAuth2AuthorizationServerRequestService;
+import com.moabam.api.dto.auth.AuthorizationCodeResponse;
+import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
+import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;

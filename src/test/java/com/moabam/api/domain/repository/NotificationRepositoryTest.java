@@ -12,7 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.global.common.repository.StringRedisRepository;
+import com.moabam.api.infrastructure.redis.NotificationRepository;
+import com.moabam.api.infrastructure.redis.StringRedisRepository;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationRepositoryTest {

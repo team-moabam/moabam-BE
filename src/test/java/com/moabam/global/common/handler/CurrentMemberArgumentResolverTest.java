@@ -15,11 +15,12 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import com.moabam.api.domain.entity.Member;
-import com.moabam.api.domain.entity.enums.Role;
-import com.moabam.api.dto.AuthorizationMember;
-import com.moabam.global.common.annotation.CurrentMember;
-import com.moabam.global.common.util.AuthorizationThreadLocal;
+import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.Role;
+import com.moabam.global.auth.annotation.CurrentMember;
+import com.moabam.global.auth.handler.CurrentMemberArgumentResolver;
+import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthorizationThreadLocal;
 
 @ExtendWith(MockitoExtension.class)
 class CurrentMemberArgumentResolverTest {

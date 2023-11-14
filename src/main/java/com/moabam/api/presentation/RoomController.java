@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.moabam.api.application.RoomService;
-import com.moabam.api.dto.CreateRoomRequest;
-import com.moabam.api.dto.EnterRoomRequest;
-import com.moabam.api.dto.ModifyRoomRequest;
-import com.moabam.api.dto.RoomDetailsResponse;
+import com.moabam.api.application.room.RoomService;
+import com.moabam.api.dto.room.CreateRoomRequest;
+import com.moabam.api.dto.room.EnterRoomRequest;
+import com.moabam.api.dto.room.ModifyRoomRequest;
+import com.moabam.api.dto.room.RoomDetailsResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

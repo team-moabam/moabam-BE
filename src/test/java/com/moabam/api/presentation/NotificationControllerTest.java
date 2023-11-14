@@ -23,12 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
-import com.moabam.api.domain.entity.Member;
-import com.moabam.api.domain.entity.Room;
-import com.moabam.api.domain.repository.MemberRepository;
-import com.moabam.api.domain.repository.NotificationRepository;
-import com.moabam.api.domain.repository.RoomRepository;
-import com.moabam.global.common.repository.StringRedisRepository;
+import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.repository.MemberRepository;
+import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.repository.RoomRepository;
+import com.moabam.api.infrastructure.redis.NotificationRepository;
+import com.moabam.api.infrastructure.redis.StringRedisRepository;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.ErrorSnippetFixture;

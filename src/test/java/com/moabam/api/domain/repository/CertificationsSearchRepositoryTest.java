@@ -1,6 +1,6 @@
 package com.moabam.api.domain.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,12 +10,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.moabam.api.domain.entity.Certification;
-import com.moabam.api.domain.entity.DailyMemberCertification;
-import com.moabam.api.domain.entity.DailyRoomCertification;
-import com.moabam.api.domain.entity.Participant;
-import com.moabam.api.domain.entity.Room;
-import com.moabam.api.domain.entity.Routine;
+import com.moabam.api.domain.room.Certification;
+import com.moabam.api.domain.room.DailyMemberCertification;
+import com.moabam.api.domain.room.DailyRoomCertification;
+import com.moabam.api.domain.room.Participant;
+import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.Routine;
+import com.moabam.api.domain.room.repository.CertificationRepository;
+import com.moabam.api.domain.room.repository.CertificationsSearchRepository;
+import com.moabam.api.domain.room.repository.DailyMemberCertificationRepository;
+import com.moabam.api.domain.room.repository.DailyRoomCertificationRepository;
+import com.moabam.api.domain.room.repository.ParticipantRepository;
+import com.moabam.api.domain.room.repository.RoomRepository;
+import com.moabam.api.domain.room.repository.RoutineRepository;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
 import com.moabam.support.fixture.RoomFixture;
 

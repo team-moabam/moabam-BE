@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.moabam.api.domain.entity.enums.CouponType;
+import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.CouponType;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.fixture.CouponFixture;

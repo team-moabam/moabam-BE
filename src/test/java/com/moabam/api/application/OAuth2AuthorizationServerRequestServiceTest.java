@@ -29,8 +29,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.moabam.api.dto.AuthorizationTokenInfoResponse;
-import com.moabam.api.dto.AuthorizationTokenResponse;
+import com.moabam.api.application.auth.OAuth2AuthorizationServerRequestService;
+import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
+import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;

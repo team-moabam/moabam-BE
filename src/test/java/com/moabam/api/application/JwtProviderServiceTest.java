@@ -10,7 +10,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.moabam.api.dto.PublicClaim;
+import com.moabam.api.application.auth.JwtProviderService;
+import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.support.fixture.PublicClaimFixture;
 

@@ -1,7 +1,7 @@
 package com.moabam.support.fixture;
 
-import com.moabam.api.domain.entity.Inventory;
-import com.moabam.api.domain.entity.Item;
+import com.moabam.api.domain.item.Inventory;
+import com.moabam.api.domain.item.Item;
 
 public class InventoryFixture {
 

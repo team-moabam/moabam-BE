@@ -9,13 +9,13 @@ import java.util.List;
 
 import org.springframework.mock.web.MockMultipartFile;
 
-import com.moabam.api.domain.entity.Certification;
-import com.moabam.api.domain.entity.DailyMemberCertification;
-import com.moabam.api.domain.entity.DailyRoomCertification;
-import com.moabam.api.domain.entity.Participant;
-import com.moabam.api.domain.entity.Room;
-import com.moabam.api.domain.entity.Routine;
-import com.moabam.api.domain.entity.enums.RoomType;
+import com.moabam.api.domain.room.Certification;
+import com.moabam.api.domain.room.DailyMemberCertification;
+import com.moabam.api.domain.room.DailyRoomCertification;
+import com.moabam.api.domain.room.Participant;
+import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.RoomType;
+import com.moabam.api.domain.room.Routine;
 
 public class RoomFixture {
 

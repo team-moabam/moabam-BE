@@ -19,10 +19,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.application.ProductService;
-import com.moabam.api.domain.entity.Product;
-import com.moabam.api.dto.ProductMapper;
-import com.moabam.api.dto.ProductsResponse;
+import com.moabam.api.application.product.ProductMapper;
+import com.moabam.api.application.product.ProductService;
+import com.moabam.api.domain.product.Product;
+import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.support.common.WithoutFilterSupporter;
 
 @WebMvcTest(controllers = ProductController.class)

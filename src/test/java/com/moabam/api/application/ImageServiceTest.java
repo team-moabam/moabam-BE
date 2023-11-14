@@ -15,8 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.moabam.api.domain.resizedimage.ImageType;
-import com.moabam.api.domain.resizedimage.ResizedImage;
+import com.moabam.api.application.image.ImageService;
+import com.moabam.api.domain.image.ImageType;
+import com.moabam.api.domain.image.ResizedImage;
 import com.moabam.api.infrastructure.s3.S3Manager;
 import com.moabam.support.fixture.RoomFixture;
 

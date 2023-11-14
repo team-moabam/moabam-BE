@@ -11,8 +11,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.moabam.api.domain.entity.Item;
-import com.moabam.api.domain.entity.enums.ItemType;
+import com.moabam.api.domain.item.Item;
+import com.moabam.api.domain.item.ItemType;
+import com.moabam.api.domain.item.repository.InventoryRepository;
+import com.moabam.api.domain.item.repository.ItemRepository;
+import com.moabam.api.domain.item.repository.ItemSearchRepository;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
 
 @QuerydslRepositoryTest

@@ -11,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import com.moabam.api.domain.entity.Participant;
-import com.moabam.api.domain.entity.Room;
+import com.moabam.api.domain.room.Participant;
+import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.repository.ParticipantRepository;
+import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
+import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.global.config.JpaConfig;
 
 @DataJpaTest
