@@ -20,12 +20,12 @@ public class WebConfig implements WebMvcConfigurer {
 	private static final String ALLOW_ORIGIN_PATTERN = "[a-z]+\\.moabam.com";
 
 	@Value("${allow}")
-	private String ALLOW_LOCAL_HOST;
+	private String allowLocalHost;
 
 	@Override
 	public void addCorsMappings(final CorsRegistry registry) {
 		registry.addMapping("/**")
-			.allowedOriginPatterns(ALLOW_ORIGIN_PATTERN, ALLOW_LOCAL_HOST)
+			.allowedOriginPatterns(ALLOW_ORIGIN_PATTERN, allowLocalHost)
 			.allowedMethods(ALLOWED_METHOD_NAMES.split(","))
 			.allowedHeaders("*")
 			.allowCredentials(true)
