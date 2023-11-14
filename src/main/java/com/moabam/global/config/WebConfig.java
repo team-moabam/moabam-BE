@@ -2,6 +2,7 @@ package com.moabam.global.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -17,7 +18,9 @@ public class WebConfig implements WebMvcConfigurer {
 
 	private static final String ALLOWED_METHOD_NAMES = "GET,HEAD,POST,PUT,DELETE,TRACE,OPTIONS,PATCH";
 	private static final String ALLOW_ORIGIN_PATTERN = "[a-z]+\\.moabam.com";
-	private static final String ALLOW_LOCAL_HOST = "http://localhost:3000";
+
+	@Value("${allow}")
+	private String ALLOW_LOCAL_HOST;
 
 	@Override
 	public void addCorsMappings(final CorsRegistry registry) {
