@@ -4,6 +4,7 @@ import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.bug.BugActionType;
 import com.moabam.api.domain.bug.BugHistory;
 import com.moabam.api.domain.bug.BugType;
+import com.moabam.api.dto.TodayBugResponse;
 import com.moabam.api.dto.bug.BugResponse;
 
 import lombok.AccessLevel;
@@ -17,6 +18,13 @@ public final class BugMapper {
 			.morningBug(bug.getMorningBug())
 			.nightBug(bug.getNightBug())
 			.goldenBug(bug.getGoldenBug())
+			.build();
+	}
+
+	public static TodayBugResponse toTodayBugResponse(int morningBug, int nightBug) {
+		return TodayBugResponse.builder()
+			.morningBug(morningBug)
+			.nightBug(nightBug)
 			.build();
 	}
 

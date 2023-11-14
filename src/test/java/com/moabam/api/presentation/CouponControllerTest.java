@@ -26,9 +26,11 @@ import com.moabam.api.application.coupon.CouponMapper;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
+import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.global.error.model.ErrorMessage;
+import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.CouponFixture;
 import com.moabam.support.fixture.CouponSnippetFixture;
@@ -49,6 +51,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@Autowired
 	private CouponRepository couponRepository;
 
+	@WithMember(role = Role.ADMIN)
 	@DisplayName("쿠폰을 성공적으로 발행한다. - Void")
 	@Test
 	void couponController_createCoupon() throws Exception {
@@ -68,6 +71,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isCreated());
 	}
 
+	@WithMember(role = Role.ADMIN)
 	@DisplayName("쿠폰 발급 종료기간 시작기간보다 이전인 쿠폰을 발행한다. - BadRequestException")
 	@Test
 	void couponController_createCoupon_BadRequestException() throws Exception {
@@ -90,6 +94,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
 	}
 
+	@WithMember(role = Role.ADMIN)
 	@DisplayName("쿠폰명이 중복된 쿠폰을 발행한다. - ConflictException")
 	@Test
 	void couponController_createCoupon_ConflictException() throws Exception {
@@ -113,6 +118,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_COUPON_NAME.getMessage()));
 	}
 
+	@WithMember(role = Role.ADMIN)
 	@DisplayName("쿠폰을 성공적으로 삭제한다. - Void")
 	@Test
 	void couponController_deleteCoupon() throws Exception {
@@ -128,6 +134,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isOk());
 	}
 
+	@WithMember(role = Role.ADMIN)
 	@DisplayName("존재하지 않는 쿠폰을 삭제한다. - NotFoundException")
 	@Test
 	void couponController_deleteCoupon_NotFoundException() throws Exception {
