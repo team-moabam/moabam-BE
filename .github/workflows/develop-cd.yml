@@ -45,7 +45,7 @@ jobs:
 
       - name: Docker env 파일 생성
         run:
-          cp src/main/resources/config/dev.env > ./.env
+          cp src/main/resources/config/dev.env ./.env
 
       - name: 서버로 전송 기본 파일들 전송
         uses: appleboy/scp-action@master
