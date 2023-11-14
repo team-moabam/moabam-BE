@@ -71,4 +71,10 @@ public class RoomController {
 	public void certifyRoom(@PathVariable("roomId") Long roomId, @RequestPart List<MultipartFile> multipartFiles) {
 		roomCertificationService.certifyRoom(1L, roomId, multipartFiles);
 	}
+
+	@PutMapping("/{roomId}/members/{memberId}/mandate")
+	@ResponseStatus(HttpStatus.OK)
+	public void mandateManager(@PathVariable("roomId") Long roomId, @PathVariable("memberId") Long memberId) {
+		roomService.mandateRoomManager(1L, roomId, memberId);
+	}
 }

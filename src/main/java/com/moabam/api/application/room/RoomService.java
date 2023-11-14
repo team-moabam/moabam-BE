@@ -63,10 +63,7 @@ public class RoomService {
 	@Transactional
 	public void modifyRoom(Long memberId, Long roomId, ModifyRoomRequest modifyRoomRequest) {
 		Participant participant = getParticipant(memberId, roomId);
-
-		if (!participant.isManager()) {
-			throw new ForbiddenException(ROOM_MODIFY_UNAUTHORIZED_REQUEST);
-		}
+		validateManagerAuthorization(participant);
 
 		Room room = participant.getRoom();
 		room.changeTitle(modifyRoomRequest.title());
@@ -119,6 +116,16 @@ public class RoomService {
 		roomRepository.delete(room);
 	}
 
+	@Transactional
+	public void mandateRoomManager(Long managerId, Long roomId, Long memberId) {
+		Participant managerParticipant = getParticipant(managerId, roomId);
+		Participant memberParticipant = getParticipant(memberId, roomId);
+		validateManagerAuthorization(managerParticipant);
+
+		managerParticipant.disableManager();
+		memberParticipant.enableManager();
+	}
+
 	public void validateRoomById(Long roomId) {
 		if (!roomRepository.existsById(roomId)) {
 			throw new NotFoundException(ROOM_NOT_FOUND);
@@ -128,6 +135,12 @@ public class RoomService {
 	private Participant getParticipant(Long memberId, Long roomId) {
 		return participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
+	}
+
+	private void validateManagerAuthorization(Participant participant) {
+		if (!participant.isManager()) {
+			throw new ForbiddenException(ROOM_MODIFY_UNAUTHORIZED_REQUEST);
+		}
 	}
 
 	private void validateRoomEnter(Long memberId, String requestPassword, Room room) {
