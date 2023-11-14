@@ -49,11 +49,11 @@ public class RoomFixture {
 
 		Routine routine1 = Routine.builder()
 			.room(room)
-			.content("물 마시기")
+			.content("첫 루틴")
 			.build();
 		Routine routine2 = Routine.builder()
 			.room(room)
-			.content("코테 풀기")
+			.content("두번째 루틴")
 			.build();
 
 		routines.add(routine1);
