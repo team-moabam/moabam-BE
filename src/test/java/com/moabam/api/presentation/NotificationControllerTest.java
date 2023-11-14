@@ -30,6 +30,7 @@ import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.infrastructure.redis.NotificationRepository;
 import com.moabam.api.infrastructure.redis.StringRedisRepository;
 import com.moabam.global.error.model.ErrorMessage;
+import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.ErrorSnippetFixture;
 import com.moabam.support.fixture.MemberFixture;
@@ -80,6 +81,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 		stringRedisRepository.delete(knockKey);
 	}
 
+	@WithMember
 	@DisplayName("GET - 성공적으로 상대에게 콕 알림을 보낸다. - Void")
 	@Test
 	void notificationController_sendKnockNotification() throws Exception {
@@ -95,6 +97,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isOk());
 	}
 
+	@WithMember
 	@DisplayName("GET - 콕 알림을 보낸 상대가 접속 중이 아니다. - NotFoundException")
 	@Test
 	void notificationController_sendKnockNotification_NotFoundException() throws Exception {
@@ -110,6 +113,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_FCM_TOKEN.getMessage()));
 	}
 
+	@WithMember
 	@DisplayName("GET - 이미 콕 알림을 보낸 대상이다. - ConflictException")
 	@Test
 	void notificationController_sendKnockNotification_ConflictException() throws Exception {
