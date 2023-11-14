@@ -27,7 +27,8 @@ public class ParticipantSearchRepository {
 				.join(participant.room, room).fetchJoin()
 				.where(
 					DynamicQuery.generateEq(roomId, participant.room.id::eq),
-					DynamicQuery.generateEq(memberId, participant.memberId::eq)
+					DynamicQuery.generateEq(memberId, participant.memberId::eq),
+					participant.deletedAt.isNull()
 				)
 				.fetchOne()
 		);
@@ -37,7 +38,8 @@ public class ParticipantSearchRepository {
 		return jpaQueryFactory
 			.selectFrom(participant)
 			.where(
-				participant.room.id.eq(roomId)
+				participant.room.id.eq(roomId),
+				participant.deletedAt.isNull()
 			)
 			.fetch();
 	}
@@ -47,7 +49,8 @@ public class ParticipantSearchRepository {
 			.selectFrom(participant)
 			.where(
 				participant.room.id.eq(roomId),
-				participant.memberId.ne(memberId)
+				participant.memberId.ne(memberId),
+				participant.deletedAt.isNull()
 			)
 			.fetch();
 	}
@@ -56,7 +59,10 @@ public class ParticipantSearchRepository {
 		return jpaQueryFactory
 			.selectFrom(participant)
 			.join(participant.room, room).fetchJoin()
-			.where(participant.room.certifyTime.eq(certifyTime))
+			.where(
+				participant.room.certifyTime.eq(certifyTime),
+				participant.deletedAt.isNull()
+			)
 			.fetch();
 	}
 }
