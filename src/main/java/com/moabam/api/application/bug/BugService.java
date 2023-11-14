@@ -44,7 +44,7 @@ public class BugService {
 
 	private int calculateBugQuantity(List<BugHistory> bugHistory, BugType bugType) {
 		return bugHistory.stream()
-			.filter(history -> history.getBugType() == bugType)
+			.filter(history -> bugType.equals(history.getBugType()))
 			.mapToInt(BugHistory::getQuantity)
 			.sum();
 	}
