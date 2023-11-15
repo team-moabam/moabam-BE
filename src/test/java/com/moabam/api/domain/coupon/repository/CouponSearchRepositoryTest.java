@@ -1,4 +1,4 @@
-package com.moabam.api.domain.repository;
+package com.moabam.api.domain.coupon.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -15,8 +15,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import com.moabam.api.domain.coupon.Coupon;
-import com.moabam.api.domain.coupon.repository.CouponRepository;
-import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.global.config.JpaConfig;
 import com.moabam.global.error.exception.NotFoundException;

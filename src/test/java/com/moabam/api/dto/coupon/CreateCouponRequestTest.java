@@ -1,4 +1,4 @@
-package com.moabam.api.dto;
+package com.moabam.api.dto.coupon;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.moabam.api.dto.coupon.CreateCouponRequest;
 
 class CreateCouponRequestTest {
 
