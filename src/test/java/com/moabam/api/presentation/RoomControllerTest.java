@@ -40,6 +40,7 @@ import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoutineRepository;
+import com.moabam.api.domain.room.repository.RoutineSearchRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
@@ -66,6 +67,9 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	private RoutineRepository routineRepository;
+
+	@Autowired
+	private RoutineSearchRepository routineSearchRepository;
 
 	@Autowired
 	private ParticipantRepository participantRepository;
@@ -112,6 +116,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		List<String> routines = new ArrayList<>();
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"재윤과 앵맹이의 방임", null, routines, MORNING, 10, 4);
 		String json = objectMapper.writeValueAsString(createRoomRequest);
@@ -129,6 +134,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("비밀번호 있는 방 생성 성공")
+	@WithMember
 	@ParameterizedTest
 	@CsvSource({
 		"1234", "12345678", "98765"
@@ -138,6 +144,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		List<String> routines = new ArrayList<>();
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 있는 재맹의 방임", password, routines, MORNING, 10, 4);
 		String json = objectMapper.writeValueAsString(createRoomRequest);
@@ -164,6 +171,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		List<String> routines = new ArrayList<>();
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 있는 재윤과 앵맹이의 방임", password, routines, MORNING, 10, 4);
 		String json = objectMapper.writeValueAsString(createRoomRequest);
@@ -187,6 +195,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		routines.add("코드 리뷰 달기");
 		routines.add("책 읽기");
 		routines.add("산책 하기");
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 없는 재윤과 앵맹이의 방임", null, routines, MORNING, 10, 4);
 		String json = objectMapper.writeValueAsString(createRoomRequest);
@@ -204,6 +213,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	void create_room_with_no_routine_fail() throws Exception {
 		// given
 		List<String> routines = new ArrayList<>();
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 없는 재윤과 앵맹이의 방임", null, routines, MORNING, 10, 4);
 		String json = objectMapper.writeValueAsString(createRoomRequest);
@@ -216,7 +226,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andDo(print());
 	}
 
-	@DisplayName("올바르지 못한 시간으로 아침 방 생성")
+	@DisplayName("올바르지 못한 시간으로 아침 방 생성시 예외 발생")
 	@ParameterizedTest
 	@CsvSource({
 		"1", "3", "11", "12", "20"
@@ -226,6 +236,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		List<String> routines = new ArrayList<>();
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 없는 재윤과 앵맹이의 방임", null, routines, MORNING, certifyTime, 4);
 		String json = objectMapper.writeValueAsString(createRoomRequest);
@@ -248,6 +259,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		List<String> routines = new ArrayList<>();
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"비번 없는 재윤과 앵맹이의 방임", null, routines, NIGHT, certifyTime, 4);
 		String json = objectMapper.writeValueAsString(createRoomRequest);
@@ -261,6 +273,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("방 수정 성공 - 방장일 경우")
+	@WithMember(id = 1L)
 	@Test
 	void modify_room_success() throws Exception {
 		// given
@@ -272,19 +285,20 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.maxUserCount(5)
 			.build();
 
-		Participant participant = Participant.builder()
-			.room(room)
-			.memberId(1L)
-			.build();
+		List<Routine> routines = RoomFixture.routines(room);
+
+		Participant participant = RoomFixture.participant(room, 1L);
 		participant.enableManager();
 
-		List<String> routines = new ArrayList<>();
-		routines.add("물 마시기");
-		routines.add("코테 풀기");
+		List<String> newRoutines = new ArrayList<>();
+		newRoutines.add("물 마시기");
+		newRoutines.add("코테 풀기");
 
 		roomRepository.save(room);
+		routineRepository.saveAll(routines);
 		participantRepository.save(participant);
-		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", null, routines, "1234", 10, 7);
+
+		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "공지공지", newRoutines, "4567", 10, 7);
 		String json = objectMapper.writeValueAsString(modifyRoomRequest);
 
 		// expected
@@ -293,9 +307,20 @@ class RoomControllerTest extends WithoutFilterSupporter {
 				.content(json))
 			.andExpect(status().isOk())
 			.andDo(print());
+
+		Room modifiedRoom = roomRepository.findById(room.getId()).orElseThrow();
+		List<Routine> modifiedRoutines = routineSearchRepository.findAllByRoomId(room.getId());
+
+		assertThat(modifiedRoom.getTitle()).isEqualTo("수정할 방임!");
+		assertThat(modifiedRoom.getCertifyTime()).isEqualTo(10);
+		assertThat(modifiedRoom.getPassword()).isEqualTo("4567");
+		assertThat(modifiedRoom.getAnnouncement()).isEqualTo("공지공지");
+		assertThat(modifiedRoom.getMaxUserCount()).isEqualTo(7);
+		assertThat(modifiedRoutines).hasSize(2);
 	}
 
 	@DisplayName("방 수정 실패 - 방장 아닐 경우")
+	@WithMember(id = 1L)
 	@Test
 	void unauthorized_modify_room_fail() throws Exception {
 		// given
@@ -307,10 +332,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.maxUserCount(5)
 			.build();
 
-		Participant participant = Participant.builder()
-			.room(room)
-			.memberId(1L)
-			.build();
+		Participant participant = RoomFixture.participant(room, 1L);
 
 		List<String> routines = new ArrayList<>();
 		routines.add("물 마시기");
@@ -332,6 +354,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("비밀번호 있는 방 참여 성공")
+	@WithMember(id = 1L)
 	@Test
 	void enter_room_with_password_success() throws Exception {
 		// given
@@ -356,15 +379,11 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("비밀번호 없는 방 참여 성공")
+	@WithMember(id = 1L)
 	@Test
 	void enter_room_with_no_password_success() throws Exception {
 		// given
-		Room room = Room.builder()
-			.title("처음 제목")
-			.roomType(MORNING)
-			.certifyTime(9)
-			.maxUserCount(5)
-			.build();
+		Room room = RoomFixture.room();
 
 		roomRepository.save(room);
 		EnterRoomRequest enterRoomRequest = new EnterRoomRequest(null);
@@ -379,6 +398,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("방 참여 후 인원수 증가 테스트")
+	@WithMember(id = 1L)
 	@Test
 	void enter_and_increase_room_user_count() throws Exception {
 		// given
@@ -407,6 +427,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("아침 방 참여 후 사용자의 방 입장 횟수 증가 테스트")
+	@WithMember(id = 1L)
 	@Test
 	void enter_and_increase_morning_room_count() throws Exception {
 		// given
@@ -436,6 +457,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("저녁 방 참여 후 사용자의 방 입장 횟수 증가 테스트")
+	@WithMember(id = 1L)
 	@Test
 	void enter_and_increase_night_room_count() throws Exception {
 		// given
@@ -521,6 +543,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("비밀번호 불일치 방 참여시 예외 발생")
+	@WithMember(id = 1L)
 	@Test
 	void enter_room_wrong_password_fail() throws Exception {
 		// given
@@ -555,6 +578,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("인원수가 모두 찬 방 참여시 예외 발생")
+	@WithMember(id = 1L)
 	@Test
 	void enter_max_user_room_fail() throws Exception {
 		// given
@@ -585,6 +609,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("일반 사용자의 방 나가기 성공")
+	@WithMember(id = 1L)
 	@Test
 	void no_manager_exit_room_success() throws Exception {
 		// given
@@ -594,10 +619,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.certifyTime(21)
 			.maxUserCount(8)
 			.build();
-		Participant participant = Participant.builder()
-			.room(room)
-			.memberId(1L)
-			.build();
+
+		Participant participant = RoomFixture.participant(room, 1L);
 
 		for (int i = 0; i < 4; i++) {
 			room.increaseCurrentUserCount();
@@ -614,11 +637,13 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		participantRepository.flush();
 		Room findRoom = roomRepository.findById(room.getId()).orElseThrow();
 		Participant deletedParticipant = participantRepository.findById(participant.getId()).orElseThrow();
+
 		assertThat(findRoom.getCurrentUserCount()).isEqualTo(4);
 		assertThat(deletedParticipant.getDeletedAt()).isNotNull();
 	}
 
 	@DisplayName("방장의 방 나가기 - 방 삭제 성공")
+	@WithMember(id = 1L)
 	@Test
 	void manager_delete_room_success() throws Exception {
 		// given
@@ -628,11 +653,10 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.certifyTime(21)
 			.maxUserCount(8)
 			.build();
-		Participant participant = Participant.builder()
-			.room(room)
-			.memberId(1L)
-			.build();
+
+		Participant participant = RoomFixture.participant(room, 1L);
 		participant.enableManager();
+
 		roomRepository.save(room);
 		participantRepository.save(participant);
 
@@ -642,11 +666,13 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andDo(print());
 
 		Participant deletedParticipant = participantRepository.findById(participant.getId()).orElseThrow();
+
 		assertThat(roomRepository.findById(room.getId())).isEmpty();
 		assertThat(deletedParticipant.getDeletedAt()).isNotNull();
 	}
 
 	@DisplayName("방장이 위임하지 않고 방 나가기 실패")
+	@WithMember(id = 1L)
 	@Test
 	void manager_exit_room_fail() throws Exception {
 		// given
@@ -656,10 +682,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.certifyTime(21)
 			.maxUserCount(10)
 			.build();
-		Participant participant = Participant.builder()
-			.room(room)
-			.memberId(1L)
-			.build();
+
+		Participant participant = RoomFixture.participant(room, 1L);
 		participant.enableManager();
 
 		for (int i = 0; i < 6; i++) {
@@ -678,21 +702,13 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("아침 방 나가기 이후 사용자의 방 입장 횟수 감소 테스트")
+	@WithMember(id = 1L)
 	@Test
 	void exit_and_decrease_morning_room_count() throws Exception {
 		// given
-		Room room = Room.builder()
-			.title("방 제목")
-			.password("1234")
-			.roomType(MORNING)
-			.certifyTime(9)
-			.maxUserCount(5)
-			.build();
+		Room room = RoomFixture.room();
 
-		Participant participant = Participant.builder()
-			.room(room)
-			.memberId(1L)
-			.build();
+		Participant participant = RoomFixture.participant(room, 1L);
 
 		for (int i = 0; i < 3; i++) {
 			member.enterMorningRoom();
@@ -713,6 +729,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("저녁 방 나가기 이후 사용자의 방 입장 횟수 감소 테스트")
+	@WithMember(id = 1L)
 	@Test
 	void exit_and_decrease_night_room_count() throws Exception {
 		// given
@@ -724,10 +741,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.maxUserCount(5)
 			.build();
 
-		Participant participant = Participant.builder()
-			.room(room)
-			.memberId(1L)
-			.build();
+		Participant participant = RoomFixture.participant(room, 1L);
 
 		for (int i = 0; i < 3; i++) {
 			member.enterNightRoom();
@@ -748,6 +762,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("방 상세 정보 조회 성공 테스트")
+	@WithMember(id = 1L)
 	@Test
 	void get_room_details_test() throws Exception {
 		// given
@@ -762,62 +777,34 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		room.increaseCurrentUserCount();
 		room.increaseCurrentUserCount();
 
-		Routine routine1 = Routine.builder()
-			.room(room)
-			.content("물 마시기")
-			.build();
+		List<Routine> routines = RoomFixture.routines(room);
 
-		Routine routine2 = Routine.builder()
-			.room(room)
-			.content("코테 풀기")
-			.build();
-
-		Participant participant1 = Participant.builder()
-			.room(room)
-			.memberId(1L)
-			.build();
+		Participant participant1 = RoomFixture.participant(room, 1L);
 		participant1.enableManager();
 
-		Member member2 = Member.builder()
-			.socialId(2L)
-			.nickname("NICKNAME_2")
-			.bug(BugFixture.bug())
-			.build();
-
-		Member member3 = Member.builder()
-			.socialId(3L)
-			.nickname("NICKNAME_3")
-			.bug(BugFixture.bug())
-			.build();
+		Member member2 = MemberFixture.member(2L, "NICK2");
+		Member member3 = MemberFixture.member(3L, "NICK3");
 
 		roomRepository.save(room);
-		routineRepository.save(routine1);
-		routineRepository.save(routine2);
+		routineRepository.saveAll(routines);
 		memberRepository.save(member2);
 		memberRepository.save(member3);
 
-		Participant participant2 = Participant.builder()
-			.room(room)
-			.memberId(member2.getId())
-			.build();
-
-		Participant participant3 = Participant.builder()
-			.room(room)
-			.memberId(member3.getId())
-			.build();
+		Participant participant2 = RoomFixture.participant(room, member2.getId());
+		Participant participant3 = RoomFixture.participant(room, member3.getId());
 
 		participantRepository.save(participant1);
 		participantRepository.save(participant2);
 		participantRepository.save(participant3);
 
 		Certification certification1 = Certification.builder()
-			.routine(routine1)
+			.routine(routines.get(0))
 			.memberId(member.getId())
 			.image("member1Image")
 			.build();
 
 		Certification certification2 = Certification.builder()
-			.routine(routine2)
+			.routine(routines.get(1))
 			.memberId(member.getId())
 			.image("member2Image")
 			.build();
@@ -825,19 +812,12 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		certificationRepository.save(certification1);
 		certificationRepository.save(certification2);
 
-		DailyMemberCertification dailyMemberCertification = DailyMemberCertification.builder()
-			.memberId(member.getId())
-			.roomId(room.getId())
-			.participant(participant1)
-			.build();
-
+		DailyMemberCertification dailyMemberCertification = RoomFixture.dailyMemberCertification(member.getId(),
+			room.getId(), participant1);
 		dailyMemberCertificationRepository.save(dailyMemberCertification);
 
-		DailyRoomCertification dailyRoomCertification = DailyRoomCertification.builder()
-			.roomId(room.getId())
-			.certifiedAt(LocalDate.now())
-			.build();
-
+		DailyRoomCertification dailyRoomCertification = RoomFixture.dailyRoomCertification(room.getId(),
+			LocalDate.now());
 		dailyRoomCertificationRepository.save(dailyRoomCertification);
 
 		// expected
@@ -847,6 +827,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	}
 
 	@DisplayName("방 추방 성공")
+	@WithMember(id = 1L)
 	@Test
 	void deport_member_success() throws Exception {
 		// given
@@ -875,6 +856,6 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		assertThat(getRoom.getCurrentUserCount()).isEqualTo(1);
 		assertThat(getMemberParticipant.getDeletedAt()).isNotNull();
-		assertThat(participantSearchRepository.findOne(3L, room.getId())).isEmpty();
+		assertThat(participantSearchRepository.findOne(member.getId(), room.getId())).isEmpty();
 	}
 }
