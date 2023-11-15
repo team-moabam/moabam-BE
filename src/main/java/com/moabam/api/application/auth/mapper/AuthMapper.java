@@ -3,6 +3,7 @@ package com.moabam.api.application.auth.mapper;
 import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.global.auth.model.PublicClaim;
 
 import lombok.AccessLevel;
@@ -27,6 +28,13 @@ public final class AuthMapper {
 				.role(member.getRole())
 				.build())
 			.isSignUp(isSignUp)
+			.build();
+	}
+
+	public static TokenSaveValue toTokenSaveValue(String refreshToken, String ip) {
+		return TokenSaveValue.builder()
+			.refreshToken(refreshToken)
+			.loginIp(ip)
 			.build();
 	}
 }

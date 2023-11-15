@@ -1,6 +1,7 @@
 package com.moabam.global.filter;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -137,6 +138,44 @@ class AuthorizationFilterTest {
 			.resolveException(
 				eq(httpServletRequest), eq(httpServletResponse),
 				eq(null), any(UnauthorizedException.class));
+	}
+
+	@DisplayName("에러 발생 시 모든 토큰 만료")
+	@Test
+	void error_with_expire_token() throws ServletException, IOException {
+		// given
+		JwtProviderService jwtProviderService = JwtProviderFixture.jwtProviderService();
+		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
+
+		MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
+		MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
+		MockFilterChain mockFilterChain = new MockFilterChain();
+
+		// when
+		String token = jwtProviderService.provideAccessToken(publicClaim);
+		httpServletRequest.setCookies(
+			new Cookie("token_type", "Bearer"),
+			new Cookie("access_token", token));
+
+		when(jwtAuthenticationService.parseClaim(token)).thenReturn(publicClaim);
+		when(jwtAuthenticationService.isTokenExpire(token)).thenReturn(true);
+
+		// when
+		authorizationFilter.doFilter(httpServletRequest, httpServletResponse, mockFilterChain);
+		Cookie cookie = httpServletResponse.getCookie("access_token");
+
+		// then
+		assertAll(
+			() -> assertThat(cookie).isNotNull(),
+			() -> assertThat(cookie.getMaxAge()).isZero(),
+			() -> assertThat(cookie.getValue()).isEqualTo(token)
+		);
+
+		verify(handlerExceptionResolver, times(1))
+			.resolveException(
+				eq(httpServletRequest), eq(httpServletResponse),
+				eq(null), any(UnauthorizedException.class));
+
 	}
 
 	@DisplayName("새로운 도큰 발급 성공")

@@ -15,6 +15,12 @@ public class CookieUtils {
 		return basic("token_type", value, expireTime);
 	}
 
+	public static Cookie deleteCookie(Cookie cookie) {
+		cookie.setMaxAge(0);
+		cookie.setPath("/");
+		return cookie;
+	}
+
 	private static Cookie basic(String name, String value, long expireTime) {
 		Cookie cookie = new Cookie(name, value);
 		cookie.setSecure(true);
