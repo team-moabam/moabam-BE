@@ -15,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.global.config.EmbeddedRedisConfig;
 import com.moabam.global.config.RedisConfig;
+import com.moabam.global.error.exception.UnauthorizedException;
+import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 @SpringBootTest(classes = {RedisConfig.class, EmbeddedRedisConfig.class, HashTemplateRepository.class})
@@ -59,6 +61,17 @@ class HashTemplateRepositoryTest {
 		hashTemplateRepository.delete(key);
 
 		// When + Then
-		assertThat(hashTemplateRepository.get(key)).isNull();
+		assertThatThrownBy(() -> hashTemplateRepository.get(key))
+			.isInstanceOf(UnauthorizedException.class)
+			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
+	}
+
+	@DisplayName("토큰이 null 이어서 예외 발생")
+	@Test
+	void valid_token_failby_token_is_null() {
+		// Given + When + Then
+		assertThatThrownBy(() -> hashTemplateRepository.get("0"))
+			.isInstanceOf(UnauthorizedException.class)
+			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
 	}
 }

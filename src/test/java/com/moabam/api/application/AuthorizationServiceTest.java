@@ -271,19 +271,6 @@ class AuthorizationServiceTest {
 			authorizationService.validTokenPair(1L, "token"));
 	}
 
-	@DisplayName("토큰이 null 이어서 예외 발생")
-	@Test
-	void valid_token_failby_token_is_null() {
-		// Given
-		willReturn(null)
-			.given(tokenRepository).getTokenSaveValue(1L);
-
-		// When + Then
-		assertThatThrownBy(() -> authorizationService.validTokenPair(1L, "token"))
-			.isInstanceOf(UnauthorizedException.class)
-			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
-	}
-
 	@DisplayName("이전 토큰과 동일한지 검증")
 	@Test
 	void valid_token_failby_notEquals_token() {

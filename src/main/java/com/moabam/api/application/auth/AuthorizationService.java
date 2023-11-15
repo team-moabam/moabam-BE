@@ -1,7 +1,5 @@
 package com.moabam.api.application.auth;
 
-import static java.util.Objects.*;
-
 import java.util.Arrays;
 
 import org.springframework.http.ResponseEntity;
@@ -92,10 +90,6 @@ public class AuthorizationService {
 
 	public void validTokenPair(Long id, String oldRefreshToken) {
 		TokenSaveValue tokenSaveValue = tokenRepository.getTokenSaveValue(id);
-
-		if (isNull(tokenSaveValue)) {
-			throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
-		}
 
 		if (!tokenSaveValue.refreshToken().equals(oldRefreshToken)) {
 			tokenRepository.delete(id);
