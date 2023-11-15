@@ -15,6 +15,7 @@ import com.moabam.api.application.auth.JwtAuthenticationService;
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.auth.model.PublicClaim;
+import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -93,7 +94,6 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 				throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
 			}
 
-			// 토큰이 내가 발급해 준 토큰인지 확인
 			authorizationService.validTokenPair(publicClaim.id(), refreshToken);
 			authorizationService.issueServiceToken(httpServletResponse, publicClaim);
 		}
@@ -122,8 +122,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 		Arrays.stream(httpServletRequest.getCookies())
 			.forEach(cookie -> {
 				if (cookie.getName().contains("token")) {
-					cookie.setMaxAge(0);
-					httpServletResponse.addCookie(cookie);
+					httpServletResponse.addCookie(CookieUtils.deleteCookie(cookie));
 				}
 			});
 	}

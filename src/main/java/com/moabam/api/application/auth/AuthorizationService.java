@@ -130,7 +130,7 @@ public class AuthorizationService {
 	public void issueServiceToken(HttpServletResponse response, PublicClaim publicClaim) {
 		String accessToken = jwtProviderService.provideAccessToken(publicClaim);
 		String refreshToken = jwtProviderService.provideRefreshToken();
-		TokenSaveValue tokenSaveRequest = AuthMapper.toTokenSaveRequest(accessToken, refreshToken, null);
+		TokenSaveValue tokenSaveRequest = AuthMapper.toTokenSaveValue(refreshToken, null);
 
 		tokenRepository.saveToken(publicClaim.id(), tokenSaveRequest);
 

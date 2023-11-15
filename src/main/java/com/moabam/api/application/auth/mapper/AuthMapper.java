@@ -31,7 +31,7 @@ public final class AuthMapper {
 			.build();
 	}
 
-	public static TokenSaveValue toTokenSaveRequest(String accessToken, String refreshToken, String ip) {
+	public static TokenSaveValue toTokenSaveValue(String refreshToken, String ip) {
 		return TokenSaveValue.builder()
 			.refreshToken(refreshToken)
 			.loginIp(ip)
