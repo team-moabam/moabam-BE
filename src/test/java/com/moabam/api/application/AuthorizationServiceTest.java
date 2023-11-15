@@ -33,12 +33,15 @@ import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.api.infrastructure.redis.TokenRepository;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
+import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.fixture.AuthorizationResponseFixture;
+import com.moabam.support.fixture.TokenSaveValueFixture;
 
 import jakarta.servlet.http.Cookie;
 
@@ -56,6 +59,9 @@ class AuthorizationServiceTest {
 
 	@Mock
 	JwtProviderService jwtProviderService;
+
+	@Mock
+	TokenRepository tokenRepository;
 
 	OAuthConfig oauthConfig;
 	TokenConfig tokenConfig;
@@ -82,7 +88,7 @@ class AuthorizationServiceTest {
 		);
 		noPropertyService = new AuthorizationService(noOAuthConfig, tokenConfig,
 			oAuth2AuthorizationServerRequestService,
-			memberService, jwtProviderService);
+			memberService, jwtProviderService, tokenRepository);
 	}
 
 	@DisplayName("인가코드 URI 생성 매퍼 실패")
@@ -246,5 +252,44 @@ class AuthorizationServiceTest {
 			() -> assertThat(refreshCookie.isHttpOnly()).isTrue(),
 			() -> assertThat(refreshCookie.getPath()).isEqualTo("/")
 		);
+	}
+
+	@DisplayName("토큰 redis 검증")
+	@Test
+	void valid_token_in_redis() {
+		// Given
+		willReturn(TokenSaveValueFixture.tokenSaveValue("token"))
+			.given(tokenRepository).getTokenSaveValue(1L);
+
+		// When + Then
+		assertThatNoException().isThrownBy(() ->
+			authorizationService.validTokenPair(1L, "token"));
+	}
+
+	@DisplayName("토큰이 null 이어서 예외 발생")
+	@Test
+	void valid_token_failby_token_is_null() {
+		// Given
+		willReturn(null)
+			.given(tokenRepository).getTokenSaveValue(1L);
+
+		// When + Then
+		assertThatThrownBy(() -> authorizationService.validTokenPair(1L, "token"))
+			.isInstanceOf(UnauthorizedException.class)
+			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
+	}
+
+	@DisplayName("이전 토큰과 동일한지 검증")
+	@Test
+	void valid_token_failby_notEquals_token() {
+		// Given
+		willReturn(TokenSaveValueFixture.tokenSaveValue("token"))
+			.given(tokenRepository).getTokenSaveValue(1L);
+
+		// When + Then
+		assertThatThrownBy(() -> authorizationService.validTokenPair(1L, "oldToken"))
+			.isInstanceOf(UnauthorizedException.class)
+			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
+		verify(tokenRepository).delete(1L);
 	}
 }

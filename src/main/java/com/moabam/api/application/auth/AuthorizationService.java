@@ -1,5 +1,7 @@
 package com.moabam.api.application.auth;
 
+import static java.util.Objects.*;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +9,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.moabam.api.application.auth.mapper.AuthMapper;
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.dto.auth.AuthorizationCodeRequest;
@@ -15,12 +18,15 @@ import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.api.dto.auth.TokenSaveValue;
+import com.moabam.api.infrastructure.redis.TokenRepository;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
+import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,6 +41,7 @@ public class AuthorizationService {
 	private final OAuth2AuthorizationServerRequestService oauth2AuthorizationServerRequestService;
 	private final MemberService memberService;
 	private final JwtProviderService jwtProviderService;
+	private final TokenRepository tokenRepository;
 
 	public void redirectToLoginPage(HttpServletResponse httpServletResponse) {
 		String authorizationCodeUri = getAuthorizationCodeUri();
@@ -121,13 +128,31 @@ public class AuthorizationService {
 	}
 
 	public void issueServiceToken(HttpServletResponse response, PublicClaim publicClaim) {
+		String accessToken = jwtProviderService.provideAccessToken(publicClaim);
+		String refreshToken = jwtProviderService.provideRefreshToken();
+		TokenSaveValue tokenSaveRequest = AuthMapper.toTokenSaveRequest(accessToken, refreshToken, null);
+
+		tokenRepository.saveToken(publicClaim.id(), tokenSaveRequest);
+
 		response.addCookie(
 			CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()));
 		response.addCookie(
-			CookieUtils.tokenCookie("access_token", jwtProviderService.provideAccessToken(publicClaim),
-				tokenConfig.getRefreshExpire()));
+			CookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire()));
 		response.addCookie(
-			CookieUtils.tokenCookie("refresh_token", jwtProviderService.provideRefreshToken(),
-				tokenConfig.getRefreshExpire()));
+			CookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire()));
+	}
+
+	public void validTokenPair(Long id, String oldRefreshToken) {
+		TokenSaveValue tokenSaveValue = tokenRepository.getTokenSaveValue(id);
+
+		if (isNull(tokenSaveValue)) {
+			throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
+		}
+
+		if (!tokenSaveValue.refreshToken().equals(oldRefreshToken)) {
+			tokenRepository.delete(id);
+
+			throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
+		}
 	}
 }
