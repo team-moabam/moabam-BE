@@ -858,4 +858,31 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		assertThat(getMemberParticipant.getDeletedAt()).isNotNull();
 		assertThat(participantSearchRepository.findOne(member.getId(), room.getId())).isEmpty();
 	}
+
+	@DisplayName("현재 참여중인 모든 방 조회 성공 - 첫번째 방은 개인과 방 모두 인증 성공")
+	@WithMember(id = 1L)
+	@Test
+	void get_all_my_rooms_success() throws Exception {
+		// given
+		Room room1 = RoomFixture.room("아침 - 첫 번째 방", MORNING, 10);
+		Room room2 = RoomFixture.room("아침 - 두 번째 방", MORNING, 8);
+		Room room3 = RoomFixture.room("밤 - 세 번째 방", NIGHT, 22);
+
+		Participant participant1 = RoomFixture.participant(room1, 1L);
+		Participant participant2 = RoomFixture.participant(room2, 1L);
+		Participant participant3 = RoomFixture.participant(room3, 1L);
+
+		DailyMemberCertification dailyMemberCertification = RoomFixture.dailyMemberCertification(1L, 1L, participant1);
+		DailyRoomCertification dailyRoomCertification = RoomFixture.dailyRoomCertification(1L, LocalDate.now());
+
+		roomRepository.saveAll(List.of(room1, room2, room3));
+		participantRepository.saveAll(List.of(participant1, participant2, participant3));
+		dailyMemberCertificationRepository.save(dailyMemberCertification);
+		dailyRoomCertificationRepository.save(dailyRoomCertification);
+
+		// expected
+		mockMvc.perform(get("/rooms/my-join"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
 }
