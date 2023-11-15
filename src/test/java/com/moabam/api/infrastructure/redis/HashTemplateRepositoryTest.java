@@ -15,8 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.global.config.EmbeddedRedisConfig;
 import com.moabam.global.config.RedisConfig;
+<<<<<<< HEAD
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
+=======
+>>>>>>> b7ca2493ffc73b73c54b3b68b1378b7261f21dcf
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 @SpringBootTest(classes = {RedisConfig.class, EmbeddedRedisConfig.class, HashTemplateRepository.class})
@@ -61,6 +64,7 @@ class HashTemplateRepositoryTest {
 		hashTemplateRepository.delete(key);
 
 		// When + Then
+<<<<<<< HEAD
 		assertThatThrownBy(() -> hashTemplateRepository.get(key))
 			.isInstanceOf(UnauthorizedException.class)
 			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
@@ -73,5 +77,8 @@ class HashTemplateRepositoryTest {
 		assertThatThrownBy(() -> hashTemplateRepository.get("0"))
 			.isInstanceOf(UnauthorizedException.class)
 			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
+=======
+		assertThat(hashTemplateRepository.get(key)).isNull();
+>>>>>>> b7ca2493ffc73b73c54b3b68b1378b7261f21dcf
 	}
 }
