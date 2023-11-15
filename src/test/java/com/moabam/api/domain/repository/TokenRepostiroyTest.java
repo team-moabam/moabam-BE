@@ -21,7 +21,7 @@ import com.moabam.api.infrastructure.redis.TokenRepository;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 @ExtendWith(MockitoExtension.class)
-public class TokenRepostiroyTest {
+class TokenRepostiroyTest {
 
 	@InjectMocks
 	TokenRepository tokenRepository;

@@ -1,4 +1,4 @@
-package com.moabam.global.common.repository;
+package com.moabam.api.infrastructure.redis;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,13 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.moabam.api.dto.auth.TokenSaveValue;
-import com.moabam.api.infrastructure.redis.HashTemplateRepository;
 import com.moabam.global.config.EmbeddedRedisConfig;
 import com.moabam.global.config.RedisConfig;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 @SpringBootTest(classes = {RedisConfig.class, EmbeddedRedisConfig.class, HashTemplateRepository.class})
-public class HashTemplateRepositoryTest {
+class HashTemplateRepositoryTest {
 
 	@Autowired
 	private HashTemplateRepository hashTemplateRepository;
