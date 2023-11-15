@@ -20,7 +20,7 @@ import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.dto.notification.KnockNotificationStatusResponse;
 import com.moabam.api.infrastructure.redis.NotificationRepository;
-import com.moabam.global.auth.annotation.MemberTest;
+import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -38,10 +38,10 @@ public class NotificationService {
 	private final ParticipantSearchRepository participantSearchRepository;
 
 	@Transactional
-	public void sendKnockNotification(MemberTest member, Long targetId, Long roomId) {
+	public void sendKnockNotification(AuthorizationMember member, Long targetId, Long roomId) {
 		roomService.validateRoomById(roomId);
 
-		String knockKey = generateKnockKey(member.memberId(), targetId, roomId);
+		String knockKey = generateKnockKey(member.id(), targetId, roomId);
 		validateConflictKnockNotification(knockKey);
 		validateFcmToken(targetId);
 
@@ -65,12 +65,12 @@ public class NotificationService {
 	/**
 	 * TODO : 영명-재윤님 방 조회하실 때, 특정 사용자의 방 내 참여자들에 대한 콕 찌르기 여부를 반환해주는 메서드이니 사용하시기 바랍니다.
 	 */
-	public KnockNotificationStatusResponse checkMyKnockNotificationStatusInRoom(MemberTest member, Long roomId) {
-		List<Participant> participants = participantSearchRepository.findOtherParticipantsInRoom(member.memberId(),
-			roomId);
+	public KnockNotificationStatusResponse checkMyKnockNotificationStatusInRoom(AuthorizationMember member,
+		Long roomId) {
+		List<Participant> participants = participantSearchRepository.findOtherParticipantsInRoom(member.id(), roomId);
 
 		Predicate<Long> knockPredicate = targetId ->
-			notificationRepository.existsByKey(generateKnockKey(member.memberId(), targetId, roomId));
+			notificationRepository.existsByKey(generateKnockKey(member.id(), targetId, roomId));
 
 		Map<Boolean, List<Long>> knockNotificationStatus = participants.stream()
 			.map(Participant::getMemberId)

@@ -4,45 +4,31 @@ import static com.moabam.api.domain.room.RoomType.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.moabam.api.application.image.ImageService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.room.RoomService;
 import com.moabam.api.application.room.mapper.RoomMapper;
-import com.moabam.api.domain.image.ImageType;
 import com.moabam.api.domain.member.Member;
-import com.moabam.api.domain.room.DailyMemberCertification;
-import com.moabam.api.domain.room.DailyRoomCertification;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.Routine;
-import com.moabam.api.domain.room.repository.CertificationRepository;
-import com.moabam.api.domain.room.repository.CertificationsSearchRepository;
-import com.moabam.api.domain.room.repository.DailyMemberCertificationRepository;
-import com.moabam.api.domain.room.repository.DailyRoomCertificationRepository;
 import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoutineRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
-import com.moabam.global.common.util.ClockHolder;
+import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.RoomFixture;
 
@@ -65,56 +51,7 @@ class RoomServiceTest {
 	private ParticipantRepository participantRepository;
 
 	@Mock
-	private CertificationRepository certificationRepository;
-
-	@Mock
-	private CertificationsSearchRepository certificationsSearchRepository;
-
-	@Mock
 	private ParticipantSearchRepository participantSearchRepository;
-
-	@Mock
-	private DailyRoomCertificationRepository dailyRoomCertificationRepository;
-
-	@Mock
-	private DailyMemberCertificationRepository dailyMemberCertificationRepository;
-
-	@Mock
-	private ImageService imageService;
-
-	@Mock
-	private ClockHolder clockHolder;
-
-	@Spy
-	private Room room;
-
-	@Spy
-	private Participant participant;
-
-	private Member member1;
-	private Member member2;
-	private Member member3;
-	private LocalDate today;
-	private Long memberId;
-	private Long roomId;
-
-	@BeforeEach
-	void init() {
-		room = spy(RoomFixture.room());
-		participant = spy(RoomFixture.participant(room, 1L));
-		member1 = MemberFixture.member(1L, "회원1");
-		member2 = MemberFixture.member(2L, "회원2");
-		member3 = MemberFixture.member(3L, "회원3");
-
-		lenient().when(room.getId()).thenReturn(1L);
-		lenient().when(participant.getRoom()).thenReturn(room);
-
-		today = LocalDate.now();
-		memberId = 1L;
-		roomId = room.getId();
-		room.levelUp();
-		room.levelUp();
-	}
 
 	@DisplayName("비밀번호 없는 방 생성 성공")
 	@Test
@@ -124,11 +61,14 @@ class RoomServiceTest {
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
 
+		Member member = spy(MemberFixture.member());
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"재윤과 앵맹이의 방임", null, routines, MORNING, 10, 4);
 
 		Room expectedRoom = RoomMapper.toRoomEntity(createRoomRequest);
 		given(roomRepository.save(any(Room.class))).willReturn(expectedRoom);
+		given(memberService.getById(1L)).willReturn(member);
 
 		// when
 		Long result = roomService.createRoom(1L, createRoomRequest);
@@ -149,11 +89,14 @@ class RoomServiceTest {
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
 
+		Member member = spy(MemberFixture.member());
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"재윤과 앵맹이의 방임", "1234", routines, MORNING, 10, 4);
 
 		Room expectedRoom = RoomMapper.toRoomEntity(createRoomRequest);
 		given(roomRepository.save(any(Room.class))).willReturn(expectedRoom);
+		given(memberService.getById(1L)).willReturn(member);
 
 		// when
 		Long result = roomService.createRoom(1L, createRoomRequest);
@@ -166,70 +109,53 @@ class RoomServiceTest {
 		assertThat(expectedRoom.getPassword()).isEqualTo("1234");
 	}
 
-	@DisplayName("이미 인증되어 있는 방에서 루틴 인증 성공")
+	@DisplayName("방장 위임 성공")
 	@Test
-	void already_certified_room_routine_success() {
+	void room_manager_mandate_success() {
 		// given
-		List<Routine> routines = RoomFixture.routines(room);
-		DailyRoomCertification dailyRoomCertification = RoomFixture.dailyRoomCertification(roomId, today);
-		MockMultipartFile image = RoomFixture.makeMultipartFile1();
-		List<MultipartFile> images = List.of(image, image, image);
-		List<String> uploadImages = new ArrayList<>();
-		uploadImages.add("https://image.moabam.com/certifications/20231108/1_asdfsdfxcv-4815vcx-asfd");
-		uploadImages.add("https://image.moabam.com/certifications/20231108/2_asdfsdfxcv-4815vcx-asfd");
+		Long managerId = 1L;
+		Long memberId = 2L;
 
-		given(imageService.uploadImages(images, ImageType.CERTIFICATION)).willReturn(uploadImages);
-		given(clockHolder.times()).willReturn(LocalDateTime.now().withHour(9).withMinute(58));
-		given(participantSearchRepository.findOne(memberId, roomId)).willReturn(Optional.of(participant));
-		given(memberService.getById(memberId)).willReturn(member1);
-		given(routineRepository.findById(1L)).willReturn(Optional.of(routines.get(0)));
-		given(routineRepository.findById(2L)).willReturn(Optional.of(routines.get(1)));
-		given(certificationsSearchRepository.findDailyRoomCertification(roomId, today)).willReturn(
-			Optional.of(dailyRoomCertification));
+		Room room = spy(RoomFixture.room());
+		given(room.getId()).willReturn(1L);
+
+		Participant memberParticipant = RoomFixture.participant(room, memberId);
+		Participant managerParticipant = RoomFixture.participant(room, managerId);
+		managerParticipant.enableManager();
+
+		given(participantSearchRepository.findOne(memberId, room.getId())).willReturn(
+			Optional.of(memberParticipant));
+		given(participantSearchRepository.findOne(managerId, room.getId())).willReturn(
+			Optional.of(managerParticipant));
 
 		// when
-		roomService.certifyRoom(memberId, roomId, images);
+		roomService.mandateRoomManager(managerId, room.getId(), memberId);
 
 		// then
-		assertThat(member1.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member1.getTotalCertifyCount()).isEqualTo(1);
+		assertThat(managerParticipant.isManager()).isFalse();
+		assertThat(memberParticipant.isManager()).isTrue();
 	}
 
-	@DisplayName("인증되지 않은 방에서 루틴 인증 후 방의 인증 성공")
+	@DisplayName("방장 위임 실패 - 방장이 아닌 유저가 요청할 때")
 	@Test
-	void not_certified_room_routine_success() {
+	void room_manager_mandate_fail() {
 		// given
-		List<Routine> routines = RoomFixture.routines(room);
-		MockMultipartFile image = RoomFixture.makeMultipartFile1();
-		List<DailyMemberCertification> dailyMemberCertifications =
-			RoomFixture.dailyMemberCertifications(roomId, participant);
-		List<MultipartFile> images = List.of(image, image, image);
-		List<String> uploadImages = new ArrayList<>();
-		uploadImages.add("https://image.moabam.com/certifications/20231108/1_asdfsdfxcv-4815vcx-asfd");
-		uploadImages.add("https://image.moabam.com/certifications/20231108/2_asdfsdfxcv-4815vcx-asfd");
+		Long managerId = 1L;
+		Long memberId = 2L;
 
-		given(imageService.uploadImages(images, ImageType.CERTIFICATION)).willReturn(uploadImages);
-		given(clockHolder.times()).willReturn(LocalDateTime.now().withHour(9).withMinute(58));
-		given(participantSearchRepository.findOne(memberId, roomId)).willReturn(Optional.of(participant));
-		given(memberService.getById(memberId)).willReturn(member1);
-		given(routineRepository.findById(1L)).willReturn(Optional.of(routines.get(0)));
-		given(routineRepository.findById(2L)).willReturn(Optional.of(routines.get(1)));
-		given(certificationsSearchRepository.findDailyRoomCertification(roomId, today))
-			.willReturn(Optional.empty());
-		given(certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today))
-			.willReturn(dailyMemberCertifications);
-		given(memberService.getRoomMembers(anyList())).willReturn(List.of(member1, member2, member3));
+		Room room = spy(RoomFixture.room());
+		given(room.getId()).willReturn(1L);
 
-		// when
-		roomService.certifyRoom(memberId, roomId, images);
+		Participant memberParticipant = RoomFixture.participant(room, memberId);
+		Participant managerParticipant = RoomFixture.participant(room, managerId);
 
-		// then
-		assertThat(member1.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member2.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member3.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member3.getBug().getNightBug()).isEqualTo(20);
-		assertThat(member3.getBug().getGoldenBug()).isEqualTo(30);
-		assertThat(room.getExp()).isEqualTo(1);
-		assertThat(room.getLevel()).isEqualTo(2);
+		given(participantSearchRepository.findOne(memberId, room.getId())).willReturn(
+			Optional.of(memberParticipant));
+		given(participantSearchRepository.findOne(managerId, room.getId())).willReturn(
+			Optional.of(managerParticipant));
+
+		// when, then
+		assertThatThrownBy(() -> roomService.mandateRoomManager(managerId, 1L, memberId))
+			.isInstanceOf(ForbiddenException.class);
 	}
 }
