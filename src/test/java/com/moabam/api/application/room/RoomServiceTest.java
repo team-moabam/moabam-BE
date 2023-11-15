@@ -1,4 +1,4 @@
-package com.moabam.api.application;
+package com.moabam.api.application.room;
 
 import static com.moabam.api.domain.room.RoomType.*;
 import static org.assertj.core.api.Assertions.*;
@@ -17,8 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.application.member.MemberService;
-import com.moabam.api.application.room.RoomService;
 import com.moabam.api.application.room.mapper.RoomMapper;
+import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.Routine;
@@ -28,6 +28,7 @@ import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoutineRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.global.error.exception.ForbiddenException;
+import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,11 +60,14 @@ class RoomServiceTest {
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
 
+		Member member = spy(MemberFixture.member());
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"재윤과 앵맹이의 방임", null, routines, MORNING, 10, 4);
 
 		Room expectedRoom = RoomMapper.toRoomEntity(createRoomRequest);
 		given(roomRepository.save(any(Room.class))).willReturn(expectedRoom);
+		given(memberService.getById(1L)).willReturn(member);
 
 		// when
 		Long result = roomService.createRoom(1L, createRoomRequest);
@@ -84,11 +88,14 @@ class RoomServiceTest {
 		routines.add("물 마시기");
 		routines.add("코테 풀기");
 
+		Member member = spy(MemberFixture.member());
+
 		CreateRoomRequest createRoomRequest = new CreateRoomRequest(
 			"재윤과 앵맹이의 방임", "1234", routines, MORNING, 10, 4);
 
 		Room expectedRoom = RoomMapper.toRoomEntity(createRoomRequest);
 		given(roomRepository.save(any(Room.class))).willReturn(expectedRoom);
+		given(memberService.getById(1L)).willReturn(member);
 
 		// when
 		Long result = roomService.createRoom(1L, createRoomRequest);
@@ -128,7 +135,7 @@ class RoomServiceTest {
 		assertThat(memberParticipant.isManager()).isTrue();
 	}
 
-	@DisplayName("방장 위임 실패 - 방장이 아닌 유저가 요청할때")
+	@DisplayName("방장 위임 실패 - 방장이 아닌 유저가 요청할 때")
 	@Test
 	void room_manager_mandate_fail() {
 		// given

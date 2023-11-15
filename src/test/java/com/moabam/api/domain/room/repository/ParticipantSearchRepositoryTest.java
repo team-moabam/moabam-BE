@@ -1,4 +1,4 @@
-package com.moabam.api.domain.repository;
+package com.moabam.api.domain.room.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -13,9 +13,6 @@ import org.springframework.context.annotation.Import;
 
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
-import com.moabam.api.domain.room.repository.ParticipantRepository;
-import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
-import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.global.config.JpaConfig;
 
 @DataJpaTest
