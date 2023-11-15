@@ -21,6 +21,7 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
+import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
 import com.moabam.global.auth.annotation.CurrentMember;
 import com.moabam.global.auth.model.AuthorizationMember;
@@ -97,5 +98,11 @@ public class RoomController {
 		@PathVariable("roomId") Long roomId, @PathVariable("memberId") Long memberId) {
 
 		roomService.deportParticipant(authorizationMember.id(), roomId, memberId);
+	}
+
+	@GetMapping("/my-join")
+	@ResponseStatus(HttpStatus.OK)
+	public MyRoomsResponse getMyRooms(@CurrentMember AuthorizationMember authorizationMember) {
+		return roomSearchService.getMyRooms(authorizationMember.id());
 	}
 }
