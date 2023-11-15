@@ -45,7 +45,13 @@ public class WebConfig implements WebMvcConfigurer {
 			.permitAll(List.of(
 				PathMapper.parsePath("/"),
 				PathMapper.parsePath("/members"),
-				PathMapper.parsePath("/members/login/*/oauth")
+				PathMapper.parsePath("/members/login/*/oauth"),
+				PathMapper.parsePath("/css/*"),
+				PathMapper.parsePath("/js/*"),
+				PathMapper.parsePath("/images/*"),
+				PathMapper.parsePath("/webjars/*"),
+				PathMapper.parsePath("/favicon/*"),
+				PathMapper.parsePath("/*/icon-*")
 			))
 			.build();
 

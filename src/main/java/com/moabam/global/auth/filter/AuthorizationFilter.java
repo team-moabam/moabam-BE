@@ -51,6 +51,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 			invoke(httpServletRequest, httpServletResponse);
 		} catch (UnauthorizedException unauthorizedException) {
 			log.error("Login Failed");
+			expireToken(httpServletRequest, httpServletResponse);
 			handlerExceptionResolver.resolveException(httpServletRequest, httpServletResponse, null,
 				unauthorizedException);
 
@@ -92,6 +93,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 				throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
 			}
 
+			// 토큰이 내가 발급해 준 토큰인지 확인
+			authorizationService.validTokenPair(publicClaim.id(), refreshToken);
 			authorizationService.issueServiceToken(httpServletResponse, publicClaim);
 		}
 
@@ -109,5 +112,19 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 			.map(Cookie::getValue)
 			.findFirst()
 			.orElseThrow(() -> new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL));
+	}
+
+	private void expireToken(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+		if (httpServletRequest.getCookies() == null) {
+			return;
+		}
+
+		Arrays.stream(httpServletRequest.getCookies())
+			.forEach(cookie -> {
+				if (cookie.getName().contains("token")) {
+					cookie.setMaxAge(0);
+					httpServletResponse.addCookie(cookie);
+				}
+			});
 	}
 }
