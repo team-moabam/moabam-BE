@@ -34,11 +34,22 @@ public class ParticipantSearchRepository {
 		);
 	}
 
-	public List<Participant> findParticipants(Long roomId) {
+	public List<Participant> findParticipantsByRoomId(Long roomId) {
 		return jpaQueryFactory
 			.selectFrom(participant)
 			.where(
 				participant.room.id.eq(roomId),
+				participant.deletedAt.isNull()
+			)
+			.fetch();
+	}
+
+	public List<Participant> findParticipantsByMemberId(Long memberId) {
+		return jpaQueryFactory
+			.selectFrom(participant)
+			.join(participant.room, room).fetchJoin()
+			.where(
+				participant.memberId.eq(memberId),
 				participant.deletedAt.isNull()
 			)
 			.fetch();
