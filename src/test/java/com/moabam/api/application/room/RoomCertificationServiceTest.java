@@ -1,7 +1,7 @@
-package com.moabam.api.application;
+package com.moabam.api.application.room;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.moabam.api.application.image.ImageService;
 import com.moabam.api.application.member.MemberService;
-import com.moabam.api.application.room.RoomCertificationService;
 import com.moabam.api.domain.image.ImageType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.room.DailyMemberCertification;

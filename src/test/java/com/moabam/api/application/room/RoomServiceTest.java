@@ -1,4 +1,4 @@
-package com.moabam.api.application;
+package com.moabam.api.application.room;
 
 import static com.moabam.api.domain.room.RoomType.*;
 import static org.assertj.core.api.Assertions.*;
@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.application.member.MemberService;
-import com.moabam.api.application.room.RoomService;
 import com.moabam.api.application.room.mapper.RoomMapper;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.room.Participant;

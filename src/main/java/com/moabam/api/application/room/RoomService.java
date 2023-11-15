@@ -78,7 +78,7 @@ public class RoomService {
 		room.changeCertifyTime(modifyRoomRequest.certifyTime());
 		room.changeMaxCount(modifyRoomRequest.maxUserCount());
 
-		List<Routine> routines = routineSearchRepository.findByRoomId(roomId);
+		List<Routine> routines = routineSearchRepository.findAllByRoomId(roomId);
 		routineRepository.deleteAll(routines);
 
 		List<Routine> newRoutines = RoutineMapper.toRoutineEntities(room, modifyRoomRequest.routines());

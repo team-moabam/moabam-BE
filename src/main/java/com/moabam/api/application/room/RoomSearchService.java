@@ -64,7 +64,7 @@ public class RoomSearchService {
 	}
 
 	private List<RoutineResponse> getRoutineResponses(Long roomId) {
-		List<Routine> roomRoutines = routineSearchRepository.findByRoomId(roomId);
+		List<Routine> roomRoutines = routineSearchRepository.findAllByRoomId(roomId);
 
 		return RoutineMapper.toRoutineResponses(roomRoutines);
 	}

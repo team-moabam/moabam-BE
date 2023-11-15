@@ -1,4 +1,4 @@
-package com.moabam.api.domain.repository;
+package com.moabam.api.domain.room.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -16,13 +16,6 @@ import com.moabam.api.domain.room.DailyRoomCertification;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.Routine;
-import com.moabam.api.domain.room.repository.CertificationRepository;
-import com.moabam.api.domain.room.repository.CertificationsSearchRepository;
-import com.moabam.api.domain.room.repository.DailyMemberCertificationRepository;
-import com.moabam.api.domain.room.repository.DailyRoomCertificationRepository;
-import com.moabam.api.domain.room.repository.ParticipantRepository;
-import com.moabam.api.domain.room.repository.RoomRepository;
-import com.moabam.api.domain.room.repository.RoutineRepository;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
 import com.moabam.support.fixture.RoomFixture;
 
