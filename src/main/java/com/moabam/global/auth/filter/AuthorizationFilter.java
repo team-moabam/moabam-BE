@@ -15,7 +15,6 @@ import com.moabam.api.application.auth.JwtAuthenticationService;
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.auth.model.PublicClaim;
-import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -52,7 +51,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 			invoke(httpServletRequest, httpServletResponse);
 		} catch (UnauthorizedException unauthorizedException) {
 			log.error("Login Failed");
-			expireToken(httpServletRequest, httpServletResponse);
+			authorizationService.removeToken(httpServletRequest, httpServletResponse);
 			handlerExceptionResolver.resolveException(httpServletRequest, httpServletResponse, null,
 				unauthorizedException);
 
@@ -112,18 +111,5 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 			.map(Cookie::getValue)
 			.findFirst()
 			.orElseThrow(() -> new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL));
-	}
-
-	private void expireToken(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-		if (httpServletRequest.getCookies() == null) {
-			return;
-		}
-
-		Arrays.stream(httpServletRequest.getCookies())
-			.forEach(cookie -> {
-				if (cookie.getName().contains("token")) {
-					httpServletResponse.addCookie(CookieUtils.deleteCookie(cookie));
-				}
-			});
 	}
 }
