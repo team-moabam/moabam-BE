@@ -71,6 +71,8 @@ class ItemServiceTest {
 		ItemType type = ItemType.MORNING;
 		Item item1 = morningSantaSkin().build();
 		Item item2 = morningKillerSkin().build();
+		Inventory inventory = inventory(memberId, item1);
+		given(inventorySearchRepository.findDefault(memberId, type)).willReturn(Optional.of(inventory));
 		given(inventorySearchRepository.findItems(memberId, type)).willReturn(List.of(item1, item2));
 		given(itemSearchRepository.findNotPurchasedItems(memberId, type)).willReturn(emptyList());
 
