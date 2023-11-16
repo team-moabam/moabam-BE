@@ -12,7 +12,10 @@ import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.global.auth.annotation.CurrentMember;
+import com.moabam.global.auth.model.AuthorizationMember;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -37,5 +40,12 @@ public class MemberController {
 			authorizationService.requestTokenInfo(tokenResponse);
 
 		return authorizationService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
+	}
+
+	@GetMapping("/logout")
+	@ResponseStatus(HttpStatus.OK)
+	public void logout(@CurrentMember AuthorizationMember authorizationMember,
+		HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+		authorizationService.logout(authorizationMember, httpServletRequest, httpServletResponse);
 	}
 }
