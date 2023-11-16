@@ -4,6 +4,7 @@ import static com.moabam.global.auth.model.AuthorizationThreadLocal.*;
 import static com.moabam.support.fixture.BugFixture.*;
 import static com.moabam.support.fixture.BugHistoryFixture.*;
 import static com.moabam.support.fixture.MemberFixture.*;
+import static com.moabam.support.fixture.ProductFixture.*;
 import static java.nio.charset.StandardCharsets.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -26,10 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.bug.BugMapper;
 import com.moabam.api.application.member.MemberService;
+import com.moabam.api.application.product.ProductMapper;
 import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
+import com.moabam.api.domain.product.Product;
+import com.moabam.api.domain.product.repository.ProductRepository;
 import com.moabam.api.dto.TodayBugResponse;
 import com.moabam.api.dto.bug.BugResponse;
+import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 
@@ -52,6 +57,9 @@ class BugControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	BugHistorySearchRepository bugHistorySearchRepository;
+
+	@Autowired
+	ProductRepository productRepository;
 
 	@DisplayName("벌레를 조회한다.")
 	@WithMember
@@ -95,6 +103,25 @@ class BugControllerTest extends WithoutFilterSupporter {
 			.getResponse()
 			.getContentAsString(UTF_8);
 		TodayBugResponse actual = objectMapper.readValue(content, TodayBugResponse.class);
+		assertThat(actual).isEqualTo(expected);
+	}
+
+	@DisplayName("벌레 상품 목록을 조회한다.")
+	@Test
+	void get_products_success() throws Exception {
+		// given
+		List<Product> products = productRepository.saveAll(List.of(bugProduct(), bugProduct()));
+		ProductsResponse expected = ProductMapper.toProductsResponse(products);
+
+		// when, then
+		String content = mockMvc.perform(get("/bugs/products")
+				.contentType(APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(UTF_8);
+		ProductsResponse actual = objectMapper.readValue(content, ProductsResponse.class);
 		assertThat(actual).isEqualTo(expected);
 	}
 }

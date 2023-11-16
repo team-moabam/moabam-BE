@@ -1,4 +1,4 @@
-package com.moabam.api.domain.repository;
+package com.moabam.api.domain.item.repository;
 
 import static com.moabam.support.fixture.InventoryFixture.*;
 import static com.moabam.support.fixture.ItemFixture.*;
@@ -13,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.ItemType;
-import com.moabam.api.domain.item.repository.InventoryRepository;
-import com.moabam.api.domain.item.repository.ItemRepository;
-import com.moabam.api.domain.item.repository.ItemSearchRepository;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
 
 @QuerydslRepositoryTest

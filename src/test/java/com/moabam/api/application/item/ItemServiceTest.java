@@ -1,4 +1,4 @@
-package com.moabam.api.application;
+package com.moabam.api.application.item;
 
 import static com.moabam.support.fixture.InventoryFixture.*;
 import static com.moabam.support.fixture.ItemFixture.*;
@@ -19,7 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.application.item.ItemService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.bug.BugHistory;
 import com.moabam.api.domain.bug.BugType;

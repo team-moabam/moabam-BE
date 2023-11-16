@@ -37,6 +37,23 @@ public class RoomFixture {
 			.build();
 	}
 
+	public static Room room(String title, RoomType roomType, int certifyTime) {
+		return Room.builder()
+			.title(title)
+			.roomType(roomType)
+			.certifyTime(certifyTime)
+			.maxUserCount(8)
+			.build();
+	}
+
+	public static List<Room> rooms() {
+		return List.of(
+			room("아침 - 첫 번째 방", RoomType.MORNING, 10),
+			room("아침 - 두 번째 방", RoomType.MORNING, 9),
+			room("밤 - 첫 번째 방", RoomType.NIGHT, 22)
+		);
+	}
+
 	public static Participant participant(Room room, Long memberId) {
 		return Participant.builder()
 			.room(room)
