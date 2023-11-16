@@ -112,6 +112,15 @@ public class RoomCertificationService {
 		}
 	}
 
+	public boolean existsMemberCertification(Long memberId, Long roomId, LocalDate date) {
+		return dailyMemberCertificationRepository.existsByMemberIdAndRoomIdAndCreatedAtBetween(memberId, roomId,
+			date.atStartOfDay(), date.atTime(LocalTime.MAX));
+	}
+
+	public boolean existsRoomCertification(Long roomId, LocalDate date) {
+		return dailyRoomCertificationRepository.existsByRoomIdAndCertifiedAt(roomId, date);
+	}
+
 	private void validateCertifyTime(LocalDateTime now, int certifyTime) {
 		LocalTime targetTime = LocalTime.of(certifyTime, 0);
 		LocalDateTime minusTenMinutes = LocalDateTime.of(now.toLocalDate(), targetTime).minusMinutes(10);
