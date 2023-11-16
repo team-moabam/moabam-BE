@@ -1,6 +1,7 @@
 package com.moabam.api.application.room;
 
-import static com.moabam.global.error.model.ErrorMessage.*;
+import static com.moabam.global.error.model.ErrorMessage.PARTICIPANT_NOT_FOUND;
+import static com.moabam.global.error.model.ErrorMessage.ROOM_DETAILS_ERROR;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -29,6 +30,8 @@ import com.moabam.api.dto.room.CertificationImageResponse;
 import com.moabam.api.dto.room.MyRoomResponse;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
+import com.moabam.api.dto.room.RoomHistoryResponse;
+import com.moabam.api.dto.room.RoomsHistoryResponse;
 import com.moabam.api.dto.room.RoutineResponse;
 import com.moabam.api.dto.room.TodayCertificateRankResponse;
 import com.moabam.global.error.exception.NotFoundException;
@@ -69,7 +72,7 @@ public class RoomSearchService {
 	public MyRoomsResponse getMyRooms(Long memberId) {
 		LocalDate today = LocalDate.now();
 		List<MyRoomResponse> myRoomResponses = new ArrayList<>();
-		List<Participant> participants = participantSearchRepository.findParticipantsByMemberId(memberId);
+		List<Participant> participants = participantSearchRepository.findNotDeletedParticipantsByMemberId(memberId);
 
 		for (Participant participant : participants) {
 			Room room = participant.getRoom();
@@ -81,6 +84,25 @@ public class RoomSearchService {
 		}
 
 		return RoomMapper.toMyRoomsResponse(myRoomResponses);
+	}
+
+	public RoomsHistoryResponse getJoinHistory(Long memberId) {
+		List<Participant> participants = participantSearchRepository.findAllParticipantsByMemberId(memberId);
+		List<RoomHistoryResponse> roomHistoryResponses = new ArrayList<>();
+
+		for (Participant participant : participants) {
+			if (participant.getRoom() == null) {
+				roomHistoryResponses.add(RoomMapper.toRoomHistoryResponse(null,
+					participant.getDeletedRoomTitle(), participant));
+
+				continue;
+			}
+
+			roomHistoryResponses.add(RoomMapper.toRoomHistoryResponse(participant.getRoom().getId(),
+				participant.getRoom().getTitle(), participant));
+		}
+
+		return RoomMapper.toRoomsHistoryResponse(roomHistoryResponses);
 	}
 
 	private List<RoutineResponse> getRoutineResponses(Long roomId) {
