@@ -22,7 +22,6 @@ import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.domain.room.repository.CertificationsSearchRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
-import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoutineSearchRepository;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
@@ -48,9 +47,6 @@ class RoomSearchServiceTest {
 
 	@Mock
 	private RoomCertificationService certificationService;
-
-	@Mock
-	private RoomRepository roomRepository;
 
 	@DisplayName("유저가 참여중인 방 목록 조회 성공")
 	@Test
