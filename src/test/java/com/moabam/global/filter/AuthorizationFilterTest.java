@@ -171,5 +171,4 @@ class AuthorizationFilterTest {
 		AuthorizationMember authorizationMember = AuthorizationThreadLocal.getAuthorizationMember();
 		assertThat(authorizationMember.id()).isEqualTo(1L);
 	}
-
 }

@@ -12,7 +12,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.StringUtils;
 
@@ -56,6 +58,15 @@ public class EmbeddedRedisConfig {
 		stringRedisTemplate.setConnectionFactory(redisConnectionFactory);
 
 		return stringRedisTemplate;
+	}
+
+	@Bean
+	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+		redisTemplate.setDefaultSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+		redisTemplate.setConnectionFactory(redisConnectionFactory);
+
+		return redisTemplate;
 	}
 
 	public void startRedis() {
