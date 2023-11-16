@@ -15,11 +15,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.moabam.api.application.room.RoomCertificationService;
+import com.moabam.api.application.room.RoomSearchService;
 import com.moabam.api.application.room.RoomService;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
 import com.moabam.api.dto.room.RoomDetailsResponse;
+import com.moabam.global.auth.annotation.CurrentMember;
+import com.moabam.global.auth.model.AuthorizationMember;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,41 +34,68 @@ import lombok.RequiredArgsConstructor;
 public class RoomController {
 
 	private final RoomService roomService;
+	private final RoomSearchService roomSearchService;
+	private final RoomCertificationService roomCertificationService;
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Long createRoom(@Valid @RequestBody CreateRoomRequest createRoomRequest) {
-		return roomService.createRoom(1L, createRoomRequest);
+	public Long createRoom(@CurrentMember AuthorizationMember authorizationMember,
+		@Valid @RequestBody CreateRoomRequest createRoomRequest) {
+
+		return roomService.createRoom(authorizationMember.id(), createRoomRequest);
 	}
 
 	@PutMapping("/{roomId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void modifyRoom(@Valid @RequestBody ModifyRoomRequest modifyRoomRequest,
-		@PathVariable("roomId") Long roomId) {
-		roomService.modifyRoom(1L, roomId, modifyRoomRequest);
+	public void modifyRoom(@CurrentMember AuthorizationMember authorizationMember,
+		@Valid @RequestBody ModifyRoomRequest modifyRoomRequest, @PathVariable("roomId") Long roomId) {
+
+		roomService.modifyRoom(authorizationMember.id(), roomId, modifyRoomRequest);
 	}
 
 	@PostMapping("/{roomId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void enterRoom(@PathVariable("roomId") Long roomId, @Valid @RequestBody EnterRoomRequest enterRoomRequest) {
-		roomService.enterRoom(1L, roomId, enterRoomRequest);
+	public void enterRoom(@CurrentMember AuthorizationMember authorizationMember, @PathVariable("roomId") Long roomId,
+		@Valid @RequestBody EnterRoomRequest enterRoomRequest) {
+
+		roomService.enterRoom(authorizationMember.id(), roomId, enterRoomRequest);
 	}
 
 	@DeleteMapping("/{roomId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void exitRoom(@PathVariable("roomId") Long roomId) {
-		roomService.exitRoom(1L, roomId);
+	public void exitRoom(@CurrentMember AuthorizationMember authorizationMember, @PathVariable("roomId") Long roomId) {
+		roomService.exitRoom(authorizationMember.id(), roomId);
 	}
 
 	@GetMapping("/{roomId}")
 	@ResponseStatus(HttpStatus.OK)
-	public RoomDetailsResponse getRoomDetails(@PathVariable("roomId") Long roomId) {
-		return roomService.getRoomDetails(1L, roomId);
+	public RoomDetailsResponse getRoomDetails(@CurrentMember AuthorizationMember authorizationMember,
+		@PathVariable("roomId") Long roomId) {
+
+		return roomSearchService.getRoomDetails(authorizationMember.id(), roomId);
 	}
 
 	@PostMapping("/{roomId}/certification")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void certifyRoom(@PathVariable("roomId") Long roomId, @RequestPart List<MultipartFile> multipartFiles) {
-		roomService.certifyRoom(1L, roomId, multipartFiles);
+	public void certifyRoom(@CurrentMember AuthorizationMember authorizationMember, @PathVariable("roomId") Long roomId,
+		@RequestPart List<MultipartFile> multipartFiles) {
+
+		roomCertificationService.certifyRoom(authorizationMember.id(), roomId, multipartFiles);
+	}
+
+	@PutMapping("/{roomId}/members/{memberId}/mandate")
+	@ResponseStatus(HttpStatus.OK)
+	public void mandateManager(@CurrentMember AuthorizationMember authorizationMember,
+		@PathVariable("roomId") Long roomId, @PathVariable("memberId") Long memberId) {
+
+		roomService.mandateRoomManager(authorizationMember.id(), roomId, memberId);
+	}
+
+	@DeleteMapping("/{roomId}/members/{memberId}")
+	@ResponseStatus(HttpStatus.OK)
+	public void deportParticipant(@CurrentMember AuthorizationMember authorizationMember,
+		@PathVariable("roomId") Long roomId, @PathVariable("memberId") Long memberId) {
+
+		roomService.deportParticipant(authorizationMember.id(), roomId, memberId);
 	}
 }

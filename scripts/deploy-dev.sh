@@ -47,6 +47,7 @@ echo
 
 IS_BLUE=$(docker ps | grep ${BLUE_CONTAINER})
 NGINX_CONF="/home/ubuntu/moabam/nginx/nginx.conf"
+UPSTREAM_CONF="/home/ubuntu/moabam/nginx/conf.d/upstream.conf"
 
 if [ -n "$IS_BLUE" ]; then
     echo "### BLUE => GREEN ###"
@@ -62,7 +63,7 @@ if [ -n "$IS_BLUE" ]; then
 
         if [ -n "$REQUEST" ]; then
             echo "${GREEN_CONTAINER} health check 성공"
-            sed -i "s/${BLUE_CONTAINER}/${GREEN_CONTAINER}/g" $NGINX_CONF
+            sed -i "s/${BLUE_CONTAINER}/${GREEN_CONTAINER}/g" $UPSTREAM_CONF
             echo "3. nginx 설정파일 reload"
             docker exec nginx service nginx reload
             echo "4. ${BLUE_CONTAINER} 컨테이너 종료"
@@ -96,7 +97,7 @@ else
 
         if [ -n "$REQUEST" ]; then
             echo "${BLUE_CONTAINER} health check 성공"
-            sed -i "s/${GREEN_CONTAINER}/${BLUE_CONTAINER}/g" $NGINX_CONF
+            sed -i "s/${GREEN_CONTAINER}/${BLUE_CONTAINER}/g" $UPSTREAM_CONF
             echo "3. nginx 설정파일 reload"
             docker exec nginx service nginx reload
             echo "4. ${GREEN_CONTAINER} 컨테이너 종료"

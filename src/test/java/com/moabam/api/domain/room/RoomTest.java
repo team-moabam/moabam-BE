@@ -1,4 +1,4 @@
-package com.moabam.api.domain.entity;
+package com.moabam.api.domain.room;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import com.moabam.api.domain.room.Room;
-import com.moabam.api.domain.room.RoomType;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
 
