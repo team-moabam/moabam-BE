@@ -34,7 +34,7 @@ import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
-import com.moabam.api.infrastructure.redis.TokenRepository;
+import com.moabam.api.infrastructure.repository.auth.TokenRepository;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.CookieUtils;

@@ -1,4 +1,4 @@
-package com.moabam.api.domain.member.repository;
+package com.moabam.api.infrastructure.repository.member;
 
 import static com.moabam.api.domain.member.QMember.*;
 import static com.moabam.api.domain.room.QParticipant.*;

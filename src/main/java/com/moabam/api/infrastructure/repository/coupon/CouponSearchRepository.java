@@ -1,4 +1,4 @@
-package com.moabam.api.domain.coupon.repository;
+package com.moabam.api.infrastructure.repository.coupon;
 
 import static com.moabam.api.domain.coupon.QCoupon.*;
 

@@ -20,7 +20,7 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.dto.notification.KnockNotificationStatusResponse;
-import com.moabam.api.infrastructure.redis.NotificationRepository;
+import com.moabam.api.infrastructure.repository.notification.NotificationRepository;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.error.exception.ConflictException;

@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.infrastructure.repository.notification.NotificationRepository;
+
 @ExtendWith(MockitoExtension.class)
 class NotificationRepositoryTest {
 

@@ -15,8 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.dto.auth.TokenSaveValue;
-import com.moabam.api.infrastructure.redis.HashTemplateRepository;
-import com.moabam.api.infrastructure.redis.TokenRepository;
+import com.moabam.api.infrastructure.redis.HashRedisRepository;
+import com.moabam.api.infrastructure.repository.auth.TokenRepository;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,13 +26,13 @@ class TokenRepostiroyTest {
 	TokenRepository tokenRepository;
 
 	@Mock
-	HashTemplateRepository hashTemplateRepository;
+	HashRedisRepository hashRedisRepository;
 
 	@DisplayName("토큰 저장 성공")
 	@Test
 	void save_token_suceess() {
 		// Given
-		willDoNothing().given(hashTemplateRepository).save(any(), any(TokenSaveValue.class), any(Duration.class));
+		willDoNothing().given(hashRedisRepository).save(any(), any(TokenSaveValue.class), any(Duration.class));
 
 		// When + Then
 		Assertions.assertThatNoException()
@@ -44,7 +44,7 @@ class TokenRepostiroyTest {
 	void token_get_success() {
 		// given
 		willReturn(TokenSaveValueFixture.tokenSaveValue("token"))
-			.given(hashTemplateRepository).get(anyString());
+			.given(hashRedisRepository).get(anyString());
 
 		// when
 		TokenSaveValue tokenSaveValue = tokenRepository.getTokenSaveValue(123L);
