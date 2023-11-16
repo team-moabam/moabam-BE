@@ -324,6 +324,6 @@ class AuthorizationServiceTest {
 		Cookie cookie = httpServletResponse.getCookie("access_token");
 
 		// Then
-		assertThat(httpServletResponse.getCookies().length).isZero();
+		assertThat(httpServletResponse.getCookies()).isEmpty();
 	}
 }
