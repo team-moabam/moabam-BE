@@ -39,10 +39,11 @@ public class ItemService {
 	private final BugHistoryRepository bugHistoryRepository;
 
 	public ItemsResponse getItems(Long memberId, ItemType type) {
+		Item defaultItem = getDefaultInventory(memberId, type).getItem();
 		List<Item> purchasedItems = inventorySearchRepository.findItems(memberId, type);
 		List<Item> notPurchasedItems = itemSearchRepository.findNotPurchasedItems(memberId, type);
 
-		return ItemMapper.toItemsResponse(purchasedItems, notPurchasedItems);
+		return ItemMapper.toItemsResponse(defaultItem.getId(), purchasedItems, notPurchasedItems);
 	}
 
 	@Transactional
@@ -65,8 +66,7 @@ public class ItemService {
 	public void selectItem(Long memberId, Long itemId) {
 		Inventory inventory = getInventory(memberId, itemId);
 
-		inventorySearchRepository.findDefault(memberId, inventory.getItemType())
-			.ifPresent(Inventory::deselect);
+		getDefaultInventory(memberId, inventory.getItemType()).deselect();
 		inventory.select();
 	}
 
@@ -78,6 +78,11 @@ public class ItemService {
 	private Inventory getInventory(Long memberId, Long itemId) {
 		return inventorySearchRepository.findOne(memberId, itemId)
 			.orElseThrow(() -> new NotFoundException(INVENTORY_NOT_FOUND));
+	}
+
+	private Inventory getDefaultInventory(Long memberId, ItemType type) {
+		return inventorySearchRepository.findDefault(memberId, type)
+			.orElseThrow(() -> new NotFoundException(DEFAULT_INVENTORY_NOT_FOUND));
 	}
 
 	private void validateAlreadyPurchased(Long memberId, Long itemId) {
