@@ -1,6 +1,7 @@
 package com.moabam.api.domain.payment;
 
 import static com.moabam.global.error.model.ErrorMessage.*;
+import static java.lang.Math.*;
 import static java.util.Objects.*;
 
 import java.util.UUID;
@@ -19,6 +20,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
 
+	private static final int MIN_AMOUNT = 0;
+
 	@Column(name = "order_id", updatable = false, nullable = false, unique = true)
 	private String id;
 
@@ -36,14 +39,14 @@ public class Order {
 	}
 
 	private int validateAmount(int amount) {
-		if (amount < 0) {
-			throw new BadRequestException(INVALID_PRICE);
+		if (amount < MIN_AMOUNT) {
+			throw new BadRequestException(INVALID_ORDER_AMOUNT);
 		}
 
 		return amount;
 	}
 
 	public void discountAmount(int price) {
-		this.amount -= price;
+		this.amount = max(MIN_AMOUNT, amount - price);
 	}
 }

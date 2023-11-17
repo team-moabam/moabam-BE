@@ -15,7 +15,7 @@ public final class PaymentFixture {
 			.build();
 	}
 
-	private static Order order() {
+	public static Order order() {
 		return Order.builder()
 			.name(BUG_PRODUCT_NAME)
 			.amount(BUG_PRODUCT_PRICE)

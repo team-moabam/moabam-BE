@@ -47,6 +47,7 @@ public enum ErrorMessage {
 	INVALID_PRICE("가격은 0 이상이어야 합니다."),
 	INVALID_QUANTITY("수량은 1 이상이어야 합니다."),
 	INVALID_LEVEL("레벨은 1 이상이어야 합니다."),
+	INVALID_ORDER_AMOUNT("주문 금액은 0 이상이어야 합니다."),
 
 	PRODUCT_NOT_FOUND("존재하지 않는 상품입니다."),
 
