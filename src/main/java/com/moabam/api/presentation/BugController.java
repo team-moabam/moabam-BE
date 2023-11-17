@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.bug.BugService;
-import com.moabam.api.dto.TodayBugResponse;
 import com.moabam.api.dto.bug.BugResponse;
+import com.moabam.api.dto.bug.TodayBugResponse;
 import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.global.auth.annotation.CurrentMember;
 import com.moabam.global.auth.model.AuthorizationMember;

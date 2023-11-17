@@ -27,8 +27,9 @@ public final class ItemMapper {
 			.build();
 	}
 
-	public static ItemsResponse toItemsResponse(List<Item> purchasedItems, List<Item> notPurchasedItems) {
+	public static ItemsResponse toItemsResponse(Long itemId, List<Item> purchasedItems, List<Item> notPurchasedItems) {
 		return ItemsResponse.builder()
+			.defaultItemId(itemId)
 			.purchasedItems(StreamUtils.map(purchasedItems, ItemMapper::toItemResponse))
 			.notPurchasedItems(StreamUtils.map(notPurchasedItems, ItemMapper::toItemResponse))
 			.build();
