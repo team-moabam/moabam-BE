@@ -23,6 +23,7 @@ import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
+import com.moabam.api.dto.room.RoomsHistoryResponse;
 import com.moabam.global.auth.annotation.CurrentMember;
 import com.moabam.global.auth.model.AuthorizationMember;
 
@@ -104,5 +105,11 @@ public class RoomController {
 	@ResponseStatus(HttpStatus.OK)
 	public MyRoomsResponse getMyRooms(@CurrentMember AuthorizationMember authorizationMember) {
 		return roomSearchService.getMyRooms(authorizationMember.id());
+	}
+
+	@GetMapping("/join-history")
+	@ResponseStatus(HttpStatus.OK)
+	public RoomsHistoryResponse getJoinHistory(@CurrentMember AuthorizationMember authorizationMember) {
+		return roomSearchService.getJoinHistory(authorizationMember.id());
 	}
 }

@@ -111,6 +111,7 @@ public class RoomService {
 
 		decreaseRoomCount(memberId, room.getRoomType());
 		participant.removeRoom();
+		participantRepository.flush();
 		participantRepository.delete(participant);
 
 		if (!participant.isManager()) {
@@ -118,7 +119,6 @@ public class RoomService {
 			return;
 		}
 
-		roomRepository.flush();
 		roomRepository.delete(room);
 	}
 
