@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,12 +19,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.moabam.api.application.room.RoomCertificationService;
 import com.moabam.api.application.room.RoomSearchService;
 import com.moabam.api.application.room.RoomService;
+import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
+import com.moabam.api.dto.room.SearchAllRoomsResponse;
 import com.moabam.global.auth.annotation.CurrentMember;
 import com.moabam.global.auth.model.AuthorizationMember;
 
@@ -44,7 +47,7 @@ public class RoomController {
 	public Long createRoom(@CurrentMember AuthorizationMember authorizationMember,
 		@Valid @RequestBody CreateRoomRequest createRoomRequest) {
 
-		return roomService.createRoom(authorizationMember.id(), createRoomRequest);
+		return roomService.createRoom(authorizationMember.id(), authorizationMember.nickname(), createRoomRequest);
 	}
 
 	@PutMapping("/{roomId}")
@@ -111,5 +114,13 @@ public class RoomController {
 	@ResponseStatus(HttpStatus.OK)
 	public RoomsHistoryResponse getJoinHistory(@CurrentMember AuthorizationMember authorizationMember) {
 		return roomSearchService.getJoinHistory(authorizationMember.id());
+	}
+
+	@GetMapping
+	@ResponseStatus(HttpStatus.OK)
+	public SearchAllRoomsResponse searchAllRooms(@RequestParam(value = "type") RoomType roomType,
+		@RequestParam(value = "roomId", required = false) Long roomId) {
+
+		return roomSearchService.searchAllRooms(roomType, roomId);
 	}
 }
