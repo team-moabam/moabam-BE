@@ -17,8 +17,8 @@ import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.domain.product.repository.ProductRepository;
-import com.moabam.api.dto.TodayBugResponse;
 import com.moabam.api.dto.bug.BugResponse;
+import com.moabam.api.dto.bug.TodayBugResponse;
 import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.global.common.util.ClockHolder;
 
