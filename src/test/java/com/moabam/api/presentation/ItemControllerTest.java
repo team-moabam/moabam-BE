@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.item.ItemMapper;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.bug.BugType;
+import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.ItemType;
 import com.moabam.api.domain.item.repository.InventoryRepository;
@@ -70,9 +71,10 @@ class ItemControllerTest extends WithoutFilterSupporter {
 			// given
 			Long memberId = getAuthorizationMember().id();
 			Item item1 = itemRepository.save(morningSantaSkin().build());
-			inventoryRepository.save(inventory(memberId, item1));
+			Inventory inventory = inventoryRepository.save(inventory(memberId, item1));
+			inventory.select();
 			Item item2 = itemRepository.save(morningKillerSkin().build());
-			ItemsResponse expected = ItemMapper.toItemsResponse(List.of(item1), List.of(item2));
+			ItemsResponse expected = ItemMapper.toItemsResponse(item1.getId(), List.of(item1), List.of(item2));
 
 			// expected
 			String content = mockMvc.perform(get("/items")

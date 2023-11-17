@@ -4,8 +4,8 @@ import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.bug.BugActionType;
 import com.moabam.api.domain.bug.BugHistory;
 import com.moabam.api.domain.bug.BugType;
-import com.moabam.api.dto.TodayBugResponse;
 import com.moabam.api.dto.bug.BugResponse;
+import com.moabam.api.dto.bug.TodayBugResponse;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

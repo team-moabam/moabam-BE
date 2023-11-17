@@ -2,6 +2,7 @@ package com.moabam.api.application.bug;
 
 import static com.moabam.api.domain.bug.BugActionType.*;
 import static com.moabam.api.domain.bug.BugType.*;
+import static com.moabam.api.domain.product.ProductType.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
@@ -22,8 +23,9 @@ import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.domain.product.repository.ProductRepository;
-import com.moabam.api.dto.TodayBugResponse;
 import com.moabam.api.dto.bug.BugResponse;
+import com.moabam.api.dto.bug.TodayBugResponse;
+import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.api.dto.product.PurchaseProductRequest;
 import com.moabam.api.dto.product.PurchaseProductResponse;
 import com.moabam.global.common.util.ClockHolder;
@@ -54,6 +56,12 @@ public class BugService {
 		int nightBug = calculateBugQuantity(todayRewardBug, NIGHT);
 
 		return BugMapper.toTodayBugResponse(morningBug, nightBug);
+	}
+
+	public ProductsResponse getBugProducts() {
+		List<Product> products = productRepository.findAllByType(BUG);
+
+		return ProductMapper.toProductsResponse(products);
 	}
 
 	public PurchaseProductResponse purchaseBugProduct(Long memberId, Long productId, PurchaseProductRequest request) {
