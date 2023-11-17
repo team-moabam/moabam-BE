@@ -18,6 +18,7 @@ import com.moabam.api.domain.bug.BugHistory;
 import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
 import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
@@ -42,6 +43,7 @@ public class BugService {
 	private final BugHistorySearchRepository bugHistorySearchRepository;
 	private final ProductRepository productRepository;
 	private final PaymentRepository paymentRepository;
+	private final CouponRepository couponRepository;
 	private final ClockHolder clockHolder;
 
 	public BugResponse getBug(Long memberId) {
@@ -69,7 +71,9 @@ public class BugService {
 		Payment payment = PaymentMapper.toEntity(memberId, product);
 
 		if (!isNull(request.couponId())) {
-			Coupon coupon = Coupon.builder().build(); // TODO: CouponWallet 에 존재하는 할인 쿠폰인지 확인 @홍
+			// TODO: (임시) CouponWallet 에 존재하는 할인 쿠폰인지 확인 @홍혁준
+			Coupon coupon = couponRepository.findById(request.couponId())
+				.orElseThrow(() -> new NotFoundException(NOT_FOUND_COUPON));
 			payment.applyCoupon(coupon);
 		}
 		paymentRepository.save(payment);

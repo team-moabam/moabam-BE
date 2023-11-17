@@ -67,6 +67,6 @@ public class Payment extends BaseTimeEntity {
 	}
 
 	public void applyCoupon(Coupon coupon) {
-		this.order.discountAmount(1000); // TODO: 할인 쿠폰 가격만큼 감소 @홍
+		this.order.discountAmount(coupon.getPoint());
 	}
 }
