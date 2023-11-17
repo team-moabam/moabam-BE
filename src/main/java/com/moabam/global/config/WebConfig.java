@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -54,7 +55,8 @@ public class WebConfig implements WebMvcConfigurer {
 				PathMapper.parsePath("/images/*"),
 				PathMapper.parsePath("/webjars/*"),
 				PathMapper.parsePath("/favicon/*"),
-				PathMapper.parsePath("/*/icon-*")
+				PathMapper.parsePath("/*/icon-*"),
+				PathMapper.parsePath("/serverTime", List.of(HttpMethod.GET))
 			))
 			.build();
 
