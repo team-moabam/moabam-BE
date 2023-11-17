@@ -12,10 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.application.auth.mapper.AuthMapper;
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.repository.MemberRepository;
+import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
-import com.moabam.api.infrastructure.repository.member.MemberRepository;
-import com.moabam.api.infrastructure.repository.member.MemberSearchRepository;
 import com.moabam.global.error.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;

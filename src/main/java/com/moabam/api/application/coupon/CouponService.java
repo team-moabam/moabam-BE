@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.repository.CouponRepository;
+import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
-import com.moabam.api.infrastructure.repository.coupon.CouponRepository;
-import com.moabam.api.infrastructure.repository.coupon.CouponSearchRepository;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;

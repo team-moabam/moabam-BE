@@ -1,4 +1,4 @@
-package com.moabam.api.infrastructure.repository.notification;
+package com.moabam.api.domain.notification.repository;
 
 import static com.moabam.global.common.util.GlobalConstant.*;
 import static java.util.Objects.*;

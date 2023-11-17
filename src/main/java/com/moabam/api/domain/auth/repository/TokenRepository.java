@@ -1,4 +1,4 @@
-package com.moabam.api.infrastructure.repository.auth;
+package com.moabam.api.domain.auth.repository;
 
 import java.time.Duration;
 

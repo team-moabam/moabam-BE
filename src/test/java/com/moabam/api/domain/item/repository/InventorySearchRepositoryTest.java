@@ -17,7 +17,7 @@ import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.ItemType;
 import com.moabam.api.domain.member.Member;
-import com.moabam.api.infrastructure.repository.member.MemberRepository;
+import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
 
 @QuerydslRepositoryTest

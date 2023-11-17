@@ -1,4 +1,4 @@
-package com.moabam.api.infrastructure.repository.member;
+package com.moabam.api.domain.member.repository;
 
 import java.util.Optional;
 

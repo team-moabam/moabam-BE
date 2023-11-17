@@ -16,8 +16,6 @@ import org.springframework.context.annotation.Import;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
-import com.moabam.api.infrastructure.repository.coupon.CouponRepository;
-import com.moabam.api.infrastructure.repository.coupon.CouponSearchRepository;
 import com.moabam.global.config.JpaConfig;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;

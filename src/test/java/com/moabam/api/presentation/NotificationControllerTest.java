@@ -1,6 +1,5 @@
 package com.moabam.api.presentation;
 
-import static com.moabam.global.common.util.GlobalConstant.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
@@ -24,11 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.repository.MemberRepository;
+import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.infrastructure.redis.StringRedisRepository;
-import com.moabam.api.infrastructure.repository.member.MemberRepository;
-import com.moabam.api.infrastructure.repository.notification.NotificationRepository;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
@@ -41,6 +40,8 @@ import com.moabam.support.fixture.RoomFixture;
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 class NotificationControllerTest extends WithoutFilterSupporter {
+
+	private static final String KNOCK_KEY = "room_%s_member_%s_knocks_%s";
 
 	@Autowired
 	private MockMvc mockMvc;

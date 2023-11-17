@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.room.Certification;
 import com.moabam.api.domain.room.DailyMemberCertification;
 import com.moabam.api.domain.room.DailyRoomCertification;
@@ -43,7 +44,6 @@ import com.moabam.api.domain.room.repository.RoutineSearchRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
-import com.moabam.api.infrastructure.repository.member.MemberRepository;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.BugFixture;

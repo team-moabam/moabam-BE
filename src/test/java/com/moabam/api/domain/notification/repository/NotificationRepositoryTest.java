@@ -1,4 +1,4 @@
-package com.moabam.api.infrastructure.redis;
+package com.moabam.api.domain.notification.repository;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.infrastructure.repository.notification.NotificationRepository;
+import com.moabam.api.infrastructure.redis.StringRedisRepository;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationRepositoryTest {

@@ -1,4 +1,4 @@
-package com.moabam.api.infrastructure.repository.coupon;
+package com.moabam.api.domain.coupon.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

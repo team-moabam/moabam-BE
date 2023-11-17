@@ -14,9 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.domain.auth.repository.TokenRepository;
 import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.api.infrastructure.redis.HashRedisRepository;
-import com.moabam.api.infrastructure.repository.auth.TokenRepository;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 @ExtendWith(MockitoExtension.class)
