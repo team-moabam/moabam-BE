@@ -13,7 +13,6 @@ import com.moabam.api.dto.coupon.CreateCouponRequest;
 
 public final class CouponFixture {
 
-	public static final Long ADMIN_ID = 1L;
 	public static final String DISCOUNT_1000_COUPON_NAME = "황금벌레 1000원 할인";
 	public static final int DISCOUNT_1000_COUPON_STOCK = 100;
 	public static final LocalDateTime DISCOUNT_1000_COUPON_START_AT = LocalDateTime.of(2023, 1, 1, 0, 0);
@@ -50,8 +49,8 @@ public final class CouponFixture {
 			.couponType(CouponType.DISCOUNT_COUPON)
 			.stock(DISCOUNT_1000_COUPON_STOCK)
 			.startAt(DISCOUNT_1000_COUPON_START_AT)
-			.endAt(DISCOUNT_1000_COUPON_START_AT)
-			.adminId(ADMIN_ID)
+			.endAt(DISCOUNT_1000_COUPON_END_AT)
+			.adminId(1L)
 			.build();
 	}
 

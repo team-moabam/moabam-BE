@@ -68,5 +68,6 @@ public class Payment extends BaseTimeEntity {
 
 	public void applyCoupon(Coupon coupon) {
 		this.order.discountAmount(coupon.getPoint());
+		this.coupon = coupon;
 	}
 }
