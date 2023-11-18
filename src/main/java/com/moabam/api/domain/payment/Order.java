@@ -47,4 +47,8 @@ public class Order {
 	public void discountAmount(int price) {
 		this.amount = max(MIN_AMOUNT, amount - price);
 	}
+
+	public void updateId(String id) {
+		this.id = id;
+	}
 }

@@ -51,6 +51,9 @@ public enum ErrorMessage {
 
 	PRODUCT_NOT_FOUND("존재하지 않는 상품입니다."),
 
+	PAYMENT_NOT_FOUND("존재하지 않는 결제 정보입니다."),
+	INVALID_MEMBER_PAYMENT("해당 회원의 결제 정보가 아닙니다."),
+
 	FAILED_FCM_INIT("파이어베이스 설정을 실패했습니다."),
 	NOT_FOUND_FCM_TOKEN("해당 유저는 접속 중이 아닙니다."),
 	CONFLICT_KNOCK("이미 콕 알림을 보낸 대상입니다."),
