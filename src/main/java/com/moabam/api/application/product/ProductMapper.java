@@ -33,7 +33,6 @@ public final class ProductMapper {
 
 	public static PurchaseProductResponse toPurchaseProductResponse(Payment payment) {
 		return PurchaseProductResponse.builder()
-			.orderId(payment.getOrder().getId())
 			.orderName(payment.getOrder().getName())
 			.price(payment.getOrder().getAmount())
 			.build();

@@ -4,8 +4,6 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.lang.Math.*;
 import static java.util.Objects.*;
 
-import java.util.UUID;
-
 import com.moabam.global.error.exception.BadRequestException;
 
 import jakarta.persistence.Column;
@@ -22,7 +20,7 @@ public class Order {
 
 	private static final int MIN_AMOUNT = 0;
 
-	@Column(name = "order_id", updatable = false, nullable = false, unique = true)
+	@Column(name = "order_id")
 	private String id;
 
 	@Column(name = "order_name", nullable = false)
@@ -32,8 +30,8 @@ public class Order {
 	private int amount;
 
 	@Builder
-	private Order(String name, int amount) {
-		this.id = UUID.randomUUID().toString();
+	private Order(String id, String name, int amount) {
+		this.id = id;
 		this.name = requireNonNull(name);
 		this.amount = validateAmount(amount);
 	}
