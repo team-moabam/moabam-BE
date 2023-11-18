@@ -2,6 +2,7 @@ package com.moabam.api.domain.payment;
 
 import static com.moabam.support.fixture.CouponFixture.*;
 import static com.moabam.support.fixture.PaymentFixture.*;
+import static com.moabam.support.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,7 @@ class PaymentTest {
 	@Test
 	void apply_coupon() {
 		// given
-		Payment payment = bugProductPayment();
+		Payment payment = payment(bugProduct());
 		Coupon coupon = discount1000Coupon();
 
 		// when

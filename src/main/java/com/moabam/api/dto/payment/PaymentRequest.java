@@ -1,9 +1,9 @@
 package com.moabam.api.dto.payment;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 public record PaymentRequest(
-	@NotNull String orderId
+	@NotBlank String orderId
 ) {
 
 }
