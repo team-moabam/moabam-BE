@@ -73,7 +73,7 @@ public class RoomSearchService {
 		double completePercentage = calculateCompletePercentage(dailyMemberCertifications.size(),
 			room.getCurrentUserCount());
 
-		return RoomMapper.toRoomDetailsResponse(room, managerNickname, routineResponses, certifiedDates,
+		return RoomMapper.toRoomDetailsResponse(memberId, room, managerNickname, routineResponses, certifiedDates,
 			todayCertificateRankResponses, completePercentage);
 	}
 
