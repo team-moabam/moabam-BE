@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record PurchaseProductResponse(
+	Long paymentId,
 	String orderName,
 	int price
 ) {
