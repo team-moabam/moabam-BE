@@ -54,4 +54,17 @@ class OrderTest {
 			assertThat(order.getAmount()).isZero();
 		}
 	}
+
+	@DisplayName("주문 id를 갱신한다.")
+	@Test
+	void update_id_success() {
+		// given
+		Order order = order();
+
+		// when
+		order.updateId(ORDER_ID);
+
+		// then
+		assertThat(order.getId()).isEqualTo(ORDER_ID);
+	}
 }
