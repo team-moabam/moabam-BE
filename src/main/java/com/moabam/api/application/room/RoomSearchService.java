@@ -56,19 +56,18 @@ public class RoomSearchService {
 	private final MemberService memberService;
 	private final RoomCertificationService roomCertificationService;
 
-	public RoomDetailsResponse getRoomDetails(Long memberId, Long roomId) {
-		LocalDate today = LocalDate.now();
+	public RoomDetailsResponse getRoomDetails(Long memberId, Long roomId, LocalDate date) {
 		Participant participant = participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
 		Room room = participant.getRoom();
 
 		String managerNickname = room.getManagerNickname();
 		List<DailyMemberCertification> dailyMemberCertifications =
-			certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today);
+			certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, date);
 		List<RoutineResponse> routineResponses = getRoutineResponses(roomId);
 		List<TodayCertificateRankResponse> todayCertificateRankResponses = getTodayCertificateRankResponses(roomId,
-			dailyMemberCertifications, today);
-		List<LocalDate> certifiedDates = getCertifiedDates(roomId, today);
+			dailyMemberCertifications, date);
+		List<LocalDate> certifiedDates = getCertifiedDatesBeforeWeek(roomId);
 		double completePercentage = calculateCompletePercentage(dailyMemberCertifications.size(),
 			room.getCurrentUserCount());
 
@@ -148,24 +147,24 @@ public class RoomSearchService {
 	}
 
 	private List<TodayCertificateRankResponse> getTodayCertificateRankResponses(Long roomId,
-		List<DailyMemberCertification> dailyMemberCertifications, LocalDate today) {
+		List<DailyMemberCertification> dailyMemberCertifications, LocalDate date) {
 
 		List<TodayCertificateRankResponse> responses = new ArrayList<>();
-		List<Certification> certifications = certificationsSearchRepository.findCertifications(roomId, today);
+		List<Certification> certifications = certificationsSearchRepository.findCertifications(roomId, date);
 		List<Participant> participants = participantSearchRepository.findParticipantsByRoomId(roomId);
 		List<Member> members = memberService.getRoomMembers(participants.stream()
 			.map(Participant::getMemberId)
 			.toList());
 
-		addCompletedMembers(responses, dailyMemberCertifications, members, certifications, participants, today);
-		addUncompletedMembers(responses, dailyMemberCertifications, members, participants, today);
+		addCompletedMembers(responses, dailyMemberCertifications, members, certifications, participants, date);
+		addUncompletedMembers(responses, dailyMemberCertifications, members, participants, date);
 
 		return responses;
 	}
 
 	private void addCompletedMembers(List<TodayCertificateRankResponse> responses,
 		List<DailyMemberCertification> dailyMemberCertifications, List<Member> members,
-		List<Certification> certifications, List<Participant> participants, LocalDate today) {
+		List<Certification> certifications, List<Participant> participants, LocalDate date) {
 
 		int rank = 1;
 
@@ -175,7 +174,7 @@ public class RoomSearchService {
 				.findAny()
 				.orElseThrow(() -> new NotFoundException(ROOM_DETAILS_ERROR));
 
-			int contributionPoint = calculateContributionPoint(member.getId(), participants, today);
+			int contributionPoint = calculateContributionPoint(member.getId(), participants, date);
 			List<CertificationImageResponse> certificationImageResponses =
 				CertificationsMapper.toCertificateImageResponses(member.getId(), certifications);
 
@@ -189,7 +188,7 @@ public class RoomSearchService {
 
 	private void addUncompletedMembers(List<TodayCertificateRankResponse> responses,
 		List<DailyMemberCertification> dailyMemberCertifications, List<Member> members,
-		List<Participant> participants, LocalDate today) {
+		List<Participant> participants, LocalDate date) {
 
 		List<Long> allMemberIds = participants.stream()
 			.map(Participant::getMemberId)
@@ -207,7 +206,7 @@ public class RoomSearchService {
 				.findAny()
 				.orElseThrow(() -> new NotFoundException(ROOM_DETAILS_ERROR));
 
-			int contributionPoint = calculateContributionPoint(memberId, participants, today);
+			int contributionPoint = calculateContributionPoint(memberId, participants, date);
 
 			TodayCertificateRankResponse response = CertificationsMapper.toTodayCertificateRankResponse(
 				500, member, contributionPoint, "https://~awake", "https://~sleep", null);
@@ -216,20 +215,20 @@ public class RoomSearchService {
 		}
 	}
 
-	private int calculateContributionPoint(Long memberId, List<Participant> participants, LocalDate today) {
+	private int calculateContributionPoint(Long memberId, List<Participant> participants, LocalDate date) {
 		Participant participant = participants.stream()
 			.filter(p -> p.getMemberId().equals(memberId))
 			.findAny()
 			.orElseThrow(() -> new NotFoundException(ROOM_DETAILS_ERROR));
 
-		int participatedDays = Period.between(participant.getCreatedAt().toLocalDate(), today).getDays() + 1;
+		int participatedDays = Period.between(participant.getCreatedAt().toLocalDate(), date).getDays() + 1;
 
 		return (int)(((double)participant.getCertifyCount() / participatedDays) * 100);
 	}
 
-	private List<LocalDate> getCertifiedDates(Long roomId, LocalDate today) {
+	private List<LocalDate> getCertifiedDatesBeforeWeek(Long roomId) {
 		List<DailyRoomCertification> certifications = certificationsSearchRepository.findDailyRoomCertifications(
-			roomId, today);
+			roomId, LocalDate.now());
 
 		return certifications.stream().map(DailyRoomCertification::getCertifiedAt).toList();
 	}
