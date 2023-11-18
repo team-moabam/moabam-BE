@@ -27,7 +27,7 @@ public class RoomSearchRepository {
 				DynamicQuery.generateEq(roomId, room.id::lt)
 			)
 			.orderBy(room.id.desc())
-			.limit(ROOM_FIXED_SEARCH_SIZE + 1)
+			.limit(ROOM_FIXED_SEARCH_SIZE + 1L)
 			.fetch();
 	}
 }
