@@ -114,7 +114,7 @@ public class RoomSearchService {
 
 	public SearchAllRoomsResponse searchAllRooms(@Nullable RoomType roomType, @Nullable Long roomId) {
 		List<SearchAllRoomResponse> searchAllRoomResponses = new ArrayList<>();
-		List<Room> rooms = roomSearchRepository.findAllWithNoOffset(roomType, roomId);
+		List<Room> rooms = new ArrayList<>(roomSearchRepository.findAllWithNoOffset(roomType, roomId));
 
 		boolean hasNext = false;
 

@@ -118,7 +118,7 @@ public class RoomController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public SearchAllRoomsResponse searchAllRooms(@RequestParam(value = "type") RoomType roomType,
+	public SearchAllRoomsResponse searchAllRooms(@RequestParam(value = "type", required = false) RoomType roomType,
 		@RequestParam(value = "roomId", required = false) Long roomId) {
 
 		return roomSearchService.searchAllRooms(roomType, roomId);
