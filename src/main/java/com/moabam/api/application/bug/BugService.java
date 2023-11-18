@@ -66,6 +66,7 @@ public class BugService {
 		return ProductMapper.toProductsResponse(products);
 	}
 
+	@Transactional
 	public PurchaseProductResponse purchaseBugProduct(Long memberId, Long productId, PurchaseProductRequest request) {
 		Product product = getById(productId);
 		Payment payment = PaymentMapper.toEntity(memberId, product);
