@@ -63,7 +63,7 @@ public class Payment extends BaseTimeEntity {
 		this.coupon = coupon;
 		this.order = requireNonNull(order);
 		this.paymentKey = paymentKey;
-		this.status = requireNonNullElse(status, PaymentStatus.REQUEST);
+		this.status = requireNonNullElse(status, PaymentStatus.PENDING);
 	}
 
 	public void applyCoupon(Coupon coupon) {
