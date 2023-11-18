@@ -13,6 +13,7 @@ import com.moabam.api.dto.payment.PaymentRequest;
 import com.moabam.global.auth.annotation.CurrentMember;
 import com.moabam.global.auth.model.AuthorizationMember;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -26,7 +27,7 @@ public class PaymentController {
 	@ResponseStatus(HttpStatus.OK)
 	public void requestPayment(@CurrentMember AuthorizationMember member,
 		@PathVariable Long paymentId,
-		@RequestBody PaymentRequest request) {
+		@Valid @RequestBody PaymentRequest request) {
 		paymentService.requestPayment(member.id(), paymentId, request);
 	}
 }

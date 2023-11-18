@@ -18,6 +18,7 @@ import com.moabam.api.dto.product.PurchaseProductResponse;
 import com.moabam.global.auth.annotation.CurrentMember;
 import com.moabam.global.auth.model.AuthorizationMember;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -49,7 +50,7 @@ public class BugController {
 	@ResponseStatus(HttpStatus.OK)
 	public PurchaseProductResponse purchaseBugProduct(@CurrentMember AuthorizationMember member,
 		@PathVariable Long productId,
-		@RequestBody PurchaseProductRequest request) {
+		@Valid @RequestBody PurchaseProductRequest request) {
 		return bugService.purchaseBugProduct(member.id(), productId, request);
 	}
 }
