@@ -17,10 +17,10 @@ public final class CouponFixture {
 		return Coupon.builder()
 			.name("couponName")
 			.point(point)
-			.couponType(CouponType.MORNING_COUPON)
+			.type(CouponType.MORNING_COUPON)
 			.stock(stock)
 			.startAt(LocalDateTime.of(2023, 1, 1, 0, 0))
-			.endAt(LocalDateTime.of(2023, 1, 1, 0, 0))
+			.endAt(LocalDateTime.of(2023, 2, 1, 0, 0))
 			.adminId(1L)
 			.build();
 	}
@@ -29,7 +29,7 @@ public final class CouponFixture {
 		return Coupon.builder()
 			.name(name)
 			.point(10)
-			.couponType(CouponType.MORNING_COUPON)
+			.type(CouponType.MORNING_COUPON)
 			.stock(100)
 			.startAt(LocalDateTime.of(2023, startMonth, 1, 0, 0))
 			.endAt(LocalDateTime.of(2023, endMonth, 1, 0, 0))

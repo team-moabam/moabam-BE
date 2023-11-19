@@ -18,7 +18,7 @@ public class CouponQueueService {
 	private final CouponQueueRepository couponQueueRepository;
 
 	public void register(AuthorizationMember member, String couponName) {
-		long registerTime = System.currentTimeMillis();
+		double registerTime = System.currentTimeMillis();
 
 		if (canRegister(couponName)) {
 			log.info("{} 쿠폰이 모두 발급되었습니다.", couponName);

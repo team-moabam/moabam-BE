@@ -1,6 +1,6 @@
 package com.moabam.api.domain.coupon.repository;
 
-import java.util.Set;
+import static java.util.Objects.*;
 
 import org.springframework.stereotype.Repository;
 
@@ -15,22 +15,10 @@ public class CouponQueueRepository {
 	private final ZSetRedisRepository zSetRedisRepository;
 
 	public void addQueue(String couponName, String memberNickname, double score) {
-		zSetRedisRepository.addIfAbsent(couponName, memberNickname, score);
-	}
-
-	public Set<String> getQueue(String couponName, long startRank, long endRank) {
-		return zSetRedisRepository.range(couponName, startRank, endRank);
-	}
-
-	public Set<String> popQueue(String couponName, long count) {
-		return zSetRedisRepository.popMin(couponName, count);
-	}
-
-	public void removeQueueByMemberNickname(String couponName, String memberNickname) {
-		zSetRedisRepository.remove(couponName, memberNickname);
+		zSetRedisRepository.addIfAbsent(requireNonNull(couponName), requireNonNull(memberNickname), score);
 	}
 
 	public Long queueSize(String couponName) {
-		return zSetRedisRepository.size(couponName);
+		return zSetRedisRepository.size(requireNonNull(couponName));
 	}
 }

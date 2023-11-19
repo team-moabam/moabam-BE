@@ -14,6 +14,7 @@ import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.common.util.SystemClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -28,6 +29,7 @@ public class CouponService {
 
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
+	private final SystemClockHolder systemClockHolder;
 
 	@Transactional
 	public void createCoupon(AuthorizationMember admin, CreateCouponRequest request) {
@@ -48,14 +50,14 @@ public class CouponService {
 	}
 
 	public CouponResponse getCouponById(Long couponId) {
-		Coupon coupon = couponSearchRepository.findById(couponId)
+		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 
 		return CouponMapper.toDto(coupon);
 	}
 
 	public List<CouponResponse> getCoupons(CouponSearchRequest request) {
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = systemClockHolder.times();
 		List<Coupon> coupons = couponSearchRepository.findAllByStatus(now, request);
 
 		return coupons.stream()
@@ -64,15 +66,15 @@ public class CouponService {
 	}
 
 	public Coupon validateCouponPeriod(String couponName) {
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = systemClockHolder.times();
 		Coupon coupon = couponRepository.findByName(couponName)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 
 		if (!now.isBefore(coupon.getStartAt()) && !now.isAfter(coupon.getEndAt())) {
-			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD_REGISTER);
+			return coupon;
 		}
 
-		return coupon;
+		throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD_END);
 	}
 
 	private void validateCouponPeriod(LocalDateTime startAt, LocalDateTime endAt) {

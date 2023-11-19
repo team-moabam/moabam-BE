@@ -26,6 +26,7 @@ import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
+import com.moabam.global.common.util.SystemClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -45,6 +46,9 @@ class CouponServiceTest {
 
 	@Mock
 	private CouponSearchRepository couponSearchRepository;
+
+	@Mock
+	private SystemClockHolder systemClockHolder;
 
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("쿠폰을 성공적으로 발행한다. - Void")
@@ -175,7 +179,7 @@ class CouponServiceTest {
 	void couponService_getCouponById() {
 		// Given
 		Coupon coupon = CouponFixture.coupon(10, 100);
-		given(couponSearchRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
+		given(couponRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
 
 		// When
 		CouponResponse actual = couponService.getCouponById(1L);
@@ -189,7 +193,7 @@ class CouponServiceTest {
 	@Test
 	void couponService_getCouponById_NotFoundException() {
 		// Given
-		given(couponSearchRepository.findById(any(Long.class))).willReturn(Optional.empty());
+		given(couponRepository.findById(any(Long.class))).willReturn(Optional.empty());
 
 		// When & Then
 		assertThatThrownBy(() -> couponService.getCouponById(1L))
@@ -205,11 +209,57 @@ class CouponServiceTest {
 		CouponSearchRequest request = CouponFixture.couponSearchRequest(true, true, true);
 		given(couponSearchRepository.findAllByStatus(any(LocalDateTime.class), any(CouponSearchRequest.class)))
 			.willReturn(coupons);
+		given(systemClockHolder.times()).willReturn(LocalDateTime.now());
 
 		// When
 		List<CouponResponse> actual = couponService.getCoupons(request);
 
 		// Then
 		assertThat(actual).hasSize(coupons.size());
+	}
+
+	@DisplayName("해당 쿠폰은 발급 가능 기간입니다. - Coupon")
+	@Test
+	void couponService_validateCouponPeriod() {
+		// Given
+		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 0);
+		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
+		given(couponRepository.findByName(any(String.class))).willReturn(Optional.of(coupon));
+		given(systemClockHolder.times()).willReturn(now);
+
+		// When
+		Coupon actual = couponService.validateCouponPeriod(coupon.getName());
+
+		// Then
+		assertThat(actual.getName()).isEqualTo(coupon.getName());
+	}
+
+	@DisplayName("해당 쿠폰은 발급 가능 기간이 아닙니다. - BadRequestException")
+	@Test
+	void couponService_validateCouponPeriod_BadRequestException() {
+		// Given
+		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 0);
+		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
+		given(couponRepository.findByName(any(String.class))).willReturn(Optional.of(coupon));
+		given(systemClockHolder.times()).willReturn(now);
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.validateCouponPeriod("couponName"))
+			.isInstanceOf(BadRequestException.class)
+			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD_END.getMessage());
+	}
+
+	@DisplayName("해당 쿠폰은 존재하지 않습니다. - NotFoundException")
+	@Test
+	void couponService_validateCouponPeriod_NotFoundException() {
+		// Given
+		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 0);
+		given(couponRepository.findByName(any(String.class))).willReturn(Optional.empty());
+		given(systemClockHolder.times()).willReturn(now);
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.validateCouponPeriod("Not found coupon name"))
+			.isInstanceOf(NotFoundException.class)
+			.hasMessage(ErrorMessage.NOT_FOUND_COUPON.getMessage());
 	}
 }

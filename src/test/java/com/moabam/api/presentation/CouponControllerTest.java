@@ -1,12 +1,14 @@
 package com.moabam.api.presentation;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +32,7 @@ import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
+import com.moabam.global.common.util.SystemClockHolder;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
@@ -50,6 +54,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	private CouponRepository couponRepository;
+
+	@MockBean
+	private SystemClockHolder systemClockHolder;
 
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("쿠폰을 성공적으로 발행한다. - Void")
@@ -226,5 +233,73 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$", hasSize(0)));
+	}
+
+	@WithMember
+	@DisplayName("쿠폰 발급 요청을 한다. - Void")
+	@Test
+	void couponController_registerCouponQueue() throws Exception {
+		// Given
+		Coupon couponFixture = CouponFixture.coupon("CouponName", 1, 2);
+		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 1);
+		Coupon coupon = couponRepository.save(couponFixture);
+
+		given(systemClockHolder.times()).willReturn(now);
+
+		// When & Then
+		mockMvc.perform(post("/coupons")
+				.param("couponName", coupon.getName()))
+			.andDo(print())
+			.andDo(document("coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint())))
+			.andExpect(status().isOk());
+	}
+
+	@WithMember
+	@DisplayName("존재하지 않는 쿠폰에 발급 요청을 한다. - NotFoundException")
+	@Test
+	void couponController_registerCouponQueue_NotFoundException() throws Exception {
+		// Given
+		Coupon coupon = CouponFixture.coupon("CouponName", 1, 2);
+		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 1);
+
+		given(systemClockHolder.times()).willReturn(now);
+
+		// When & Then
+		mockMvc.perform(post("/coupons")
+				.param("couponName", coupon.getName()))
+			.andDo(print())
+			.andDo(document("coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isNotFound())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON.getMessage()));
+	}
+
+	@WithMember
+	@DisplayName("발급 기간이 아닌 쿠폰에 발급 요청을 한다. - BadRequestException")
+	@Test
+	void couponController_registerCouponQueue_BadRequestException() throws Exception {
+		// Given
+		Coupon couponFixture = CouponFixture.coupon("CouponName", 1, 2);
+		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 1);
+		Coupon coupon = couponRepository.save(couponFixture);
+
+		given(systemClockHolder.times()).willReturn(now);
+
+		// When & Then
+		mockMvc.perform(post("/coupons")
+				.param("couponName", coupon.getName()))
+			.andDo(print())
+			.andDo(document("coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD_END.getMessage()));
 	}
 }
