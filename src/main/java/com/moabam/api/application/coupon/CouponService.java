@@ -63,6 +63,24 @@ public class CouponService {
 			.toList();
 	}
 
+	public Coupon validateCouponPeriod(String couponName) {
+		LocalDateTime now = LocalDateTime.now();
+		Coupon coupon = couponRepository.findByName(couponName)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
+
+		if (!now.isBefore(coupon.getStartAt()) && !now.isAfter(coupon.getEndAt())) {
+			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD_REGISTER);
+		}
+
+		return coupon;
+	}
+
+	private void validateCouponPeriod(LocalDateTime startAt, LocalDateTime endAt) {
+		if (startAt.isAfter(endAt)) {
+			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
+		}
+	}
+
 	private void validateAdminRole(AuthorizationMember admin) {
 		if (!admin.role().equals(Role.ADMIN)) {
 			throw new NotFoundException(ErrorMessage.MEMBER_NOT_FOUND);
@@ -72,12 +90,6 @@ public class CouponService {
 	private void validateConflictCouponName(String name) {
 		if (couponRepository.existsByName(name)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_NAME);
-		}
-	}
-
-	private void validateCouponPeriod(LocalDateTime startAt, LocalDateTime endAt) {
-		if (startAt.isAfter(endAt)) {
-			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
 		}
 	}
 }

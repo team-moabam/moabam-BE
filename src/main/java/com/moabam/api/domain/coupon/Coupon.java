@@ -48,8 +48,8 @@ public class Coupon extends BaseTimeEntity {
 	private String description;
 
 	@Enumerated(value = EnumType.STRING)
-	@Column(name = "coupon_type", nullable = false)
-	private CouponType couponType;
+	@Column(name = "type", nullable = false)
+	private CouponType type;
 
 	@ColumnDefault("1")
 	@Column(name = "stock", nullable = false)
@@ -66,12 +66,12 @@ public class Coupon extends BaseTimeEntity {
 	private Long adminId;
 
 	@Builder
-	private Coupon(String name, int point, String description, CouponType couponType, int stock, LocalDateTime startAt,
+	private Coupon(String name, int point, String description, CouponType type, int stock, LocalDateTime startAt,
 		LocalDateTime endAt, Long adminId) {
 		this.name = requireNonNull(name);
 		this.point = validatePoint(point);
 		this.description = Optional.ofNullable(description).orElse(BLANK);
-		this.couponType = requireNonNull(couponType);
+		this.type = requireNonNull(type);
 		this.stock = validateStock(stock);
 		this.startAt = requireNonNull(startAt);
 		this.endAt = requireNonNull(endAt);
