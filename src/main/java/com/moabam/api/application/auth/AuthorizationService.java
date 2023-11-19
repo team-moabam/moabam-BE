@@ -1,7 +1,5 @@
 package com.moabam.api.application.auth;
 
-import static java.util.Objects.*;
-
 import java.util.Arrays;
 
 import org.springframework.http.ResponseEntity;
@@ -24,8 +22,8 @@ import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.api.infrastructure.redis.TokenRepository;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.PublicClaim;
-import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.common.util.GlobalConstant;
+import com.moabam.global.common.util.cookie.CookieUtils;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
@@ -46,6 +44,7 @@ public class AuthorizationService {
 	private final MemberService memberService;
 	private final JwtProviderService jwtProviderService;
 	private final TokenRepository tokenRepository;
+	private final CookieUtils cookieUtils;
 
 	public void redirectToLoginPage(HttpServletResponse httpServletResponse) {
 		String authorizationCodeUri = getAuthorizationCodeUri();
@@ -83,19 +82,16 @@ public class AuthorizationService {
 		tokenRepository.saveToken(publicClaim.id(), tokenSaveRequest);
 
 		response.addCookie(
-			CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()));
+			cookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()));
 		response.addCookie(
-			CookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire()));
+			cookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire()));
 		response.addCookie(
-			CookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire()));
+			cookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire()));
+
 	}
 
 	public void validTokenPair(Long id, String oldRefreshToken) {
 		TokenSaveValue tokenSaveValue = tokenRepository.getTokenSaveValue(id);
-
-		if (isNull(tokenSaveValue)) {
-			throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
-		}
 
 		if (!tokenSaveValue.refreshToken().equals(oldRefreshToken)) {
 			tokenRepository.delete(id);
@@ -118,7 +114,7 @@ public class AuthorizationService {
 		Arrays.stream(httpServletRequest.getCookies())
 			.forEach(cookie -> {
 				if (cookie.getName().contains("token")) {
-					httpServletResponse.addCookie(CookieUtils.deleteCookie(cookie));
+					httpServletResponse.addCookie(cookieUtils.deleteCookie(cookie));
 				}
 			});
 	}

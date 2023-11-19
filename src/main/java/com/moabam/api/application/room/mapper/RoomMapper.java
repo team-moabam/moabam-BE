@@ -3,9 +3,14 @@ package com.moabam.api.application.room.mapper;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.dto.room.CreateRoomRequest;
+import com.moabam.api.dto.room.MyRoomResponse;
+import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
+import com.moabam.api.dto.room.RoomHistoryResponse;
+import com.moabam.api.dto.room.RoomsHistoryResponse;
 import com.moabam.api.dto.room.RoutineResponse;
 import com.moabam.api.dto.room.TodayCertificateRankResponse;
 
@@ -43,6 +48,42 @@ public final class RoomMapper {
 			.certifiedDates(certifiedDates)
 			.routine(routineResponses)
 			.todayCertificateRank(todayCertificateRankResponses)
+			.build();
+	}
+
+	public static MyRoomResponse toMyRoomResponse(Room room, boolean isMemberCertifiedToday,
+		boolean isRoomCertifiedToday) {
+		return MyRoomResponse.builder()
+			.roomId(room.getId())
+			.title(room.getTitle())
+			.roomType(room.getRoomType())
+			.certifyTime(room.getCertifyTime())
+			.currentUserCount(room.getCurrentUserCount())
+			.maxUserCount(room.getMaxUserCount())
+			.obtainedBugs(room.getLevel())
+			.isMemberCertifiedToday(isMemberCertifiedToday)
+			.isRoomCertifiedToday(isRoomCertifiedToday)
+			.build();
+	}
+
+	public static MyRoomsResponse toMyRoomsResponse(List<MyRoomResponse> myRoomResponses) {
+		return MyRoomsResponse.builder()
+			.participatingRooms(myRoomResponses)
+			.build();
+	}
+
+	public static RoomHistoryResponse toRoomHistoryResponse(Long roomId, String title, Participant participant) {
+		return RoomHistoryResponse.builder()
+			.roomId(roomId)
+			.title(title)
+			.createdAt(participant.getCreatedAt())
+			.deletedAt(participant.getDeletedAt())
+			.build();
+	}
+
+	public static RoomsHistoryResponse toRoomsHistoryResponse(List<RoomHistoryResponse> roomHistoryResponses) {
+		return RoomsHistoryResponse.builder()
+			.roomHistory(roomHistoryResponses)
 			.build();
 	}
 }

@@ -37,7 +37,8 @@ import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.infrastructure.redis.TokenRepository;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.PublicClaim;
-import com.moabam.global.common.util.CookieUtils;
+import com.moabam.global.common.util.cookie.CookieDevUtils;
+import com.moabam.global.common.util.cookie.CookieUtils;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
@@ -68,6 +69,7 @@ class AuthorizationServiceTest {
 	@Mock
 	TokenRepository tokenRepository;
 
+	CookieUtils cookieUtils;
 	OAuthConfig oauthConfig;
 	TokenConfig tokenConfig;
 	AuthorizationService noPropertyService;
@@ -75,9 +77,11 @@ class AuthorizationServiceTest {
 
 	@BeforeEach
 	public void initParams() {
+		cookieUtils = new CookieDevUtils();
 		tokenConfig = new TokenConfig(null, 100000, 150000,
 			"testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttest");
 		ReflectionTestUtils.setField(authorizationService, "tokenConfig", tokenConfig);
+		ReflectionTestUtils.setField(authorizationService, "cookieUtils", cookieUtils);
 
 		oauthConfig = new OAuthConfig(
 			new OAuthConfig.Provider("https://authorization/url", "http://redirect/url", "http://token/url",
@@ -93,7 +97,7 @@ class AuthorizationServiceTest {
 		);
 		noPropertyService = new AuthorizationService(noOAuthConfig, tokenConfig,
 			oAuth2AuthorizationServerRequestService,
-			memberService, jwtProviderService, tokenRepository);
+			memberService, jwtProviderService, tokenRepository, cookieUtils);
 	}
 
 	@DisplayName("인가코드 URI 생성 매퍼 실패")
@@ -271,19 +275,6 @@ class AuthorizationServiceTest {
 			authorizationService.validTokenPair(1L, "token"));
 	}
 
-	@DisplayName("토큰이 null 이어서 예외 발생")
-	@Test
-	void valid_token_failby_token_is_null() {
-		// Given
-		willReturn(null)
-			.given(tokenRepository).getTokenSaveValue(1L);
-
-		// When + Then
-		assertThatThrownBy(() -> authorizationService.validTokenPair(1L, "token"))
-			.isInstanceOf(UnauthorizedException.class)
-			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
-	}
-
 	@DisplayName("이전 토큰과 동일한지 검증")
 	@Test
 	void valid_token_failby_notEquals_token() {
@@ -304,9 +295,9 @@ class AuthorizationServiceTest {
 		// given
 		MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
 		httpServletRequest.setCookies(
-			CookieUtils.tokenCookie("access_token", "value", 100000),
-			CookieUtils.tokenCookie("refresh_token", "value", 100000),
-			CookieUtils.typeCookie("Bearer", 100000)
+			cookieUtils.tokenCookie("access_token", "value", 100000),
+			cookieUtils.tokenCookie("refresh_token", "value", 100000),
+			cookieUtils.typeCookie("Bearer", 100000)
 		);
 
 		MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
@@ -337,6 +328,6 @@ class AuthorizationServiceTest {
 		Cookie cookie = httpServletResponse.getCookie("access_token");
 
 		// Then
-		assertThat(httpServletResponse.getCookies().length).isZero();
+		assertThat(httpServletResponse.getCookies()).isEmpty();
 	}
 }

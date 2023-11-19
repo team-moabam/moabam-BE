@@ -9,6 +9,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.hash.Jackson2HashMapper;
 import org.springframework.stereotype.Repository;
 
+import com.moabam.global.error.exception.UnauthorizedException;
+import com.moabam.global.error.model.ErrorMessage;
+
 @Repository
 public class HashTemplateRepository {
 
@@ -35,7 +38,7 @@ public class HashTemplateRepository {
 		Map<String, Object> memberToken = hashOperations.entries(key);
 
 		if (memberToken.size() == 0) {
-			return null;
+			throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
 		}
 
 		return hashMapper.fromHash(memberToken);

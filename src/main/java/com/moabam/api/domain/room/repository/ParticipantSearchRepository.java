@@ -34,12 +34,33 @@ public class ParticipantSearchRepository {
 		);
 	}
 
-	public List<Participant> findParticipants(Long roomId) {
+	public List<Participant> findParticipantsByRoomId(Long roomId) {
 		return jpaQueryFactory
 			.selectFrom(participant)
 			.where(
 				participant.room.id.eq(roomId),
 				participant.deletedAt.isNull()
+			)
+			.fetch();
+	}
+
+	public List<Participant> findNotDeletedParticipantsByMemberId(Long memberId) {
+		return jpaQueryFactory
+			.selectFrom(participant)
+			.join(participant.room, room).fetchJoin()
+			.where(
+				participant.memberId.eq(memberId),
+				participant.deletedAt.isNull()
+			)
+			.fetch();
+	}
+
+	public List<Participant> findAllParticipantsByMemberId(Long memberId) {
+		return jpaQueryFactory
+			.selectFrom(participant)
+			.leftJoin(participant.room, room).fetchJoin()
+			.where(
+				participant.memberId.eq(memberId)
 			)
 			.fetch();
 	}
