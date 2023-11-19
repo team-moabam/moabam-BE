@@ -15,8 +15,8 @@ public class CookieProdUtils extends CookieUtils {
 		cookie.setHttpOnly(true);
 		cookie.setPath("/");
 		cookie.setMaxAge((int)expireTime);
+		cookie.setAttribute("SameSite", "Lax");
 
 		return cookie;
 	}
 }
-

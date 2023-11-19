@@ -56,6 +56,7 @@ public class WebConfig implements WebMvcConfigurer {
 				PathMapper.parsePath("/webjars/*"),
 				PathMapper.parsePath("/favicon/*"),
 				PathMapper.parsePath("/*/icon-*"),
+				PathMapper.parsePath("/favicon.ico"),
 				PathMapper.parsePath("/serverTime", List.of(HttpMethod.GET))
 			))
 			.build();
