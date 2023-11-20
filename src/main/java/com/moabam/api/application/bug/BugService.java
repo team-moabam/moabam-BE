@@ -69,7 +69,7 @@ public class BugService {
 	@Transactional
 	public PurchaseProductResponse purchaseBugProduct(Long memberId, Long productId, PurchaseProductRequest request) {
 		Product product = getById(productId);
-		Payment payment = PaymentMapper.toEntity(memberId, product);
+		Payment payment = PaymentMapper.toPayment(memberId, product);
 
 		if (!isNull(request.couponId())) {
 			// TODO: (임시) CouponWallet 에 존재하는 할인 쿠폰인지 확인 @홍혁준
@@ -82,15 +82,15 @@ public class BugService {
 		return ProductMapper.toPurchaseProductResponse(payment);
 	}
 
+	private Product getById(Long productId) {
+		return productRepository.findById(productId)
+			.orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+	}
+
 	private int calculateBugQuantity(List<BugHistory> bugHistory, BugType bugType) {
 		return bugHistory.stream()
 			.filter(history -> bugType.equals(history.getBugType()))
 			.mapToInt(BugHistory::getQuantity)
 			.sum();
-	}
-
-	private Product getById(Long productId) {
-		return productRepository.findById(productId)
-			.orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
 	}
 }

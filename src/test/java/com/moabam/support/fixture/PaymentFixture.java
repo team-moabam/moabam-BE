@@ -1,7 +1,5 @@
 package com.moabam.support.fixture;
 
-import static com.moabam.support.fixture.ProductFixture.*;
-
 import com.moabam.api.domain.payment.Order;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.product.Product;
@@ -14,14 +12,14 @@ public final class PaymentFixture {
 		return Payment.builder()
 			.memberId(1L)
 			.product(product)
-			.order(order())
+			.order(order(product))
+			.amount(product.getPrice())
 			.build();
 	}
 
-	public static Order order() {
+	public static Order order(Product product) {
 		return Order.builder()
-			.name(BUG_PRODUCT_NAME)
-			.amount(BUG_PRODUCT_PRICE)
+			.name(product.getName())
 			.build();
 	}
 }
