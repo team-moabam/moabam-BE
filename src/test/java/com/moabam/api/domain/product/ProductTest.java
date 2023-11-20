@@ -13,7 +13,7 @@ class ProductTest {
 	@Test
 	void validate_price_exception() {
 		Product.ProductBuilder productBuilder = Product.builder()
-			.name("X10")
+			.name("황금벌레 10")
 			.price(-10);
 
 		assertThatThrownBy(productBuilder::build)
@@ -25,7 +25,7 @@ class ProductTest {
 	@Test
 	void validate_quantity_exception() {
 		Product.ProductBuilder productBuilder = Product.builder()
-			.name("X10")
+			.name("황금벌레 10")
 			.price(1000)
 			.quantity(-1);
 

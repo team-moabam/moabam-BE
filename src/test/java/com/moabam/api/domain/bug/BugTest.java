@@ -2,7 +2,6 @@ package com.moabam.api.domain.bug;
 
 import static com.moabam.support.fixture.BugFixture.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -42,8 +41,11 @@ class BugTest {
 			// given
 			Bug bug = bug();
 
-			// when, then
-			assertDoesNotThrow(() -> bug.use(BugType.MORNING, 5));
+			// when
+			bug.use(BugType.MORNING, 5);
+
+			// then
+			assertThat(bug.getMorningBug()).isEqualTo(MORNING_BUG - 5);
 		}
 
 		@DisplayName("벌레 개수가 부족하면 사용할 수 없다.")
@@ -71,8 +73,8 @@ class BugTest {
 		bug.increaseBug(BugType.GOLDEN, 5);
 
 		// then
-		assertThat(bug.getMorningBug()).isEqualTo(15);
-		assertThat(bug.getNightBug()).isEqualTo(25);
-		assertThat(bug.getGoldenBug()).isEqualTo(35);
+		assertThat(bug.getMorningBug()).isEqualTo(MORNING_BUG + 5);
+		assertThat(bug.getNightBug()).isEqualTo(NIGHT_BUG + 5);
+		assertThat(bug.getGoldenBug()).isEqualTo(GOLDEN_BUG + 5);
 	}
 }
