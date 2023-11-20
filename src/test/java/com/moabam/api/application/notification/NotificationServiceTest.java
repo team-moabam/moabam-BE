@@ -14,12 +14,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.Message;
 import com.moabam.api.application.room.RoomService;
+import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
-import com.moabam.api.infrastructure.redis.NotificationRepository;
+import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.error.exception.ConflictException;
@@ -38,7 +37,7 @@ class NotificationServiceTest {
 	private RoomService roomService;
 
 	@Mock
-	private FirebaseMessaging firebaseMessaging;
+	private FcmService fcmService;
 
 	@Mock
 	private NotificationRepository notificationRepository;
@@ -62,7 +61,7 @@ class NotificationServiceTest {
 		notificationService.sendKnockNotification(member, 2L, 1L);
 
 		// Then
-		verify(firebaseMessaging).sendAsync(any(Message.class));
+		verify(fcmService).sendAsyncFcm(any(String.class), any(String.class));
 		verify(notificationRepository).saveKnockNotification(any(String.class));
 	}
 
@@ -124,7 +123,7 @@ class NotificationServiceTest {
 		notificationService.sendCertificationTimeNotification();
 
 		// Then
-		verify(firebaseMessaging, times(3)).sendAsync(any(Message.class));
+		verify(fcmService, times(3)).sendAsyncFcm(any(String.class), any(String.class));
 	}
 
 	@WithMember
@@ -140,7 +139,7 @@ class NotificationServiceTest {
 		notificationService.sendCertificationTimeNotification();
 
 		// Then
-		verify(firebaseMessaging, times(0)).sendAsync(any(Message.class));
+		verify(fcmService, times(0)).sendAsyncFcm(any(String.class), any(String.class));
 	}
 
 	@WithMember

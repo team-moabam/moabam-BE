@@ -19,11 +19,11 @@ import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
-@SpringBootTest(classes = {RedisConfig.class, EmbeddedRedisConfig.class, HashTemplateRepository.class})
-class HashTemplateRepositoryTest {
+@SpringBootTest(classes = {RedisConfig.class, EmbeddedRedisConfig.class, HashRedisRepository.class})
+class HashRedisRepositoryTest {
 
 	@Autowired
-	private HashTemplateRepository hashTemplateRepository;
+	private HashRedisRepository hashRedisRepository;
 
 	String key = "auth_123";
 	String token = "token";
@@ -33,19 +33,19 @@ class HashTemplateRepositoryTest {
 
 	@BeforeEach
 	void setUp() {
-		hashTemplateRepository.save(key, (Object)tokenSaveValue, duration);
+		hashRedisRepository.save(key, (Object)tokenSaveValue, duration);
 	}
 
 	@AfterEach
 	void delete() {
-		hashTemplateRepository.delete(key);
+		hashRedisRepository.delete(key);
 	}
 
 	@DisplayName("레디스에 hash 저장 성공")
 	@Test
 	void hashTemplate_repository_save_success() {
 		// Given + When
-		TokenSaveValue object = (TokenSaveValue)hashTemplateRepository.get(key);
+		TokenSaveValue object = (TokenSaveValue)hashRedisRepository.get(key);
 
 		// Then
 		assertAll(
@@ -58,10 +58,10 @@ class HashTemplateRepositoryTest {
 	@Test
 	void delete_and_get_null() {
 		// Given
-		hashTemplateRepository.delete(key);
+		hashRedisRepository.delete(key);
 
 		// When + Then
-		assertThatThrownBy(() -> hashTemplateRepository.get(key))
+		assertThatThrownBy(() -> hashRedisRepository.get(key))
 			.isInstanceOf(UnauthorizedException.class)
 			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
 	}
@@ -70,7 +70,7 @@ class HashTemplateRepositoryTest {
 	@Test
 	void valid_token_failby_token_is_null() {
 		// Given + When + Then
-		assertThatThrownBy(() -> hashTemplateRepository.get("0"))
+		assertThatThrownBy(() -> hashRedisRepository.get("0"))
 			.isInstanceOf(UnauthorizedException.class)
 			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
 	}
