@@ -23,7 +23,7 @@ import com.moabam.api.dto.notification.KnockNotificationStatusResponse;
 import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
-import com.moabam.global.common.util.SystemClockHolder;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -49,7 +49,7 @@ class NotificationServiceTest {
 	private ParticipantSearchRepository participantSearchRepository;
 
 	@Mock
-	private SystemClockHolder systemClockHolder;
+	private ClockHolder clockHolder;
 
 	@WithMember
 	@DisplayName("성공적으로 상대에게 콕 알림을 보낸다. - Void")
@@ -124,7 +124,7 @@ class NotificationServiceTest {
 		// Given
 		given(participantSearchRepository.findAllByRoomCertifyTime(any(Integer.class))).willReturn(participants);
 		given(notificationRepository.findFcmTokenByMemberId(any(Long.class))).willReturn("FCM-TOKEN");
-		given(systemClockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
 		// When
 		notificationService.sendCertificationTimeNotification();
@@ -141,7 +141,7 @@ class NotificationServiceTest {
 		// Given
 		given(participantSearchRepository.findAllByRoomCertifyTime(any(Integer.class))).willReturn(participants);
 		given(notificationRepository.findFcmTokenByMemberId(any(Long.class))).willReturn(null);
-		given(systemClockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
 		// When
 		notificationService.sendCertificationTimeNotification();

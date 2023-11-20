@@ -14,7 +14,7 @@ import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.global.auth.model.AuthorizationMember;
-import com.moabam.global.common.util.SystemClockHolder;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -29,7 +29,7 @@ public class CouponService {
 
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
-	private final SystemClockHolder systemClockHolder;
+	private final ClockHolder clockHolder;
 
 	@Transactional
 	public void createCoupon(AuthorizationMember admin, CreateCouponRequest request) {
@@ -57,7 +57,7 @@ public class CouponService {
 	}
 
 	public List<CouponResponse> getCoupons(CouponSearchRequest request) {
-		LocalDateTime now = systemClockHolder.times();
+		LocalDateTime now = clockHolder.times();
 		List<Coupon> coupons = couponSearchRepository.findAllByStatus(now, request);
 
 		return coupons.stream()
@@ -66,7 +66,7 @@ public class CouponService {
 	}
 
 	public Coupon validateCouponPeriod(String couponName) {
-		LocalDateTime now = systemClockHolder.times();
+		LocalDateTime now = clockHolder.times();
 		Coupon coupon = couponRepository.findByName(couponName)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 

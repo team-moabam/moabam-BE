@@ -26,7 +26,7 @@ import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
-import com.moabam.global.common.util.SystemClockHolder;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -48,7 +48,7 @@ class CouponServiceTest {
 	private CouponSearchRepository couponSearchRepository;
 
 	@Mock
-	private SystemClockHolder systemClockHolder;
+	private ClockHolder clockHolder;
 
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("쿠폰을 성공적으로 발행한다. - Void")
@@ -209,7 +209,7 @@ class CouponServiceTest {
 		CouponSearchRequest request = CouponFixture.couponSearchRequest(true, true, true);
 		given(couponSearchRepository.findAllByStatus(any(LocalDateTime.class), any(CouponSearchRequest.class)))
 			.willReturn(coupons);
-		given(systemClockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
 		// When
 		List<CouponResponse> actual = couponService.getCoupons(request);
@@ -225,7 +225,7 @@ class CouponServiceTest {
 		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 0);
 		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
 		given(couponRepository.findByName(any(String.class))).willReturn(Optional.of(coupon));
-		given(systemClockHolder.times()).willReturn(now);
+		given(clockHolder.times()).willReturn(now);
 
 		// When
 		Coupon actual = couponService.validateCouponPeriod(coupon.getName());
@@ -241,7 +241,7 @@ class CouponServiceTest {
 		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 0);
 		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
 		given(couponRepository.findByName(any(String.class))).willReturn(Optional.of(coupon));
-		given(systemClockHolder.times()).willReturn(now);
+		given(clockHolder.times()).willReturn(now);
 
 		// When & Then
 		assertThatThrownBy(() -> couponService.validateCouponPeriod("couponName"))
@@ -255,7 +255,7 @@ class CouponServiceTest {
 		// Given
 		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 0);
 		given(couponRepository.findByName(any(String.class))).willReturn(Optional.empty());
-		given(systemClockHolder.times()).willReturn(now);
+		given(clockHolder.times()).willReturn(now);
 
 		// When & Then
 		assertThatThrownBy(() -> couponService.validateCouponPeriod("Not found coupon name"))

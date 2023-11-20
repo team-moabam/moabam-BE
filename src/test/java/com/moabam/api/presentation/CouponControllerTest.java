@@ -32,7 +32,7 @@ import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
-import com.moabam.global.common.util.SystemClockHolder;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
@@ -56,7 +56,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	private CouponRepository couponRepository;
 
 	@MockBean
-	private SystemClockHolder systemClockHolder;
+	private ClockHolder clockHolder;
 
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("쿠폰을 성공적으로 발행한다. - Void")
@@ -244,7 +244,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 1);
 		Coupon coupon = couponRepository.save(couponFixture);
 
-		given(systemClockHolder.times()).willReturn(now);
+		given(clockHolder.times()).willReturn(now);
 
 		// When & Then
 		mockMvc.perform(post("/coupons")
@@ -265,7 +265,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 1);
 		Coupon coupon = couponRepository.save(couponFixture);
 
-		given(systemClockHolder.times()).willReturn(now);
+		given(clockHolder.times()).willReturn(now);
 
 		// When & Then
 		mockMvc.perform(post("/coupons")
@@ -288,7 +288,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		Coupon coupon = CouponFixture.coupon("Not found coupon name", 1, 2);
 		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 1);
 
-		given(systemClockHolder.times()).willReturn(now);
+		given(clockHolder.times()).willReturn(now);
 
 		// When & Then
 		mockMvc.perform(post("/coupons")
