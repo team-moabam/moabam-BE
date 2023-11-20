@@ -63,7 +63,7 @@ public class AuthorizationService {
 
 		return authorizationTokenInfoResponse.getBody();
 	}
-	
+
 	public LoginResponse signUpOrLogin(HttpServletResponse httpServletResponse,
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse) {
 		LoginResponse loginResponse = memberService.login(authorizationTokenInfoResponse);

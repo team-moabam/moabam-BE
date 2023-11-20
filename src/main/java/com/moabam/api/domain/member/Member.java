@@ -4,10 +4,8 @@ import static com.moabam.global.common.util.GlobalConstant.*;
 import static com.moabam.global.common.util.RandomUtils.*;
 import static java.util.Objects.*;
 
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -44,7 +42,7 @@ public class Member extends BaseTimeEntity {
 	private Long id;
 
 	@Column(name = "social_id", nullable = false, unique = true)
-	private Long socialId;
+	private String socialId;
 
 	@Column(name = "nickname", nullable = false, unique = true)
 	private String nickname;
@@ -83,7 +81,7 @@ public class Member extends BaseTimeEntity {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	private Member(Long id, Long socialId, Bug bug) {
+	private Member(Long id, String socialId, Bug bug) {
 		this.id = id;
 		this.socialId = requireNonNull(socialId);
 		this.nickname = createNickName();
@@ -122,14 +120,14 @@ public class Member extends BaseTimeEntity {
 
 	public void delete() {
 		deletedAt = LocalDateTime.now();
-		socialId = deleteNickName(deletedAt);
+		socialId = deleteSocialId(deletedAt);
 	}
 
 	private String createNickName() {
 		return "오목눈이#" + randomStringValues();
 	}
 
-	private String deleteNickName(LocalDateTime now) {
+	private String deleteSocialId(LocalDateTime now) {
 		return "delete_" + now.toString() + randomNumberValues();
 	}
 }

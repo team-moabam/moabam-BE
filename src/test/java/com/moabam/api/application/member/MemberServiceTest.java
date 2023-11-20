@@ -1,4 +1,4 @@
-package com.moabam.api.application;
+package com.moabam.api.application.member;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
@@ -37,7 +36,7 @@ class MemberServiceTest {
 			AuthorizationResponseFixture.authorizationTokenInfoResponse();
 		Member member = MemberFixture.member();
 		willReturn(Optional.of(member))
-			.given(memberRepository).findBySocialId(authorizationTokenInfoResponse.id());
+			.given(memberRepository).findBySocialId(String.valueOf(authorizationTokenInfoResponse.id()));
 
 		// when
 		LoginResponse result = memberService.login(authorizationTokenInfoResponse);
@@ -54,7 +53,7 @@ class MemberServiceTest {
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
 			AuthorizationResponseFixture.authorizationTokenInfoResponse();
 		willReturn(Optional.empty())
-			.given(memberRepository).findBySocialId(authorizationTokenInfoResponse.id());
+			.given(memberRepository).findBySocialId(String.valueOf(authorizationTokenInfoResponse.id()));
 
 		Member member = spy(MemberFixture.member());
 		given(member.getId()).willReturn(1L);
