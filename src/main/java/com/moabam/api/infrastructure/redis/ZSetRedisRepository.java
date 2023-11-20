@@ -12,9 +12,11 @@ public class ZSetRedisRepository {
 	private final RedisTemplate<String, Object> redisTemplate;
 
 	public void addIfAbsent(String key, String value, double score) {
-		redisTemplate
-			.opsForZSet()
-			.addIfAbsent(key, value, score);
+		if (redisTemplate.opsForZSet().score(key, value) == null) {
+			redisTemplate
+				.opsForZSet()
+				.add(key, value, score);
+		}
 	}
 
 	public Long size(String key) {
