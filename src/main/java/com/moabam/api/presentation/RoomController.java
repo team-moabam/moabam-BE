@@ -124,4 +124,13 @@ public class RoomController {
 
 		return roomSearchService.searchAllRooms(roomType, roomId);
 	}
+
+	@GetMapping("/search")
+	@ResponseStatus(HttpStatus.OK)
+	public SearchAllRoomsResponse search(@RequestParam(value = "keyword") String keyword,
+		@RequestParam(value = "type", required = false) RoomType roomType,
+		@RequestParam(value = "roomId", required = false) Long roomId) {
+
+		return roomSearchService.search(keyword, roomType, roomId);
+	}
 }
