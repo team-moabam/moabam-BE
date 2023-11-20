@@ -68,7 +68,7 @@ public class BugService {
 
 	@Transactional
 	public PurchaseProductResponse purchaseBugProduct(Long memberId, Long productId, PurchaseProductRequest request) {
-		Product product = getProduct(productId);
+		Product product = getById(productId);
 		Payment payment = PaymentMapper.toEntity(memberId, product);
 
 		if (!isNull(request.couponId())) {
@@ -89,7 +89,7 @@ public class BugService {
 			.sum();
 	}
 
-	private Product getProduct(Long productId) {
+	private Product getById(Long productId) {
 		return productRepository.findById(productId)
 			.orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
 	}
