@@ -2,11 +2,9 @@ package com.moabam.api.application.member;
 
 import static com.moabam.global.error.model.ErrorMessage.*;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +14,8 @@ import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.common.util.RandomUtils;
 import com.moabam.global.error.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -41,18 +41,6 @@ public class MemberService {
 		return AuthMapper.toLoginResponse(loginMember, member.isEmpty());
 	}
 
-	private Member signUp(Long socialId) {
-		String randomNickName = createRandomNickName();
-		Member member = AuthMapper.toMember(socialId, randomNickName);
-
-		return memberRepository.save(member);
-	}
-
-	private String createRandomNickName() {
-		return RandomStringUtils.random(6, 0, 0, true, true, null,
-			new SecureRandom());
-	}
-
 	public Member getManager(Long roomId) {
 		return memberSearchRepository.findManager(roomId)
 			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
@@ -60,5 +48,20 @@ public class MemberService {
 
 	public List<Member> getRoomMembers(List<Long> memberIds) {
 		return memberRepository.findAllById(memberIds);
+	}
+
+	@Transactional
+	public void deleteMember(AuthorizationMember authorizationMember) {
+		Member member = memberSearchRepository.findMember(authorizationMember.id())
+			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
+
+		member.delete();
+	}
+
+	private Member signUp(Long socialId) {
+		String randomNickName = RandomUtils.randomStringValues();
+		Member member = AuthMapper.toMember(socialId, randomNickName);
+
+		return memberRepository.save(member);
 	}
 }

@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import com.moabam.api.domain.member.Member;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -24,10 +25,25 @@ public class MemberSearchRepository {
 				.selectFrom(member)
 				.innerJoin(participant).on(member.id.eq(participant.memberId))
 				.where(
+					isNotDeleted(),
 					participant.isManager.eq(true),
 					participant.room.id.eq(roomId)
 				)
 				.fetchOne()
 		);
+	}
+
+	public Optional<Member> findMember(Long memberId) {
+		return Optional.ofNullable(jpaQueryFactory
+			.selectFrom(member)
+			.where(
+				isNotDeleted(),
+				member.id.eq(memberId)
+			)
+			.fetchOne());
+	}
+
+	private BooleanExpression isNotDeleted() {
+		return member.deletedAt.isNotNull();
 	}
 }
