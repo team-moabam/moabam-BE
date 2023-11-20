@@ -1,6 +1,7 @@
 package com.moabam.api.presentation;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.auth.AuthorizationService;
+import com.moabam.api.application.member.MemberService;
 import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
@@ -25,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 
 	private final AuthorizationService authorizationService;
+	private final MemberService memberService;
 
 	@GetMapping
 	public void socialLogin(HttpServletResponse httpServletResponse) {
@@ -47,5 +50,11 @@ public class MemberController {
 	public void logout(@CurrentMember AuthorizationMember authorizationMember,
 		HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 		authorizationService.logout(authorizationMember, httpServletRequest, httpServletResponse);
+	}
+
+	@DeleteMapping
+	@ResponseStatus(HttpStatus.OK)
+	public void deleteMember(@CurrentMember AuthorizationMember authorizationMember) {
+		memberService.deleteMember(authorizationMember);
 	}
 }
