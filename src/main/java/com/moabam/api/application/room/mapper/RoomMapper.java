@@ -42,14 +42,14 @@ public final class RoomMapper {
 			.managerNickName(managerNickname)
 			.roomImage(room.getRoomImage())
 			.level(room.getLevel())
-			.roomType(room.getRoomType().name())
+			.roomType(room.getRoomType())
 			.certifyTime(room.getCertifyTime())
 			.currentUserCount(room.getCurrentUserCount())
 			.maxUserCount(room.getMaxUserCount())
 			.announcement(room.getAnnouncement())
 			.completePercentage(completePercentage)
 			.certifiedDates(certifiedDates)
-			.routine(routineResponses)
+			.routines(routineResponses)
 			.todayCertificateRank(todayCertificateRankResponses)
 			.build();
 	}
@@ -103,7 +103,7 @@ public final class RoomMapper {
 			.certifyTime(room.getCertifyTime())
 			.currentUserCount(room.getCurrentUserCount())
 			.maxUserCount(room.getMaxUserCount())
-			.routine(routineResponses)
+			.routines(routineResponses)
 			.build();
 	}
 

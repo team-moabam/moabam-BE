@@ -28,6 +28,7 @@ import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.domain.room.Routine;
 import com.moabam.api.domain.room.repository.CertificationsSearchRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
+import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoomSearchRepository;
 import com.moabam.api.domain.room.repository.RoutineSearchRepository;
 import com.moabam.api.dto.room.CertificationImageResponse;
@@ -54,6 +55,7 @@ public class RoomSearchService {
 	private final ParticipantSearchRepository participantSearchRepository;
 	private final RoutineSearchRepository routineSearchRepository;
 	private final RoomSearchRepository roomSearchRepository;
+	private final RoomRepository roomRepository;
 	private final MemberService memberService;
 	private final RoomCertificationService roomCertificationService;
 	private final NotificationService notificationService;
@@ -116,7 +118,38 @@ public class RoomSearchService {
 	public SearchAllRoomsResponse searchAllRooms(@Nullable RoomType roomType, @Nullable Long roomId) {
 		List<SearchAllRoomResponse> searchAllRoomResponses = new ArrayList<>();
 		List<Room> rooms = new ArrayList<>(roomSearchRepository.findAllWithNoOffset(roomType, roomId));
+		boolean hasNext = isHasNext(searchAllRoomResponses, rooms);
 
+		return RoomMapper.toSearchAllRoomsResponse(hasNext, searchAllRoomResponses);
+	}
+
+	public SearchAllRoomsResponse search(String keyword, @Nullable RoomType roomType, @Nullable Long roomId) {
+		List<SearchAllRoomResponse> searchAllRoomResponses = new ArrayList<>();
+		List<Room> rooms = new ArrayList<>();
+
+		if (roomId == null && roomType == null) {
+			rooms = new ArrayList<>(roomRepository.searchByKeyword(keyword));
+		}
+
+		if (roomId == null && roomType != null) {
+			rooms = new ArrayList<>(roomRepository.searchByKeywordAndRoomType(keyword, roomType.name()));
+		}
+
+		if (roomId != null && roomType == null) {
+			rooms = new ArrayList<>(roomRepository.searchByKeywordAndRoomId(keyword, roomId));
+		}
+
+		if (roomId != null && roomType != null) {
+			rooms = new ArrayList<>(
+				roomRepository.searchByKeywordAndRoomIdAndRoomType(keyword, roomType.name(), roomId));
+		}
+
+		boolean hasNext = isHasNext(searchAllRoomResponses, rooms);
+
+		return RoomMapper.toSearchAllRoomsResponse(hasNext, searchAllRoomResponses);
+	}
+
+	private boolean isHasNext(List<SearchAllRoomResponse> searchAllRoomResponses, List<Room> rooms) {
 		boolean hasNext = false;
 
 		if (rooms.size() > ROOM_FIXED_SEARCH_SIZE) {
@@ -138,8 +171,7 @@ public class RoomSearchService {
 				RoomMapper.toSearchAllRoomResponse(room, RoutineMapper.toRoutineResponses(filteredRoutines),
 					isPassword));
 		}
-
-		return RoomMapper.toSearchAllRoomsResponse(hasNext, searchAllRoomResponses);
+		return hasNext;
 	}
 
 	private List<RoutineResponse> getRoutineResponses(Long roomId) {

@@ -18,7 +18,7 @@ public record SearchAllRoomResponse(
 	int certifyTime,
 	int currentUserCount,
 	int maxUserCount,
-	List<RoutineResponse> routine
+	List<RoutineResponse> routines
 ) {
 
 }
