@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import com.moabam.global.config.EmbeddedRedisConfig;
 
@@ -15,6 +16,9 @@ class ZSetRedisRepositoryTest {
 
 	@Autowired
 	private ZSetRedisRepository zSetRedisRepository;
+
+	@Autowired
+	private RedisTemplate<String, Object> redisTemplate;
 
 	String key = "key";
 	String value = "value";
@@ -34,6 +38,17 @@ class ZSetRedisRepositoryTest {
 
 		// Then
 		assertThat(zSetRedisRepository.size(key)).isEqualTo(1);
+	}
+
+	@DisplayName("이미 존재하는 값을 한 번 더 저장을 시도한다. - Void")
+	@Test
+	void setRedisRepository_addIfAbsent_not_update() {
+		// When
+		zSetRedisRepository.addIfAbsent(key, value, 1);
+		zSetRedisRepository.addIfAbsent(key, value, 5);
+
+		// Then
+		assertThat(redisTemplate.opsForZSet().score(key, value)).isEqualTo(1);
 	}
 
 	@DisplayName("레디스의 특정 키의 사이즈가 성공적으로 반환된다. - int")
