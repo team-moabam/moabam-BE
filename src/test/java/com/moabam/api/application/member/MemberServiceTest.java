@@ -14,12 +14,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
+import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.api.dto.member.DeleteMemberResponse;
+import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.support.annotation.WithMember;
+import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.AuthorizationResponseFixture;
+import com.moabam.support.fixture.DeleteMemberFixture;
 import com.moabam.support.fixture.MemberFixture;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, FilterProcessExtension.class})
 class MemberServiceTest {
 
 	@InjectMocks
@@ -27,6 +33,9 @@ class MemberServiceTest {
 
 	@Mock
 	MemberRepository memberRepository;
+
+	@Mock
+	MemberSearchRepository memberSearchRepository;
 
 	@DisplayName("회원 존재하고 로그인 성공")
 	@Test
@@ -66,5 +75,42 @@ class MemberServiceTest {
 		// then
 		assertThat(authorizationTokenInfoResponse.id()).isEqualTo(result.publicClaim().id());
 		assertThat(result.isSignUp()).isTrue();
+	}
+
+	@DisplayName("멤버 삭제 성공")
+	@Test
+	void delete_member_test(@WithMember AuthorizationMember authorizationMember) {
+		// given
+		Member member = MemberFixture.member();
+		String beforeSocialId = member.getSocialId();
+
+		given(memberSearchRepository.findMember(authorizationMember.id()))
+			.willReturn(Optional.ofNullable(member));
+
+		// when
+		DeleteMemberResponse deleteMemberResponse = memberService.deleteMember(authorizationMember);
+
+		// then
+		assertThat(member).isNotNull();
+		assertThat(deleteMemberResponse.socialId()).isEqualTo(beforeSocialId);
+		assertThat(member.getSocialId()).contains("delete");
+	}
+
+	@DisplayName("회원 삭제 반환")
+	@Test
+	void undo_delete_member(@WithMember AuthorizationMember authorizationMember) {
+		// given
+		Member member = MemberFixture.member();
+		DeleteMemberResponse deleteMemberResponse = DeleteMemberFixture.deleteMemberResponse();
+
+		given(memberSearchRepository.findMember(authorizationMember.id()))
+			.willReturn(Optional.ofNullable(member));
+
+		// when
+		memberService.undoDelete(deleteMemberResponse);
+
+		// then
+		assertThat(member).isNotNull();
+		assertThat(deleteMemberResponse.socialId()).isEqualTo(member.getSocialId());
 	}
 }

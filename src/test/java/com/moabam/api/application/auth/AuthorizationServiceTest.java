@@ -23,9 +23,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.moabam.api.application.auth.AuthorizationService;
-import com.moabam.api.application.auth.JwtProviderService;
-import com.moabam.api.application.auth.OAuth2AuthorizationServerRequestService;
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.dto.auth.AuthorizationCodeRequest;
@@ -85,15 +82,15 @@ class AuthorizationServiceTest {
 
 		oauthConfig = new OAuthConfig(
 			new OAuthConfig.Provider("https://authorization/url", "http://redirect/url", "http://token/url",
-				"http://tokenInfo/url"),
+				"http://tokenInfo/url", "https://deleteRequest/url"),
 			new OAuthConfig.Client("provider", "testtestetsttest", "testtesttest", "authorization_code",
-				List.of("profile_nickname", "profile_image"))
+				List.of("profile_nickname", "profile_image"), "adminKey")
 		);
 		ReflectionTestUtils.setField(authorizationService, "oAuthConfig", oauthConfig);
 
 		noOAuthConfig = new OAuthConfig(
-			new OAuthConfig.Provider(null, null, null, null),
-			new OAuthConfig.Client(null, null, null, null, null)
+			new OAuthConfig.Provider(null, null, null, null, null),
+			new OAuthConfig.Client(null, null, null, null, null, null)
 		);
 		noPropertyService = new AuthorizationService(noOAuthConfig, tokenConfig,
 			oAuth2AuthorizationServerRequestService,
@@ -329,5 +326,27 @@ class AuthorizationServiceTest {
 
 		// Then
 		assertThat(httpServletResponse.getCookies()).isEmpty();
+	}
+
+	@DisplayName("")
+	@Test
+	void unlinke_success() {
+		// given
+
+		// when
+
+		// then
+
+	}
+
+	@DisplayName("연결 요청 실패에 따른 성공 실패")
+	@Test
+	void unlink_fail() {
+		// given
+
+		// when
+
+		// then
+
 	}
 }
