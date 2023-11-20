@@ -4,10 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +15,6 @@ import org.springframework.context.annotation.Import;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.global.config.JpaConfig;
-import com.moabam.global.error.exception.NotFoundException;
-import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.fixture.CouponFixture;
 
 @DataJpaTest
@@ -30,31 +26,6 @@ class CouponSearchRepositoryTest {
 
 	@Autowired
 	private CouponSearchRepository couponSearchRepository;
-
-	@DisplayName("특정 쿠폰을 조회한다. - CouponResponse")
-	@Test
-	void couponSearchRepository_findById() {
-		// Given
-		Coupon coupon = couponRepository.save(CouponFixture.coupon(10, 100));
-
-		// When
-		Coupon actual = couponSearchRepository.findById(coupon.getId())
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
-
-		// Then
-		assertThat(actual.getStock()).isEqualTo(coupon.getStock());
-		assertThat(actual.getPoint()).isEqualTo(coupon.getPoint());
-	}
-
-	@DisplayName("존재하지 않는 쿠폰을 조회한다. - NotFoundException")
-	@Test
-	void couponSearchRepository_findById_NotFoundException() {
-		// When
-		Optional<Coupon> actual = couponSearchRepository.findById(77777L);
-
-		// Then
-		assertThat(actual).isEmpty();
-	}
 
 	@DisplayName("모든 쿠폰을 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")

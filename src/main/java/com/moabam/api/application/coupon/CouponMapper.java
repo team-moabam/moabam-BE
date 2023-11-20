@@ -15,7 +15,7 @@ public final class CouponMapper {
 		return Coupon.builder()
 			.name(request.name())
 			.description(request.description())
-			.couponType(CouponType.from(request.couponType()))
+			.type(CouponType.from(request.couponType()))
 			.point(request.point())
 			.stock(request.stock())
 			.startAt(request.startAt())
@@ -33,7 +33,7 @@ public final class CouponMapper {
 			.description(coupon.getDescription())
 			.point(coupon.getPoint())
 			.stock(coupon.getStock())
-			.couponType(coupon.getCouponType())
+			.couponType(coupon.getType())
 			.startAt(coupon.getStartAt())
 			.endAt(coupon.getEndAt())
 			.build();

@@ -9,6 +9,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.moabam.global.auth.handler.PathResolver;
 
+import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpMethod;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,14 @@ public class PathFilter extends OncePerRequestFilter {
 			}
 		});
 
+		if (isOption(request.getMethod())) {
+			request.setAttribute("isPermit", true);
+		}
+
 		filterChain.doFilter(request, response);
+	}
+
+	public boolean isOption(String method) {
+		return HttpMethod.OPTIONS.name().equals(method);
 	}
 }

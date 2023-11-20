@@ -25,13 +25,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
 import com.moabam.api.application.member.MemberService;
+import com.moabam.api.domain.auth.repository.TokenRepository;
 import com.moabam.api.dto.auth.AuthorizationCodeRequest;
 import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
-import com.moabam.api.infrastructure.redis.TokenRepository;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.cookie.CookieDevUtils;

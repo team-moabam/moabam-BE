@@ -1,10 +1,7 @@
 package com.moabam.api.application.notification;
 
-import java.util.List;
-
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import com.moabam.api.dto.notification.KnockNotificationStatusResponse;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -13,20 +10,11 @@ import lombok.NoArgsConstructor;
 public final class NotificationMapper {
 
 	private static final String NOTIFICATION_TITLE = "모아밤";
-	private static final String KNOCK_BODY = "님이 콕 찔렀습니다.";
-	private static final String CERTIFY_TIME_BODY = "방 인증 시간입니다.";
 
-	public static Notification toKnockNotificationEntity(String nickname) {
+	public static Notification toNotification(String body) {
 		return Notification.builder()
 			.setTitle(NOTIFICATION_TITLE)
-			.setBody(nickname + KNOCK_BODY)
-			.build();
-	}
-
-	public static Notification toCertifyAuthNotificationEntity(String title) {
-		return Notification.builder()
-			.setTitle(NOTIFICATION_TITLE)
-			.setBody(title + CERTIFY_TIME_BODY)
+			.setBody(body)
 			.build();
 	}
 
@@ -34,16 +22,6 @@ public final class NotificationMapper {
 		return Message.builder()
 			.setNotification(notification)
 			.setToken(fcmToken)
-			.build();
-	}
-
-	public static KnockNotificationStatusResponse toKnockNotificationStatusResponse(
-		List<Long> knockedMembersId,
-		List<Long> notKnockedMembersId
-	) {
-		return KnockNotificationStatusResponse.builder()
-			.knockedMembersId(knockedMembersId)
-			.notKnockedMembersId(notKnockedMembersId)
 			.build();
 	}
 }

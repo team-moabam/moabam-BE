@@ -5,6 +5,7 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

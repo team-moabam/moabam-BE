@@ -1,16 +1,11 @@
 package com.moabam.api.presentation;
 
-import static com.moabam.api.domain.room.RoomType.MORNING;
-import static com.moabam.api.domain.room.RoomType.NIGHT;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static com.moabam.api.domain.room.RoomType.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -37,6 +32,7 @@ import com.moabam.api.domain.room.DailyMemberCertification;
 import com.moabam.api.domain.room.DailyRoomCertification;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.domain.room.Routine;
 import com.moabam.api.domain.room.repository.CertificationRepository;
 import com.moabam.api.domain.room.repository.DailyMemberCertificationRepository;
@@ -828,8 +824,12 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			LocalDate.now());
 		dailyRoomCertificationRepository.save(dailyRoomCertification);
 
+		DailyRoomCertification dailyRoomCertification1 = RoomFixture.dailyRoomCertification(room.getId(),
+			LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), LocalDate.now().getDayOfMonth() - 3));
+		dailyRoomCertificationRepository.save(dailyRoomCertification1);
+
 		// expected
-		mockMvc.perform(get("/rooms/" + room.getId()))
+		mockMvc.perform(get("/rooms/" + room.getId() + "/" + LocalDate.now()))
 			.andExpect(status().isOk())
 			.andDo(print());
 	}
@@ -916,6 +916,314 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		// expected
 		mockMvc.perform(get("/rooms/join-history"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("아침, 저녁 방 전체 조회 성공 - 첫 번째 조회, 다음 페이지 있음")
+	@WithMember(id = 1L)
+	@Test
+	void search_all_morning_night_rooms_success() throws Exception {
+		// given
+		Room room1 = RoomFixture.room("아침 - 첫 번째 방", RoomType.MORNING, 10, "1234");
+		Room room2 = RoomFixture.room("아침 - 두 번째 방", RoomType.MORNING, 9);
+		Room room3 = RoomFixture.room("밤 - 세 번째 방", RoomType.NIGHT, 22);
+		Room room4 = RoomFixture.room("아침 - 네 번째 방", RoomType.MORNING, 7);
+		Room room5 = RoomFixture.room("밤 - 다섯 번째 방", RoomType.NIGHT, 23, "5869");
+		Room room6 = RoomFixture.room("아침 - 여섯 번째 방", RoomType.MORNING, 8);
+		Room room7 = RoomFixture.room("밤 - 일곱 번째 방", RoomType.NIGHT, 20);
+		Room room8 = RoomFixture.room("밤 - 여덟 번째 방", RoomType.NIGHT, 1, "5236");
+		Room room9 = RoomFixture.room("아침 - 아홉 번째 방", RoomType.MORNING, 4);
+		Room room10 = RoomFixture.room("밤 - 열 번째 방", RoomType.NIGHT, 1, "97979");
+		Room room11 = RoomFixture.room("밤 - 열하나 번째 방", RoomType.NIGHT, 22);
+		Room room12 = RoomFixture.room("아침 - 열둘 번째 방", RoomType.MORNING, 10);
+		Room room13 = RoomFixture.room("밤 - 열셋 번째 방", RoomType.NIGHT, 2);
+		Room room14 = RoomFixture.room("밤 - 열넷 번째 방", RoomType.NIGHT, 21);
+
+		Routine routine1 = RoomFixture.routine(room1, "방1의 루틴1");
+		Routine routine2 = RoomFixture.routine(room1, "방1의 루틴2");
+
+		Routine routine3 = RoomFixture.routine(room2, "방2의 루틴1");
+		Routine routine4 = RoomFixture.routine(room2, "방2의 루틴2");
+
+		Routine routine5 = RoomFixture.routine(room3, "방3의 루틴1");
+		Routine routine6 = RoomFixture.routine(room3, "방3의 루틴2");
+
+		Routine routine7 = RoomFixture.routine(room4, "방4의 루틴1");
+		Routine routine8 = RoomFixture.routine(room4, "방4의 루틴2");
+
+		Routine routine9 = RoomFixture.routine(room5, "방5의 루틴1");
+		Routine routine10 = RoomFixture.routine(room5, "방5의 루틴2");
+
+		Routine routine11 = RoomFixture.routine(room6, "방6의 루틴1");
+		Routine routine12 = RoomFixture.routine(room6, "방6의 루틴2");
+
+		Routine routine13 = RoomFixture.routine(room7, "방7의 루틴1");
+		Routine routine14 = RoomFixture.routine(room7, "방7의 루틴2");
+
+		Routine routine15 = RoomFixture.routine(room8, "방8의 루틴1");
+		Routine routine16 = RoomFixture.routine(room8, "방8의 루틴2");
+
+		Routine routine17 = RoomFixture.routine(room9, "방9의 루틴1");
+		Routine routine18 = RoomFixture.routine(room9, "방9의 루틴2");
+
+		Routine routine19 = RoomFixture.routine(room10, "방10의 루틴1");
+		Routine routine20 = RoomFixture.routine(room10, "방10의 루틴2");
+
+		Routine routine21 = RoomFixture.routine(room11, "방11의 루틴1");
+		Routine routine22 = RoomFixture.routine(room11, "방11의 루틴2");
+
+		Routine routine23 = RoomFixture.routine(room12, "방12의 루틴1");
+		Routine routine24 = RoomFixture.routine(room12, "방12의 루틴2");
+
+		Routine routine25 = RoomFixture.routine(room13, "방13의 루틴1");
+		Routine routine26 = RoomFixture.routine(room13, "방13의 루틴2");
+
+		Routine routine27 = RoomFixture.routine(room14, "방14의 루틴1");
+		Routine routine28 = RoomFixture.routine(room14, "방14의 루틴2");
+
+		roomRepository.saveAll(
+			List.of(room1, room2, room3, room4, room5, room6, room7, room8, room9, room10, room11, room12, room13,
+				room14));
+
+		routineRepository.saveAll(
+			List.of(routine1, routine2, routine3, routine4, routine5, routine6, routine7, routine8, routine9, routine10,
+				routine11, routine12, routine13, routine14, routine15, routine16, routine17, routine18, routine19,
+				routine20, routine21, routine22, routine23, routine24, routine25, routine26, routine27, routine28));
+
+		// expected
+		mockMvc.perform(get("/rooms"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("아침, 저녁 방 전체 조회 성공 - 마지막 조회, 다음 페이지 없음")
+	@WithMember(id = 1L)
+	@Test
+	void search_last_page_all_morning_night_rooms_success() throws Exception {
+		// given
+		Room room1 = RoomFixture.room("아침 - 첫 번째 방", RoomType.MORNING, 10, "1234");
+		Room room2 = RoomFixture.room("아침 - 두 번째 방", RoomType.MORNING, 9);
+		Room room3 = RoomFixture.room("밤 - 세 번째 방", RoomType.NIGHT, 22);
+		Room room4 = RoomFixture.room("아침 - 네 번째 방", RoomType.MORNING, 7);
+		Room room5 = RoomFixture.room("밤 - 다섯 번째 방", RoomType.NIGHT, 23, "5869");
+		Room room6 = RoomFixture.room("아침 - 여섯 번째 방", RoomType.MORNING, 8);
+		Room room7 = RoomFixture.room("밤 - 일곱 번째 방", RoomType.NIGHT, 20);
+		Room room8 = RoomFixture.room("밤 - 여덟 번째 방", RoomType.NIGHT, 1, "5236");
+		Room room9 = RoomFixture.room("아침 - 아홉 번째 방", RoomType.MORNING, 4);
+		Room room10 = RoomFixture.room("밤 - 열 번째 방", RoomType.NIGHT, 1, "97979");
+		Room room11 = RoomFixture.room("밤 - 열하나 번째 방", RoomType.NIGHT, 22);
+		Room room12 = RoomFixture.room("아침 - 열둘 번째 방", RoomType.MORNING, 10);
+		Room room13 = RoomFixture.room("밤 - 열셋 번째 방", RoomType.NIGHT, 2);
+		Room room14 = RoomFixture.room("밤 - 열넷 번째 방", RoomType.NIGHT, 21);
+
+		Routine routine1 = RoomFixture.routine(room1, "방1의 루틴1");
+		Routine routine2 = RoomFixture.routine(room1, "방1의 루틴2");
+
+		Routine routine3 = RoomFixture.routine(room2, "방2의 루틴1");
+		Routine routine4 = RoomFixture.routine(room2, "방2의 루틴2");
+
+		Routine routine5 = RoomFixture.routine(room3, "방3의 루틴1");
+		Routine routine6 = RoomFixture.routine(room3, "방3의 루틴2");
+
+		Routine routine7 = RoomFixture.routine(room4, "방4의 루틴1");
+		Routine routine8 = RoomFixture.routine(room4, "방4의 루틴2");
+
+		Routine routine9 = RoomFixture.routine(room5, "방5의 루틴1");
+		Routine routine10 = RoomFixture.routine(room5, "방5의 루틴2");
+
+		Routine routine11 = RoomFixture.routine(room6, "방6의 루틴1");
+		Routine routine12 = RoomFixture.routine(room6, "방6의 루틴2");
+
+		Routine routine13 = RoomFixture.routine(room7, "방7의 루틴1");
+		Routine routine14 = RoomFixture.routine(room7, "방7의 루틴2");
+
+		Routine routine15 = RoomFixture.routine(room8, "방8의 루틴1");
+		Routine routine16 = RoomFixture.routine(room8, "방8의 루틴2");
+
+		Routine routine17 = RoomFixture.routine(room9, "방9의 루틴1");
+		Routine routine18 = RoomFixture.routine(room9, "방9의 루틴2");
+
+		Routine routine19 = RoomFixture.routine(room10, "방10의 루틴1");
+		Routine routine20 = RoomFixture.routine(room10, "방10의 루틴2");
+
+		Routine routine21 = RoomFixture.routine(room11, "방11의 루틴1");
+		Routine routine22 = RoomFixture.routine(room11, "방11의 루틴2");
+
+		Routine routine23 = RoomFixture.routine(room12, "방12의 루틴1");
+		Routine routine24 = RoomFixture.routine(room12, "방12의 루틴2");
+
+		Routine routine25 = RoomFixture.routine(room13, "방13의 루틴1");
+		Routine routine26 = RoomFixture.routine(room13, "방13의 루틴2");
+
+		Routine routine27 = RoomFixture.routine(room14, "방14의 루틴1");
+		Routine routine28 = RoomFixture.routine(room14, "방14의 루틴2");
+
+		roomRepository.saveAll(
+			List.of(room1, room2, room3, room4, room5, room6, room7, room8, room9, room10, room11, room12, room13,
+				room14));
+
+		routineRepository.saveAll(
+			List.of(routine1, routine2, routine3, routine4, routine5, routine6, routine7, routine8, routine9, routine10,
+				routine11, routine12, routine13, routine14, routine15, routine16, routine17, routine18, routine19,
+				routine20, routine21, routine22, routine23, routine24, routine25, routine26, routine27, routine28));
+
+		// expected
+		mockMvc.perform(get("/rooms?roomId=5"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("아침 방 전체 조회 성공 - 첫 번째 조회, 다음 페이지 없음")
+	@WithMember(id = 1L)
+	@Test
+	void search_last_page_all_morning_rooms_success() throws Exception {
+		// given
+		Room room1 = RoomFixture.room("아침 - 첫 번째 방", RoomType.MORNING, 10, "1234");
+		Room room2 = RoomFixture.room("아침 - 두 번째 방", RoomType.MORNING, 9);
+		Room room3 = RoomFixture.room("밤 - 세 번째 방", RoomType.NIGHT, 22);
+		Room room4 = RoomFixture.room("아침 - 네 번째 방", RoomType.MORNING, 7);
+		Room room5 = RoomFixture.room("밤 - 다섯 번째 방", RoomType.NIGHT, 23, "5869");
+		Room room6 = RoomFixture.room("아침 - 여섯 번째 방", RoomType.MORNING, 8);
+		Room room7 = RoomFixture.room("밤 - 일곱 번째 방", RoomType.NIGHT, 20);
+		Room room8 = RoomFixture.room("밤 - 여덟 번째 방", RoomType.NIGHT, 1, "5236");
+		Room room9 = RoomFixture.room("아침 - 아홉 번째 방", RoomType.MORNING, 4);
+		Room room10 = RoomFixture.room("밤 - 열 번째 방", RoomType.NIGHT, 1, "97979");
+		Room room11 = RoomFixture.room("밤 - 열하나 번째 방", RoomType.NIGHT, 22);
+		Room room12 = RoomFixture.room("아침 - 열둘 번째 방", RoomType.MORNING, 10);
+		Room room13 = RoomFixture.room("밤 - 열셋 번째 방", RoomType.NIGHT, 2);
+		Room room14 = RoomFixture.room("밤 - 열넷 번째 방", RoomType.NIGHT, 21);
+
+		Routine routine1 = RoomFixture.routine(room1, "방1의 루틴1");
+		Routine routine2 = RoomFixture.routine(room1, "방1의 루틴2");
+
+		Routine routine3 = RoomFixture.routine(room2, "방2의 루틴1");
+		Routine routine4 = RoomFixture.routine(room2, "방2의 루틴2");
+
+		Routine routine5 = RoomFixture.routine(room3, "방3의 루틴1");
+		Routine routine6 = RoomFixture.routine(room3, "방3의 루틴2");
+
+		Routine routine7 = RoomFixture.routine(room4, "방4의 루틴1");
+		Routine routine8 = RoomFixture.routine(room4, "방4의 루틴2");
+
+		Routine routine9 = RoomFixture.routine(room5, "방5의 루틴1");
+		Routine routine10 = RoomFixture.routine(room5, "방5의 루틴2");
+
+		Routine routine11 = RoomFixture.routine(room6, "방6의 루틴1");
+		Routine routine12 = RoomFixture.routine(room6, "방6의 루틴2");
+
+		Routine routine13 = RoomFixture.routine(room7, "방7의 루틴1");
+		Routine routine14 = RoomFixture.routine(room7, "방7의 루틴2");
+
+		Routine routine15 = RoomFixture.routine(room8, "방8의 루틴1");
+		Routine routine16 = RoomFixture.routine(room8, "방8의 루틴2");
+
+		Routine routine17 = RoomFixture.routine(room9, "방9의 루틴1");
+		Routine routine18 = RoomFixture.routine(room9, "방9의 루틴2");
+
+		Routine routine19 = RoomFixture.routine(room10, "방10의 루틴1");
+		Routine routine20 = RoomFixture.routine(room10, "방10의 루틴2");
+
+		Routine routine21 = RoomFixture.routine(room11, "방11의 루틴1");
+		Routine routine22 = RoomFixture.routine(room11, "방11의 루틴2");
+
+		Routine routine23 = RoomFixture.routine(room12, "방12의 루틴1");
+		Routine routine24 = RoomFixture.routine(room12, "방12의 루틴2");
+
+		Routine routine25 = RoomFixture.routine(room13, "방13의 루틴1");
+		Routine routine26 = RoomFixture.routine(room13, "방13의 루틴2");
+
+		Routine routine27 = RoomFixture.routine(room14, "방14의 루틴1");
+		Routine routine28 = RoomFixture.routine(room14, "방14의 루틴2");
+
+		roomRepository.saveAll(
+			List.of(room1, room2, room3, room4, room5, room6, room7, room8, room9, room10, room11, room12, room13,
+				room14));
+
+		routineRepository.saveAll(
+			List.of(routine1, routine2, routine3, routine4, routine5, routine6, routine7, routine8, routine9, routine10,
+				routine11, routine12, routine13, routine14, routine15, routine16, routine17, routine18, routine19,
+				routine20, routine21, routine22, routine23, routine24, routine25, routine26, routine27, routine28));
+
+		// expected
+		mockMvc.perform(get("/rooms?type=MORNING"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("저녁 방 전체 조회 성공 - 첫 번째 조회, 다음 페이지 없음")
+	@WithMember(id = 1L)
+	@Test
+	void search_last_page_all_night_rooms_success() throws Exception {
+		// given
+		Room room1 = RoomFixture.room("아침 - 첫 번째 방", RoomType.MORNING, 10, "1234");
+		Room room2 = RoomFixture.room("아침 - 두 번째 방", RoomType.MORNING, 9);
+		Room room3 = RoomFixture.room("밤 - 세 번째 방", RoomType.NIGHT, 22);
+		Room room4 = RoomFixture.room("아침 - 네 번째 방", RoomType.MORNING, 7);
+		Room room5 = RoomFixture.room("밤 - 다섯 번째 방", RoomType.NIGHT, 23, "5869");
+		Room room6 = RoomFixture.room("아침 - 여섯 번째 방", RoomType.MORNING, 8);
+		Room room7 = RoomFixture.room("밤 - 일곱 번째 방", RoomType.NIGHT, 20);
+		Room room8 = RoomFixture.room("밤 - 여덟 번째 방", RoomType.NIGHT, 1, "5236");
+		Room room9 = RoomFixture.room("아침 - 아홉 번째 방", RoomType.MORNING, 4);
+		Room room10 = RoomFixture.room("밤 - 열 번째 방", RoomType.NIGHT, 1, "97979");
+		Room room11 = RoomFixture.room("밤 - 열하나 번째 방", RoomType.NIGHT, 22);
+		Room room12 = RoomFixture.room("아침 - 열둘 번째 방", RoomType.MORNING, 10);
+		Room room13 = RoomFixture.room("밤 - 열셋 번째 방", RoomType.NIGHT, 2);
+		Room room14 = RoomFixture.room("밤 - 열넷 번째 방", RoomType.NIGHT, 21);
+
+		Routine routine1 = RoomFixture.routine(room1, "방1의 루틴1");
+		Routine routine2 = RoomFixture.routine(room1, "방1의 루틴2");
+
+		Routine routine3 = RoomFixture.routine(room2, "방2의 루틴1");
+		Routine routine4 = RoomFixture.routine(room2, "방2의 루틴2");
+
+		Routine routine5 = RoomFixture.routine(room3, "방3의 루틴1");
+		Routine routine6 = RoomFixture.routine(room3, "방3의 루틴2");
+
+		Routine routine7 = RoomFixture.routine(room4, "방4의 루틴1");
+		Routine routine8 = RoomFixture.routine(room4, "방4의 루틴2");
+
+		Routine routine9 = RoomFixture.routine(room5, "방5의 루틴1");
+		Routine routine10 = RoomFixture.routine(room5, "방5의 루틴2");
+
+		Routine routine11 = RoomFixture.routine(room6, "방6의 루틴1");
+		Routine routine12 = RoomFixture.routine(room6, "방6의 루틴2");
+
+		Routine routine13 = RoomFixture.routine(room7, "방7의 루틴1");
+		Routine routine14 = RoomFixture.routine(room7, "방7의 루틴2");
+
+		Routine routine15 = RoomFixture.routine(room8, "방8의 루틴1");
+		Routine routine16 = RoomFixture.routine(room8, "방8의 루틴2");
+
+		Routine routine17 = RoomFixture.routine(room9, "방9의 루틴1");
+		Routine routine18 = RoomFixture.routine(room9, "방9의 루틴2");
+
+		Routine routine19 = RoomFixture.routine(room10, "방10의 루틴1");
+		Routine routine20 = RoomFixture.routine(room10, "방10의 루틴2");
+
+		Routine routine21 = RoomFixture.routine(room11, "방11의 루틴1");
+		Routine routine22 = RoomFixture.routine(room11, "방11의 루틴2");
+
+		Routine routine23 = RoomFixture.routine(room12, "방12의 루틴1");
+		Routine routine24 = RoomFixture.routine(room12, "방12의 루틴2");
+
+		Routine routine25 = RoomFixture.routine(room13, "방13의 루틴1");
+		Routine routine26 = RoomFixture.routine(room13, "방13의 루틴2");
+
+		Routine routine27 = RoomFixture.routine(room14, "방14의 루틴1");
+		Routine routine28 = RoomFixture.routine(room14, "방14의 루틴2");
+
+		roomRepository.saveAll(
+			List.of(room1, room2, room3, room4, room5, room6, room7, room8, room9, room10, room11, room12, room13,
+				room14));
+
+		routineRepository.saveAll(
+			List.of(routine1, routine2, routine3, routine4, routine5, routine6, routine7, routine8, routine9, routine10,
+				routine11, routine12, routine13, routine14, routine15, routine16, routine17, routine18, routine19,
+				routine20, routine21, routine22, routine23, routine24, routine25, routine26, routine27, routine28));
+
+		// expected
+		mockMvc.perform(get("/rooms?type=NIGHT"))
 			.andExpect(status().isOk())
 			.andDo(print());
 	}

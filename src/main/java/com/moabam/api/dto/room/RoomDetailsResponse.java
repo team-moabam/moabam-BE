@@ -8,6 +8,7 @@ import lombok.Builder;
 @Builder
 public record RoomDetailsResponse(
 	Long roomId,
+	Long myMemberId,
 	String title,
 	String managerNickName,
 	String roomImage,

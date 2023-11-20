@@ -1,4 +1,4 @@
-package com.moabam.api.infrastructure.redis;
+package com.moabam.api.domain.notification.repository;
 
 import static com.moabam.global.common.util.GlobalConstant.*;
 import static java.util.Objects.*;
@@ -6,6 +6,8 @@ import static java.util.Objects.*;
 import java.time.Duration;
 
 import org.springframework.stereotype.Repository;
+
+import com.moabam.api.infrastructure.redis.StringRedisRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,17 +21,17 @@ public class NotificationRepository {
 	private final StringRedisRepository stringRedisRepository;
 
 	// TODO : 세연님 로그인 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 저장하면 됩니다. Front와 상의 후 삭제예정
-	public void saveFcmToken(Long key, String value) {
+	public void saveFcmToken(Long memberId, String fcmToken) {
 		stringRedisRepository.save(
-			String.valueOf(requireNonNull(key)),
-			requireNonNull(value),
+			String.valueOf(requireNonNull(memberId)),
+			requireNonNull(fcmToken),
 			Duration.ofDays(EXPIRE_FCM_TOKEN)
 		);
 	}
 
-	public void saveKnockNotification(String key) {
+	public void saveKnockNotification(String knockKey) {
 		stringRedisRepository.save(
-			requireNonNull(key),
+			requireNonNull(knockKey),
 			BLANK,
 			Duration.ofHours(EXPIRE_KNOCK)
 		);

@@ -12,6 +12,8 @@ import com.moabam.api.dto.room.RoomDetailsResponse;
 import com.moabam.api.dto.room.RoomHistoryResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
 import com.moabam.api.dto.room.RoutineResponse;
+import com.moabam.api.dto.room.SearchAllRoomResponse;
+import com.moabam.api.dto.room.SearchAllRoomsResponse;
 import com.moabam.api.dto.room.TodayCertificateRankResponse;
 
 import lombok.AccessLevel;
@@ -30,11 +32,12 @@ public final class RoomMapper {
 			.build();
 	}
 
-	public static RoomDetailsResponse toRoomDetailsResponse(Room room, String managerNickname,
+	public static RoomDetailsResponse toRoomDetailsResponse(Long memberId, Room room, String managerNickname,
 		List<RoutineResponse> routineResponses, List<LocalDate> certifiedDates,
 		List<TodayCertificateRankResponse> todayCertificateRankResponses, double completePercentage) {
 		return RoomDetailsResponse.builder()
 			.roomId(room.getId())
+			.myMemberId(memberId)
 			.title(room.getTitle())
 			.managerNickName(managerNickname)
 			.roomImage(room.getRoomImage())
@@ -84,6 +87,31 @@ public final class RoomMapper {
 	public static RoomsHistoryResponse toRoomsHistoryResponse(List<RoomHistoryResponse> roomHistoryResponses) {
 		return RoomsHistoryResponse.builder()
 			.roomHistory(roomHistoryResponses)
+			.build();
+	}
+
+	public static SearchAllRoomResponse toSearchAllRoomResponse(Room room, List<RoutineResponse> routineResponses,
+		boolean isPassword) {
+		return SearchAllRoomResponse.builder()
+			.id(room.getId())
+			.title(room.getTitle())
+			.image(room.getRoomImage())
+			.isPassword(isPassword)
+			.managerNickname(room.getManagerNickname())
+			.level(room.getLevel())
+			.roomType(room.getRoomType())
+			.certifyTime(room.getCertifyTime())
+			.currentUserCount(room.getCurrentUserCount())
+			.maxUserCount(room.getMaxUserCount())
+			.routine(routineResponses)
+			.build();
+	}
+
+	public static SearchAllRoomsResponse toSearchAllRoomsResponse(boolean hasNext,
+		List<SearchAllRoomResponse> searchAllRoomResponses) {
+		return SearchAllRoomsResponse.builder()
+			.hasNext(hasNext)
+			.rooms(searchAllRoomResponses)
 			.build();
 	}
 }

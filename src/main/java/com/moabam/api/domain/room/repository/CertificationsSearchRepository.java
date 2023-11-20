@@ -70,12 +70,12 @@ public class CertificationsSearchRepository {
 			.fetchOne());
 	}
 
-	public List<DailyRoomCertification> findDailyRoomCertifications(Long roomId, LocalDate date) {
+	public List<DailyRoomCertification> findDailyRoomCertifications(Long roomId, LocalDate today) {
 		return jpaQueryFactory
 			.selectFrom(dailyRoomCertification)
 			.where(
 				dailyRoomCertification.roomId.eq(roomId),
-				dailyRoomCertification.certifiedAt.eq(date)
+				dailyRoomCertification.certifiedAt.between(today.minusWeeks(1), today)
 			)
 			.fetch();
 	}
