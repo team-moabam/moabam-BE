@@ -25,4 +25,13 @@ public class RoutineSearchRepository {
 			)
 			.fetch();
 	}
+
+	public List<Routine> findAllByRoomIds(List<Long> roomIds) {
+		return jpaQueryFactory
+			.selectFrom(routine)
+			.where(
+				routine.room.id.in(roomIds)
+			)
+			.fetch();
+	}
 }
