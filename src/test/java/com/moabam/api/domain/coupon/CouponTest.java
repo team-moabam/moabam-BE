@@ -24,7 +24,7 @@ class CouponTest {
 		Coupon actual = Coupon.builder()
 			.name("couponName")
 			.point(10)
-			.couponType(CouponType.MORNING_COUPON)
+			.type(CouponType.MORNING_COUPON)
 			.stock(100)
 			.startAt(startAt)
 			.endAt(endAt)
@@ -36,7 +36,7 @@ class CouponTest {
 		assertThat(actual.getDescription()).isBlank();
 		assertThat(actual.getPoint()).isEqualTo(10);
 		assertThat(actual.getStock()).isEqualTo(100);
-		assertThat(actual.getCouponType()).isEqualTo(CouponType.MORNING_COUPON);
+		assertThat(actual.getType()).isEqualTo(CouponType.MORNING_COUPON);
 		assertThat(actual.getStartAt()).isEqualTo(startAt);
 		assertThat(actual.getEndAt()).isEqualTo(endAt);
 		assertThat(actual.getAdminId()).isEqualTo(1L);

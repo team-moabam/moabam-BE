@@ -2,7 +2,6 @@ package com.moabam.api.application.notification;
 
 import static com.moabam.global.common.util.GlobalConstant.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -19,6 +18,7 @@ import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.dto.notification.KnockNotificationStatusResponse;
 import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -38,6 +38,7 @@ public class NotificationService {
 	private final RoomService roomService;
 	private final NotificationRepository notificationRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
+	private final ClockHolder clockHolder;
 
 	@Transactional
 	public void sendKnockNotification(AuthorizationMember member, Long targetId, Long roomId) {
@@ -55,7 +56,7 @@ public class NotificationService {
 
 	@Scheduled(cron = "0 50 * * * *")
 	public void sendCertificationTimeNotification() {
-		int certificationTime = (LocalDateTime.now().getHour() + ONE_HOUR) % HOURS_IN_A_DAY;
+		int certificationTime = (clockHolder.times().getHour() + ONE_HOUR) % HOURS_IN_A_DAY;
 		List<Participant> participants = participantSearchRepository.findAllByRoomCertifyTime(certificationTime);
 
 		participants.parallelStream().forEach(participant -> {

@@ -596,19 +596,47 @@ Content-Length: 3
 </div>
 </div>
 <div class="sect2">
-<h3 id="_특정_사용자의_쿠폰_보관함을_조회">특정 사용자의 쿠폰 보관함을 조회</h3>
+<h3 id="_특정_쿠폰에_대해_발급">특정 쿠폰에 대해 발급</h3>
 <div class="literalblock">
 <div class="content">
-<pre>사용자가 자신의 보관함에 있는 쿠폰들을 조회합니다.</pre>
+<pre>사용자가 발급 가능한 쿠폰을 선착순으로 발급 받습니다.</pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_요청_5">요청</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /coupons HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Host: localhost:8080
+Content-Length: 32
+
+couponName=Not+found+coupon+name</code></pre>
+</div>
+</div>
+<h4 id="_응답_5" class="discrete">응답</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 56
+
+{
+  "message" : "존재하지 않는 쿠폰입니다."
+}</code></pre>
 </div>
 </div>
 <hr>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_쿠폰_발급_진행_중">쿠폰 발급 (진행 중)</h3>
+<h3 id="_특정_사용자의_쿠폰_보관함을_조회">특정 사용자의 쿠폰 보관함을 조회</h3>
 <div class="literalblock">
 <div class="content">
-<pre>사용자가 발급 가능한 쿠폰을 선착순으로 발급 받습니다.</pre>
+<pre>사용자가 자신의 보관함에 있는 쿠폰들을 조회합니다.</pre>
 </div>
 </div>
 <hr>
@@ -627,7 +655,7 @@ Content-Length: 3
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-13 18:48:03 +0900
+Last updated 2023-11-20 14:35:51 +0900
 </div>
 </div>
 </body>
