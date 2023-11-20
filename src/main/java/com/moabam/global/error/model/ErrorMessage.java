@@ -47,6 +47,9 @@ public enum ErrorMessage {
 	INVALID_PRICE("가격은 0 이상이어야 합니다."),
 	INVALID_QUANTITY("수량은 1 이상이어야 합니다."),
 	INVALID_LEVEL("레벨은 1 이상이어야 합니다."),
+	INVALID_ORDER_AMOUNT("주문 금액은 0 이상이어야 합니다."),
+
+	PRODUCT_NOT_FOUND("존재하지 않는 상품입니다."),
 
 	FAILED_FCM_INIT("파이어베이스 설정을 실패했습니다."),
 	NOT_FOUND_FCM_TOKEN("해당 유저는 접속 중이 아닙니다."),

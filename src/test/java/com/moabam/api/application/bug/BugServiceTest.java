@@ -7,8 +7,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +25,9 @@ import com.moabam.api.domain.product.repository.ProductRepository;
 import com.moabam.api.dto.bug.BugResponse;
 import com.moabam.api.dto.product.ProductResponse;
 import com.moabam.api.dto.product.ProductsResponse;
+import com.moabam.api.dto.product.PurchaseProductRequest;
 import com.moabam.global.common.util.StreamUtils;
+import com.moabam.global.error.exception.NotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class BugServiceTest {
@@ -70,5 +74,25 @@ class BugServiceTest {
 		List<String> productNames = StreamUtils.map(response.products(), ProductResponse::name);
 		assertThat(response.products()).hasSize(2);
 		assertThat(productNames).containsExactly(BUG_PRODUCT_NAME, BUG_PRODUCT_NAME);
+	}
+
+	@DisplayName("벌레 상품을 구매한다.")
+	@Nested
+	class PurchaseBugProduct {
+
+		@DisplayName("해당 상품이 존재하지 않으면 예외가 발생한다.")
+		@Test
+		void product_not_found_exception() {
+			// given
+			Long memberId = 1L;
+			Long productId = 1L;
+			PurchaseProductRequest request = new PurchaseProductRequest(null);
+			given(productRepository.findById(productId)).willReturn(Optional.empty());
+
+			// when, then
+			assertThatThrownBy(() -> bugService.purchaseBugProduct(memberId, productId, request))
+				.isInstanceOf(NotFoundException.class)
+				.hasMessage("존재하지 않는 상품입니다.");
+		}
 	}
 }
