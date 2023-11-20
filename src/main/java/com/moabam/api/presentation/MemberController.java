@@ -2,7 +2,8 @@ package com.moabam.api.presentation;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,21 +32,21 @@ public class MemberController {
 		authorizationService.redirectToLoginPage(httpServletResponse);
 	}
 
-	@GetMapping("/login/kakao/oauth")
+	@PostMapping("/login/kakao/oauth")
 	@ResponseStatus(HttpStatus.OK)
-	public LoginResponse authorizationTokenIssue(@ModelAttribute AuthorizationCodeResponse authorizationCodeResponse,
+	public LoginResponse authorizationTokenIssue(@RequestBody AuthorizationCodeResponse authorizationCodeResponse,
 		HttpServletResponse httpServletResponse) {
 		AuthorizationTokenResponse tokenResponse = authorizationService.requestToken(authorizationCodeResponse);
-		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
-			authorizationService.requestTokenInfo(tokenResponse);
+		AuthorizationTokenInfoResponse authorizationTokenInfoResponse = authorizationService.requestTokenInfo(
+			tokenResponse);
 
 		return authorizationService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
 	}
 
 	@GetMapping("/logout")
 	@ResponseStatus(HttpStatus.OK)
-	public void logout(@CurrentMember AuthorizationMember authorizationMember,
-		HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+	public void logout(@CurrentMember AuthorizationMember authorizationMember, HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
 		authorizationService.logout(authorizationMember, httpServletRequest, httpServletResponse);
 	}
 }
