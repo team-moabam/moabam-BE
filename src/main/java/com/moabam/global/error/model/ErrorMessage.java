@@ -40,12 +40,19 @@ public enum ErrorMessage {
 	ITEM_UNLOCK_LEVEL_HIGH("아이템 해금 레벨이 높습니다."),
 	ITEM_NOT_PURCHASABLE_BY_BUG_TYPE("해당 벌레 타입으로는 구매할 수 없는 아이템입니다."),
 	INVENTORY_NOT_FOUND("구매하지 않은 아이템은 적용할 수 없습니다."),
+	DEFAULT_INVENTORY_NOT_FOUND("현재 적용된 아이템이 없습니다."),
 	INVENTORY_CONFLICT("이미 구매한 아이템입니다."),
 
 	INVALID_BUG_COUNT("벌레 개수는 0 이상이어야 합니다."),
 	INVALID_PRICE("가격은 0 이상이어야 합니다."),
 	INVALID_QUANTITY("수량은 1 이상이어야 합니다."),
 	INVALID_LEVEL("레벨은 1 이상이어야 합니다."),
+	INVALID_ORDER_AMOUNT("주문 금액은 0 이상이어야 합니다."),
+
+	PRODUCT_NOT_FOUND("존재하지 않는 상품입니다."),
+
+	PAYMENT_NOT_FOUND("존재하지 않는 결제 정보입니다."),
+	INVALID_MEMBER_PAYMENT("해당 회원의 결제 정보가 아닙니다."),
 
 	FAILED_FCM_INIT("파이어베이스 설정을 실패했습니다."),
 	NOT_FOUND_FCM_TOKEN("해당 유저는 접속 중이 아닙니다."),

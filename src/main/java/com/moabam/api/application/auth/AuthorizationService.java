@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.moabam.api.application.auth.mapper.AuthMapper;
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
 import com.moabam.api.application.member.MemberService;
+import com.moabam.api.domain.auth.repository.TokenRepository;
 import com.moabam.api.dto.auth.AuthorizationCodeRequest;
 import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
@@ -19,11 +20,10 @@ import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.auth.TokenSaveValue;
-import com.moabam.api.infrastructure.redis.TokenRepository;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.PublicClaim;
-import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.common.util.GlobalConstant;
+import com.moabam.global.common.util.cookie.CookieUtils;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
@@ -44,6 +44,7 @@ public class AuthorizationService {
 	private final MemberService memberService;
 	private final JwtProviderService jwtProviderService;
 	private final TokenRepository tokenRepository;
+	private final CookieUtils cookieUtils;
 
 	public void redirectToLoginPage(HttpServletResponse httpServletResponse) {
 		String authorizationCodeUri = getAuthorizationCodeUri();
@@ -81,11 +82,11 @@ public class AuthorizationService {
 		tokenRepository.saveToken(publicClaim.id(), tokenSaveRequest);
 
 		response.addCookie(
-			CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()));
+			cookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()));
 		response.addCookie(
-			CookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire()));
+			cookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire()));
 		response.addCookie(
-			CookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire()));
+			cookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire()));
 	}
 
 	public void validTokenPair(Long id, String oldRefreshToken) {
@@ -112,7 +113,7 @@ public class AuthorizationService {
 		Arrays.stream(httpServletRequest.getCookies())
 			.forEach(cookie -> {
 				if (cookie.getName().contains("token")) {
-					httpServletResponse.addCookie(CookieUtils.deleteCookie(cookie));
+					httpServletResponse.addCookie(cookieUtils.deleteCookie(cookie));
 				}
 			});
 	}

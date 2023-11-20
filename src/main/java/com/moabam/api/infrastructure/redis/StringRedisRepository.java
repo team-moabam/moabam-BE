@@ -2,7 +2,7 @@ package com.moabam.api.infrastructure.redis;
 
 import java.time.Duration;
 
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -11,25 +11,25 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StringRedisRepository {
 
-	private final StringRedisTemplate stringRedisTemplate;
+	private final RedisTemplate<String, String> redisTemplate;
 
 	public void save(String key, String value, Duration timeout) {
-		stringRedisTemplate
+		redisTemplate
 			.opsForValue()
 			.set(key, value, timeout);
 	}
 
 	public void delete(String key) {
-		stringRedisTemplate.delete(key);
+		redisTemplate.delete(key);
 	}
 
 	public String get(String key) {
-		return stringRedisTemplate
+		return redisTemplate
 			.opsForValue()
 			.get(key);
 	}
 
 	public Boolean hasKey(String key) {
-		return stringRedisTemplate.hasKey(key);
+		return redisTemplate.hasKey(key);
 	}
 }

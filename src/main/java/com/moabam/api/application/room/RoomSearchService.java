@@ -1,6 +1,8 @@
 package com.moabam.api.application.room;
 
+import static com.moabam.global.common.util.GlobalConstant.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -21,18 +23,25 @@ import com.moabam.api.domain.room.DailyMemberCertification;
 import com.moabam.api.domain.room.DailyRoomCertification;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.domain.room.Routine;
 import com.moabam.api.domain.room.repository.CertificationsSearchRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
+import com.moabam.api.domain.room.repository.RoomSearchRepository;
 import com.moabam.api.domain.room.repository.RoutineSearchRepository;
 import com.moabam.api.dto.room.CertificationImageResponse;
 import com.moabam.api.dto.room.MyRoomResponse;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
+import com.moabam.api.dto.room.RoomHistoryResponse;
+import com.moabam.api.dto.room.RoomsHistoryResponse;
 import com.moabam.api.dto.room.RoutineResponse;
+import com.moabam.api.dto.room.SearchAllRoomResponse;
+import com.moabam.api.dto.room.SearchAllRoomsResponse;
 import com.moabam.api.dto.room.TodayCertificateRankResponse;
 import com.moabam.global.error.exception.NotFoundException;
 
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -43,6 +52,7 @@ public class RoomSearchService {
 	private final CertificationsSearchRepository certificationsSearchRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
 	private final RoutineSearchRepository routineSearchRepository;
+	private final RoomSearchRepository roomSearchRepository;
 	private final MemberService memberService;
 	private final RoomCertificationService roomCertificationService;
 
@@ -52,7 +62,7 @@ public class RoomSearchService {
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
 		Room room = participant.getRoom();
 
-		String managerNickname = memberService.getManager(roomId).getNickname();
+		String managerNickname = room.getManagerNickname();
 		List<DailyMemberCertification> dailyMemberCertifications =
 			certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today);
 		List<RoutineResponse> routineResponses = getRoutineResponses(roomId);
@@ -69,7 +79,7 @@ public class RoomSearchService {
 	public MyRoomsResponse getMyRooms(Long memberId) {
 		LocalDate today = LocalDate.now();
 		List<MyRoomResponse> myRoomResponses = new ArrayList<>();
-		List<Participant> participants = participantSearchRepository.findParticipantsByMemberId(memberId);
+		List<Participant> participants = participantSearchRepository.findNotDeletedParticipantsByMemberId(memberId);
 
 		for (Participant participant : participants) {
 			Room room = participant.getRoom();
@@ -81,6 +91,54 @@ public class RoomSearchService {
 		}
 
 		return RoomMapper.toMyRoomsResponse(myRoomResponses);
+	}
+
+	public RoomsHistoryResponse getJoinHistory(Long memberId) {
+		List<Participant> participants = participantSearchRepository.findAllParticipantsByMemberId(memberId);
+		List<RoomHistoryResponse> roomHistoryResponses = new ArrayList<>();
+
+		for (Participant participant : participants) {
+			if (participant.getRoom() == null) {
+				roomHistoryResponses.add(RoomMapper.toRoomHistoryResponse(null,
+					participant.getDeletedRoomTitle(), participant));
+
+				continue;
+			}
+
+			roomHistoryResponses.add(RoomMapper.toRoomHistoryResponse(participant.getRoom().getId(),
+				participant.getRoom().getTitle(), participant));
+		}
+
+		return RoomMapper.toRoomsHistoryResponse(roomHistoryResponses);
+	}
+
+	public SearchAllRoomsResponse searchAllRooms(@Nullable RoomType roomType, @Nullable Long roomId) {
+		List<SearchAllRoomResponse> searchAllRoomResponses = new ArrayList<>();
+		List<Room> rooms = new ArrayList<>(roomSearchRepository.findAllWithNoOffset(roomType, roomId));
+
+		boolean hasNext = false;
+
+		if (rooms.size() > ROOM_FIXED_SEARCH_SIZE) {
+			hasNext = true;
+			rooms.remove(ROOM_FIXED_SEARCH_SIZE);
+		}
+
+		List<Long> roomIds = rooms.stream().map(Room::getId).toList();
+		List<Routine> routines = routineSearchRepository.findAllByRoomIds(roomIds);
+
+		for (Room room : rooms) {
+			List<Routine> filteredRoutines = routines.stream()
+				.filter(routine -> routine.getRoom().getId().equals(room.getId()))
+				.toList();
+
+			boolean isPassword = !isEmpty(room.getPassword());
+
+			searchAllRoomResponses.add(
+				RoomMapper.toSearchAllRoomResponse(room, RoutineMapper.toRoutineResponses(filteredRoutines),
+					isPassword));
+		}
+
+		return RoomMapper.toSearchAllRoomsResponse(hasNext, searchAllRoomResponses);
 	}
 
 	private List<RoutineResponse> getRoutineResponses(Long roomId) {

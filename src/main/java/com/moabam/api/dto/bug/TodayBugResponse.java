@@ -1,4 +1,4 @@
-package com.moabam.api.dto;
+package com.moabam.api.dto.bug;
 
 import lombok.Builder;
 

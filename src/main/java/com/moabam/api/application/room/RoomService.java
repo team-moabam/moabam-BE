@@ -44,7 +44,7 @@ public class RoomService {
 	private final MemberService memberService;
 
 	@Transactional
-	public Long createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
+	public Long createRoom(Long memberId, String nickname, CreateRoomRequest createRoomRequest) {
 		Room room = RoomMapper.toRoomEntity(createRoomRequest);
 		List<Routine> routines = RoutineMapper.toRoutineEntities(room, createRoomRequest.routines());
 		Participant participant = Participant.builder()
@@ -59,6 +59,7 @@ public class RoomService {
 		increaseRoomCount(memberId, room.getRoomType());
 
 		participant.enableManager();
+		room.changeManagerNickname(nickname);
 		Room savedRoom = roomRepository.save(room);
 		routineRepository.saveAll(routines);
 		participantRepository.save(participant);
@@ -111,6 +112,7 @@ public class RoomService {
 
 		decreaseRoomCount(memberId, room.getRoomType());
 		participant.removeRoom();
+		participantRepository.flush();
 		participantRepository.delete(participant);
 
 		if (!participant.isManager()) {
@@ -118,7 +120,6 @@ public class RoomService {
 			return;
 		}
 
-		roomRepository.flush();
 		roomRepository.delete(room);
 	}
 
@@ -127,6 +128,10 @@ public class RoomService {
 		Participant managerParticipant = getParticipant(managerId, roomId);
 		Participant memberParticipant = getParticipant(memberId, roomId);
 		validateManagerAuthorization(managerParticipant);
+
+		Room room = managerParticipant.getRoom();
+		Member member = memberService.getById(memberParticipant.getMemberId());
+		room.changeManagerNickname(member.getNickname());
 
 		managerParticipant.disableManager();
 		memberParticipant.enableManager();

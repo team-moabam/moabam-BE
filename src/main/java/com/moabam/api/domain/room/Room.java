@@ -76,6 +76,9 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "room_image", length = 500)
 	private String roomImage;
 
+	@Column(name = "manager_nickname", length = 30)
+	private String managerNickname;
+
 	@Builder
 	private Room(Long id, String title, String password, RoomType roomType, int certifyTime, int maxUserCount) {
 		this.id = id;
@@ -109,6 +112,10 @@ public class Room extends BaseTimeEntity {
 
 	public void changePassword(String password) {
 		this.password = password;
+	}
+
+	public void changeManagerNickname(String managerNickname) {
+		this.managerNickname = managerNickname;
 	}
 
 	public void changeMaxCount(int maxUserCount) {

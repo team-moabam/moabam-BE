@@ -5,7 +5,7 @@ import com.moabam.api.domain.product.ProductType;
 
 public class ProductFixture {
 
-	public static final String BUG_PRODUCT_NAME = "X10";
+	public static final String BUG_PRODUCT_NAME = "황금벌레 10";
 	public static final int BUG_PRODUCT_PRICE = 3000;
 	public static final int BUG_PRODUCT_QUANTITY = 10;
 
