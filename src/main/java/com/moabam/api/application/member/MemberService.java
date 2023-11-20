@@ -15,7 +15,6 @@ import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.global.auth.model.AuthorizationMember;
-import com.moabam.global.common.util.RandomUtils;
 import com.moabam.global.error.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class MemberService {
 
 	@Transactional
 	public LoginResponse login(AuthorizationTokenInfoResponse authorizationTokenInfoResponse) {
-		Optional<Member> member = memberRepository.findBySocialId(authorizationTokenInfoResponse.id());
+		Optional<Member> member = memberRepository.findBySocialId(String.valueOf(authorizationTokenInfoResponse.id()));
 		Member loginMember = member.orElseGet(() -> signUp(authorizationTokenInfoResponse.id()));
 
 		return AuthMapper.toLoginResponse(loginMember, member.isEmpty());
@@ -59,8 +58,7 @@ public class MemberService {
 	}
 
 	private Member signUp(Long socialId) {
-		String randomNickName = RandomUtils.randomStringValues();
-		Member member = AuthMapper.toMember(socialId, randomNickName);
+		Member member = MemberMapper.toMember(socialId);
 
 		return memberRepository.save(member);
 	}
