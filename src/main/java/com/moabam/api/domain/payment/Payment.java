@@ -1,10 +1,12 @@
 package com.moabam.api.domain.payment;
 
+import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.product.Product;
 import com.moabam.global.common.entity.BaseTimeEntity;
+import com.moabam.global.error.exception.BadRequestException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -63,11 +65,22 @@ public class Payment extends BaseTimeEntity {
 		this.coupon = coupon;
 		this.order = requireNonNull(order);
 		this.paymentKey = paymentKey;
-		this.status = requireNonNullElse(status, PaymentStatus.REQUEST);
+		this.status = requireNonNullElse(status, PaymentStatus.PENDING);
 	}
 
 	public void applyCoupon(Coupon coupon) {
 		this.order.discountAmount(coupon.getPoint());
 		this.coupon = coupon;
+	}
+
+	public void validateByMember(Long memberId) {
+		if (!this.memberId.equals(memberId)) {
+			throw new BadRequestException(INVALID_MEMBER_PAYMENT);
+		}
+	}
+
+	public void request(String orderId) {
+		this.order.updateId(orderId);
+		this.status = PaymentStatus.REQUEST;
 	}
 }
