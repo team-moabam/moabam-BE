@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.bug.BugService;
 import com.moabam.api.dto.bug.BugResponse;
-import com.moabam.api.dto.bug.TodayBugResponse;
 import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.api.dto.product.PurchaseProductRequest;
 import com.moabam.api.dto.product.PurchaseProductResponse;
@@ -32,12 +31,6 @@ public class BugController {
 	@ResponseStatus(HttpStatus.OK)
 	public BugResponse getBug(@CurrentMember AuthorizationMember member) {
 		return bugService.getBug(member.id());
-	}
-
-	@GetMapping("/today")
-	@ResponseStatus(HttpStatus.OK)
-	public TodayBugResponse getTodayBug(@CurrentMember AuthorizationMember member) {
-		return bugService.getTodayBug(member.id());
 	}
 
 	@GetMapping("/products")
