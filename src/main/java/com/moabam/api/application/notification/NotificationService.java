@@ -2,7 +2,6 @@ package com.moabam.api.application.notification;
 
 import static com.moabam.global.common.util.GlobalConstant.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -16,9 +15,9 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
-import com.moabam.api.dto.notification.KnockNotificationStatusResponse;
 import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -38,6 +37,7 @@ public class NotificationService {
 	private final RoomService roomService;
 	private final NotificationRepository notificationRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
+	private final ClockHolder clockHolder;
 
 	@Transactional
 	public void sendKnockNotification(AuthorizationMember member, Long targetId, Long roomId) {
@@ -55,7 +55,7 @@ public class NotificationService {
 
 	@Scheduled(cron = "0 50 * * * *")
 	public void sendCertificationTimeNotification() {
-		int certificationTime = (LocalDateTime.now().getHour() + ONE_HOUR) % HOURS_IN_A_DAY;
+		int certificationTime = (clockHolder.times().getHour() + ONE_HOUR) % HOURS_IN_A_DAY;
 		List<Participant> participants = participantSearchRepository.findAllByRoomCertifyTime(certificationTime);
 
 		participants.parallelStream().forEach(participant -> {
@@ -66,22 +66,20 @@ public class NotificationService {
 		});
 	}
 
-	/**
-	 * TODO : 영명-재윤님 방 조회하실 때, 특정 사용자의 방 내 참여자들에 대한 콕 찌르기 여부를 반환해주는 메서드이니 사용하시기 바랍니다.
-	 */
-	public KnockNotificationStatusResponse checkMyKnockNotificationStatusInRoom(AuthorizationMember member,
-		Long roomId) {
-		List<Participant> participants = participantSearchRepository.findOtherParticipantsInRoom(member.id(), roomId);
+	public List<Long> getMyKnockedNotificationStatusInRoom(Long memberId, Long roomId,
+		List<Participant> participants) {
+		List<Participant> filteredParticipants = participants.stream()
+			.filter(participant -> !participant.getMemberId().equals(memberId))
+			.toList();
 
 		Predicate<Long> knockPredicate = targetId ->
-			notificationRepository.existsByKey(generateKnockKey(member.id(), targetId, roomId));
+			notificationRepository.existsByKey(generateKnockKey(memberId, targetId, roomId));
 
-		Map<Boolean, List<Long>> knockNotificationStatus = participants.stream()
+		Map<Boolean, List<Long>> knockNotificationStatus = filteredParticipants.stream()
 			.map(Participant::getMemberId)
 			.collect(Collectors.partitioningBy(knockPredicate));
 
-		return NotificationMapper
-			.toKnockNotificationStatusResponse(knockNotificationStatus.get(true), knockNotificationStatus.get(false));
+		return knockNotificationStatus.get(true);
 	}
 
 	private void validateConflictKnockNotification(String knockKey) {

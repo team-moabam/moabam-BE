@@ -41,12 +41,13 @@ public final class CertificationsMapper {
 
 	public static TodayCertificateRankResponse toTodayCertificateRankResponse(int rank, Member member,
 		int contributionPoint, String awakeImage, String sleepImage,
-		List<CertificationImageResponse> certificationImageResponses) {
+		List<CertificationImageResponse> certificationImageResponses, boolean isNotificationSent) {
 
 		return TodayCertificateRankResponse.builder()
 			.rank(rank)
 			.memberId(member.getId())
 			.nickname(member.getNickname())
+			.isNotificationSent(isNotificationSent)
 			.profileImage(member.getProfileImage())
 			.contributionPoint(contributionPoint)
 			.awakeImage(awakeImage)

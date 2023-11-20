@@ -32,11 +32,12 @@ public final class RoomMapper {
 			.build();
 	}
 
-	public static RoomDetailsResponse toRoomDetailsResponse(Room room, String managerNickname,
+	public static RoomDetailsResponse toRoomDetailsResponse(Long memberId, Room room, String managerNickname,
 		List<RoutineResponse> routineResponses, List<LocalDate> certifiedDates,
 		List<TodayCertificateRankResponse> todayCertificateRankResponses, double completePercentage) {
 		return RoomDetailsResponse.builder()
 			.roomId(room.getId())
+			.myMemberId(memberId)
 			.title(room.getTitle())
 			.managerNickName(managerNickname)
 			.roomImage(room.getRoomImage())
