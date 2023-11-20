@@ -14,6 +14,7 @@ import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.api.dto.member.DeleteMemberResponse;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.error.exception.NotFoundException;
 
@@ -50,11 +51,21 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void deleteMember(AuthorizationMember authorizationMember) {
+	public DeleteMemberResponse deleteMember(AuthorizationMember authorizationMember) {
 		Member member = memberSearchRepository.findMember(authorizationMember.id())
 			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
-
+		String socialId = member.getSocialId();
 		member.delete();
+
+		return MemberMapper.toDeleteMemberResponse(member.getId(), socialId);
+	}
+
+	@Transactional
+	public void undoDelete(DeleteMemberResponse deleteMemberResponse) {
+		Member member = memberSearchRepository.findMember(deleteMemberResponse.id())
+			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
+
+		member.undoDelete(deleteMemberResponse.socialId());
 	}
 
 	private Member signUp(Long socialId) {

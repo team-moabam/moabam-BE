@@ -18,6 +18,7 @@ import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.auth.TokenSaveValue;
+import com.moabam.api.dto.member.DeleteMemberResponse;
 import com.moabam.api.infrastructure.redis.TokenRepository;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.PublicClaim;
@@ -32,7 +33,9 @@ import com.moabam.global.error.model.ErrorMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthorizationService {
@@ -170,5 +173,16 @@ public class AuthorizationService {
 		}
 
 		return contents;
+	}
+
+	public void unLinkMember(DeleteMemberResponse deleteMemberResponse) {
+		try {
+			oauth2AuthorizationServerRequestService.unlinkMemberRequest(
+				oAuthConfig.provider().unlink(), oAuthConfig.client().adminKey(), deleteMemberResponse.socialId());
+			log.info("회원 탈퇴 성공 : [id={}, socialId={}]", deleteMemberResponse.id(), deleteMemberResponse.socialId());
+		} catch (BadRequestException badRequestException) {
+			log.warn("회원 탈퇴요청 실패 : 카카오 연결 오류");
+			memberService.undoDelete(deleteMemberResponse);
+		}
 	}
 }

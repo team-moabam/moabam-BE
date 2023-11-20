@@ -123,6 +123,11 @@ public class Member extends BaseTimeEntity {
 		socialId = deleteSocialId(deletedAt);
 	}
 
+	public void undoDelete(String socialId) {
+		this.socialId = socialId;
+		deletedAt = null;
+	}
+
 	private String createNickName() {
 		return "오목눈이#" + randomStringValues();
 	}

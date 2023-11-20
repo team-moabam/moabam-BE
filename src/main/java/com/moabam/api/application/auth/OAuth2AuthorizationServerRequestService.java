@@ -14,6 +14,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
+import com.moabam.api.dto.auth.UnlinkMemberRequest;
+import com.moabam.api.dto.auth.UnlinkMemberResponse;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
@@ -57,5 +59,16 @@ public class OAuth2AuthorizationServerRequestService {
 		HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
 		return restTemplate.exchange(tokenInfoUri, HttpMethod.GET, httpEntity, AuthorizationTokenInfoResponse.class);
+	}
+
+	public void unlinkMemberRequest(String unlinkUri, String adminKey,
+		String socialId) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_TYPE,
+			MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8);
+		headers.add("Authorization", "KakaoAK " + adminKey);
+		HttpEntity<UnlinkMemberRequest> httpEntity = new HttpEntity<>(UnlinkMemberRequest.of(socialId), headers);
+
+		restTemplate.exchange(unlinkUri, HttpMethod.POST, httpEntity, UnlinkMemberResponse.class);
 	}
 }
