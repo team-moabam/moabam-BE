@@ -30,7 +30,7 @@ import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.member.Role;
-import com.moabam.api.dto.coupon.CouponSearchRequest;
+import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.model.ErrorMessage;
@@ -63,7 +63,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@Test
 	void couponController_createCoupon() throws Exception {
 		// Given
-		String couponType = CouponType.GOLDEN_COUPON.getTypeName();
+		String couponType = CouponType.GOLDEN_COUPON.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 2);
 
 		// When & Then
@@ -83,7 +83,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@Test
 	void couponController_createCoupon_BadRequestException() throws Exception {
 		// Given
-		String couponType = CouponType.GOLDEN_COUPON.getTypeName();
+		String couponType = CouponType.GOLDEN_COUPON.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 2, 1);
 
 		// When & Then
@@ -106,7 +106,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@Test
 	void couponController_createCoupon_ConflictException() throws Exception {
 		// Given
-		String couponType = CouponType.GOLDEN_COUPON.getTypeName();
+		String couponType = CouponType.GOLDEN_COUPON.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 2);
 		couponRepository.save(CouponMapper.toEntity(1L, request));
 
@@ -172,7 +172,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 				CouponSnippetFixture.COUPON_RESPONSE))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.couponId").value(coupon.getId()));
+			.andExpect(jsonPath("$.id").value(coupon.getId()));
 	}
 
 	@DisplayName("존재하지 않는 쿠폰을 조회한다. - NotFoundException")
@@ -195,7 +195,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@ParameterizedTest
 	void couponController_getCoupons(List<Coupon> coupons) throws Exception {
 		// Given
-		CouponSearchRequest request = CouponFixture.couponSearchRequest(true, true, true);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, true, true);
 		List<Coupon> coupon = couponRepository.saveAll(coupons);
 
 		// When & Then
@@ -206,8 +206,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("coupons/search",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.COUPON_SEARCH_REQUEST,
-				CouponSnippetFixture.COUPON_SEARCH_RESPONSE))
+				CouponSnippetFixture.COUPON_STATUS_REQUEST,
+				CouponSnippetFixture.COUPON_STATUS_RESPONSE))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$", hasSize(coupon.size())));
@@ -218,7 +218,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@ParameterizedTest
 	void couponController_getCoupons_not_status(List<Coupon> coupons) throws Exception {
 		// Given
-		CouponSearchRequest request = CouponFixture.couponSearchRequest(false, false, false);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false, false);
 		couponRepository.saveAll(coupons);
 
 		// When & Then
@@ -229,7 +229,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("coupons/search",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.COUPON_SEARCH_REQUEST))
+				CouponSnippetFixture.COUPON_STATUS_REQUEST))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$", hasSize(0)));

@@ -14,11 +14,11 @@ public class CouponQueueRepository {
 
 	private final ZSetRedisRepository zSetRedisRepository;
 
-	public void addQueue(String couponName, String memberNickname, double score) {
+	public void addIfAbsent(String couponName, String memberNickname, double score) {
 		zSetRedisRepository.addIfAbsent(requireNonNull(couponName), requireNonNull(memberNickname), score);
 	}
 
-	public Long queueSize(String couponName) {
+	public Long size(String couponName) {
 		return zSetRedisRepository.size(requireNonNull(couponName));
 	}
 }

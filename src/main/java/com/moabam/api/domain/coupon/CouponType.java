@@ -23,16 +23,16 @@ public enum CouponType {
 	GOLDEN_COUPON("황금"),
 	DISCOUNT_COUPON("할인");
 
-	private final String typeName;
+	private final String name;
 	private static final Map<String, CouponType> COUPON_TYPE_MAP;
 
 	static {
 		COUPON_TYPE_MAP = Collections.unmodifiableMap(Arrays.stream(values())
-			.collect(Collectors.toMap(CouponType::getTypeName, Function.identity())));
+			.collect(Collectors.toMap(CouponType::getName, Function.identity())));
 	}
 
-	public static CouponType from(String typeName) {
-		return Optional.ofNullable(COUPON_TYPE_MAP.get(typeName))
+	public static CouponType from(String name) {
+		return Optional.ofNullable(COUPON_TYPE_MAP.get(name))
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_TYPE));
 	}
 }

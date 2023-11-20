@@ -158,7 +158,7 @@ public class RoomSearchService {
 			.map(Participant::getMemberId)
 			.toList());
 
-		List<Long> myKnockedNotificationStatusInRoom = notificationService.getMyKnockedNotificationStatusInRoom(
+		List<Long> myKnockedNotificationStatusInRoom = notificationService.getMyKnockStatusInRoom(
 			memberId, roomId, participants);
 
 		addCompletedMembers(responses, dailyMemberCertifications, members, certifications, participants, date,
