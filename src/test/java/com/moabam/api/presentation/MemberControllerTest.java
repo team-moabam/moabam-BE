@@ -112,6 +112,7 @@ class MemberControllerTest {
 		contentParams.add("client_secret", oAuthConfig.client().clientSecret());
 
 		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
+		String requestBody = objectMapper.writeValueAsString(authorizationCodeResponse);
 		AuthorizationTokenResponse authorizationTokenResponse =
 			AuthorizationResponseFixture.authorizationTokenResponse();
 		String response = objectMapper.writeValueAsString(authorizationTokenResponse);
@@ -132,8 +133,9 @@ class MemberControllerTest {
 			.andExpect(MockRestRequestMatchers.header("Authorization", "Bearer accessToken"))
 			.andRespond(withSuccess(tokenInfoResponse, MediaType.APPLICATION_JSON));
 
-		mockMvc.perform(get("/members/login/kakao/oauth")
-				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
+		mockMvc.perform(post("/members/login/kakao/oauth")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody))
 			.andExpectAll(
 				status().isOk(),
 				MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON),
@@ -161,6 +163,7 @@ class MemberControllerTest {
 		contentParams.add("client_secret", oAuthConfig.client().clientSecret());
 
 		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
+		String requestBody = objectMapper.writeValueAsString(authorizationCodeResponse);
 
 		// expected
 		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenUri()))
@@ -169,8 +172,9 @@ class MemberControllerTest {
 			.andExpect(method(HttpMethod.POST))
 			.andRespond(withStatus(HttpStatusCode.valueOf(code)));
 
-		mockMvc.perform(get("/members/login/kakao/oauth")
-				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
+		mockMvc.perform(post("/members/login/kakao/oauth")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody))
 			.andExpect(status().isBadRequest());
 	}
 
@@ -191,7 +195,7 @@ class MemberControllerTest {
 			.andExpect(MockRestRequestMatchers.header("Authorization", "Bearer accessToken"))
 			.andRespond(withStatus(HttpStatusCode.valueOf(code)));
 
-		mockMvc.perform(get("/members/login/kakao/oauth")
+		mockMvc.perform(post("/members/login/kakao/oauth")
 				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
 			.andExpect(status().isBadRequest());
 	}

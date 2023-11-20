@@ -3,6 +3,7 @@ package com.moabam.api.application.notification;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -18,10 +19,10 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
-import com.moabam.api.dto.notification.KnockNotificationStatusResponse;
 import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -45,6 +46,9 @@ class NotificationServiceTest {
 
 	@Mock
 	private ParticipantSearchRepository participantSearchRepository;
+
+	@Mock
+	private ClockHolder clockHolder;
 
 	@WithMember
 	@DisplayName("성공적으로 상대에게 콕 알림을 보낸다. - Void")
@@ -119,6 +123,7 @@ class NotificationServiceTest {
 		// Given
 		given(participantSearchRepository.findAllByRoomCertifyTime(any(Integer.class))).willReturn(participants);
 		given(notificationRepository.findFcmTokenByMemberId(any(Long.class))).willReturn("FCM-TOKEN");
+		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
 		// When
 		notificationService.sendCertificationTimeNotification();
@@ -135,6 +140,7 @@ class NotificationServiceTest {
 		// Given
 		given(participantSearchRepository.findAllByRoomCertifyTime(any(Integer.class))).willReturn(participants);
 		given(notificationRepository.findFcmTokenByMemberId(any(Long.class))).willReturn(null);
+		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
 		// When
 		notificationService.sendCertificationTimeNotification();
@@ -151,17 +157,14 @@ class NotificationServiceTest {
 		// Given
 		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
 
-		given(participantSearchRepository.findOtherParticipantsInRoom(any(Long.class), any(Long.class)))
-			.willReturn(participants);
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(true);
 
 		// When
-		KnockNotificationStatusResponse actual =
-			notificationService.checkMyKnockNotificationStatusInRoom(member, 1L);
+		List<Long> actual =
+			notificationService.getMyKnockedNotificationStatusInRoom(member.id(), 1L, participants);
 
 		// Then
-		assertThat(actual.knockedMembersId()).hasSize(3);
-		assertThat(actual.notKnockedMembersId()).isEmpty();
+		assertThat(actual).hasSize(2);
 	}
 
 	@WithMember
@@ -171,16 +174,15 @@ class NotificationServiceTest {
 	void notificationService_notKnocked_checkMyKnockNotificationStatusInRoom(List<Participant> participants) {
 		// Given
 		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
-		given(participantSearchRepository.findOtherParticipantsInRoom(any(Long.class), any(Long.class)))
-			.willReturn(participants);
+
+		// given
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
 
 		// When
-		KnockNotificationStatusResponse actual =
-			notificationService.checkMyKnockNotificationStatusInRoom(member, 1L);
+		List<Long> actual =
+			notificationService.getMyKnockedNotificationStatusInRoom(member.id(), 1L, participants);
 
 		// Then
-		assertThat(actual.knockedMembersId()).isEmpty();
-		assertThat(actual.notKnockedMembersId()).hasSize(3);
+		assertThat(actual).isEmpty();
 	}
 }

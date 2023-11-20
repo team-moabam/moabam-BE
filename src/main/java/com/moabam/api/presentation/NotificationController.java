@@ -19,8 +19,8 @@ public class NotificationController {
 	private final NotificationService notificationService;
 
 	@GetMapping("/rooms/{roomId}/members/{memberId}")
-	public void sendKnockNotification(@CurrentMember AuthorizationMember member, @PathVariable Long roomId,
-		@PathVariable Long memberId) {
+	public void sendKnockNotification(@CurrentMember AuthorizationMember member, @PathVariable("roomId") Long roomId,
+		@PathVariable("memberId") Long memberId) {
 		notificationService.sendKnockNotification(member, memberId, roomId);
 	}
 }

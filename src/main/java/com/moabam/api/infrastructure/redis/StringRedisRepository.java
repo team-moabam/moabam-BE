@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StringRedisRepository {
 
-	private final RedisTemplate<String, String> redisTemplate;
+	private final RedisTemplate<String, Object> redisTemplate;
 
 	public void save(String key, String value, Duration timeout) {
 		redisTemplate
@@ -24,7 +24,7 @@ public class StringRedisRepository {
 	}
 
 	public String get(String key) {
-		return redisTemplate
+		return (String)redisTemplate
 			.opsForValue()
 			.get(key);
 	}

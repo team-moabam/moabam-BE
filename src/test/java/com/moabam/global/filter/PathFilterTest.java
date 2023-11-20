@@ -36,7 +36,7 @@ class PathFilterTest {
 	@DisplayName("Authentication을 넘기기 위한 필터 설정")
 	@ParameterizedTest
 	@ValueSource(strings = {
-		"GET", "POST", "PATCH", "DELETE"
+		"GET", "POST", "PATCH", "DELETE", "OPTIONS"
 	})
 	void filter_pass_for_authentication(String method) throws ServletException, IOException {
 		// given

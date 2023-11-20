@@ -4,7 +4,6 @@ import static com.moabam.api.domain.coupon.QCoupon.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -21,14 +20,6 @@ import lombok.RequiredArgsConstructor;
 public class CouponSearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
-
-	public Optional<Coupon> findById(Long couponId) {
-		return Optional.ofNullable(
-			jpaQueryFactory.selectFrom(coupon)
-				.where(coupon.id.eq(couponId))
-				.fetchOne()
-		);
-	}
 
 	public List<Coupon> findAllByStatus(LocalDateTime now, CouponSearchRequest request) {
 		return jpaQueryFactory.selectFrom(coupon)
