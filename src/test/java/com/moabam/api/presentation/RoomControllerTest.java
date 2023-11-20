@@ -1147,7 +1147,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 				routine20, routine21, routine22, routine23, routine24, routine25, routine26, routine27, routine28));
 
 		// expected
-		mockMvc.perform(get("/rooms?type=MORNING"))
+		mockMvc.perform(get("/rooms?roomType=MORNING"))
 			.andExpect(status().isOk())
 			.andDo(print());
 	}
@@ -1309,7 +1309,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 				routine20, routine21, routine22, routine23, routine24, routine25, routine26, routine27, routine28));
 
 		// expected
-		mockMvc.perform(get("/rooms/search?keyword=번째&type=MORNING"))
+		mockMvc.perform(get("/rooms/search?keyword=번째&roomType=MORNING"))
 			.andExpect(status().isOk())
 			.andDo(print());
 	}
@@ -1386,7 +1386,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 				routine20, routine21, routine22, routine23, routine24, routine25, routine26, routine27, routine28));
 
 		// expected
-		mockMvc.perform(get("/rooms/search?keyword=루틴&type=NIGHT&roomId=3"))
+		mockMvc.perform(get("/rooms/search?keyword=루틴&roomType=NIGHT&roomId=3"))
 			.andExpect(status().isOk())
 			.andDo(print());
 	}
