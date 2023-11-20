@@ -1,5 +1,6 @@
 package com.moabam.api.presentation;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -72,12 +73,12 @@ public class RoomController {
 		roomService.exitRoom(authorizationMember.id(), roomId);
 	}
 
-	@GetMapping("/{roomId}")
+	@GetMapping("/{roomId}/{date}")
 	@ResponseStatus(HttpStatus.OK)
 	public RoomDetailsResponse getRoomDetails(@CurrentMember AuthorizationMember authorizationMember,
-		@PathVariable("roomId") Long roomId) {
+		@PathVariable("roomId") Long roomId, @PathVariable("date") LocalDate date) {
 
-		return roomSearchService.getRoomDetails(authorizationMember.id(), roomId);
+		return roomSearchService.getRoomDetails(authorizationMember.id(), roomId, date);
 	}
 
 	@PostMapping("/{roomId}/certification")

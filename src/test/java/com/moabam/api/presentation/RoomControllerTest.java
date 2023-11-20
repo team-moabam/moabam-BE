@@ -825,8 +825,12 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			LocalDate.now());
 		dailyRoomCertificationRepository.save(dailyRoomCertification);
 
+		DailyRoomCertification dailyRoomCertification1 = RoomFixture.dailyRoomCertification(room.getId(),
+			LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), LocalDate.now().getDayOfMonth() - 3));
+		dailyRoomCertificationRepository.save(dailyRoomCertification1);
+
 		// expected
-		mockMvc.perform(get("/rooms/" + room.getId()))
+		mockMvc.perform(get("/rooms/" + room.getId() + "/" + LocalDate.now()))
 			.andExpect(status().isOk())
 			.andDo(print());
 	}

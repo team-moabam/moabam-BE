@@ -19,7 +19,6 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
-import com.moabam.api.dto.notification.KnockNotificationStatusResponse;
 import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
@@ -158,17 +157,14 @@ class NotificationServiceTest {
 		// Given
 		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
 
-		given(participantSearchRepository.findOtherParticipantsInRoom(any(Long.class), any(Long.class)))
-			.willReturn(participants);
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(true);
 
 		// When
-		KnockNotificationStatusResponse actual =
-			notificationService.checkMyKnockNotificationStatusInRoom(member, 1L);
+		List<Long> actual =
+			notificationService.getMyKnockedNotificationStatusInRoom(member.id(), 1L, participants);
 
 		// Then
-		assertThat(actual.knockedMembersId()).hasSize(3);
-		assertThat(actual.notKnockedMembersId()).isEmpty();
+		assertThat(actual).hasSize(2);
 	}
 
 	@WithMember
@@ -178,16 +174,15 @@ class NotificationServiceTest {
 	void notificationService_notKnocked_checkMyKnockNotificationStatusInRoom(List<Participant> participants) {
 		// Given
 		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
-		given(participantSearchRepository.findOtherParticipantsInRoom(any(Long.class), any(Long.class)))
-			.willReturn(participants);
+
+		// given
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
 
 		// When
-		KnockNotificationStatusResponse actual =
-			notificationService.checkMyKnockNotificationStatusInRoom(member, 1L);
+		List<Long> actual =
+			notificationService.getMyKnockedNotificationStatusInRoom(member.id(), 1L, participants);
 
 		// Then
-		assertThat(actual.knockedMembersId()).isEmpty();
-		assertThat(actual.notKnockedMembersId()).hasSize(3);
+		assertThat(actual).isEmpty();
 	}
 }

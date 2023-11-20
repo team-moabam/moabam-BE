@@ -15,7 +15,6 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
-import com.moabam.api.dto.notification.KnockNotificationStatusResponse;
 import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.common.util.ClockHolder;
@@ -67,22 +66,20 @@ public class NotificationService {
 		});
 	}
 
-	/**
-	 * TODO : 영명-재윤님 방 조회하실 때, 특정 사용자의 방 내 참여자들에 대한 콕 찌르기 여부를 반환해주는 메서드이니 사용하시기 바랍니다.
-	 */
-	public KnockNotificationStatusResponse checkMyKnockNotificationStatusInRoom(AuthorizationMember member,
-		Long roomId) {
-		List<Participant> participants = participantSearchRepository.findOtherParticipantsInRoom(member.id(), roomId);
+	public List<Long> getMyKnockedNotificationStatusInRoom(Long memberId, Long roomId,
+		List<Participant> participants) {
+		List<Participant> filteredParticipants = participants.stream()
+			.filter(participant -> !participant.getMemberId().equals(memberId))
+			.toList();
 
 		Predicate<Long> knockPredicate = targetId ->
-			notificationRepository.existsByKey(generateKnockKey(member.id(), targetId, roomId));
+			notificationRepository.existsByKey(generateKnockKey(memberId, targetId, roomId));
 
-		Map<Boolean, List<Long>> knockNotificationStatus = participants.stream()
+		Map<Boolean, List<Long>> knockNotificationStatus = filteredParticipants.stream()
 			.map(Participant::getMemberId)
 			.collect(Collectors.partitioningBy(knockPredicate));
 
-		return NotificationMapper
-			.toKnockNotificationStatusResponse(knockNotificationStatus.get(true), knockNotificationStatus.get(false));
+		return knockNotificationStatus.get(true);
 	}
 
 	private void validateConflictKnockNotification(String knockKey) {
