@@ -1,7 +1,5 @@
 package com.moabam.global.config;
 
-import static com.moabam.global.common.util.GlobalConstant.*;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -23,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @EnableScheduling
 public class FcmConfig {
+
+	private static final String FIREBASE_PATH = "config/moabam-firebase.json";
 
 	@Bean
 	public FirebaseMessaging firebaseMessaging() {
