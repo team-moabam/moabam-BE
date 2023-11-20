@@ -22,8 +22,8 @@ import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.api.infrastructure.redis.TokenRepository;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.PublicClaim;
+import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.common.util.GlobalConstant;
-import com.moabam.global.common.util.cookie.CookieUtils;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
@@ -44,7 +44,6 @@ public class AuthorizationService {
 	private final MemberService memberService;
 	private final JwtProviderService jwtProviderService;
 	private final TokenRepository tokenRepository;
-	private final CookieUtils cookieUtils;
 
 	public void redirectToLoginPage(HttpServletResponse httpServletResponse) {
 		String authorizationCodeUri = getAuthorizationCodeUri();
@@ -82,11 +81,11 @@ public class AuthorizationService {
 		tokenRepository.saveToken(publicClaim.id(), tokenSaveRequest);
 
 		response.addCookie(
-			cookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()));
+			CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()));
 		response.addCookie(
-			cookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire()));
+			CookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire()));
 		response.addCookie(
-			cookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire()));
+			CookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire()));
 	}
 
 	public void validTokenPair(Long id, String oldRefreshToken) {
@@ -113,7 +112,7 @@ public class AuthorizationService {
 		Arrays.stream(httpServletRequest.getCookies())
 			.forEach(cookie -> {
 				if (cookie.getName().contains("token")) {
-					httpServletResponse.addCookie(cookieUtils.deleteCookie(cookie));
+					httpServletResponse.addCookie(CookieUtils.deleteCookie(cookie));
 				}
 			});
 	}

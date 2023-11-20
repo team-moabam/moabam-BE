@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.moabam.api.application.auth.JwtProviderService;
-import com.moabam.global.common.util.cookie.CookieUtils;
+import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.support.fixture.PublicClaimFixture;
 
@@ -32,9 +32,6 @@ public class WithFilterSupporter {
 	@Autowired
 	TokenConfig tokenConfig;
 
-	@Autowired
-	CookieUtils cookieUtils;
-
 	protected MockMvc mockMvc;
 
 	@BeforeEach
@@ -42,11 +39,11 @@ public class WithFilterSupporter {
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
 			.apply(RestDocsFactory.restdocs(contextProvider))
 			.defaultRequest(get("/")
-				.cookie(cookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()))
-				.cookie(cookieUtils.tokenCookie("access_token",
+				.cookie(CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()))
+				.cookie(CookieUtils.tokenCookie("access_token",
 					jwtProviderService.provideAccessToken(PublicClaimFixture.publicClaim()),
 					tokenConfig.getRefreshExpire()))
-				.cookie(cookieUtils.tokenCookie("refresh_token",
+				.cookie(CookieUtils.tokenCookie("refresh_token",
 					jwtProviderService.provideRefreshToken(),
 					tokenConfig.getRefreshExpire())))
 			.build();

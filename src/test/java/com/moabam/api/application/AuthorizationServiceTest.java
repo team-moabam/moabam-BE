@@ -37,8 +37,7 @@ import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.infrastructure.redis.TokenRepository;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.PublicClaim;
-import com.moabam.global.common.util.cookie.CookieDevUtils;
-import com.moabam.global.common.util.cookie.CookieUtils;
+import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
@@ -69,7 +68,6 @@ class AuthorizationServiceTest {
 	@Mock
 	TokenRepository tokenRepository;
 
-	CookieUtils cookieUtils;
 	OAuthConfig oauthConfig;
 	TokenConfig tokenConfig;
 	AuthorizationService noPropertyService;
@@ -77,11 +75,9 @@ class AuthorizationServiceTest {
 
 	@BeforeEach
 	public void initParams() {
-		cookieUtils = new CookieDevUtils();
 		tokenConfig = new TokenConfig(null, 100000, 150000,
 			"testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttest");
 		ReflectionTestUtils.setField(authorizationService, "tokenConfig", tokenConfig);
-		ReflectionTestUtils.setField(authorizationService, "cookieUtils", cookieUtils);
 
 		oauthConfig = new OAuthConfig(
 			new OAuthConfig.Provider("https://authorization/url", "http://redirect/url", "http://token/url",
@@ -97,7 +93,7 @@ class AuthorizationServiceTest {
 		);
 		noPropertyService = new AuthorizationService(noOAuthConfig, tokenConfig,
 			oAuth2AuthorizationServerRequestService,
-			memberService, jwtProviderService, tokenRepository, cookieUtils);
+			memberService, jwtProviderService, tokenRepository);
 	}
 
 	@DisplayName("인가코드 URI 생성 매퍼 실패")
@@ -295,9 +291,9 @@ class AuthorizationServiceTest {
 		// given
 		MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
 		httpServletRequest.setCookies(
-			cookieUtils.tokenCookie("access_token", "value", 100000),
-			cookieUtils.tokenCookie("refresh_token", "value", 100000),
-			cookieUtils.typeCookie("Bearer", 100000)
+			CookieUtils.tokenCookie("access_token", "value", 100000),
+			CookieUtils.tokenCookie("refresh_token", "value", 100000),
+			CookieUtils.typeCookie("Bearer", 100000)
 		);
 
 		MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
