@@ -12,9 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.moabam.global.config.EmbeddedRedisConfig;
-import com.moabam.global.config.RedisConfig;
 
-@SpringBootTest(classes = {RedisConfig.class, EmbeddedRedisConfig.class, StringRedisRepository.class})
+@SpringBootTest(classes = {EmbeddedRedisConfig.class, StringRedisRepository.class})
 class StringRedisRepositoryTest {
 
 	@Autowired

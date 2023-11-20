@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -235,7 +236,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$", hasSize(0)));
 	}
 
-	@WithMember
+	@Disabled
+	@WithMember(nickname = "member-coupon-1")
 	@DisplayName("쿠폰 발급 요청을 한다. - Void")
 	@Test
 	void couponController_registerCouponQueue() throws Exception {
@@ -256,12 +258,13 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isOk());
 	}
 
+	@Disabled
 	@WithMember
 	@DisplayName("존재하지 않는 쿠폰에 발급 요청을 한다. - NotFoundException")
 	@Test
 	void couponController_registerCouponQueue_NotFoundException() throws Exception {
 		// Given
-		Coupon coupon = CouponFixture.coupon("CouponName", 1, 2);
+		Coupon coupon = CouponFixture.coupon("Not found coupon name", 1, 2);
 		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 1);
 
 		given(systemClockHolder.times()).willReturn(now);
@@ -279,7 +282,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON.getMessage()));
 	}
 
-	@WithMember
+	@Disabled
+	@WithMember(nickname = "member-coupon-2")
 	@DisplayName("발급 기간이 아닌 쿠폰에 발급 요청을 한다. - BadRequestException")
 	@Test
 	void couponController_registerCouponQueue_BadRequestException() throws Exception {

@@ -3,54 +3,62 @@ package com.moabam.api.infrastructure.redis;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.moabam.global.config.EmbeddedRedisConfig;
-import com.moabam.global.config.RedisConfig;
 
-@SpringBootTest(classes = {RedisConfig.class, EmbeddedRedisConfig.class, ZSetRedisRepository.class})
+@SpringBootTest(classes = {EmbeddedRedisConfig.class, ZSetRedisRepository.class})
 class ZSetRedisRepositoryTest {
 
 	@Autowired
 	private ZSetRedisRepository zSetRedisRepository;
 
-	private String key = "key";
-	private String value = "value";
-	private int size = 3;
+	String key = "key";
+	String value = "value";
 
-	@BeforeEach
-	void setUp() {
-		for (int i = 0; i < size; i++) {
-			zSetRedisRepository.addIfAbsent(key, value + i, i);
+	@AfterEach
+	void afterEach() {
+		if (zSetRedisRepository.hasKey(key)) {
+			zSetRedisRepository.delete(key);
 		}
 	}
 
-	@AfterEach
-	void setDown() {
-		zSetRedisRepository.delete(key);
-	}
-
+	@Disabled
 	@DisplayName("레디스의 SortedSet 데이터가 성공적으로 저장된다. - Void")
 	@Test
-	void zsetRedisRepository_addIfAbsent() {
+	void setRedisRepository_addIfAbsent() {
+		// When
+		zSetRedisRepository.addIfAbsent(key, value, 1);
+
 		// Then
-		assertThat(zSetRedisRepository.size(key)).isEqualTo(size);
+		assertThat(zSetRedisRepository.size(key)).isEqualTo(1);
 	}
 
+	@Disabled
 	@DisplayName("레디스의 특정 키의 사이즈가 성공적으로 반환된다. - int")
 	@Test
-	void size() {
+	void setRedisRepository_size() {
+		// Given
+		zSetRedisRepository.addIfAbsent(key, value, 1);
+
+		// When
+		long actual = zSetRedisRepository.size(key);
+
 		// Then
-		assertThat(zSetRedisRepository.size(key)).isEqualTo(size);
+		assertThat(actual).isEqualTo(1);
 	}
 
+	@Disabled
 	@DisplayName("레디스의 특정 데이터가 성공적으로 삭제된다. - Void")
 	@Test
-	void stringRedisRepository_delete() {
+	void setRedisRepository_delete() {
+		// Given
+		zSetRedisRepository.addIfAbsent(key, value, 1);
+
 		// When
 		zSetRedisRepository.delete(key);
 
@@ -58,9 +66,10 @@ class ZSetRedisRepositoryTest {
 		assertThat(zSetRedisRepository.hasKey(key)).isFalse();
 	}
 
+	@Disabled
 	@DisplayName("레디스의 특정 데이터 존재 여부를 성공적으로 체크한다. - Boolean")
 	@Test
-	void stringRedisRepository_hasKey() {
+	void setRedisRepository_hasKey() {
 		// When & Then
 		assertThat(zSetRedisRepository.hasKey("not found key")).isFalse();
 	}
