@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -64,8 +63,7 @@ public class AuthorizationService {
 
 		return authorizationTokenInfoResponse.getBody();
 	}
-
-	@Transactional
+	
 	public LoginResponse signUpOrLogin(HttpServletResponse httpServletResponse,
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse) {
 		LoginResponse loginResponse = memberService.login(authorizationTokenInfoResponse);
@@ -87,7 +85,6 @@ public class AuthorizationService {
 			cookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire()));
 		response.addCookie(
 			cookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire()));
-
 	}
 
 	public void validTokenPair(Long id, String oldRefreshToken) {
