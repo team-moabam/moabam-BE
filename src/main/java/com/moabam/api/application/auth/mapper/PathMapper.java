@@ -9,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import com.moabam.api.domain.member.Role;
 import com.moabam.global.auth.handler.PathResolver;
 
-import jakarta.annotation.Nonnull;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -20,12 +19,12 @@ public class PathMapper {
 		return parsePath(uri, null, null);
 	}
 
-	public static <T> PathResolver.Path parsePath(String uri, @Nonnull List<T> params) {
-		if (!params.isEmpty() && params.get(0) instanceof Role) {
-			return parsePath(uri, (List<Role>)params, null);
-		}
+	public static PathResolver.Path pathWithRole(String uri, List<Role> params) {
+		return parsePath(uri, params, null);
+	}
 
-		return parsePath(uri, null, (List<HttpMethod>)params);
+	public static PathResolver.Path pathWithMethod(String uri, List<HttpMethod> params) {
+		return parsePath(uri, null, params);
 	}
 
 	private static PathResolver.Path parsePath(String uri, List<Role> roles, List<HttpMethod> methods) {
