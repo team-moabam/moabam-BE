@@ -23,11 +23,11 @@ public class PaymentController {
 
 	private final PaymentService paymentService;
 
-	@PostMapping("/{paymentId}/request")
+	@PostMapping("/{paymentId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void requestPayment(@CurrentMember AuthorizationMember member,
+	public void request(@CurrentMember AuthorizationMember member,
 		@PathVariable Long paymentId,
 		@Valid @RequestBody PaymentRequest request) {
-		paymentService.requestPayment(member.id(), paymentId, request);
+		paymentService.request(member.id(), paymentId, request);
 	}
 }

@@ -20,13 +20,13 @@ public class PaymentService {
 	private final PaymentRepository paymentRepository;
 
 	@Transactional
-	public void requestPayment(Long memberId, Long paymentId, PaymentRequest request) {
-		Payment payment = getPayment(paymentId);
+	public void request(Long memberId, Long paymentId, PaymentRequest request) {
+		Payment payment = getById(paymentId);
 		payment.validateByMember(memberId);
 		payment.request(request.orderId());
 	}
 
-	private Payment getPayment(Long paymentId) {
+	private Payment getById(Long paymentId) {
 		return paymentRepository.findById(paymentId)
 			.orElseThrow(() -> new NotFoundException(PAYMENT_NOT_FOUND));
 	}

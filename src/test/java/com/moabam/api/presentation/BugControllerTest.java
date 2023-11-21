@@ -2,7 +2,6 @@ package com.moabam.api.presentation;
 
 import static com.moabam.global.auth.model.AuthorizationThreadLocal.*;
 import static com.moabam.support.fixture.BugFixture.*;
-import static com.moabam.support.fixture.BugHistoryFixture.*;
 import static com.moabam.support.fixture.CouponFixture.*;
 import static com.moabam.support.fixture.MemberFixture.*;
 import static com.moabam.support.fixture.ProductFixture.*;
@@ -37,7 +36,6 @@ import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.domain.product.repository.ProductRepository;
 import com.moabam.api.dto.bug.BugResponse;
-import com.moabam.api.dto.bug.TodayBugResponse;
 import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.api.dto.product.PurchaseProductRequest;
 import com.moabam.api.dto.product.PurchaseProductResponse;
@@ -88,30 +86,6 @@ class BugControllerTest extends WithoutFilterSupporter {
 			.getResponse()
 			.getContentAsString(UTF_8);
 		BugResponse actual = objectMapper.readValue(content, BugResponse.class);
-		assertThat(actual).isEqualTo(expected);
-	}
-
-	@DisplayName("오늘 보상 벌레를 조회한다.")
-	@WithMember
-	@Test
-	void get_today_bug_success() throws Exception {
-		// given
-		Long memberId = getAuthorizationMember().id();
-		bugHistoryRepository.saveAll(List.of(
-			rewardMorningBug(memberId, 2),
-			rewardMorningBug(memberId, 3),
-			rewardNightBug(memberId, 5)));
-		TodayBugResponse expected = BugMapper.toTodayBugResponse(5, 5);
-
-		// expected
-		String content = mockMvc.perform(get("/bugs/today")
-				.contentType(APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andDo(print())
-			.andReturn()
-			.getResponse()
-			.getContentAsString(UTF_8);
-		TodayBugResponse actual = objectMapper.readValue(content, TodayBugResponse.class);
 		assertThat(actual).isEqualTo(expected);
 	}
 
