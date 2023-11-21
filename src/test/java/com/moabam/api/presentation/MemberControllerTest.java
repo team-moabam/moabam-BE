@@ -1,50 +1,62 @@
 package com.moabam.api.presentation;
 
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.Optional;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.application.auth.AuthorizationService;
 import com.moabam.api.application.auth.OAuth2AuthorizationServerRequestService;
-import com.moabam.api.dto.auth.AuthorizationCodeResponse;
-import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
-import com.moabam.api.dto.auth.AuthorizationTokenResponse;
-import com.moabam.global.common.util.GlobalConstant;
+import com.moabam.api.domain.auth.repository.TokenRepository;
+import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.repository.MemberRepository;
+import com.moabam.api.domain.member.repository.MemberSearchRepository;
+import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.repository.RoomRepository;
+import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.global.config.OAuthConfig;
+import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
-import com.moabam.support.fixture.AuthorizationResponseFixture;
+import com.moabam.support.annotation.WithMember;
+import com.moabam.support.common.WithoutFilterSupporter;
+import com.moabam.support.fixture.MemberFixture;
+import com.moabam.support.fixture.RoomFixture;
+import com.moabam.support.fixture.TokenSaveValueFixture;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
-class MemberControllerTest {
+@AutoConfigureMockRestServiceServer
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class MemberControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	MockMvc mockMvc;
@@ -53,150 +65,128 @@ class MemberControllerTest {
 	ObjectMapper objectMapper;
 
 	@Autowired
-	OAuth2AuthorizationServerRequestService oAuth2AuthorizationServerRequestService;
+	MemberRepository memberRepository;
 
-	@SpyBean
-	AuthorizationService authorizationService;
+	@Autowired
+	MemberSearchRepository memberSearchRepository;
+
+	@Autowired
+	TokenRepository tokenRepository;
+
+	@Autowired
+	RoomRepository roomRepository;
+
+	@Autowired
+	OAuth2AuthorizationServerRequestService oAuth2AuthorizationServerRequestService;
 
 	@Autowired
 	OAuthConfig oAuthConfig;
 
-	static RestTemplateBuilder restTemplateBuilder;
+	RestTemplateBuilder restTemplateBuilder;
 
 	MockRestServiceServer mockRestServiceServer;
 
+	Member member;
+
 	@BeforeAll
-	static void allSetUp() {
+	void allSetUp() {
 		restTemplateBuilder = new RestTemplateBuilder()
 			.errorHandler(new RestTemplateResponseHandler());
+
+		member = MemberFixture.member();
+		memberRepository.save(member);
 	}
 
 	@BeforeEach
 	void setUp() {
-		// TODO 추후 RestTemplate -> REstTemplateBuilder & Bean등록하여 테스트 코드도 일부 변경됨
 		RestTemplate restTemplate = restTemplateBuilder.build();
 		ReflectionTestUtils.setField(oAuth2AuthorizationServerRequestService, "restTemplate", restTemplate);
 		mockRestServiceServer = MockRestServiceServer.createServer(restTemplate);
 	}
 
-	@DisplayName("인가 코드 받기 위한 로그인 페이지 요청")
+	@DisplayName("로그아웃 성공 테스트")
+	@WithMember
 	@Test
-	void authorization_code_request_success() throws Exception {
+	void logout_success() throws Exception {
 		// given
-		String uri = UriComponentsBuilder
-			.fromUriString(oAuthConfig.provider().authorizationUri())
-			.queryParam("response_type", "code")
-			.queryParam("client_id", oAuthConfig.client().clientId())
-			.queryParam("redirect_uri", oAuthConfig.provider().redirectUri())
-			.queryParam("scope", String.join(",", oAuthConfig.client().scope()))
-			.toUriString();
+		TokenSaveValue tokenSaveValue = TokenSaveValueFixture.tokenSaveValue();
+		tokenRepository.saveToken(member.getId(), tokenSaveValue);
 
 		// expected
-		ResultActions result = mockMvc.perform(get("/members"));
+		ResultActions result = mockMvc.perform(get("/members/logout"));
 
-		result.andExpect(status().is3xxRedirection())
-			.andExpect(MockMvcResultMatchers.header().string("Content-type",
-				MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8))
-			.andExpect(MockMvcResultMatchers.redirectedUrl(uri));
+		result.andExpect(status().is2xxSuccessful());
+
+		Assertions.assertThatThrownBy(() -> tokenRepository.getTokenSaveValue(member.getId()))
+			.isInstanceOf(UnauthorizedException.class);
+
 	}
 
-	@DisplayName("소셜 로그인 및 회원가입 요청 성공")
+	@DisplayName("회원 삭제 성공 테스트")
+	@WithMember
 	@Test
-	void social_login_signUp_request_success() throws Exception {
-		// given
-		MultiValueMap<String, String> contentParams = new LinkedMultiValueMap<>();
-		contentParams.add("grant_type", oAuthConfig.client().authorizationGrantType());
-		contentParams.add("client_id", oAuthConfig.client().clientId());
-		contentParams.add("redirect_uri", oAuthConfig.provider().redirectUri());
-		contentParams.add("code", "test");
-		contentParams.add("client_secret", oAuthConfig.client().clientSecret());
-
-		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
-		String requestBody = objectMapper.writeValueAsString(authorizationCodeResponse);
-		AuthorizationTokenResponse authorizationTokenResponse =
-			AuthorizationResponseFixture.authorizationTokenResponse();
-		String response = objectMapper.writeValueAsString(authorizationTokenResponse);
-
-		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
-			AuthorizationResponseFixture.authorizationTokenInfoResponse();
-		String tokenInfoResponse = objectMapper.writeValueAsString(authorizationTokenInfoResponse);
+	void delete_member_success() throws Exception {
 
 		// expected
-		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenUri()))
-			.andExpect(MockRestRequestMatchers.content().formData(contentParams))
-			.andExpect(MockRestRequestMatchers.content().contentType("application/x-www-form-urlencoded;charset=UTF-8"))
+		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().unlink()))
+			.andExpect(MockRestRequestMatchers.content()
+				.contentType("application/x-www-form-urlencoded;charset=UTF-8"))
+			.andExpect(MockRestRequestMatchers.header(
+				"Authorization", "KakaoAK " + oAuthConfig.client().adminKey()))
 			.andExpect(method(HttpMethod.POST))
-			.andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
+			.andRespond(withStatus(HttpStatus.OK));
 
-		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenInfo()))
-			.andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
-			.andExpect(MockRestRequestMatchers.header("Authorization", "Bearer accessToken"))
-			.andRespond(withSuccess(tokenInfoResponse, MediaType.APPLICATION_JSON));
-
-		mockMvc.perform(post("/members/login/kakao/oauth")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestBody))
-			.andExpectAll(
-				status().isOk(),
-				MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON),
-				cookie().value("token_type", "Bearer"),
-				cookie().exists("access_token"),
-				cookie().httpOnly("access_token", true),
-				cookie().secure("access_token", true),
-				cookie().exists("refresh_token"),
-				cookie().httpOnly("refresh_token", true),
-				cookie().secure("refresh_token", true)
-			)
-			.andExpect(MockMvcResultMatchers.jsonPath("$.isSignUp").value(true));
+		ResultActions result = mockMvc.perform(delete("/members"));
 	}
 
-	@DisplayName("Authorization Token 발급 실패")
-	@ParameterizedTest
-	@ValueSource(ints = {400, 401, 403, 429, 500, 502, 503})
-	void authorization_token_request_fail(int code) throws Exception {
-		// given
-		MultiValueMap<String, String> contentParams = new LinkedMultiValueMap<>();
-		contentParams.add("grant_type", oAuthConfig.client().authorizationGrantType());
-		contentParams.add("client_id", oAuthConfig.client().clientId());
-		contentParams.add("redirect_uri", oAuthConfig.provider().redirectUri());
-		contentParams.add("code", "test");
-		contentParams.add("client_secret", oAuthConfig.client().clientSecret());
-
-		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
-		String requestBody = objectMapper.writeValueAsString(authorizationCodeResponse);
-
+	@DisplayName("회원이 없어서 회원 삭제 실패")
+	@WithMember(id = 123L)
+	@Test
+	void delete_member_failby_not_found_member() throws Exception {
 		// expected
-		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenUri()))
-			.andExpect(MockRestRequestMatchers.content().formData(contentParams))
-			.andExpect(MockRestRequestMatchers.content().contentType("application/x-www-form-urlencoded;charset=UTF-8"))
+		mockMvc.perform(delete("/members"))
+			.andExpect(status().isConflict());
+	}
+
+	@DisplayName("연결 오류로 인한 카카오 연결 끊기 실패로 롤백")
+	@WithMember
+	@ParameterizedTest
+	@ValueSource(ints = {401, 400})
+	void unlink_social_member_failby_connection_error_and_rollback(int code) throws Exception {
+		// expected
+		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().unlink()))
+			.andExpect(MockRestRequestMatchers.header(
+				"Content-Type", "application/x-www-form-urlencoded;charset=UTF-8"))
+			.andExpect(MockRestRequestMatchers.header(
+				"Authorization", "KakaoAK " + oAuthConfig.client().adminKey()))
 			.andExpect(method(HttpMethod.POST))
 			.andRespond(withStatus(HttpStatusCode.valueOf(code)));
 
-		mockMvc.perform(post("/members/login/kakao/oauth")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestBody))
-			.andExpect(status().isBadRequest());
+		ResultActions result = mockMvc.perform(delete("/members"));
+		result.andExpect(status().isBadRequest());
+
+		Optional<Member> rollbackMemberOptional = memberSearchRepository.findMember(member.getId());
+		assertThat(rollbackMemberOptional).isPresent();
+
+		Member rollMember = rollbackMemberOptional.get();
+		assertAll(
+			() -> assertThat(rollMember.getSocialId()).isEqualTo(member.getSocialId()),
+			() -> assertThat(rollMember.getDeletedAt()).isNull()
+		);
 	}
 
-	@DisplayName("토큰 정보 요청 실패")
-	@ParameterizedTest
-	@ValueSource(ints = {400, 401})
-	void token_info_response_fail(int code) throws Exception {
+	@DisplayName("방장으로 인해 회원 삭제 조회 실패")
+	@WithMember
+	@Test
+	void unlink_social_member_failby_meber_is_manger() throws Exception {
 		// given
-		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
+		Room room = RoomFixture.room();
+		room.changeManagerNickname(member.getNickname());
 
-		// when
-		doReturn(AuthorizationResponseFixture.authorizationTokenResponse())
-			.when(authorizationService).requestToken(authorizationCodeResponse);
+		roomRepository.save(room);
 
-		// expected
-		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().tokenInfo()))
-			.andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
-			.andExpect(MockRestRequestMatchers.header("Authorization", "Bearer accessToken"))
-			.andRespond(withStatus(HttpStatusCode.valueOf(code)));
-
-		mockMvc.perform(post("/members/login/kakao/oauth")
-				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
-			.andExpect(status().isBadRequest());
+		// then
+		ResultActions result = mockMvc.perform(delete("/members"))
+			.andExpect(status().isConflict());
 	}
 }

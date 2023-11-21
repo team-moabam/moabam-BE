@@ -1,13 +1,13 @@
 package com.moabam.api.domain.member;
 
 import static com.moabam.global.common.util.GlobalConstant.*;
+import static com.moabam.global.common.util.RandomUtils.*;
 import static java.util.Objects.*;
 
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import com.moabam.api.domain.bug.Bug;
 import com.moabam.global.common.entity.BaseTimeEntity;
@@ -31,7 +31,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "member")
 @SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where id = ?")
-@Where(clause = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 
@@ -41,7 +40,7 @@ public class Member extends BaseTimeEntity {
 	private Long id;
 
 	@Column(name = "social_id", nullable = false, unique = true)
-	private Long socialId;
+	private String socialId;
 
 	@Column(name = "nickname", nullable = false, unique = true)
 	private String nickname;
@@ -80,10 +79,10 @@ public class Member extends BaseTimeEntity {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	private Member(Long id, Long socialId, String nickname, Bug bug) {
+	private Member(Long id, String socialId, Bug bug) {
 		this.id = id;
 		this.socialId = requireNonNull(socialId);
-		this.nickname = requireNonNull(nickname);
+		this.nickname = createNickName();
 		this.profileImage = BaseImageUrl.PROFILE_URL;
 		this.bug = requireNonNull(bug);
 		this.role = Role.USER;
@@ -115,5 +114,27 @@ public class Member extends BaseTimeEntity {
 
 	public void increaseTotalCertifyCount() {
 		this.totalCertifyCount++;
+	}
+
+	public void delete() {
+		deletedAt = LocalDateTime.now();
+		socialId = deleteSocialId(deletedAt);
+	}
+
+	public void undoDelete(String socialId) {
+		this.socialId = socialId;
+		deletedAt = null;
+	}
+
+	public void changeNickName(String nickname) {
+		this.nickname = nickname;
+	}
+
+	private String createNickName() {
+		return "오목눈이#" + randomStringValues();
+	}
+
+	private String deleteSocialId(LocalDateTime now) {
+		return "delete_" + now.toString() + randomNumberValues();
 	}
 }

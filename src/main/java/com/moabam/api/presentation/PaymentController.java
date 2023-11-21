@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.payment.PaymentService;
 import com.moabam.api.dto.payment.PaymentRequest;
-import com.moabam.global.auth.annotation.CurrentMember;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.annotation.Auth;
+import com.moabam.global.auth.model.AuthMember;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +23,11 @@ public class PaymentController {
 
 	private final PaymentService paymentService;
 
-	@PostMapping("/{paymentId}/request")
+	@PostMapping("/{paymentId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void requestPayment(@CurrentMember AuthorizationMember member,
+	public void requestPayment(@Auth AuthMember member,
 		@PathVariable Long paymentId,
 		@Valid @RequestBody PaymentRequest request) {
-		paymentService.requestPayment(member.id(), paymentId, request);
+		paymentService.request(member.id(), paymentId, request);
 	}
 }

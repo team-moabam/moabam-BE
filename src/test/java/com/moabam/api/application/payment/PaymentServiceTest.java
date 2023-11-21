@@ -45,7 +45,7 @@ class PaymentServiceTest {
 			given(paymentRepository.findById(paymentId)).willReturn(Optional.empty());
 
 			// when, then
-			assertThatThrownBy(() -> paymentService.requestPayment(memberId, paymentId, request))
+			assertThatThrownBy(() -> paymentService.request(memberId, paymentId, request))
 				.isInstanceOf(NotFoundException.class)
 				.hasMessage("존재하지 않는 결제 정보입니다.");
 		}

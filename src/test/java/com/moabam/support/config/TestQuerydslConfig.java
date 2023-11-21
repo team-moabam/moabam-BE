@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import com.moabam.api.domain.item.repository.InventorySearchRepository;
 import com.moabam.api.domain.item.repository.ItemSearchRepository;
+import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.domain.room.repository.CertificationsSearchRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -37,5 +38,10 @@ public class TestQuerydslConfig {
 	@Bean
 	public CertificationsSearchRepository certificationsSearchRepository() {
 		return new CertificationsSearchRepository(jpaQueryFactory());
+	}
+
+	@Bean
+	public MemberSearchRepository memberSearchRepository() {
+		return new MemberSearchRepository(jpaQueryFactory());
 	}
 }

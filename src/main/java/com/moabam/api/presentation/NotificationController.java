@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.notification.NotificationService;
 import com.moabam.api.infrastructure.fcm.FcmService;
-import com.moabam.global.auth.annotation.CurrentMember;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.annotation.Auth;
+import com.moabam.global.auth.model.AuthMember;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,7 @@ public class NotificationController {
 
 	@GetMapping("/rooms/{roomId}/members/{memberId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void sendKnockNotification(@CurrentMember AuthorizationMember member, @PathVariable("roomId") Long roomId,
+	public void sendKnockNotification(@Auth AuthMember member, @PathVariable("roomId") Long roomId,
 		@PathVariable("memberId") Long memberId) {
 		notificationService.sendKnock(member, memberId, roomId);
 	}

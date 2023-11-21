@@ -115,7 +115,7 @@ class RoomServiceTest {
 		Long managerId = 1L;
 		Long memberId = 2L;
 
-		Member member = MemberFixture.member(1234L, "닉네임");
+		Member member = MemberFixture.member("1234", "닉네임");
 
 		Room room = spy(RoomFixture.room());
 		given(room.getId()).willReturn(1L);

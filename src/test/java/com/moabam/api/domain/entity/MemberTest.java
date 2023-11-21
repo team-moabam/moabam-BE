@@ -15,7 +15,7 @@ import com.moabam.support.fixture.MemberFixture;
 
 class MemberTest {
 
-	Long socialId = 1L;
+	String socialId = "1";
 	String nickname = "밥세공기";
 	String profileImage = "kakao/profile/url";
 
@@ -25,7 +25,6 @@ class MemberTest {
 		// When + Then
 		assertThatNoException().isThrownBy(() -> Member.builder()
 			.socialId(socialId)
-			.nickname(nickname)
 			.bug(Bug.builder().build())
 			.build());
 	}
@@ -37,7 +36,6 @@ class MemberTest {
 		assertThatNoException().isThrownBy(() -> {
 			Member member = Member.builder()
 				.socialId(socialId)
-				.nickname(nickname)
 				.bug(Bug.builder().build())
 				.build();
 
@@ -59,8 +57,7 @@ class MemberTest {
 	@Test
 	void creat_member_failBy_socialId() {
 		// When + Then
-		assertThatThrownBy(Member.builder()
-			.nickname(nickname)::build)
+		assertThatThrownBy(Member.builder()::build)
 			.isInstanceOf(NullPointerException.class);
 	}
 

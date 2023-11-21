@@ -69,7 +69,7 @@ class ItemControllerTest extends WithoutFilterSupporter {
 		@Test
 		void success() throws Exception {
 			// given
-			Long memberId = getAuthorizationMember().id();
+			Long memberId = getAuthMember().id();
 			Item item1 = itemRepository.save(morningSantaSkin().build());
 			Inventory inventory = inventoryRepository.save(inventory(memberId, item1));
 			inventory.select();
@@ -111,7 +111,7 @@ class ItemControllerTest extends WithoutFilterSupporter {
 		@Test
 		void success() throws Exception {
 			// given
-			Long memberId = getAuthorizationMember().id();
+			Long memberId = getAuthMember().id();
 			Item item = itemRepository.save(nightMageSkin());
 			PurchaseItemRequest request = new PurchaseItemRequest(BugType.NIGHT);
 			given(memberService.getById(memberId)).willReturn(member());
@@ -147,7 +147,7 @@ class ItemControllerTest extends WithoutFilterSupporter {
 	@Test
 	void select_item_success() throws Exception {
 		// given
-		Long memberId = getAuthorizationMember().id();
+		Long memberId = getAuthMember().id();
 		Item item = itemRepository.save(nightMageSkin());
 		inventoryRepository.save(inventory(memberId, item));
 

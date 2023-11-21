@@ -22,7 +22,7 @@ import com.moabam.api.application.auth.AuthorizationService;
 import com.moabam.api.application.auth.JwtAuthenticationService;
 import com.moabam.api.application.auth.JwtProviderService;
 import com.moabam.global.auth.filter.AuthorizationFilter;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.error.exception.UnauthorizedException;
@@ -168,7 +168,7 @@ class AuthorizationFilterTest {
 		verify(authorizationService, times(1))
 			.issueServiceToken(httpServletResponse, publicClaim);
 
-		AuthorizationMember authorizationMember = AuthorizationThreadLocal.getAuthorizationMember();
-		assertThat(authorizationMember.id()).isEqualTo(1L);
+		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
+		assertThat(authMember.id()).isEqualTo(1L);
 	}
 }

@@ -11,12 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.bug.BugService;
 import com.moabam.api.dto.bug.BugResponse;
-import com.moabam.api.dto.bug.TodayBugResponse;
 import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.api.dto.product.PurchaseProductRequest;
 import com.moabam.api.dto.product.PurchaseProductResponse;
-import com.moabam.global.auth.annotation.CurrentMember;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.annotation.Auth;
+import com.moabam.global.auth.model.AuthMember;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +29,8 @@ public class BugController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public BugResponse getBug(@CurrentMember AuthorizationMember member) {
+	public BugResponse getBug(@Auth AuthMember member) {
 		return bugService.getBug(member.id());
-	}
-
-	@GetMapping("/today")
-	@ResponseStatus(HttpStatus.OK)
-	public TodayBugResponse getTodayBug(@CurrentMember AuthorizationMember member) {
-		return bugService.getTodayBug(member.id());
 	}
 
 	@GetMapping("/products")
@@ -48,7 +41,7 @@ public class BugController {
 
 	@PostMapping("/products/{productId}/purchase")
 	@ResponseStatus(HttpStatus.OK)
-	public PurchaseProductResponse purchaseBugProduct(@CurrentMember AuthorizationMember member,
+	public PurchaseProductResponse purchaseBugProduct(@Auth AuthMember member,
 		@PathVariable Long productId,
 		@Valid @RequestBody PurchaseProductRequest request) {
 		return bugService.purchaseBugProduct(member.id(), productId, request);

@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -20,7 +19,8 @@ import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.auth.TokenSaveValue;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.api.dto.member.DeleteMemberResponse;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.common.util.cookie.CookieUtils;
@@ -33,7 +33,9 @@ import com.moabam.global.error.model.ErrorMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthorizationService {
@@ -65,7 +67,6 @@ public class AuthorizationService {
 		return authorizationTokenInfoResponse.getBody();
 	}
 
-	@Transactional
 	public LoginResponse signUpOrLogin(HttpServletResponse httpServletResponse,
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse) {
 		LoginResponse loginResponse = memberService.login(authorizationTokenInfoResponse);
@@ -99,10 +100,10 @@ public class AuthorizationService {
 		}
 	}
 
-	public void logout(AuthorizationMember authorizationMember, HttpServletRequest httpServletRequest,
+	public void logout(AuthMember authMember, HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 		removeToken(httpServletRequest, httpServletResponse);
-		tokenRepository.delete(authorizationMember.id());
+		tokenRepository.delete(authMember.id());
 	}
 
 	public void removeToken(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
@@ -116,6 +117,28 @@ public class AuthorizationService {
 					httpServletResponse.addCookie(cookieUtils.deleteCookie(cookie));
 				}
 			});
+	}
+
+	public void unLinkMember(DeleteMemberResponse deleteMemberResponse) {
+		try {
+			oauth2AuthorizationServerRequestService.unlinkMemberRequest(
+				oAuthConfig.provider().unlink(),
+				oAuthConfig.client().adminKey(),
+				unlinkRequestParam(deleteMemberResponse.socialId()));
+			log.info("회원 탈퇴 성공 : [id={}, socialId={}]", deleteMemberResponse.id(), deleteMemberResponse.socialId());
+		} catch (BadRequestException badRequestException) {
+			log.warn("회원 탈퇴요청 실패 : 카카오 연결 오류");
+			memberService.undoDelete(deleteMemberResponse);
+			throw new BadRequestException(ErrorMessage.UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS);
+		}
+	}
+
+	private MultiValueMap<String, String> unlinkRequestParam(String socialId) {
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("target_id_type", "user_id");
+		params.add("target_id", socialId);
+
+		return params;
 	}
 
 	private String getAuthorizationCodeUri() {
@@ -134,7 +157,8 @@ public class AuthorizationService {
 			.queryParam("client_id", authorizationCodeRequest.clientId())
 			.queryParam("redirect_uri", authorizationCodeRequest.redirectUri());
 
-		if (!authorizationCodeRequest.scope().isEmpty()) {
+		if (authorizationCodeRequest.scope() != null
+			&& !authorizationCodeRequest.scope().isEmpty()) {
 			String scopes = String.join(",", authorizationCodeRequest.scope());
 			authorizationCodeUri.queryParam("scope", scopes);
 		}

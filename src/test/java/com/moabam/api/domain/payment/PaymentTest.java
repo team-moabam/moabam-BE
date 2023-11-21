@@ -6,6 +6,7 @@ import static com.moabam.support.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.moabam.api.domain.coupon.Coupon;
@@ -13,19 +14,53 @@ import com.moabam.global.error.exception.BadRequestException;
 
 class PaymentTest {
 
-	@DisplayName("쿠폰을 적용한다.")
+	@DisplayName("금액이 음수이면 예외가 발생한다.")
 	@Test
-	void apply_coupon_success() {
-		// given
-		Payment payment = payment(bugProduct());
-		Coupon coupon = discount1000Coupon();
+	void validate_amount_exception() {
+		Payment.PaymentBuilder paymentBuilder = Payment.builder()
+			.memberId(1L)
+			.product(bugProduct())
+			.order(order(bugProduct()))
+			.amount(-1000);
 
-		// when
-		payment.applyCoupon(coupon);
+		assertThatThrownBy(paymentBuilder::build)
+			.isInstanceOf(BadRequestException.class)
+			.hasMessage("결제 금액은 0 이상이어야 합니다.");
+	}
 
-		// then
-		assertThat(payment.getOrder().getAmount()).isEqualTo(2000);
-		assertThat(payment.getCoupon()).isEqualTo(coupon);
+	@DisplayName("쿠폰을 적용한다.")
+	@Nested
+	class ApplyCoupon {
+
+		@DisplayName("성공한다.")
+		@Test
+		void success() {
+			// given
+			Payment payment = payment(bugProduct());
+			Coupon coupon = discount1000Coupon();
+
+			// when
+			payment.applyCoupon(coupon);
+
+			// then
+			assertThat(payment.getAmount()).isEqualTo(BUG_PRODUCT_PRICE - 1000);
+			assertThat(payment.getCoupon()).isEqualTo(coupon);
+		}
+
+		@DisplayName("할인 금액이 더 크면 0으로 처리한다.")
+		@Test
+		void discount_amount_greater() {
+			// given
+			Payment payment = payment(bugProduct());
+			Coupon coupon = discount10000Coupon();
+
+			// when
+			payment.applyCoupon(coupon);
+
+			// then
+			assertThat(payment.getAmount()).isZero();
+			assertThat(payment.getCoupon()).isEqualTo(coupon);
+		}
 	}
 
 	@DisplayName("해당 회원의 결제 정보가 아니면 예외가 발생한다.")

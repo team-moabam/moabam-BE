@@ -558,8 +558,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		Member member = Member.builder()
 			.id(1L)
-			.socialId(1L)
-			.nickname("nick")
+			.socialId("1")
 			.bug(BugFixture.bug())
 			.build();
 
@@ -787,8 +786,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Participant participant1 = RoomFixture.participant(room, 1L);
 		participant1.enableManager();
 
-		Member member2 = MemberFixture.member(2L, "NICK2");
-		Member member3 = MemberFixture.member(3L, "NICK3");
+		Member member2 = MemberFixture.member("2", "NICK2");
+		Member member3 = MemberFixture.member("3", "NICK3");
 
 		roomRepository.save(room);
 		routineRepository.saveAll(routines);
@@ -841,7 +840,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	void deport_member_success() throws Exception {
 		// given
 		Room room = RoomFixture.room();
-		Member member = MemberFixture.member(1234L, "참여자");
+		Member member = MemberFixture.member("1234", "참여자");
 		memberRepository.save(member);
 
 		Participant memberParticipant = RoomFixture.participant(room, member.getId());
@@ -1387,6 +1386,33 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		// expected
 		mockMvc.perform(get("/rooms/search?keyword=루틴&roomType=NIGHT&roomId=3"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("방 수정전 정보 불러오기 성공")
+	@WithMember(id = 1L)
+	@Test
+	void get_room_details_before_modification_success() throws Exception {
+		// given
+		Member member2 = MemberFixture.member("123", "참여자1");
+		Member member3 = MemberFixture.member("456", "참여자2");
+		member2 = memberRepository.save(member2);
+		member3 = memberRepository.save(member3);
+
+		Room room = RoomFixture.room("수정 전 방 제목", MORNING, 10, "1234");
+		Participant participant1 = RoomFixture.participant(room, 1L);
+		participant1.enableManager();
+		Participant participant2 = RoomFixture.participant(room, member2.getId());
+		Participant participant3 = RoomFixture.participant(room, member3.getId());
+		List<Routine> routines = RoomFixture.routines(room);
+
+		roomRepository.save(room);
+		participantRepository.saveAll(List.of(participant1, participant2, participant3));
+		routineRepository.saveAll(routines);
+
+		// expected
+		mockMvc.perform(get("/rooms/" + room.getId()))
 			.andExpect(status().isOk())
 			.andDo(print());
 	}

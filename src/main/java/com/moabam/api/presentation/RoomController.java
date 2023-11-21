@@ -23,13 +23,14 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
+import com.moabam.api.dto.room.ManageRoomResponse;
 import com.moabam.api.dto.room.ModifyRoomRequest;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
 import com.moabam.api.dto.room.SearchAllRoomsResponse;
-import com.moabam.global.auth.annotation.CurrentMember;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.annotation.Auth;
+import com.moabam.global.auth.model.AuthMember;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,76 +46,84 @@ public class RoomController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Long createRoom(@CurrentMember AuthorizationMember authorizationMember,
+	public Long createRoom(@Auth AuthMember authMember,
 		@Valid @RequestBody CreateRoomRequest createRoomRequest) {
 
-		return roomService.createRoom(authorizationMember.id(), authorizationMember.nickname(), createRoomRequest);
+		return roomService.createRoom(authMember.id(), authMember.nickname(), createRoomRequest);
+	}
+
+	@GetMapping("/{roomId}")
+	@ResponseStatus(HttpStatus.OK)
+	public ManageRoomResponse getRoomDetailsBeforeModification(@Auth AuthMember authMember,
+		@PathVariable("roomId") Long roomId) {
+
+		return roomSearchService.getRoomDetailsBeforeModification(authMember.id(), roomId);
 	}
 
 	@PutMapping("/{roomId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void modifyRoom(@CurrentMember AuthorizationMember authorizationMember,
+	public void modifyRoom(@Auth AuthMember authMember,
 		@Valid @RequestBody ModifyRoomRequest modifyRoomRequest, @PathVariable("roomId") Long roomId) {
 
-		roomService.modifyRoom(authorizationMember.id(), roomId, modifyRoomRequest);
+		roomService.modifyRoom(authMember.id(), roomId, modifyRoomRequest);
 	}
 
 	@PostMapping("/{roomId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void enterRoom(@CurrentMember AuthorizationMember authorizationMember, @PathVariable("roomId") Long roomId,
+	public void enterRoom(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId,
 		@Valid @RequestBody EnterRoomRequest enterRoomRequest) {
 
-		roomService.enterRoom(authorizationMember.id(), roomId, enterRoomRequest);
+		roomService.enterRoom(authMember.id(), roomId, enterRoomRequest);
 	}
 
 	@DeleteMapping("/{roomId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void exitRoom(@CurrentMember AuthorizationMember authorizationMember, @PathVariable("roomId") Long roomId) {
-		roomService.exitRoom(authorizationMember.id(), roomId);
+	public void exitRoom(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId) {
+		roomService.exitRoom(authMember.id(), roomId);
 	}
 
 	@GetMapping("/{roomId}/{date}")
 	@ResponseStatus(HttpStatus.OK)
-	public RoomDetailsResponse getRoomDetails(@CurrentMember AuthorizationMember authorizationMember,
+	public RoomDetailsResponse getRoomDetails(@Auth AuthMember authMember,
 		@PathVariable("roomId") Long roomId, @PathVariable("date") LocalDate date) {
 
-		return roomSearchService.getRoomDetails(authorizationMember.id(), roomId, date);
+		return roomSearchService.getRoomDetails(authMember.id(), roomId, date);
 	}
 
 	@PostMapping("/{roomId}/certification")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void certifyRoom(@CurrentMember AuthorizationMember authorizationMember, @PathVariable("roomId") Long roomId,
+	public void certifyRoom(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId,
 		@RequestPart List<MultipartFile> multipartFiles) {
 
-		roomCertificationService.certifyRoom(authorizationMember.id(), roomId, multipartFiles);
+		roomCertificationService.certifyRoom(authMember.id(), roomId, multipartFiles);
 	}
 
 	@PutMapping("/{roomId}/members/{memberId}/mandate")
 	@ResponseStatus(HttpStatus.OK)
-	public void mandateManager(@CurrentMember AuthorizationMember authorizationMember,
+	public void mandateManager(@Auth AuthMember authMember,
 		@PathVariable("roomId") Long roomId, @PathVariable("memberId") Long memberId) {
 
-		roomService.mandateRoomManager(authorizationMember.id(), roomId, memberId);
+		roomService.mandateRoomManager(authMember.id(), roomId, memberId);
 	}
 
 	@DeleteMapping("/{roomId}/members/{memberId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void deportParticipant(@CurrentMember AuthorizationMember authorizationMember,
+	public void deportParticipant(@Auth AuthMember authMember,
 		@PathVariable("roomId") Long roomId, @PathVariable("memberId") Long memberId) {
 
-		roomService.deportParticipant(authorizationMember.id(), roomId, memberId);
+		roomService.deportParticipant(authMember.id(), roomId, memberId);
 	}
 
 	@GetMapping("/my-join")
 	@ResponseStatus(HttpStatus.OK)
-	public MyRoomsResponse getMyRooms(@CurrentMember AuthorizationMember authorizationMember) {
-		return roomSearchService.getMyRooms(authorizationMember.id());
+	public MyRoomsResponse getMyRooms(@Auth AuthMember authMember) {
+		return roomSearchService.getMyRooms(authMember.id());
 	}
 
 	@GetMapping("/join-history")
 	@ResponseStatus(HttpStatus.OK)
-	public RoomsHistoryResponse getJoinHistory(@CurrentMember AuthorizationMember authorizationMember) {
-		return roomSearchService.getJoinHistory(authorizationMember.id());
+	public RoomsHistoryResponse getJoinHistory(@Auth AuthMember authMember) {
+		return roomSearchService.getJoinHistory(authMember.id());
 	}
 
 	@GetMapping
