@@ -75,6 +75,7 @@ public class RoomCertificationService {
 		dailyMemberCertificationRepository.save(dailyMemberCertification);
 
 		member.increaseTotalCertifyCount();
+		participant.updateCertifyCount();
 
 		List<String> result = imageService.uploadImages(multipartFiles, CERTIFICATION);
 		saveNewCertifications(result, memberId);

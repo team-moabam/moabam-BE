@@ -23,6 +23,7 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
+import com.moabam.api.dto.room.ManageRoomResponse;
 import com.moabam.api.dto.room.ModifyRoomRequest;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
@@ -49,6 +50,14 @@ public class RoomController {
 		@Valid @RequestBody CreateRoomRequest createRoomRequest) {
 
 		return roomService.createRoom(authMember.id(), authMember.nickname(), createRoomRequest);
+	}
+
+	@GetMapping("/{roomId}")
+	@ResponseStatus(HttpStatus.OK)
+	public ManageRoomResponse getRoomDetailsBeforeModification(@Auth AuthMember authMember,
+		@PathVariable("roomId") Long roomId) {
+
+		return roomSearchService.getRoomDetailsBeforeModification(authMember.id(), roomId);
 	}
 
 	@PutMapping("/{roomId}")
@@ -119,9 +128,18 @@ public class RoomController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public SearchAllRoomsResponse searchAllRooms(@RequestParam(value = "type", required = false) RoomType roomType,
+	public SearchAllRoomsResponse searchAllRooms(@RequestParam(value = "roomType", required = false) RoomType roomType,
 		@RequestParam(value = "roomId", required = false) Long roomId) {
 
 		return roomSearchService.searchAllRooms(roomType, roomId);
+	}
+
+	@GetMapping("/search")
+	@ResponseStatus(HttpStatus.OK)
+	public SearchAllRoomsResponse search(@RequestParam(value = "keyword") String keyword,
+		@RequestParam(value = "roomType", required = false) RoomType roomType,
+		@RequestParam(value = "roomId", required = false) Long roomId) {
+
+		return roomSearchService.search(keyword, roomType, roomId);
 	}
 }

@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.moabam.api.application.auth.mapper.PathMapper;
-import com.moabam.global.auth.handler.CurrentMemberArgumentResolver;
+import com.moabam.global.auth.handler.AuthArgumentResolver;
 import com.moabam.global.auth.handler.PathResolver;
 
 @Configuration
@@ -40,7 +40,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Bean
 	public HandlerMethodArgumentResolver handlerMethodArgumentResolver() {
-		return new CurrentMemberArgumentResolver();
+		return new AuthArgumentResolver();
 	}
 
 	@Bean

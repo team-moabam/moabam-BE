@@ -26,7 +26,7 @@ class CouponQueueRepositoryTest {
 	@Test
 	void addQueue() {
 		// When
-		couponQueueRepository.addQueue("couponName", "memberNickname", 1);
+		couponQueueRepository.addIfAbsent("couponName", "memberNickname", 1);
 
 		// Then
 		verify(zSetRedisRepository).addIfAbsent(any(String.class), any(String.class), any(Double.class));
@@ -36,7 +36,7 @@ class CouponQueueRepositoryTest {
 	@Test
 	void addQueue_NullPointerException() {
 		// When & Then
-		assertThatThrownBy(() -> couponQueueRepository.addQueue(null, "value", 1))
+		assertThatThrownBy(() -> couponQueueRepository.addIfAbsent(null, "value", 1))
 			.isInstanceOf(NullPointerException.class);
 	}
 
@@ -47,7 +47,7 @@ class CouponQueueRepositoryTest {
 		given(zSetRedisRepository.size(any(String.class))).willReturn(3L);
 
 		// When
-		long actual = couponQueueRepository.queueSize("key");
+		long actual = couponQueueRepository.size("key");
 
 		// Then
 		assertThat(actual).isEqualTo(3);
@@ -57,7 +57,7 @@ class CouponQueueRepositoryTest {
 	@Test
 	void queueSize_NullPointerException() {
 		// When & Then
-		assertThatThrownBy(() -> couponQueueRepository.queueSize(null))
+		assertThatThrownBy(() -> couponQueueRepository.size(null))
 			.isInstanceOf(NullPointerException.class);
 	}
 }

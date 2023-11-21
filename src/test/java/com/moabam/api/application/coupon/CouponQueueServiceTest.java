@@ -40,14 +40,14 @@ class CouponQueueServiceTest {
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
 
-		given(couponService.validateCouponPeriod(any(String.class))).willReturn(coupon);
-		given(couponQueueRepository.queueSize(any(String.class))).willReturn(coupon.getStock() - 1L);
+		given(couponService.validatePeriod(any(String.class))).willReturn(coupon);
+		given(couponQueueRepository.size(any(String.class))).willReturn(coupon.getStock() - 1L);
 
 		// When
 		couponQueueService.register(member, coupon.getName());
 
 		// Then
-		verify(couponQueueRepository).addQueue(any(String.class), any(String.class), any(double.class));
+		verify(couponQueueRepository).addIfAbsent(any(String.class), any(String.class), any(double.class));
 	}
 
 	@WithMember
@@ -56,7 +56,7 @@ class CouponQueueServiceTest {
 	void couponQueueService_register_BadRequestException() {
 		// Given
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
-		given(couponService.validateCouponPeriod(any(String.class)))
+		given(couponService.validatePeriod(any(String.class)))
 			.willThrow(new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD_END));
 
 		// When & Then
@@ -73,8 +73,8 @@ class CouponQueueServiceTest {
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
 
-		given(couponService.validateCouponPeriod(any(String.class))).willReturn(coupon);
-		given(couponQueueRepository.queueSize(any(String.class))).willReturn((long)coupon.getStock());
+		given(couponService.validatePeriod(any(String.class))).willReturn(coupon);
+		given(couponQueueRepository.size(any(String.class))).willReturn((long)coupon.getStock());
 
 		// When & Then
 		assertThatNoException().isThrownBy(() -> couponQueueService.register(member, coupon.getName()));

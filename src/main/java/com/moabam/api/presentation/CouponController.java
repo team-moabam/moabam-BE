@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.moabam.api.application.coupon.CouponQueueService;
 import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.dto.coupon.CouponResponse;
-import com.moabam.api.dto.coupon.CouponSearchRequest;
+import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
@@ -34,7 +34,7 @@ public class CouponController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public void createCoupon(@Auth AuthMember admin,
 		@Valid @RequestBody CreateCouponRequest request) {
-		couponService.createCoupon(admin, request);
+		couponService.create(admin, request);
 	}
 
 	@DeleteMapping("/admins/coupons/{couponId}")
@@ -45,14 +45,14 @@ public class CouponController {
 
 	@GetMapping("/coupons/{couponId}")
 	@ResponseStatus(HttpStatus.OK)
-	public CouponResponse getCouponById(@PathVariable("couponId") Long couponId) {
-		return couponService.getCouponById(couponId);
+	public CouponResponse getById(@PathVariable("couponId") Long couponId) {
+		return couponService.getById(couponId);
 	}
 
 	@PostMapping("/coupons/search")
 	@ResponseStatus(HttpStatus.OK)
-	public List<CouponResponse> getCoupons(@Valid @RequestBody CouponSearchRequest request) {
-		return couponService.getCoupons(request);
+	public List<CouponResponse> getAllByStatus(@Valid @RequestBody CouponStatusRequest request) {
+		return couponService.getAllByStatus(request);
 	}
 
 	@PostMapping("/coupons")

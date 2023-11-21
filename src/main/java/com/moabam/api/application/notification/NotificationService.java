@@ -44,17 +44,17 @@ public class NotificationService {
 		roomService.validateRoomById(roomId);
 
 		String knockKey = generateKnockKey(member.id(), targetId, roomId);
-		validateConflictKnockNotification(knockKey);
+		validateConflictKnock(knockKey);
 		validateFcmToken(targetId);
 
 		String fcmToken = notificationRepository.findFcmTokenByMemberId(targetId);
 		String notificationBody = String.format(KNOCK_BODY, member.nickname());
-		fcmService.sendAsyncFcm(fcmToken, notificationBody);
-		notificationRepository.saveKnockNotification(knockKey);
+		fcmService.sendAsync(fcmToken, notificationBody);
+		notificationRepository.saveKnock(knockKey);
 	}
 
 	@Scheduled(cron = "0 50 * * * *")
-	public void sendCertificationTimeNotification() {
+	public void sendCertificationTime() {
 		int certificationTime = (clockHolder.times().getHour() + ONE_HOUR) % HOURS_IN_A_DAY;
 		List<Participant> participants = participantSearchRepository.findAllByRoomCertifyTime(certificationTime);
 
@@ -62,28 +62,27 @@ public class NotificationService {
 			String roomTitle = participant.getRoom().getTitle();
 			String fcmToken = notificationRepository.findFcmTokenByMemberId(participant.getMemberId());
 			String notificationBody = String.format(CERTIFY_TIME_BODY, roomTitle);
-			fcmService.sendAsyncFcm(fcmToken, notificationBody);
+			fcmService.sendAsync(fcmToken, notificationBody);
 		});
 	}
 
-	public List<Long> getMyKnockedNotificationStatusInRoom(Long memberId, Long roomId,
-		List<Participant> participants) {
+	public List<Long> getMyKnockStatusInRoom(Long memberId, Long roomId, List<Participant> participants) {
 		List<Participant> filteredParticipants = participants.stream()
 			.filter(participant -> !participant.getMemberId().equals(memberId))
 			.toList();
 
 		Predicate<Long> knockPredicate = targetId ->
-			notificationRepository.existsByKey(generateKnockKey(memberId, targetId, roomId));
+			notificationRepository.existsKnockByKnockKey(generateKnockKey(memberId, targetId, roomId));
 
-		Map<Boolean, List<Long>> knockNotificationStatus = filteredParticipants.stream()
+		Map<Boolean, List<Long>> knockStatus = filteredParticipants.stream()
 			.map(Participant::getMemberId)
 			.collect(Collectors.partitioningBy(knockPredicate));
 
-		return knockNotificationStatus.get(true);
+		return knockStatus.get(true);
 	}
 
-	private void validateConflictKnockNotification(String knockKey) {
-		if (notificationRepository.existsByKey(knockKey)) {
+	private void validateConflictKnock(String knockKey) {
+		if (notificationRepository.existsKnockByKnockKey(knockKey)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_KNOCK);
 		}
 	}

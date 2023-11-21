@@ -25,12 +25,12 @@ public class CouponQueueService {
 			return;
 		}
 
-		couponQueueRepository.addQueue(couponName, member.nickname(), registerTime);
+		couponQueueRepository.addIfAbsent(couponName, member.nickname(), registerTime);
 	}
 
 	private boolean canRegister(String couponName) {
-		Coupon coupon = couponService.validateCouponPeriod(couponName);
+		Coupon coupon = couponService.validatePeriod(couponName);
 
-		return coupon.getStock() <= couponQueueRepository.queueSize(coupon.getName());
+		return coupon.getStock() <= couponQueueRepository.size(coupon.getName());
 	}
 }

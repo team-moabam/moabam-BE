@@ -59,15 +59,15 @@ class NotificationServiceTest {
 
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(true);
-		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
+		given(notificationRepository.existsKnockByKnockKey(any(String.class))).willReturn(false);
 		given(notificationRepository.findFcmTokenByMemberId(any(Long.class))).willReturn("FCM-TOKEN");
 
 		// When
-		notificationService.sendKnockNotification(member, 2L, 1L);
+		notificationService.sendKnock(member, 2L, 1L);
 
 		// Then
-		verify(fcmService).sendAsyncFcm(any(String.class), any(String.class));
-		verify(notificationRepository).saveKnockNotification(any(String.class));
+		verify(fcmService).sendAsync(any(String.class), any(String.class));
+		verify(notificationRepository).saveKnock(any(String.class));
 	}
 
 	@WithMember
@@ -79,7 +79,7 @@ class NotificationServiceTest {
 		willThrow(NotFoundException.class).given(roomService).validateRoomById(any(Long.class));
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnockNotification(member, 1L, 1L))
+		assertThatThrownBy(() -> notificationService.sendKnock(member, 1L, 1L))
 			.isInstanceOf(NotFoundException.class);
 	}
 
@@ -91,11 +91,11 @@ class NotificationServiceTest {
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
-		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
+		given(notificationRepository.existsKnockByKnockKey(any(String.class))).willReturn(false);
 		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(false);
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnockNotification(member, 1L, 1L))
+		assertThatThrownBy(() -> notificationService.sendKnock(member, 1L, 1L))
 			.isInstanceOf(NotFoundException.class)
 			.hasMessage(ErrorMessage.NOT_FOUND_FCM_TOKEN.getMessage());
 	}
@@ -108,10 +108,10 @@ class NotificationServiceTest {
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
-		given(notificationRepository.existsByKey(any(String.class))).willReturn(true);
+		given(notificationRepository.existsKnockByKnockKey(any(String.class))).willReturn(true);
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnockNotification(member, 1L, 1L))
+		assertThatThrownBy(() -> notificationService.sendKnock(member, 1L, 1L))
 			.isInstanceOf(ConflictException.class)
 			.hasMessage(ErrorMessage.CONFLICT_KNOCK.getMessage());
 	}
@@ -126,10 +126,10 @@ class NotificationServiceTest {
 		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
 		// When
-		notificationService.sendCertificationTimeNotification();
+		notificationService.sendCertificationTime();
 
 		// Then
-		verify(fcmService, times(3)).sendAsyncFcm(any(String.class), any(String.class));
+		verify(fcmService, times(3)).sendAsync(any(String.class), any(String.class));
 	}
 
 	@WithMember
@@ -143,10 +143,10 @@ class NotificationServiceTest {
 		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
 		// When
-		notificationService.sendCertificationTimeNotification();
+		notificationService.sendCertificationTime();
 
 		// Then
-		verify(fcmService, times(0)).sendAsyncFcm(any(String.class), any(String.class));
+		verify(fcmService, times(0)).sendAsync(any(String.class), any(String.class));
 	}
 
 	@WithMember
@@ -157,11 +157,11 @@ class NotificationServiceTest {
 		// Given
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
-		given(notificationRepository.existsByKey(any(String.class))).willReturn(true);
+		given(notificationRepository.existsKnockByKnockKey(any(String.class))).willReturn(true);
 
 		// When
 		List<Long> actual =
-			notificationService.getMyKnockedNotificationStatusInRoom(member.id(), 1L, participants);
+			notificationService.getMyKnockStatusInRoom(member.id(), 1L, participants);
 
 		// Then
 		assertThat(actual).hasSize(2);
@@ -176,11 +176,11 @@ class NotificationServiceTest {
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
 		// given
-		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
+		given(notificationRepository.existsKnockByKnockKey(any(String.class))).willReturn(false);
 
 		// When
 		List<Long> actual =
-			notificationService.getMyKnockedNotificationStatusInRoom(member.id(), 1L, participants);
+			notificationService.getMyKnockStatusInRoom(member.id(), 1L, participants);
 
 		// Then
 		assertThat(actual).isEmpty();

@@ -15,7 +15,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
 
-public class CurrentMemberArgumentResolver implements HandlerMethodArgumentResolver {
+public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {

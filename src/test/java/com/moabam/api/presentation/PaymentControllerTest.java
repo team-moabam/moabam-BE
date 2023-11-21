@@ -48,7 +48,7 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 
 	@Nested
 	@DisplayName("결제를 요청한다.")
-	class RequestPayment {
+	class Request {
 
 		@DisplayName("성공한다.")
 		@WithMember
@@ -60,7 +60,7 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 			PaymentRequest request = new PaymentRequest(ORDER_ID);
 
 			// expected
-			mockMvc.perform(post("/payments/{paymentId}/request", payment.getId())
+			mockMvc.perform(post("/payments/{paymentId}", payment.getId())
 					.contentType(APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isOk())
@@ -80,7 +80,7 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 			PaymentRequest request = new PaymentRequest(orderId);
 
 			// expected
-			mockMvc.perform(post("/payments/{paymentId}/request", paymentId)
+			mockMvc.perform(post("/payments/{paymentId}", paymentId)
 					.contentType(APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isBadRequest())

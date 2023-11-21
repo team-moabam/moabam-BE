@@ -7,18 +7,16 @@ import com.moabam.api.domain.room.RoomType;
 import lombok.Builder;
 
 @Builder
-public record SearchAllRoomResponse(
-	Long id,
+public record ManageRoomResponse(
+	Long roomId,
 	String title,
-	String image,
-	boolean isPassword,
-	String managerNickname,
-	int level,
+	String announcement,
 	RoomType roomType,
 	int certifyTime,
-	int currentUserCount,
 	int maxUserCount,
-	List<RoutineResponse> routines
+	String password,
+	List<RoutineResponse> routines,
+	List<ParticipantResponse> participants
 ) {
 
 }
