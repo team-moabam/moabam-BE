@@ -58,4 +58,14 @@ public class OAuth2AuthorizationServerRequestService {
 
 		return restTemplate.exchange(tokenInfoUri, HttpMethod.GET, httpEntity, AuthorizationTokenInfoResponse.class);
 	}
+
+	public void unlinkMemberRequest(String unlinkUri, String adminKey, MultiValueMap<String, String> params) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_TYPE,
+			MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8);
+		headers.add("Authorization", "KakaoAK " + adminKey);
+		HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
+
+		restTemplate.exchange(unlinkUri, HttpMethod.POST, httpEntity, Void.class);
+	}
 }

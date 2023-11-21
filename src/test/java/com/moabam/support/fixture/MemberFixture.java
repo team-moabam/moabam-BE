@@ -4,21 +4,19 @@ import com.moabam.api.domain.member.Member;
 
 public final class MemberFixture {
 
-	public static final long SOCIAL_ID = 1L;
+	public static final String SOCIAL_ID = "1";
 	public static final String NICKNAME = "모아밤";
 
 	public static Member member() {
 		return Member.builder()
 			.socialId(SOCIAL_ID)
-			.nickname(NICKNAME)
 			.bug(BugFixture.bug())
 			.build();
 	}
 
-	public static Member member(Long socialId, String nickname) {
+	public static Member member(String socialId, String nickname) {
 		return Member.builder()
 			.socialId(socialId)
-			.nickname(nickname)
 			.bug(BugFixture.bug())
 			.build();
 	}

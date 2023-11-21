@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.repository.CouponQueueRepository;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ public class CouponQueueService {
 	private final CouponService couponService;
 	private final CouponQueueRepository couponQueueRepository;
 
-	public void register(AuthorizationMember member, String couponName) {
+	public void register(AuthMember authMember, String couponName) {
 		double registerTime = System.currentTimeMillis();
 
 		if (canRegister(couponName)) {
@@ -25,7 +25,7 @@ public class CouponQueueService {
 			return;
 		}
 
-		couponQueueRepository.addIfAbsent(couponName, member.nickname(), registerTime);
+		couponQueueRepository.addIfAbsent(couponName, authMember.nickname(), registerTime);
 	}
 
 	private boolean canRegister(String couponName) {

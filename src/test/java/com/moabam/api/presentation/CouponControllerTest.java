@@ -59,9 +59,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	private ClockHolder clockHolder;
 
 	@WithMember(role = Role.ADMIN)
-	@DisplayName("쿠폰을 성공적으로 발행한다. - Void")
+	@DisplayName("POST - 쿠폰을 성공적으로 발행한다. - Void")
 	@Test
-	void couponController_createCoupon() throws Exception {
+	void create_Coupon() throws Exception {
 		// Given
 		String couponType = CouponType.GOLDEN_COUPON.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 2);
@@ -79,9 +79,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember(role = Role.ADMIN)
-	@DisplayName("쿠폰 발급 종료기간 시작기간보다 이전인 쿠폰을 발행한다. - BadRequestException")
+	@DisplayName("POST - 쿠폰 발급 종료기간 시작기간보다 이전인 쿠폰을 발행한다. - BadRequestException")
 	@Test
-	void couponController_createCoupon_BadRequestException() throws Exception {
+	void create_Coupon_BadRequestException() throws Exception {
 		// Given
 		String couponType = CouponType.GOLDEN_COUPON.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 2, 1);
@@ -102,9 +102,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember(role = Role.ADMIN)
-	@DisplayName("쿠폰명이 중복된 쿠폰을 발행한다. - ConflictException")
+	@DisplayName("POST - 쿠폰명이 중복된 쿠폰을 발행한다. - ConflictException")
 	@Test
-	void couponController_createCoupon_ConflictException() throws Exception {
+	void create_Coupon_ConflictException() throws Exception {
 		// Given
 		String couponType = CouponType.GOLDEN_COUPON.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 2);
@@ -126,9 +126,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember(role = Role.ADMIN)
-	@DisplayName("쿠폰을 성공적으로 삭제한다. - Void")
+	@DisplayName("DELETE - 쿠폰을 성공적으로 삭제한다. - Void")
 	@Test
-	void couponController_deleteCoupon() throws Exception {
+	void delete_Coupon() throws Exception {
 		// Given
 		Coupon coupon = couponRepository.save(CouponFixture.coupon(10, 100));
 
@@ -142,9 +142,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember(role = Role.ADMIN)
-	@DisplayName("존재하지 않는 쿠폰을 삭제한다. - NotFoundException")
+	@DisplayName("DELETE - 존재하지 않는 쿠폰을 삭제한다. - NotFoundException")
 	@Test
-	void couponController_deleteCoupon_NotFoundException() throws Exception {
+	void delete_Coupon_NotFoundException() throws Exception {
 		// When & Then
 		mockMvc.perform(delete("/admins/coupons/77777777777"))
 			.andDo(print())
@@ -157,9 +157,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON.getMessage()));
 	}
 
-	@DisplayName("특정 쿠폰을 조회한다. - CouponResponse")
+	@DisplayName("GET - 특정 쿠폰을 조회한다. - CouponResponse")
 	@Test
-	void couponController_getCouponById() throws Exception {
+	void getById_Coupon() throws Exception {
 		// Given
 		Coupon coupon = couponRepository.save(CouponFixture.coupon(10, 100));
 
@@ -175,9 +175,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$.id").value(coupon.getId()));
 	}
 
-	@DisplayName("존재하지 않는 쿠폰을 조회한다. - NotFoundException")
+	@DisplayName("GET - 존재하지 않는 쿠폰을 조회한다. - NotFoundException")
 	@Test
-	void couponController_getCouponById_NotFoundException() throws Exception {
+	void getById_Coupon_NotFoundException() throws Exception {
 		// When & Then
 		mockMvc.perform(get("/coupons/77777777777"))
 			.andDo(print())
@@ -190,10 +190,10 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON.getMessage()));
 	}
 
-	@DisplayName("모든 쿠폰을 조회한다. - List<CouponResponse>")
+	@DisplayName("POST - 모든 쿠폰을 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void couponController_getCoupons(List<Coupon> coupons) throws Exception {
+	void getAllByStatus_Coupons(List<Coupon> coupons) throws Exception {
 		// Given
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, true, true);
 		List<Coupon> coupon = couponRepository.saveAll(coupons);
@@ -213,10 +213,10 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$", hasSize(coupon.size())));
 	}
 
-	@DisplayName("상태 조건을 걸지 않아서 쿠폰이 조회되지 않는다. - List<CouponResponse>")
+	@DisplayName("POST - 상태 조건을 걸지 않아서 쿠폰이 조회되지 않는다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void couponController_getCoupons_not_status(List<Coupon> coupons) throws Exception {
+	void getAllByStatus_Coupons_not_status(List<Coupon> coupons) throws Exception {
 		// Given
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false, false);
 		couponRepository.saveAll(coupons);
@@ -236,9 +236,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember(nickname = "member-coupon-1")
-	@DisplayName("쿠폰 발급 요청을 한다. - Void")
+	@DisplayName("POST - 쿠폰 발급 요청을 한다. - Void")
 	@Test
-	void couponController_registerCouponQueue() throws Exception {
+	void registerQueue() throws Exception {
 		// Given
 		Coupon couponFixture = CouponFixture.coupon("CouponName", 1, 2);
 		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 1);
@@ -257,9 +257,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember(nickname = "member-coupon-2")
-	@DisplayName("발급 기간이 아닌 쿠폰에 발급 요청을 한다. - BadRequestException")
+	@DisplayName("POST - 발급 기간이 아닌 쿠폰에 발급 요청을 한다. - BadRequestException")
 	@Test
-	void couponController_registerCouponQueue_BadRequestException() throws Exception {
+	void registerQueue_BadRequestException() throws Exception {
 		// Given
 		Coupon couponFixture = CouponFixture.coupon("CouponName", 1, 2);
 		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 1);
@@ -281,9 +281,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember
-	@DisplayName("존재하지 않는 쿠폰에 발급 요청을 한다. - NotFoundException")
+	@DisplayName("POST - 존재하지 않는 쿠폰에 발급 요청을 한다. - NotFoundException")
 	@Test
-	void couponController_registerCouponQueue_NotFoundException() throws Exception {
+	void registerQueue_NotFoundException() throws Exception {
 		// Given
 		Coupon coupon = CouponFixture.coupon("Not found coupon name", 1, 2);
 		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 1);

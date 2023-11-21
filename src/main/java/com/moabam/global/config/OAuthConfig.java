@@ -15,7 +15,8 @@ public record OAuthConfig(
 		String clientId,
 		String clientSecret,
 		String authorizationGrantType,
-		List<String> scope
+		List<String> scope,
+		String adminKey
 	) {
 
 	}
@@ -24,7 +25,8 @@ public record OAuthConfig(
 		String authorizationUri,
 		String redirectUri,
 		String tokenUri,
-		String tokenInfo
+		String tokenInfo,
+		String unlink
 	) {
 
 	}

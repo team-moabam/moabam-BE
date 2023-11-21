@@ -558,8 +558,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		Member member = Member.builder()
 			.id(1L)
-			.socialId(1L)
-			.nickname("nick")
+			.socialId("1")
 			.bug(BugFixture.bug())
 			.build();
 
@@ -787,8 +786,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Participant participant1 = RoomFixture.participant(room, 1L);
 		participant1.enableManager();
 
-		Member member2 = MemberFixture.member(2L, "NICK2");
-		Member member3 = MemberFixture.member(3L, "NICK3");
+		Member member2 = MemberFixture.member("2", "NICK2");
+		Member member3 = MemberFixture.member("3", "NICK3");
 
 		roomRepository.save(room);
 		routineRepository.saveAll(routines);
@@ -841,7 +840,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	void deport_member_success() throws Exception {
 		// given
 		Room room = RoomFixture.room();
-		Member member = MemberFixture.member(1234L, "참여자");
+		Member member = MemberFixture.member("1234", "참여자");
 		memberRepository.save(member);
 
 		Participant memberParticipant = RoomFixture.participant(room, member.getId());
@@ -1396,8 +1395,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	@Test
 	void get_room_details_before_modification_success() throws Exception {
 		// given
-		Member member2 = MemberFixture.member(123L, "참여자1");
-		Member member3 = MemberFixture.member(456L, "참여자2");
+		Member member2 = MemberFixture.member("123", "참여자1");
+		Member member3 = MemberFixture.member("456", "참여자2");
 		member2 = memberRepository.save(member2);
 		member3 = memberRepository.save(member3);
 

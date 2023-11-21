@@ -1,6 +1,5 @@
 package com.moabam.api.application.auth.mapper;
 
-import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.auth.TokenSaveValue;
@@ -11,14 +10,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthMapper {
-
-	public static Member toMember(Long socialId, String nickName) {
-		return Member.builder()
-			.socialId(socialId)
-			.nickname(nickName)
-			.bug(Bug.builder().build())
-			.build();
-	}
 
 	public static LoginResponse toLoginResponse(Member member, boolean isSignUp) {
 		return LoginResponse.builder()

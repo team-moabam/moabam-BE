@@ -8,6 +8,7 @@ import java.util.function.Function;
 import org.springframework.util.CollectionUtils;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.SimpleExpression;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,18 @@ public class DynamicQuery {
 		}
 
 		return function.apply(value);
+	}
+
+	public static <T extends SimpleExpression> BooleanExpression generateIsNull(Boolean value, T field) {
+		if (Objects.isNull(value)) {
+			return null;
+		}
+
+		if (Boolean.TRUE.equals(value)) {
+			return field.isNull();
+		}
+
+		return field.isNotNull();
 	}
 
 	public static <T> BooleanExpression filterCondition(T condition, Function<T, BooleanExpression> function) {
