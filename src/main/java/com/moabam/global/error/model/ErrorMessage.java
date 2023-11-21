@@ -33,6 +33,7 @@ public enum ErrorMessage {
 	AUTHENTICATE_FAIL("인증 실패"),
 	MEMBER_NOT_FOUND("존재하지 않는 회원입니다."),
 	MEMBER_ROOM_EXCEED("참여할 수 있는 방의 개수가 모두 찼습니다."),
+	UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS("카카오 연결 요청 실패로 Rollback하였습니다."),
 
 	BUG_NOT_ENOUGH("보유한 벌레가 부족합니다."),
 
