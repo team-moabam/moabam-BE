@@ -33,7 +33,7 @@ public class NotificationController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.OK)
-	public void createFcmToken(@CurrentMember AuthorizationMember member, @RequestParam("fcmToken") String fcmToken) {
-		fcmService.createToken(member, fcmToken);
+	public void createFcmToken(@Auth AuthMember authMember, @RequestParam("fcmToken") String fcmToken) {
+		fcmService.createToken(authMember, fcmToken);
 	}
 }

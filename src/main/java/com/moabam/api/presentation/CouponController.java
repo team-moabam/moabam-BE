@@ -32,8 +32,7 @@ public class CouponController {
 
 	@PostMapping("/admins/coupons")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createCoupon(@Auth AuthMember admin,
-		@Valid @RequestBody CreateCouponRequest request) {
+	public void createCoupon(@Auth AuthMember admin, @Valid @RequestBody CreateCouponRequest request) {
 		couponService.create(admin, request);
 	}
 
@@ -56,8 +55,7 @@ public class CouponController {
 	}
 
 	@PostMapping("/coupons")
-	public void registerCouponQueue(@Auth AuthMember member,
-		@RequestParam("couponName") String couponName) {
-		couponQueueService.register(member, couponName);
+	public void registerCouponQueue(@Auth AuthMember authMember, @RequestParam("couponName") String couponName) {
+		couponQueueService.register(authMember, couponName);
 	}
 }

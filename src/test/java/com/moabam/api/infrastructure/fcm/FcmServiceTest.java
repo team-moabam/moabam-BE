@@ -10,7 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.config.FcmConfig;
 import com.moabam.support.annotation.WithMember;
@@ -33,10 +33,10 @@ class FcmServiceTest extends WithoutFilterSupporter {
 	@Test
 	void saveToken() {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
 
 		// When
-		fcmService.createToken(member, "value1");
+		fcmService.createToken(authMember, "value1");
 
 		// Then
 		verify(fcmRepository).saveToken(any(Long.class), any(String.class));
@@ -47,10 +47,10 @@ class FcmServiceTest extends WithoutFilterSupporter {
 	@Test
 	void saveToken_Blank() {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
 
 		// When
-		fcmService.createToken(member, "");
+		fcmService.createToken(authMember, "");
 
 		// Then
 		verify(fcmRepository, times(0)).saveToken(any(Long.class), any(String.class));
@@ -61,10 +61,10 @@ class FcmServiceTest extends WithoutFilterSupporter {
 	@Test
 	void saveToken_Null() {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
 
 		// When
-		fcmService.createToken(member, null);
+		fcmService.createToken(authMember, null);
 
 		// Then
 		verify(fcmRepository, times(0)).saveToken(any(Long.class), any(String.class));
