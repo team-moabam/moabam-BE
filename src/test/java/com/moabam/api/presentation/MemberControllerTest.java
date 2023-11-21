@@ -39,6 +39,8 @@ import com.moabam.api.domain.auth.repository.TokenRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
+import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
@@ -46,6 +48,7 @@ import com.moabam.global.error.handler.RestTemplateResponseHandler;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.MemberFixture;
+import com.moabam.support.fixture.RoomFixture;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 @Transactional
@@ -69,6 +72,9 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	TokenRepository tokenRepository;
+
+	@Autowired
+	RoomRepository roomRepository;
 
 	@Autowired
 	OAuth2AuthorizationServerRequestService oAuth2AuthorizationServerRequestService;
@@ -138,9 +144,8 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@Test
 	void delete_member_failby_not_found_member() throws Exception {
 		// expected
-		ResultActions result = mockMvc.perform(delete("/members"));
-
-		result.andExpect(status().isNotFound());
+		mockMvc.perform(delete("/members"))
+			.andExpect(status().isConflict());
 	}
 
 	@DisplayName("연결 오류로 인한 카카오 연결 끊기 실패로 롤백")
@@ -168,5 +173,20 @@ class MemberControllerTest extends WithoutFilterSupporter {
 			() -> assertThat(rollMember.getSocialId()).isEqualTo(member.getSocialId()),
 			() -> assertThat(rollMember.getDeletedAt()).isNull()
 		);
+	}
+
+	@DisplayName("방장으로 인해 회원 삭제 조회 실패")
+	@WithMember
+	@Test
+	void unlink_social_member_failby_meber_is_manger() throws Exception {
+		// given
+		Room room = RoomFixture.room();
+		room.changeManagerNickname(member.getNickname());
+
+		roomRepository.save(room);
+
+		// then
+		ResultActions result = mockMvc.perform(delete("/members"))
+			.andExpect(status().isConflict());
 	}
 }

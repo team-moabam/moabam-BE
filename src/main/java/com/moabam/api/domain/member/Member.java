@@ -126,6 +126,10 @@ public class Member extends BaseTimeEntity {
 		deletedAt = null;
 	}
 
+	public void changeNickName(String nickname) {
+		this.nickname = nickname;
+	}
+
 	private String createNickName() {
 		return "오목눈이#" + randomStringValues();
 	}

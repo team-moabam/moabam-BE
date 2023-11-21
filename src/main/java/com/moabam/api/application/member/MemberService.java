@@ -16,6 +16,7 @@ import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.DeleteMemberResponse;
 import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -47,8 +48,9 @@ public class MemberService {
 
 	@Transactional
 	public DeleteMemberResponse deleteMember(AuthorizationMember authorizationMember) {
-		Member member = memberSearchRepository.findMember(authorizationMember.id())
-			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
+		Member member = memberSearchRepository.findMemberWithNotManger(authorizationMember.id())
+			.orElseThrow(() -> new ConflictException(MEMBER_NOT_FOUND));
+
 		String socialId = member.getSocialId();
 		member.delete();
 
