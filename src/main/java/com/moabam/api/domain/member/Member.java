@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import com.moabam.api.domain.bug.Bug;
 import com.moabam.global.common.entity.BaseTimeEntity;
@@ -32,7 +31,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "member")
 @SQLDelete(sql = "UPDATE member SET deleted_at = CURRENT_TIMESTAMP where id = ?")
-@Where(clause = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 

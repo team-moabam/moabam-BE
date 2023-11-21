@@ -5,7 +5,6 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,11 +41,6 @@ public class MemberService {
 		return AuthMapper.toLoginResponse(loginMember, member.isEmpty());
 	}
 
-	public Member getManager(Long roomId) {
-		return memberSearchRepository.findManager(roomId)
-			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
-	}
-
 	public List<Member> getRoomMembers(List<Long> memberIds) {
 		return memberRepository.findAllById(memberIds);
 	}
@@ -63,7 +57,7 @@ public class MemberService {
 
 	@Transactional
 	public void undoDelete(DeleteMemberResponse deleteMemberResponse) {
-		Member member = memberSearchRepository.findMember(deleteMemberResponse.id())
+		Member member = memberSearchRepository.findMember(deleteMemberResponse.id(), false)
 			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
 
 		member.undoDelete(deleteMemberResponse.socialId());
