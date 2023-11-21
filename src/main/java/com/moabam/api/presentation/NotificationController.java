@@ -1,11 +1,16 @@
 package com.moabam.api.presentation;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.notification.NotificationService;
+import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.annotation.CurrentMember;
 import com.moabam.global.auth.model.AuthorizationMember;
 
@@ -17,10 +22,18 @@ import lombok.RequiredArgsConstructor;
 public class NotificationController {
 
 	private final NotificationService notificationService;
+	private final FcmService fcmService;
 
 	@GetMapping("/rooms/{roomId}/members/{memberId}")
+	@ResponseStatus(HttpStatus.OK)
 	public void sendKnockNotification(@CurrentMember AuthorizationMember member, @PathVariable("roomId") Long roomId,
 		@PathVariable("memberId") Long memberId) {
 		notificationService.sendKnock(member, memberId, roomId);
+	}
+
+	@PostMapping
+	@ResponseStatus(HttpStatus.OK)
+	public void createFcmToken(@CurrentMember AuthorizationMember member, @RequestParam("fcmToken") String fcmToken) {
+		fcmService.createToken(member, fcmToken);
 	}
 }
