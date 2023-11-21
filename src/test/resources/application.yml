@@ -42,6 +42,7 @@ oauth2:
     client-id: testtestetsttest
     client-secret: testtestetsttest
     authorization-grant-type: authorization_code
+    admin-key: testtesttesttesttesttesttest
     scope:
       - profile_nickname
       - profile_image
@@ -49,8 +50,10 @@ oauth2:
   provider:
     authorization_uri: https://authorization.com/test/test
     redirect_uri: http://redirect:8080/test
-    token_uri: https://token.com/test/test
-    token_info: https://api.token.com/test
+    token-uri: https://kauth.kakao.com/oauth/token
+    token-info: https://kapi.kakao.com/v1/user/access_token_info
+    unlink: https://kapi.kakao.com/v1/user/unlink
+
 
 token:
   iss: "PARK"

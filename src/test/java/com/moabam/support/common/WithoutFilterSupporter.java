@@ -9,19 +9,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.moabam.api.application.auth.AuthorizationService;
-import com.moabam.api.application.auth.JwtAuthenticationService;
 import com.moabam.api.domain.member.Role;
 import com.moabam.global.auth.handler.PathResolver;
 
 @ExtendWith({FilterProcessExtension.class})
 public class WithoutFilterSupporter {
-
-	@MockBean
-	private JwtAuthenticationService authenticationService;
-
-	@MockBean
-	private AuthorizationService authorizationService;
 
 	@MockBean
 	private PathResolver pathResolver;

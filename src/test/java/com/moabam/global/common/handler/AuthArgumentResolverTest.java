@@ -17,16 +17,16 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.Role;
-import com.moabam.global.auth.annotation.CurrentMember;
-import com.moabam.global.auth.handler.CurrentMemberArgumentResolver;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.annotation.Auth;
+import com.moabam.global.auth.handler.AuthArgumentResolver;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 
 @ExtendWith(MockitoExtension.class)
-class CurrentMemberArgumentResolverTest {
+class AuthArgumentResolverTest {
 
 	@InjectMocks
-	CurrentMemberArgumentResolver currentMemberArgumentResolver;
+	AuthArgumentResolver authArgumentResolver;
 
 	@Nested
 	@DisplayName("제공 파라미터 검증")
@@ -38,13 +38,13 @@ class CurrentMemberArgumentResolverTest {
 			// given
 			MethodParameter parameter = mock(MethodParameter.class);
 
-			willReturn(mock(CurrentMember.class))
+			willReturn(mock(Auth.class))
 				.given(parameter).getParameterAnnotation(any());
-			willReturn(AuthorizationMember.class)
+			willReturn(AuthMember.class)
 				.given(parameter).getParameterType();
 
 			// when
-			boolean support = currentMemberArgumentResolver.supportsParameter(parameter);
+			boolean support = authArgumentResolver.supportsParameter(parameter);
 
 			// then
 			assertThat(support).isTrue();
@@ -60,25 +60,25 @@ class CurrentMemberArgumentResolverTest {
 				.given(parameter).getParameterAnnotation(any());
 
 			// when
-			boolean support = currentMemberArgumentResolver.supportsParameter(parameter);
+			boolean support = authArgumentResolver.supportsParameter(parameter);
 
 			// then
 			assertThat(support).isFalse();
 		}
 
-		@DisplayName("AuthorizationMember 클래스로 받지 않았을 때 실패")
+		@DisplayName("AuthMember 클래스로 받지 않았을 때 실패")
 		@Test
-		void support_paramter_failby_not_authorizationmember() {
+		void support_paramter_failby_not_authmember() {
 			// given
 			MethodParameter parameter = mock(MethodParameter.class);
 
-			willReturn(mock(CurrentMember.class))
+			willReturn(mock(Auth.class))
 				.given(parameter).getParameterAnnotation(any());
 			willReturn(Member.class)
 				.given(parameter).getParameterType();
 
 			// when
-			boolean support = currentMemberArgumentResolver.supportsParameter(parameter);
+			boolean support = authArgumentResolver.supportsParameter(parameter);
 
 			// then
 			assertThat(support).isFalse();
@@ -97,17 +97,17 @@ class CurrentMemberArgumentResolverTest {
 			NativeWebRequest webRequest = mock(NativeWebRequest.class);
 			WebDataBinderFactory binderFactory = mock(WebDataBinderFactory.class);
 
-			AuthorizationThreadLocal.setAuthorizationMember(new AuthorizationMember(1L, "park", Role.USER));
+			AuthorizationThreadLocal.setAuthMember(new AuthMember(1L, "park", Role.USER));
 
 			Object object =
-				currentMemberArgumentResolver.resolveArgument(parameter, mavContainer, webRequest, binderFactory);
+				authArgumentResolver.resolveArgument(parameter, mavContainer, webRequest, binderFactory);
 
 			assertAll(
 				() -> assertThat(object).isNotNull(),
 				() -> {
-					AuthorizationMember authorizationMember = (AuthorizationMember)object;
+					AuthMember authMember = (AuthMember)object;
 
-					assertThat(authorizationMember.id()).isEqualTo(1L);
+					assertThat(authMember.id()).isEqualTo(1L);
 				}
 			);
 		}

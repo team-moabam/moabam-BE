@@ -14,8 +14,8 @@ import com.moabam.api.application.item.ItemService;
 import com.moabam.api.domain.item.ItemType;
 import com.moabam.api.dto.item.ItemsResponse;
 import com.moabam.api.dto.item.PurchaseItemRequest;
-import com.moabam.global.auth.annotation.CurrentMember;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.annotation.Auth;
+import com.moabam.global.auth.model.AuthMember;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +29,13 @@ public class ItemController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ItemsResponse getItems(@CurrentMember AuthorizationMember member, @RequestParam ItemType type) {
+	public ItemsResponse getItems(@Auth AuthMember member, @RequestParam ItemType type) {
 		return itemService.getItems(member.id(), type);
 	}
 
 	@PostMapping("/{itemId}/purchase")
 	@ResponseStatus(HttpStatus.OK)
-	public void purchaseItem(@CurrentMember AuthorizationMember member,
+	public void purchaseItem(@Auth AuthMember member,
 		@PathVariable Long itemId,
 		@Valid @RequestBody PurchaseItemRequest request) {
 		itemService.purchaseItem(member.id(), itemId, request);
@@ -43,7 +43,7 @@ public class ItemController {
 
 	@PostMapping("/{itemId}/select")
 	@ResponseStatus(HttpStatus.OK)
-	public void selectItem(@CurrentMember AuthorizationMember member, @PathVariable Long itemId) {
+	public void selectItem(@Auth AuthMember member, @PathVariable Long itemId) {
 		itemService.selectItem(member.id(), itemId);
 	}
 }

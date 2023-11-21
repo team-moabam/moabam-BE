@@ -13,7 +13,7 @@ import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
@@ -32,7 +32,7 @@ public class CouponService {
 	private final ClockHolder clockHolder;
 
 	@Transactional
-	public void create(AuthorizationMember admin, CreateCouponRequest request) {
+	public void create(AuthMember admin, CreateCouponRequest request) {
 		validateAdminRole(admin);
 		validateConflictName(request.name());
 		validatePeriod(request.startAt(), request.endAt());
@@ -42,7 +42,7 @@ public class CouponService {
 	}
 
 	@Transactional
-	public void delete(AuthorizationMember admin, Long couponId) {
+	public void delete(AuthMember admin, Long couponId) {
 		validateAdminRole(admin);
 		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
@@ -83,7 +83,7 @@ public class CouponService {
 		}
 	}
 
-	private void validateAdminRole(AuthorizationMember admin) {
+	private void validateAdminRole(AuthMember admin) {
 		if (!admin.role().equals(Role.ADMIN)) {
 			throw new NotFoundException(ErrorMessage.MEMBER_NOT_FOUND);
 		}

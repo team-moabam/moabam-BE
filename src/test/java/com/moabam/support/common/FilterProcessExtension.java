@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.support.annotation.WithMember;
 
@@ -32,8 +32,8 @@ public class FilterProcessExtension implements BeforeEachCallback, AfterEachCall
 			return;
 		}
 
-		AuthorizationThreadLocal.setAuthorizationMember(
-			new AuthorizationMember(withMember.id(), withMember.nickname(), withMember.role()));
+		AuthorizationThreadLocal.setAuthMember(
+			new AuthMember(withMember.id(), withMember.nickname(), withMember.role()));
 	}
 
 	@Override
@@ -56,6 +56,6 @@ public class FilterProcessExtension implements BeforeEachCallback, AfterEachCall
 			return null;
 		}
 
-		return new AuthorizationMember(withMember.id(), withMember.nickname(), withMember.role());
+		return new AuthMember(withMember.id(), withMember.nickname(), withMember.role());
 	}
 }

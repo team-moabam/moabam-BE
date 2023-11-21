@@ -73,7 +73,7 @@ class BugControllerTest extends WithoutFilterSupporter {
 	@Test
 	void get_bug_success() throws Exception {
 		// given
-		Long memberId = getAuthorizationMember().id();
+		Long memberId = getAuthMember().id();
 		BugResponse expected = BugMapper.toBugResponse(bug());
 		given(memberService.getById(memberId)).willReturn(member());
 

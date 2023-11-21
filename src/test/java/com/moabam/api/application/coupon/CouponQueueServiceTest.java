@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.repository.CouponQueueRepository;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -37,7 +37,7 @@ class CouponQueueServiceTest {
 	@Test
 	void couponQueueService_register() {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
 
 		given(couponService.validatePeriod(any(String.class))).willReturn(coupon);
@@ -55,7 +55,7 @@ class CouponQueueServiceTest {
 	@Test
 	void couponQueueService_register_BadRequestException() {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 		given(couponService.validatePeriod(any(String.class)))
 			.willThrow(new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD_END));
 
@@ -70,7 +70,7 @@ class CouponQueueServiceTest {
 	@Test
 	void couponQueueService_register_End() {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
 
 		given(couponService.validatePeriod(any(String.class))).willReturn(coupon);

@@ -6,21 +6,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthorizationThreadLocal {
 
-	private static final ThreadLocal<AuthorizationMember> authorizationMember;
+	private static final ThreadLocal<AuthMember> authMember;
 
 	static {
-		authorizationMember = new ThreadLocal<>();
+		authMember = new ThreadLocal<>();
 	}
 
-	public static void setAuthorizationMember(AuthorizationMember authorizationMember) {
-		AuthorizationThreadLocal.authorizationMember.set(authorizationMember);
+	public static void setAuthMember(AuthMember authMember) {
+		AuthorizationThreadLocal.authMember.set(authMember);
 	}
 
-	public static AuthorizationMember getAuthorizationMember() {
-		return authorizationMember.get();
+	public static AuthMember getAuthMember() {
+		return authMember.get();
 	}
 
 	public static void remove() {
-		authorizationMember.remove();
+		authMember.remove();
 	}
 }

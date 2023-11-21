@@ -1,4 +1,4 @@
-package com.moabam.api.application;
+package com.moabam.api.application.auth;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,7 +29,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.moabam.api.application.auth.OAuth2AuthorizationServerRequestService;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.global.common.util.GlobalConstant;
@@ -177,7 +176,7 @@ public class OAuth2AuthorizationServerRequestServiceTest {
 				.exchange(tokenInfoUri, HttpMethod.GET, httpEntity, AuthorizationTokenInfoResponse.class);
 		}
 
-		@DisplayName("")
+		@DisplayName("토큰 발급 요청 실패")
 		@ParameterizedTest
 		@ValueSource(ints = {400, 401})
 		void token_issue_request_fail(int code) {
@@ -196,6 +195,71 @@ public class OAuth2AuthorizationServerRequestServiceTest {
 			// Then
 			assertThatThrownBy(() ->
 				oAuth2AuthorizationServerRequestService.tokenInfoRequest(tokenInfoUri, tokenValue))
+				.isInstanceOf(HttpClientErrorException.class);
+		}
+	}
+
+	@DisplayName("회원 연결 끊기 요청")
+	@Nested
+	class Delete {
+
+		@DisplayName("성공")
+		@Test
+		void token_info_request_success() {
+			// Given
+			String deleteUri = "https://deleteUrl/uri";
+			String adminKey = "admin-token";
+			String socialId = "1";
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.add(HttpHeaders.CONTENT_TYPE,
+				MediaType.APPLICATION_FORM_URLENCODED_VALUE + GlobalConstant.CHARSET_UTF_8);
+			headers.add("Authorization", "KakaoAK " + adminKey);
+
+			MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+			params.add("target_id_type", "user_id");
+			params.add("target_id", socialId);
+
+			HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
+
+			// When
+			doReturn(new ResponseEntity<Void>(HttpStatus.OK))
+				.when(restTemplate).exchange(
+					eq(deleteUri),
+					eq(HttpMethod.POST),
+					any(HttpEntity.class),
+					eq(Void.class));
+			oAuth2AuthorizationServerRequestService.unlinkMemberRequest(deleteUri, adminKey, params);
+
+			// Then
+			verify(restTemplate, times(1))
+				.exchange(deleteUri, HttpMethod.POST, httpEntity, Void.class);
+		}
+
+		@DisplayName("실패")
+		@ParameterizedTest
+		@ValueSource(ints = {400, 401})
+		void token_issue_request_fail(int code) {
+			// Given
+			String deleteUri = "https://deleteUrl/uri";
+			String adminKey = "admin-token";
+			String socialId = "1";
+
+			MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+			params.add("target_id_type", "user_id");
+			params.add("target_id", socialId);
+
+			// When
+			doThrow(new HttpClientErrorException(HttpStatusCode.valueOf(code)))
+				.when(restTemplate).exchange(
+					eq(deleteUri),
+					eq(HttpMethod.POST),
+					any(HttpEntity.class),
+					eq(Void.class));
+
+			// Then
+			assertThatThrownBy(() ->
+				oAuth2AuthorizationServerRequestService.unlinkMemberRequest(deleteUri, adminKey, params))
 				.isInstanceOf(HttpClientErrorException.class);
 		}
 	}
