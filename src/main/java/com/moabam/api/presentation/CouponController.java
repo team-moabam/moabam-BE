@@ -56,7 +56,7 @@ public class CouponController {
 	}
 
 	@PostMapping("/coupons")
-	public void registerCouponQueue(@CurrentMember AuthorizationMember member,
+	public void registerQueue(@CurrentMember AuthorizationMember member,
 		@RequestParam("couponName") String couponName) {
 		couponQueueService.register(member, couponName);
 	}
