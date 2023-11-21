@@ -16,7 +16,7 @@ import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.infrastructure.fcm.FcmService;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -40,7 +40,7 @@ public class NotificationService {
 	private final ClockHolder clockHolder;
 
 	@Transactional
-	public void sendKnockNotification(AuthorizationMember member, Long targetId, Long roomId) {
+	public void sendKnockNotification(AuthMember member, Long targetId, Long roomId) {
 		roomService.validateRoomById(roomId);
 
 		String knockKey = generateKnockKey(member.id(), targetId, roomId);

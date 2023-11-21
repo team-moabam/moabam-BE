@@ -97,7 +97,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 			authorizationService.issueServiceToken(httpServletResponse, publicClaim);
 		}
 
-		AuthorizationThreadLocal.setAuthorizationMember(AuthorizationMapper.toAuthorizationMember(publicClaim));
+		AuthorizationThreadLocal.setAuthMember(AuthorizationMapper.toAuthMember(publicClaim));
 	}
 
 	private Cookie[] getCookiesOrThrow(HttpServletRequest httpServletRequest) {

@@ -75,7 +75,7 @@ class BugControllerTest extends WithoutFilterSupporter {
 	@Test
 	void get_bug_success() throws Exception {
 		// given
-		Long memberId = getAuthorizationMember().id();
+		Long memberId = getAuthMember().id();
 		BugResponse expected = BugMapper.toBugResponse(bug());
 		given(memberService.getById(memberId)).willReturn(member());
 
@@ -96,7 +96,7 @@ class BugControllerTest extends WithoutFilterSupporter {
 	@Test
 	void get_today_bug_success() throws Exception {
 		// given
-		Long memberId = getAuthorizationMember().id();
+		Long memberId = getAuthMember().id();
 		bugHistoryRepository.saveAll(List.of(
 			rewardMorningBug(memberId, 2),
 			rewardMorningBug(memberId, 3),

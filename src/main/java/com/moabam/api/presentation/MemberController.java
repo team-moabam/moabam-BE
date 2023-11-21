@@ -16,8 +16,8 @@ import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.DeleteMemberResponse;
-import com.moabam.global.auth.annotation.CurrentMember;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.annotation.Auth;
+import com.moabam.global.auth.model.AuthMember;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +31,7 @@ public class MemberController {
 	private final AuthorizationService authorizationService;
 	private final MemberService memberService;
 
-	@GetMapping
+	@GetMapping("/login/oauth")
 	public void socialLogin(HttpServletResponse httpServletResponse) {
 		authorizationService.redirectToLoginPage(httpServletResponse);
 	}
@@ -49,15 +49,15 @@ public class MemberController {
 
 	@GetMapping("/logout")
 	@ResponseStatus(HttpStatus.OK)
-	public void logout(@CurrentMember AuthorizationMember authorizationMember, HttpServletRequest httpServletRequest,
+	public void logout(@Auth AuthMember authMember, HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
-		authorizationService.logout(authorizationMember, httpServletRequest, httpServletResponse);
+		authorizationService.logout(authMember, httpServletRequest, httpServletResponse);
 	}
 
 	@DeleteMapping
 	@ResponseStatus(HttpStatus.OK)
-	public void deleteMember(@CurrentMember AuthorizationMember authorizationMember) {
-		DeleteMemberResponse deleteMemberResponse = memberService.deleteMember(authorizationMember);
+	public void deleteMember(@Auth AuthMember authMember) {
+		DeleteMemberResponse deleteMemberResponse = memberService.deleteMember(authMember);
 		authorizationService.unLinkMember(deleteMemberResponse);
 	}
 }

@@ -20,7 +20,7 @@ import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.infrastructure.fcm.FcmService;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.ConflictException;
@@ -55,7 +55,7 @@ class NotificationServiceTest {
 	@Test
 	void notificationService_sendKnockNotification() {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(notificationRepository.existsFcmTokenByMemberId(any(Long.class))).willReturn(true);
@@ -75,7 +75,7 @@ class NotificationServiceTest {
 	@Test
 	void notificationService_sendKnockNotification_Room_NotFoundException() {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 		willThrow(NotFoundException.class).given(roomService).validateRoomById(any(Long.class));
 
 		// When & Then
@@ -88,7 +88,7 @@ class NotificationServiceTest {
 	@Test
 	void notificationService_sendKnockNotification_FcmToken_NotFoundException() {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);
@@ -105,7 +105,7 @@ class NotificationServiceTest {
 	@Test
 	void notificationService_sendKnockNotification_ConflictException() {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(true);
@@ -155,7 +155,7 @@ class NotificationServiceTest {
 	@ParameterizedTest
 	void notificationService_knocked_checkMyKnockNotificationStatusInRoom(List<Participant> participants) {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(true);
 
@@ -173,7 +173,7 @@ class NotificationServiceTest {
 	@ParameterizedTest
 	void notificationService_notKnocked_checkMyKnockNotificationStatusInRoom(List<Participant> participants) {
 		// Given
-		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
 		// given
 		given(notificationRepository.existsByKey(any(String.class))).willReturn(false);

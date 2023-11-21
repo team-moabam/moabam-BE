@@ -33,7 +33,7 @@ import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.DeleteMemberResponse;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.cookie.CookieDevUtils;
 import com.moabam.global.common.util.cookie.CookieUtils;
@@ -268,7 +268,7 @@ class AuthorizationServiceTest {
 
 	@DisplayName("토큰 삭제 성공")
 	@Test
-	void error_with_expire_token(@WithMember AuthorizationMember authorizationMember) {
+	void error_with_expire_token(@WithMember AuthMember authMember) {
 		// given
 		MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
 		httpServletRequest.setCookies(cookieUtils.tokenCookie("access_token", "value", 100000),
@@ -277,7 +277,7 @@ class AuthorizationServiceTest {
 		MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 
 		// When
-		authorizationService.logout(authorizationMember, httpServletRequest, httpServletResponse);
+		authorizationService.logout(authMember, httpServletRequest, httpServletResponse);
 		Cookie cookie = httpServletResponse.getCookie("access_token");
 
 		// Then
@@ -285,18 +285,18 @@ class AuthorizationServiceTest {
 		assertThat(cookie.getMaxAge()).isZero();
 		assertThat(cookie.getValue()).isEqualTo("value");
 
-		verify(tokenRepository).delete(authorizationMember.id());
+		verify(tokenRepository).delete(authMember.id());
 	}
 
 	@DisplayName("토큰 없어서 삭제 실패")
 	@Test
-	void token_null_delete_fail(@WithMember AuthorizationMember authorizationMember) {
+	void token_null_delete_fail(@WithMember AuthMember authMember) {
 		// given
 		MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
 		MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 
 		// When
-		authorizationService.logout(authorizationMember, httpServletRequest, httpServletResponse);
+		authorizationService.logout(authMember, httpServletRequest, httpServletResponse);
 
 		// Then
 		assertThat(httpServletResponse.getCookies()).isEmpty();

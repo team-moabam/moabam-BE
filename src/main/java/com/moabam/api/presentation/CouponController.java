@@ -17,8 +17,8 @@ import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
-import com.moabam.global.auth.annotation.CurrentMember;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.annotation.Auth;
+import com.moabam.global.auth.model.AuthMember;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,14 +32,14 @@ public class CouponController {
 
 	@PostMapping("/admins/coupons")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createCoupon(@CurrentMember AuthorizationMember admin,
+	public void createCoupon(@Auth AuthMember admin,
 		@Valid @RequestBody CreateCouponRequest request) {
 		couponService.createCoupon(admin, request);
 	}
 
 	@DeleteMapping("/admins/coupons/{couponId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void deleteCoupon(@CurrentMember AuthorizationMember admin, @PathVariable("couponId") Long couponId) {
+	public void deleteCoupon(@Auth AuthMember admin, @PathVariable("couponId") Long couponId) {
 		couponService.deleteCoupon(admin, couponId);
 	}
 
@@ -56,7 +56,7 @@ public class CouponController {
 	}
 
 	@PostMapping("/coupons")
-	public void registerCouponQueue(@CurrentMember AuthorizationMember member,
+	public void registerCouponQueue(@Auth AuthMember member,
 		@RequestParam("couponName") String couponName) {
 		couponQueueService.register(member, couponName);
 	}

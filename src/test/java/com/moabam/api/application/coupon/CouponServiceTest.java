@@ -24,7 +24,7 @@ import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponSearchRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
@@ -55,7 +55,7 @@ class CouponServiceTest {
 	@Test
 	void couponService_createCoupon() {
 		// Given
-		AuthorizationMember admin = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		String couponType = CouponType.GOLDEN_COUPON.getTypeName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 2);
 
@@ -73,7 +73,7 @@ class CouponServiceTest {
 	@Test
 	void couponService_createCoupon_Admin_NotFoundException() {
 		// Given
-		AuthorizationMember admin = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		String couponType = CouponType.GOLDEN_COUPON.getTypeName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 2);
 
@@ -88,7 +88,7 @@ class CouponServiceTest {
 	@Test
 	void couponService_createCoupon_ConflictException() {
 		// Given
-		AuthorizationMember admin = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		String couponType = CouponType.GOLDEN_COUPON.getTypeName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 2);
 
@@ -105,7 +105,7 @@ class CouponServiceTest {
 	@Test
 	void couponService_createCoupon_NotFoundException() {
 		// Given
-		AuthorizationMember admin = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		CreateCouponRequest request = CouponFixture.createCouponRequest("UNKNOWN", 1, 2);
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
 
@@ -120,7 +120,7 @@ class CouponServiceTest {
 	@Test
 	void couponService_createCoupon_BadRequestException() {
 		// Given
-		AuthorizationMember admin = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		String couponType = CouponType.GOLDEN_COUPON.getTypeName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 2, 1);
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
@@ -136,7 +136,7 @@ class CouponServiceTest {
 	@Test
 	void couponService_deleteCoupon() {
 		// Given
-		AuthorizationMember admin = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon(10, 100);
 		given(couponRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
 
@@ -152,7 +152,7 @@ class CouponServiceTest {
 	@Test
 	void couponService_deleteCoupon_Admin_NotFoundException() {
 		// Given
-		AuthorizationMember admin = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 
 		// When & Then
 		assertThatThrownBy(() -> couponService.deleteCoupon(admin, 1L))
@@ -165,7 +165,7 @@ class CouponServiceTest {
 	@Test
 	void couponService_deleteCoupon_NotFoundException() {
 		// Given
-		AuthorizationMember admin = AuthorizationThreadLocal.getAuthorizationMember();
+		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		given(couponRepository.findById(any(Long.class))).willReturn(Optional.empty());
 
 		// When & Then

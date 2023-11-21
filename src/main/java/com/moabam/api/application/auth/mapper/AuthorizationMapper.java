@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.auth.AuthorizationCodeRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenRequest;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.config.OAuthConfig;
 
@@ -41,7 +41,7 @@ public final class AuthorizationMapper {
 			.build();
 	}
 
-	public static AuthorizationMember toAuthorizationMember(PublicClaim publicClaim) {
-		return new AuthorizationMember(publicClaim.id(), publicClaim.nickname(), publicClaim.role());
+	public static AuthMember toAuthMember(PublicClaim publicClaim) {
+		return new AuthMember(publicClaim.id(), publicClaim.nickname(), publicClaim.role());
 	}
 }

@@ -18,7 +18,7 @@ import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.DeleteMemberResponse;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.AuthorizationResponseFixture;
@@ -79,16 +79,16 @@ class MemberServiceTest {
 
 	@DisplayName("멤버 삭제 성공")
 	@Test
-	void delete_member_test(@WithMember AuthorizationMember authorizationMember) {
+	void delete_member_test(@WithMember AuthMember authMember) {
 		// given
 		Member member = MemberFixture.member();
 		String beforeSocialId = member.getSocialId();
 
-		given(memberSearchRepository.findMemberWithNotManger(authorizationMember.id()))
+		given(memberSearchRepository.findMemberWithNotManger(authMember.id()))
 			.willReturn(Optional.ofNullable(member));
 
 		// when
-		DeleteMemberResponse deleteMemberResponse = memberService.deleteMember(authorizationMember);
+		DeleteMemberResponse deleteMemberResponse = memberService.deleteMember(authMember);
 
 		// then
 		assertThat(member).isNotNull();
@@ -98,12 +98,12 @@ class MemberServiceTest {
 
 	@DisplayName("회원 삭제 반환")
 	@Test
-	void undo_delete_member(@WithMember AuthorizationMember authorizationMember) {
+	void undo_delete_member(@WithMember AuthMember authMember) {
 		// given
 		Member member = MemberFixture.member();
 		DeleteMemberResponse deleteMemberResponse = DeleteMemberFixture.deleteMemberResponse();
 
-		given(memberSearchRepository.findMember(authorizationMember.id(), false))
+		given(memberSearchRepository.findMember(authMember.id(), false))
 			.willReturn(Optional.ofNullable(member));
 
 		// when

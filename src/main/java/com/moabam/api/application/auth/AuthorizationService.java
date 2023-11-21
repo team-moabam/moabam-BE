@@ -20,7 +20,7 @@ import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.api.dto.member.DeleteMemberResponse;
-import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.common.util.cookie.CookieUtils;
@@ -100,10 +100,10 @@ public class AuthorizationService {
 		}
 	}
 
-	public void logout(AuthorizationMember authorizationMember, HttpServletRequest httpServletRequest,
+	public void logout(AuthMember authMember, HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 		removeToken(httpServletRequest, httpServletResponse);
-		tokenRepository.delete(authorizationMember.id());
+		tokenRepository.delete(authMember.id());
 	}
 
 	public void removeToken(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
@@ -157,7 +157,8 @@ public class AuthorizationService {
 			.queryParam("client_id", authorizationCodeRequest.clientId())
 			.queryParam("redirect_uri", authorizationCodeRequest.redirectUri());
 
-		if (!authorizationCodeRequest.scope().isEmpty()) {
+		if (authorizationCodeRequest.scope() != null
+			&& !authorizationCodeRequest.scope().isEmpty()) {
 			String scopes = String.join(",", authorizationCodeRequest.scope());
 			authorizationCodeUri.queryParam("scope", scopes);
 		}

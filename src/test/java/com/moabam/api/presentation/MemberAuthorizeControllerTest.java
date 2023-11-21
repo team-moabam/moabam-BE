@@ -92,7 +92,7 @@ class MemberAuthorizeControllerTest {
 			.toUriString();
 
 		// expected
-		ResultActions result = mockMvc.perform(get("/members"));
+		ResultActions result = mockMvc.perform(get("/members/login/oauth"));
 
 		result.andExpect(status().is3xxRedirection())
 			.andExpect(MockMvcResultMatchers.header().string("Content-type",
