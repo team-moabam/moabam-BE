@@ -27,6 +27,8 @@ import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.repository.RoomRepository;
+import com.moabam.api.infrastructure.fcm.FcmRepository;
+import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.api.infrastructure.redis.StringRedisRepository;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
@@ -58,6 +60,12 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 	@Autowired
 	private StringRedisRepository stringRedisRepository;
 
+	@Autowired
+	private FcmService fcmService;
+
+	@Autowired
+	private FcmRepository fcmRepository;
+
 	@MockBean
 	private FirebaseMessaging firebaseMessaging;
 
@@ -78,16 +86,44 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 
 	@AfterEach
 	void setDown() {
-		notificationRepository.deleteFcmTokenByMemberId(target.getId());
+		fcmService.deleteTokenByMemberId(target.getId());
 		stringRedisRepository.delete(knockKey);
+	}
+
+	@WithMember
+	@DisplayName("POST - 성공적으로 FCM Token을 저장한다. - Void")
+	@Test
+	void createFcmToken() throws Exception {
+		// When & Then
+		mockMvc.perform(post("/notifications")
+				.param("fcmToken", "FCM-TOKEN"))
+			.andDo(print())
+			.andDo(document("notifications",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint())))
+			.andExpect(status().isOk());
+	}
+
+	@WithMember
+	@DisplayName("POST - FCM Token이 BLANK라 아무일도 일어나지 않는다. - Void")
+	@Test
+	void createFcmToken_blank() throws Exception {
+		// When & Then
+		mockMvc.perform(post("/notifications")
+				.param("fcmToken", ""))
+			.andDo(print())
+			.andDo(document("notifications",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint())))
+			.andExpect(status().isOk());
 	}
 
 	@WithMember
 	@DisplayName("GET - 성공적으로 상대에게 콕 알림을 보낸다. - Void")
 	@Test
-	void notificationController_sendKnockNotification() throws Exception {
+	void sendKnock() throws Exception {
 		// Given
-		notificationRepository.saveFcmToken(target.getId(), "FCM_TOKEN");
+		fcmRepository.saveToken(target.getId(), "FCM_TOKEN");
 
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))
@@ -101,7 +137,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 	@WithMember
 	@DisplayName("GET - 콕 알림을 보낸 상대가 접속 중이 아니다. - NotFoundException")
 	@Test
-	void notificationController_sendKnockNotification_NotFoundException() throws Exception {
+	void sendKnock_NotFoundException() throws Exception {
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))
 			.andDo(print())
@@ -117,9 +153,9 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 	@WithMember
 	@DisplayName("GET - 이미 콕 알림을 보낸 대상이다. - ConflictException")
 	@Test
-	void notificationController_sendKnockNotification_ConflictException() throws Exception {
+	void sendKnock_ConflictException() throws Exception {
 		// Given
-		notificationRepository.saveFcmToken(target.getId(), "FCM_TOKEN");
+		fcmRepository.saveToken(target.getId(), "FCM_TOKEN");
 		notificationRepository.saveKnock(knockKey);
 
 		// When & Then

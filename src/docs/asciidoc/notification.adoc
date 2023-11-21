@@ -1,6 +1,6 @@
 == 알림(Notification)
 
- 콕 찌르기 알림 기능을 제공합니다.
+ 콕 찌르기 알림, FCM Token 저장 기능을 제공합니다.
 
 === 콕 찌르기 알림
 
@@ -18,3 +18,17 @@ include::{snippets}/notifications/rooms/roomId/members/memberId/http-request.ado
 ==== 응답
 
 include::{snippets}/notifications/rooms/roomId/members/memberId/http-response.adoc[]
+
+=== FCM TOKEN 저장
+
+ 1) 특정 사용자의 FCM-TOKEN을 받아서 REDIS DB에 저장합니다.
+
+[discrete]
+==== 요청
+
+include::{snippets}/notifications/http-request.adoc[]
+
+[discrete]
+==== 응답
+
+include::{snippets}/notifications/http-response.adoc[]
