@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
-import com.moabam.api.dto.coupon.CouponSearchRequest;
+import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 
 public final class CouponFixture {
@@ -59,18 +59,18 @@ public final class CouponFixture {
 			.name("couponName")
 			.description("coupon description")
 			.point(10)
-			.couponType(couponType)
+			.type(couponType)
 			.stock(10)
 			.startAt(LocalDateTime.of(2023, startMonth, 1, 0, 0))
 			.endAt(LocalDateTime.of(2023, endMonth, 1, 0, 0))
 			.build();
 	}
 
-	public static CouponSearchRequest couponSearchRequest(boolean ongoing, boolean notStarted, boolean ended) {
-		return CouponSearchRequest.builder()
-			.couponOngoing(ongoing)
-			.couponNotStarted(notStarted)
-			.couponEnded(ended)
+	public static CouponStatusRequest couponStatusRequest(boolean ongoing, boolean notStarted, boolean ended) {
+		return CouponStatusRequest.builder()
+			.ongoing(ongoing)
+			.notStarted(notStarted)
+			.ended(ended)
 			.build();
 	}
 

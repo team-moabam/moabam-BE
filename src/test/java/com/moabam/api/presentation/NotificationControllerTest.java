@@ -120,7 +120,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 	void notificationController_sendKnockNotification_ConflictException() throws Exception {
 		// Given
 		notificationRepository.saveFcmToken(target.getId(), "FCM_TOKEN");
-		notificationRepository.saveKnockNotification(knockKey);
+		notificationRepository.saveKnock(knockKey);
 
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))

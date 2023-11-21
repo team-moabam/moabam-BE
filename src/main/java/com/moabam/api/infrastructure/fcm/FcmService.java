@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import com.moabam.api.application.notification.NotificationMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,11 +14,11 @@ public class FcmService {
 
 	private final FirebaseMessaging firebaseMessaging;
 
-	public void sendAsyncFcm(String fcmToken, String notificationBody) {
-		Notification notification = NotificationMapper.toNotification(notificationBody);
+	public void sendAsync(String fcmToken, String notificationBody) {
+		Notification notification = FcmMapper.toNotification(notificationBody);
 
 		if (fcmToken != null) {
-			Message message = NotificationMapper.toMessageEntity(notification, fcmToken);
+			Message message = FcmMapper.toMessage(notification, fcmToken);
 			firebaseMessaging.sendAsync(message);
 		}
 	}

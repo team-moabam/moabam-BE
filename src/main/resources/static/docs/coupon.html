@@ -2132,13 +2132,13 @@
                     <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /admins/coupons HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Content-Length: 192
+Content-Length: 186
 Host: localhost:8080
 
 {
   "name" : "couponName",
   "description" : "coupon description",
-  "couponType" : "황금",
+  "type" : "황금",
   "point" : 10,
   "stock" : 10,
   "startAt" : "2023-01-01T00:00",
@@ -2240,13 +2240,13 @@ Content-Length: 56
                         <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /coupons/search HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Content-Length: 84
+Content-Length: 66
 Host: localhost:8080
 
 {
-  "couponOngoing" : false,
-  "couponNotStarted" : false,
-  "couponEnded" : false
+  "ongoing" : false,
+  "notStarted" : false,
+  "ended" : false
 }</code></pre>
                         </div>
                     </div>
@@ -2324,10 +2324,9 @@ Content-Length: 56
     </div>
 </div>
 <div id="footer">
-    <div id="footer-text">
-        Version 0.0.1-SNAPSHOT<br>
-        Last updated 2023-11-20 14:35:51 +0900
-    </div>
+<div id="footer-text">
+Version 0.0.1-SNAPSHOT<br>
+Last updated 2023-11-20 17:19:12 +0900
 </div>
 </body>
 </html>
