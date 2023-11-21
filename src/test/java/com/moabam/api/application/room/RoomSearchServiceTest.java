@@ -30,6 +30,7 @@ import com.moabam.api.domain.room.repository.RoutineSearchRepository;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
 import com.moabam.api.dto.room.SearchAllRoomsResponse;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,6 +60,9 @@ class RoomSearchServiceTest {
 	@Mock
 	private RoomRepository roomRepository;
 
+	@Mock
+	private ClockHolder clockHolder;
+
 	@DisplayName("유저가 참여중인 방 목록 조회 성공")
 	@Test
 	void get_my_rooms_success() {
@@ -86,6 +90,8 @@ class RoomSearchServiceTest {
 		given(certificationService.existsRoomCertification(room1.getId(), today)).willReturn(true);
 		given(certificationService.existsRoomCertification(room2.getId(), today)).willReturn(false);
 		given(certificationService.existsRoomCertification(room3.getId(), today)).willReturn(false);
+
+		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
 		// when
 		MyRoomsResponse myRooms = roomSearchService.getMyRooms(memberId);
