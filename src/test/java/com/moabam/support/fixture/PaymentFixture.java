@@ -15,7 +15,7 @@ public final class PaymentFixture {
 			.memberId(1L)
 			.product(product)
 			.order(order(product))
-			.totalAmount(product.getPrice())
+			.amount(product.getPrice())
 			.build();
 	}
 

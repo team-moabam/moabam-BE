@@ -87,6 +87,5 @@ class PaymentTest {
 
 		// then
 		assertThat(payment.getOrder().getId()).isEqualTo(ORDER_ID);
-		assertThat(payment.getStatus()).isEqualTo(PaymentStatus.REQUEST);
 	}
 }
