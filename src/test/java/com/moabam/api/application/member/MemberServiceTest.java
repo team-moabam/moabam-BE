@@ -103,7 +103,7 @@ class MemberServiceTest {
 		Member member = MemberFixture.member();
 		DeleteMemberResponse deleteMemberResponse = DeleteMemberFixture.deleteMemberResponse();
 
-		given(memberSearchRepository.findMember(authorizationMember.id()))
+		given(memberSearchRepository.findMember(authorizationMember.id(), false))
 			.willReturn(Optional.ofNullable(member));
 
 		// when

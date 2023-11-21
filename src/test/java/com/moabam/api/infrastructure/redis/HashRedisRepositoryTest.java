@@ -17,7 +17,6 @@ import com.moabam.global.config.EmbeddedRedisConfig;
 import com.moabam.global.config.RedisConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
-
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 @SpringBootTest(classes = {RedisConfig.class, EmbeddedRedisConfig.class, HashRedisRepository.class})
