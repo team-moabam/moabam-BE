@@ -1,4 +1,4 @@
-package com.moabam.api.domain.repository;
+package com.moabam.api.infrastructure.redis;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.domain.auth.repository.TokenRepository;
 import com.moabam.api.dto.auth.TokenSaveValue;
-import com.moabam.api.infrastructure.redis.HashRedisRepository;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 @ExtendWith(MockitoExtension.class)

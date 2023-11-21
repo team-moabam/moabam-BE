@@ -32,6 +32,7 @@ import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.api.dto.member.DeleteMemberResponse;
 import com.moabam.global.auth.model.AuthorizationMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.cookie.CookieDevUtils;
@@ -44,6 +45,7 @@ import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.AuthorizationResponseFixture;
+import com.moabam.support.fixture.DeleteMemberFixture;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 import jakarta.servlet.http.Cookie;
@@ -84,17 +86,14 @@ class AuthorizationServiceTest {
 			new OAuthConfig.Provider("https://authorization/url", "http://redirect/url", "http://token/url",
 				"http://tokenInfo/url", "https://deleteRequest/url"),
 			new OAuthConfig.Client("provider", "testtestetsttest", "testtesttest", "authorization_code",
-				List.of("profile_nickname", "profile_image"), "adminKey")
-		);
+				List.of("profile_nickname", "profile_image"), "adminKey"));
 		ReflectionTestUtils.setField(authorizationService, "oAuthConfig", oauthConfig);
 
 		noOAuthConfig = new OAuthConfig(
 			new OAuthConfig.Provider(null, null, null, null, null),
-			new OAuthConfig.Client(null, null, null, null, null, null)
-		);
+			new OAuthConfig.Client(null, null, null, null, null, null));
 		noPropertyService = new AuthorizationService(noOAuthConfig, tokenConfig,
-			oAuth2AuthorizationServerRequestService,
-			memberService, jwtProviderService, tokenRepository, cookieUtils);
+			oAuth2AuthorizationServerRequestService, memberService, jwtProviderService, tokenRepository, cookieUtils);
 	}
 
 	@DisplayName("인가코드 URI 생성 매퍼 실패")
@@ -113,10 +112,8 @@ class AuthorizationServiceTest {
 
 		// When + Then
 		assertThat(authorizationCodeRequest).isNotNull();
-		assertAll(
-			() -> assertThat(authorizationCodeRequest.clientId()).isEqualTo(oauthConfig.client().clientId()),
-			() -> assertThat(authorizationCodeRequest.redirectUri()).isEqualTo(oauthConfig.provider().redirectUri())
-		);
+		assertAll(() -> assertThat(authorizationCodeRequest.clientId()).isEqualTo(oauthConfig.client().clientId()),
+			() -> assertThat(authorizationCodeRequest.redirectUri()).isEqualTo(oauthConfig.provider().redirectUri()));
 	}
 
 	@DisplayName("redirect 로그인페이지 성공")
@@ -140,17 +137,16 @@ class AuthorizationServiceTest {
 			"errorDescription", null);
 
 		// When + Then
-		assertThatThrownBy(() -> authorizationService.requestToken(authorizationCodeResponse))
-			.isInstanceOf(BadRequestException.class)
-			.hasMessage(ErrorMessage.GRANT_FAILED.getMessage());
+		assertThatThrownBy(() -> authorizationService.requestToken(authorizationCodeResponse)).isInstanceOf(
+			BadRequestException.class).hasMessage(ErrorMessage.GRANT_FAILED.getMessage());
 	}
 
 	@DisplayName("인가코드 반환 성공")
 	@Test
 	void authorization_grant_success() {
 		// Given
-		AuthorizationCodeResponse authorizationCodeResponse = new AuthorizationCodeResponse("test", null,
-			null, null);
+		AuthorizationCodeResponse authorizationCodeResponse =
+			new AuthorizationCodeResponse("test", null, null, null);
 		AuthorizationTokenResponse authorizationTokenResponse =
 			AuthorizationResponseFixture.authorizationTokenResponse();
 
@@ -184,16 +180,13 @@ class AuthorizationServiceTest {
 		// Given
 		String code = "Test";
 		AuthorizationTokenRequest authorizationTokenRequest = AuthorizationMapper.toAuthorizationTokenRequest(
-			oauthConfig,
-			code);
+			oauthConfig, code);
 
 		// When + Then
 		assertThat(authorizationTokenRequest).isNotNull();
-		assertAll(
-			() -> assertThat(authorizationTokenRequest.clientId()).isEqualTo(oauthConfig.client().clientId()),
+		assertAll(() -> assertThat(authorizationTokenRequest.clientId()).isEqualTo(oauthConfig.client().clientId()),
 			() -> assertThat(authorizationTokenRequest.redirectUri()).isEqualTo(oauthConfig.provider().redirectUri()),
-			() -> assertThat(authorizationTokenRequest.code()).isEqualTo(code)
-		);
+			() -> assertThat(authorizationTokenRequest.code()).isEqualTo(code));
 	}
 
 	@DisplayName("토큰 변경 성공")
@@ -201,14 +194,13 @@ class AuthorizationServiceTest {
 	void generate_token() {
 		// Given
 		AuthorizationTokenResponse tokenResponse = AuthorizationResponseFixture.authorizationTokenResponse();
-		AuthorizationTokenInfoResponse tokenInfoResponse
-			= AuthorizationResponseFixture.authorizationTokenInfoResponse();
+		AuthorizationTokenInfoResponse tokenInfoResponse =
+			AuthorizationResponseFixture.authorizationTokenInfoResponse();
 
 		// When
-		when(oAuth2AuthorizationServerRequestService.tokenInfoRequest(
-			any(String.class),
-			eq("Bearer " + tokenResponse.accessToken())))
-			.thenReturn(new ResponseEntity<>(tokenInfoResponse, HttpStatus.OK));
+		when(oAuth2AuthorizationServerRequestService.tokenInfoRequest(any(String.class),
+			eq("Bearer " + tokenResponse.accessToken()))).thenReturn(
+			new ResponseEntity<>(tokenInfoResponse, HttpStatus.OK));
 
 		// Then
 		assertThatNoException().isThrownBy(() -> authorizationService.requestTokenInfo(tokenResponse));
@@ -223,18 +215,14 @@ class AuthorizationServiceTest {
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
 			AuthorizationResponseFixture.authorizationTokenInfoResponse();
 		LoginResponse loginResponse = LoginResponse.builder()
-			.publicClaim(PublicClaim.builder()
-				.id(1L)
-				.nickname("nickname")
-				.build())
+			.publicClaim(PublicClaim.builder().id(1L).nickname("nickname").build())
 			.isSignUp(isSignUp)
 			.build();
 
 		willReturn(loginResponse).given(memberService).login(authorizationTokenInfoResponse);
 
 		// when
-		LoginResponse result =
-			authorizationService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
+		LoginResponse result = authorizationService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
 
 		// then
 		assertThat(loginResponse).isEqualTo(result);
@@ -245,44 +233,36 @@ class AuthorizationServiceTest {
 
 		Cookie accessCookie = httpServletResponse.getCookie("access_token");
 		assertThat(accessCookie).isNotNull();
-		assertAll(
-			() -> assertThat(accessCookie.getSecure()).isTrue(),
+		assertAll(() -> assertThat(accessCookie.getSecure()).isTrue(),
 			() -> assertThat(accessCookie.isHttpOnly()).isTrue(),
-			() -> assertThat(accessCookie.getPath()).isEqualTo("/")
-		);
+			() -> assertThat(accessCookie.getPath()).isEqualTo("/"));
 
 		Cookie refreshCookie = httpServletResponse.getCookie("refresh_token");
 		assertThat(refreshCookie).isNotNull();
-		assertAll(
-			() -> assertThat(refreshCookie.getSecure()).isTrue(),
+		assertAll(() -> assertThat(refreshCookie.getSecure()).isTrue(),
 			() -> assertThat(refreshCookie.isHttpOnly()).isTrue(),
-			() -> assertThat(refreshCookie.getPath()).isEqualTo("/")
-		);
+			() -> assertThat(refreshCookie.getPath()).isEqualTo("/"));
 	}
 
 	@DisplayName("토큰 redis 검증")
 	@Test
 	void valid_token_in_redis() {
 		// Given
-		willReturn(TokenSaveValueFixture.tokenSaveValue("token"))
-			.given(tokenRepository).getTokenSaveValue(1L);
+		willReturn(TokenSaveValueFixture.tokenSaveValue("token")).given(tokenRepository).getTokenSaveValue(1L);
 
 		// When + Then
-		assertThatNoException().isThrownBy(() ->
-			authorizationService.validTokenPair(1L, "token"));
+		assertThatNoException().isThrownBy(() -> authorizationService.validTokenPair(1L, "token"));
 	}
 
 	@DisplayName("이전 토큰과 동일한지 검증")
 	@Test
 	void valid_token_failby_notEquals_token() {
 		// Given
-		willReturn(TokenSaveValueFixture.tokenSaveValue("token"))
-			.given(tokenRepository).getTokenSaveValue(1L);
+		willReturn(TokenSaveValueFixture.tokenSaveValue("token")).given(tokenRepository).getTokenSaveValue(1L);
 
 		// When + Then
-		assertThatThrownBy(() -> authorizationService.validTokenPair(1L, "oldToken"))
-			.isInstanceOf(UnauthorizedException.class)
-			.hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
+		assertThatThrownBy(() -> authorizationService.validTokenPair(1L, "oldToken")).isInstanceOf(
+			UnauthorizedException.class).hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
 		verify(tokenRepository).delete(1L);
 	}
 
@@ -291,11 +271,8 @@ class AuthorizationServiceTest {
 	void error_with_expire_token(@WithMember AuthorizationMember authorizationMember) {
 		// given
 		MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
-		httpServletRequest.setCookies(
-			cookieUtils.tokenCookie("access_token", "value", 100000),
-			cookieUtils.tokenCookie("refresh_token", "value", 100000),
-			cookieUtils.typeCookie("Bearer", 100000)
-		);
+		httpServletRequest.setCookies(cookieUtils.tokenCookie("access_token", "value", 100000),
+			cookieUtils.tokenCookie("refresh_token", "value", 100000), cookieUtils.typeCookie("Bearer", 100000));
 
 		MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 
@@ -304,11 +281,9 @@ class AuthorizationServiceTest {
 		Cookie cookie = httpServletResponse.getCookie("access_token");
 
 		// Then
-		assertAll(
-			() -> assertThat(cookie).isNotNull(),
-			() -> assertThat(cookie.getMaxAge()).isZero(),
-			() -> assertThat(cookie.getValue()).isEqualTo("value")
-		);
+		assertThat(cookie).isNotNull();
+		assertThat(cookie.getMaxAge()).isZero();
+		assertThat(cookie.getValue()).isEqualTo("value");
 
 		verify(tokenRepository).delete(authorizationMember.id());
 	}
@@ -322,31 +297,37 @@ class AuthorizationServiceTest {
 
 		// When
 		authorizationService.logout(authorizationMember, httpServletRequest, httpServletResponse);
-		Cookie cookie = httpServletResponse.getCookie("access_token");
 
 		// Then
 		assertThat(httpServletResponse.getCookies()).isEmpty();
 	}
 
-	@DisplayName("")
+	@DisplayName("회원 탈퇴 요청 성공")
 	@Test
-	void unlinke_success() {
+	void unlink_success() {
 		// given
+		DeleteMemberResponse deleteMemberResponse = DeleteMemberFixture.deleteMemberResponse();
 
-		// when
+		doNothing().when(oAuth2AuthorizationServerRequestService)
+			.unlinkMemberRequest(eq(oauthConfig.provider().unlink()), eq(oauthConfig.client().adminKey()), any());
 
-		// then
-
+		// When + Then
+		assertThatNoException().isThrownBy(() -> authorizationService.unLinkMember(deleteMemberResponse));
 	}
 
 	@DisplayName("연결 요청 실패에 따른 성공 실패")
 	@Test
 	void unlink_fail() {
 		// given
+		DeleteMemberResponse deleteMemberResponse = DeleteMemberFixture.deleteMemberResponse();
 
 		// when
+		willThrow(BadRequestException.class).given(oAuth2AuthorizationServerRequestService)
+			.unlinkMemberRequest(eq(oauthConfig.provider().unlink()), eq(oauthConfig.client().adminKey()), any());
+		assertThatThrownBy(() -> authorizationService.unLinkMember(deleteMemberResponse)).isInstanceOf(
+			BadRequestException.class).hasMessage(ErrorMessage.UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS.getMessage());
 
 		// then
-
+		verify(memberService, times(1)).undoDelete(deleteMemberResponse);
 	}
 }

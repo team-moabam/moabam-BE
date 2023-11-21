@@ -1,11 +1,10 @@
-package com.moabam.api.domain.repository;
+package com.moabam.api.domain.member;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
 import com.moabam.support.fixture.MemberFixture;
