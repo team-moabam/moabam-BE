@@ -2,7 +2,7 @@ package com.moabam.api.domain.coupon;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +17,8 @@ class CouponTest {
 	@Test
 	void coupon() {
 		// Given
-		LocalDateTime startAt = LocalDateTime.of(2000, 1, 22, 10, 30, 0);
-		LocalDateTime endAt = LocalDateTime.of(2000, 1, 22, 11, 0, 0);
+		LocalDate startAt = LocalDate.of(2023, 2, 1);
+		LocalDate openAt = LocalDate.of(2023, 1, 1);
 
 		// When
 		Coupon actual = Coupon.builder()
@@ -27,7 +27,7 @@ class CouponTest {
 			.type(CouponType.MORNING_COUPON)
 			.stock(100)
 			.startAt(startAt)
-			.endAt(endAt)
+			.openAt(openAt)
 			.adminId(1L)
 			.build();
 
@@ -38,7 +38,7 @@ class CouponTest {
 		assertThat(actual.getStock()).isEqualTo(100);
 		assertThat(actual.getType()).isEqualTo(CouponType.MORNING_COUPON);
 		assertThat(actual.getStartAt()).isEqualTo(startAt);
-		assertThat(actual.getEndAt()).isEqualTo(endAt);
+		assertThat(actual.getOpenAt()).isEqualTo(openAt);
 		assertThat(actual.getAdminId()).isEqualTo(1L);
 	}
 

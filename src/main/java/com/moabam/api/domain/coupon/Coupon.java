@@ -4,7 +4,7 @@ import static com.moabam.global.common.util.GlobalConstant.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -56,25 +56,25 @@ public class Coupon extends BaseTimeEntity {
 	private int stock;
 
 	@Column(name = "start_at", nullable = false)
-	private LocalDateTime startAt;
+	private LocalDate startAt;
 
-	@Column(name = "end_at", nullable = false)
-	private LocalDateTime endAt;
+	@Column(name = "open_at", nullable = false)
+	private LocalDate openAt;
 
 	// TODO : 관리자 테이블 생기면 관리자 테이블이랑 다대일 관계 맺을 예정
 	@Column(name = "admin_id", updatable = false, nullable = false)
 	private Long adminId;
 
 	@Builder
-	private Coupon(String name, int point, String description, CouponType type, int stock, LocalDateTime startAt,
-		LocalDateTime endAt, Long adminId) {
+	private Coupon(String name, String description, int point, int stock, CouponType type, LocalDate startAt,
+		LocalDate openAt, Long adminId) {
 		this.name = requireNonNull(name);
 		this.point = validatePoint(point);
 		this.description = Optional.ofNullable(description).orElse(BLANK);
 		this.type = requireNonNull(type);
 		this.stock = validateStock(stock);
 		this.startAt = requireNonNull(startAt);
-		this.endAt = requireNonNull(endAt);
+		this.openAt = requireNonNull(openAt);
 		this.adminId = requireNonNull(adminId);
 	}
 
@@ -96,6 +96,6 @@ public class Coupon extends BaseTimeEntity {
 
 	@Override
 	public String toString() {
-		return "Coupon{startAt=" + startAt + ", endAt=" + endAt + '}';
+		return String.format("Coupon{startAt=%s, openAt=%s}", startAt, openAt);
 	}
 }
