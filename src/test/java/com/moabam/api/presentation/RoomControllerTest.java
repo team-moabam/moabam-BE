@@ -1390,4 +1390,31 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isOk())
 			.andDo(print());
 	}
+
+	@DisplayName("방 수정전 정보 불러오기 성공")
+	@WithMember(id = 1L)
+	@Test
+	void get_room_details_before_modification_success() throws Exception {
+		// given
+		Member member2 = MemberFixture.member(123L, "참여자1");
+		Member member3 = MemberFixture.member(456L, "참여자2");
+		member2 = memberRepository.save(member2);
+		member3 = memberRepository.save(member3);
+
+		Room room = RoomFixture.room("수정 전 방 제목", MORNING, 10, "1234");
+		Participant participant1 = RoomFixture.participant(room, 1L);
+		participant1.enableManager();
+		Participant participant2 = RoomFixture.participant(room, member2.getId());
+		Participant participant3 = RoomFixture.participant(room, member3.getId());
+		List<Routine> routines = RoomFixture.routines(room);
+
+		roomRepository.save(room);
+		participantRepository.saveAll(List.of(participant1, participant2, participant3));
+		routineRepository.saveAll(routines);
+
+		// expected
+		mockMvc.perform(get("/rooms/" + room.getId()))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
 }

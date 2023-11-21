@@ -23,6 +23,7 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
+import com.moabam.api.dto.room.ManageRoomResponse;
 import com.moabam.api.dto.room.ModifyRoomRequest;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
@@ -49,6 +50,14 @@ public class RoomController {
 		@Valid @RequestBody CreateRoomRequest createRoomRequest) {
 
 		return roomService.createRoom(authorizationMember.id(), authorizationMember.nickname(), createRoomRequest);
+	}
+
+	@GetMapping("/{roomId}")
+	@ResponseStatus(HttpStatus.OK)
+	public ManageRoomResponse getRoomDetailsBeforeModification(@CurrentMember AuthorizationMember authorizationMember,
+		@PathVariable("roomId") Long roomId) {
+
+		return roomSearchService.getRoomDetailsBeforeModification(authorizationMember.id(), roomId);
 	}
 
 	@PutMapping("/{roomId}")

@@ -6,8 +6,10 @@ import java.util.List;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.dto.room.CreateRoomRequest;
+import com.moabam.api.dto.room.ManageRoomResponse;
 import com.moabam.api.dto.room.MyRoomResponse;
 import com.moabam.api.dto.room.MyRoomsResponse;
+import com.moabam.api.dto.room.ParticipantResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
 import com.moabam.api.dto.room.RoomHistoryResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
@@ -87,6 +89,21 @@ public final class RoomMapper {
 	public static RoomsHistoryResponse toRoomsHistoryResponse(List<RoomHistoryResponse> roomHistoryResponses) {
 		return RoomsHistoryResponse.builder()
 			.roomHistory(roomHistoryResponses)
+			.build();
+	}
+
+	public static ManageRoomResponse toManageRoomResponse(Room room, List<RoutineResponse> routines,
+		List<ParticipantResponse> participantResponses) {
+		return ManageRoomResponse.builder()
+			.roomId(room.getId())
+			.title(room.getTitle())
+			.announcement(room.getAnnouncement())
+			.roomType(room.getRoomType())
+			.certifyTime(room.getCertifyTime())
+			.maxUserCount(room.getMaxUserCount())
+			.password(room.getPassword())
+			.routines(routines)
+			.participants(participantResponses)
 			.build();
 	}
 
