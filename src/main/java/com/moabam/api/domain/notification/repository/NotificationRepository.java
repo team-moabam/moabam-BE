@@ -29,7 +29,7 @@ public class NotificationRepository {
 		);
 	}
 
-	public void saveKnockNotification(String knockKey) {
+	public void saveKnock(String knockKey) {
 		stringRedisRepository.save(
 			requireNonNull(knockKey),
 			BLANK,
@@ -46,8 +46,8 @@ public class NotificationRepository {
 		return stringRedisRepository.get(String.valueOf(requireNonNull(memberId)));
 	}
 
-	public boolean existsByKey(String key) {
-		return stringRedisRepository.hasKey(requireNonNull(key));
+	public boolean existsKnockByKnockKey(String knockKey) {
+		return stringRedisRepository.hasKey(requireNonNull(knockKey));
 	}
 
 	public boolean existsFcmTokenByMemberId(Long memberId) {

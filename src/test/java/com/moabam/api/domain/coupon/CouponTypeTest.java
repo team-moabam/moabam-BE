@@ -14,7 +14,7 @@ class CouponTypeTest {
 	@Test
 	void couponType_from() {
 		// When
-		CouponType actual = CouponType.from("황금");
+		CouponType actual = CouponType.from(CouponType.GOLDEN_COUPON.getName());
 
 		// Then
 		assertThat(actual).isEqualTo(CouponType.GOLDEN_COUPON);

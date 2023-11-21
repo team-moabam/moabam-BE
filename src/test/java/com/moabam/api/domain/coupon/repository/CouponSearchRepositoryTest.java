@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import com.moabam.api.domain.coupon.Coupon;
-import com.moabam.api.dto.coupon.CouponSearchRequest;
+import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.global.config.JpaConfig;
 import com.moabam.support.fixture.CouponFixture;
 
@@ -32,7 +32,7 @@ class CouponSearchRepositoryTest {
 	@ParameterizedTest
 	void couponSearchRepository_findAllByStatus(List<Coupon> coupons) {
 		// Given
-		CouponSearchRequest request = CouponFixture.couponSearchRequest(true, true, true);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, true, true);
 		LocalDateTime now = LocalDateTime.now();
 
 		couponRepository.saveAll(coupons);
@@ -49,7 +49,7 @@ class CouponSearchRepositoryTest {
 	@ParameterizedTest
 	void couponSearchRepository_findAllByStatus_and_ongoing_notStarted(List<Coupon> coupons) {
 		// Given
-		CouponSearchRequest request = CouponFixture.couponSearchRequest(true, true, false);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, true, false);
 		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
 
 		couponRepository.saveAll(coupons);
@@ -66,7 +66,7 @@ class CouponSearchRepositoryTest {
 	@ParameterizedTest
 	void couponSearchRepository_findAllByStatus_and_ongoing_ended(List<Coupon> coupons) {
 		// Given
-		CouponSearchRequest request = CouponFixture.couponSearchRequest(true, false, true);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, false, true);
 		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
 
 		couponRepository.saveAll(coupons);
@@ -83,7 +83,7 @@ class CouponSearchRepositoryTest {
 	@ParameterizedTest
 	void couponSearchRepository_findAllByStatus_ongoing_and_ended(List<Coupon> coupons) {
 		// Given
-		CouponSearchRequest request = CouponFixture.couponSearchRequest(false, true, true);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, true, true);
 		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
 
 		couponRepository.saveAll(coupons);
@@ -100,7 +100,7 @@ class CouponSearchRepositoryTest {
 	@ParameterizedTest
 	void couponSearchRepository_findAllByStatus_ongoing(List<Coupon> coupons) {
 		// Given
-		CouponSearchRequest request = CouponFixture.couponSearchRequest(true, false, false);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, false, false);
 		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
 
 		couponRepository.saveAll(coupons);
@@ -117,7 +117,7 @@ class CouponSearchRepositoryTest {
 	@ParameterizedTest
 	void couponSearchRepository_findAllByStatus_notStarted(List<Coupon> coupons) {
 		// Given
-		CouponSearchRequest request = CouponFixture.couponSearchRequest(false, true, false);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, true, false);
 		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
 
 		couponRepository.saveAll(coupons);
@@ -134,7 +134,7 @@ class CouponSearchRepositoryTest {
 	@ParameterizedTest
 	void couponSearchRepository_findAllByStatus_ended(List<Coupon> coupons) {
 		// Given
-		CouponSearchRequest request = CouponFixture.couponSearchRequest(false, false, true);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false, true);
 		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
 
 		couponRepository.saveAll(coupons);
@@ -151,7 +151,7 @@ class CouponSearchRepositoryTest {
 	@ParameterizedTest
 	void couponSearchRepository_findAllByStatus__not_status(List<Coupon> coupons) {
 		// Given
-		CouponSearchRequest request = CouponFixture.couponSearchRequest(false, false, false);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false, false);
 		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
 
 		couponRepository.saveAll(coupons);

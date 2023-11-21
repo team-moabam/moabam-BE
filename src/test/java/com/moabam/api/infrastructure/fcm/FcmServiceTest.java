@@ -25,7 +25,7 @@ class FcmServiceTest {
 	@Test
 	void fcmService_sendAsyncFcm() {
 		// When
-		fcmService.sendAsyncFcm("FCM-TOKEN", "알림");
+		fcmService.sendAsync("FCM-TOKEN", "알림");
 
 		// Then
 		verify(firebaseMessaging).sendAsync(any(Message.class));
@@ -35,7 +35,7 @@ class FcmServiceTest {
 	@Test
 	void fcmService_sendAsyncFcm_null() {
 		// When
-		fcmService.sendAsyncFcm(null, "알림");
+		fcmService.sendAsync(null, "알림");
 
 		// Then
 		verify(firebaseMessaging, times(0)).sendAsync(any(Message.class));

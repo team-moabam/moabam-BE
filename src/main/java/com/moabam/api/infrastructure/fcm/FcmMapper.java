@@ -1,4 +1,4 @@
-package com.moabam.api.application.notification;
+package com.moabam.api.infrastructure.fcm;
 
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NotificationMapper {
+public final class FcmMapper {
 
 	private static final String NOTIFICATION_TITLE = "모아밤";
 
@@ -18,7 +18,7 @@ public final class NotificationMapper {
 			.build();
 	}
 
-	public static Message toMessageEntity(Notification notification, String fcmToken) {
+	public static Message toMessage(Notification notification, String fcmToken) {
 		return Message.builder()
 			.setNotification(notification)
 			.setToken(fcmToken)
