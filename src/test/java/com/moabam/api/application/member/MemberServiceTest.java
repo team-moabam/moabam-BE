@@ -84,7 +84,7 @@ class MemberServiceTest {
 		Member member = MemberFixture.member();
 		String beforeSocialId = member.getSocialId();
 
-		given(memberSearchRepository.findMemberWithNotManger(authMember.id()))
+		given(memberSearchRepository.findMemberNotManager(authMember.id()))
 			.willReturn(Optional.ofNullable(member));
 
 		// when

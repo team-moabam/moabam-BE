@@ -48,7 +48,7 @@ public class MemberService {
 
 	@Transactional
 	public DeleteMemberResponse deleteMember(AuthMember authMember) {
-		Member member = memberSearchRepository.findMemberWithNotManger(authMember.id())
+		Member member = memberSearchRepository.findMemberNotManager(authMember.id())
 			.orElseThrow(() -> new ConflictException(MEMBER_NOT_FOUND));
 
 		String socialId = member.getSocialId();

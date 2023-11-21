@@ -34,7 +34,7 @@ public class MemberSearchRepository {
 			.fetchOne());
 	}
 
-	public Optional<Member> findMemberWithNotManger(Long memberId) {
+	public Optional<Member> findMemberNotManager(Long memberId) {
 		return Optional.ofNullable(jpaQueryFactory
 			.selectFrom(member)
 			.where(

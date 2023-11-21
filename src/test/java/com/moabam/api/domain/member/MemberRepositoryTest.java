@@ -61,7 +61,7 @@ class MemberRepositoryTest {
 
 			// when
 			Optional<Member> memberOptional =
-				memberSearchRepository.findMemberWithNotManger(member.getId());
+				memberSearchRepository.findMemberNotManager(member.getId());
 
 			// then
 			assertThat(memberOptional).isEmpty();
@@ -81,7 +81,7 @@ class MemberRepositoryTest {
 
 			// when
 			Optional<Member> memberOptional =
-				memberSearchRepository.findMemberWithNotManger(member.getId());
+				memberSearchRepository.findMemberNotManager(member.getId());
 
 			// then
 			assertThat(memberOptional).isNotEmpty();
