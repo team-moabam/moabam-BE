@@ -88,7 +88,7 @@ class BugControllerTest extends WithoutFilterSupporter {
 		BugResponse actual = objectMapper.readValue(content, BugResponse.class);
 		assertThat(actual).isEqualTo(expected);
 	}
-	
+
 	@DisplayName("벌레 상품 목록을 조회한다.")
 	@Test
 	void get_bug_products_success() throws Exception {

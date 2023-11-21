@@ -40,7 +40,7 @@ public class CouponController {
 	@DeleteMapping("/admins/coupons/{couponId}")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteCoupon(@Auth AuthMember admin, @PathVariable("couponId") Long couponId) {
-		couponService.deleteCoupon(admin, couponId);
+		couponService.delete(admin, couponId);
 	}
 
 	@GetMapping("/coupons/{couponId}")

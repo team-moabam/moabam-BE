@@ -1395,8 +1395,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	@Test
 	void get_room_details_before_modification_success() throws Exception {
 		// given
-		Member member2 = MemberFixture.member(123L, "참여자1");
-		Member member3 = MemberFixture.member(456L, "참여자2");
+		Member member2 = MemberFixture.member("123", "참여자1");
+		Member member3 = MemberFixture.member("456", "참여자2");
 		member2 = memberRepository.save(member2);
 		member3 = memberRepository.save(member3);
 

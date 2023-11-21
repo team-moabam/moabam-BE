@@ -40,7 +40,7 @@ public class NotificationService {
 	private final ClockHolder clockHolder;
 
 	@Transactional
-	public void sendKnockNotification(AuthMember member, Long targetId, Long roomId) {
+	public void sendKnock(AuthMember member, Long targetId, Long roomId) {
 		roomService.validateRoomById(roomId);
 
 		String knockKey = generateKnockKey(member.id(), targetId, roomId);
