@@ -86,7 +86,7 @@ public class Payment {
 		this.product = requireNonNull(product);
 		this.order = requireNonNull(order);
 		this.amount = validateAmount(amount);
-		this.status = requireNonNullElse(status, PaymentStatus.PENDING);
+		this.status = requireNonNullElse(status, PaymentStatus.READY);
 	}
 
 	private int validateAmount(int amount) {
@@ -97,9 +97,20 @@ public class Payment {
 		return amount;
 	}
 
+	public void validateInfo(Long memberId, int amount) {
+		validateByMember(memberId);
+		validateByAmount(amount);
+	}
+
 	public void validateByMember(Long memberId) {
 		if (!this.memberId.equals(memberId)) {
 			throw new BadRequestException(INVALID_MEMBER_PAYMENT);
+		}
+	}
+
+	private void validateByAmount(int amount) {
+		if (this.amount != amount) {
+			throw new BadRequestException(INVALID_PAYMENT_INFO);
 		}
 	}
 
@@ -110,6 +121,17 @@ public class Payment {
 
 	public void request(String orderId) {
 		this.order.updateId(orderId);
-		this.status = PaymentStatus.REQUEST;
+	}
+
+	public void confirm(String paymentKey, LocalDateTime requestedAt, LocalDateTime approvedAt) {
+		this.paymentKey = paymentKey;
+		this.requestedAt = requestedAt;
+		this.approvedAt = approvedAt;
+		this.status = PaymentStatus.DONE;
+	}
+
+	public void fail(String paymentKey) {
+		this.paymentKey = paymentKey;
+		this.status = PaymentStatus.ABORTED;
 	}
 }

@@ -1,6 +1,6 @@
 package com.moabam.api.dto.product;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 public record PurchaseProductRequest(
 	@Nullable Long couponId
