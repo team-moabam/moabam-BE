@@ -1,7 +1,6 @@
 package com.moabam.api.domain.payment;
 
 import static com.moabam.global.error.model.ErrorMessage.*;
-import static java.lang.Math.*;
 import static java.util.Objects.*;
 
 import java.time.LocalDateTime;
@@ -56,6 +55,9 @@ public class Payment {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "coupon_id")
 	private Coupon coupon;
+
+	@Column(name = "coupon_wallet_id")
+	private Long couponWalletId;
 
 	@Embedded
 	private Order order;
@@ -116,16 +118,16 @@ public class Payment {
 
 	public void applyCoupon(Coupon coupon) {
 		this.coupon = coupon;
-		this.amount = max(MIN_AMOUNT, amount - coupon.getPoint());
+		this.amount = Math.max(MIN_AMOUNT, this.amount - coupon.getPoint());
 	}
 
 	public void request(String orderId) {
 		this.order.updateId(orderId);
+		this.requestedAt = LocalDateTime.now();
 	}
 
-	public void confirm(String paymentKey, LocalDateTime requestedAt, LocalDateTime approvedAt) {
+	public void confirm(String paymentKey, LocalDateTime approvedAt) {
 		this.paymentKey = paymentKey;
-		this.requestedAt = requestedAt;
 		this.approvedAt = approvedAt;
 		this.status = PaymentStatus.DONE;
 	}

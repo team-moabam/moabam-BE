@@ -15,7 +15,6 @@ public record ConfirmTossPaymentResponse(
 	String orderName,
 	PaymentStatus status,
 	Long totalAmount,
-	LocalDateTime requestedAt,
 	LocalDateTime approvedAt
 ) {
 

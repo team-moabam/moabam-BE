@@ -5,7 +5,7 @@ import static org.springframework.http.MediaType.*;
 import java.util.Base64;
 
 import org.springframework.http.HttpStatusCode;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -19,7 +19,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class TossPaymentService {
 

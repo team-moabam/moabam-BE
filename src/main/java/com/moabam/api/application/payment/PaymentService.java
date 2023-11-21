@@ -43,7 +43,8 @@ public class PaymentService {
 			ConfirmTossPaymentResponse response = tossPaymentService.confirm(
 				TossPaymentMapper.toConfirmRequest(request.paymentKey(), request.orderId(), request.amount())
 			);
-			payment.confirm(response.paymentKey(), response.requestedAt(), response.approvedAt());
+			payment.confirm(response.paymentKey(), response.approvedAt());
+			// TODO: couponWallet 사용
 		} catch (MoabamException exception) {
 			payment.fail(request.paymentKey());
 		}

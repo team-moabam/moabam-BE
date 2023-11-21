@@ -26,8 +26,7 @@ public class PaymentController {
 
 	@PostMapping("/{paymentId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void request(@CurrentMember AuthorizationMember member,
-		@PathVariable Long paymentId,
+	public void request(@CurrentMember AuthorizationMember member, @PathVariable Long paymentId,
 		@Valid @RequestBody PaymentRequest request) {
 		paymentService.request(member.id(), paymentId, request);
 	}
