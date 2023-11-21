@@ -11,9 +11,10 @@ import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
-import com.moabam.api.dto.coupon.CouponSearchRequest;
+import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.global.auth.model.AuthorizationMember;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -28,39 +29,58 @@ public class CouponService {
 
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
+	private final ClockHolder clockHolder;
 
 	@Transactional
-	public void createCoupon(AuthorizationMember admin, CreateCouponRequest request) {
+	public void create(AuthorizationMember admin, CreateCouponRequest request) {
 		validateAdminRole(admin);
-		validateConflictCouponName(request.name());
-		validateCouponPeriod(request.startAt(), request.endAt());
+		validateConflictName(request.name());
+		validatePeriod(request.startAt(), request.endAt());
 
 		Coupon coupon = CouponMapper.toEntity(admin.id(), request);
 		couponRepository.save(coupon);
 	}
 
 	@Transactional
-	public void deleteCoupon(AuthorizationMember admin, Long couponId) {
+	public void delete(AuthorizationMember admin, Long couponId) {
 		validateAdminRole(admin);
 		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 		couponRepository.delete(coupon);
 	}
 
-	public CouponResponse getCouponById(Long couponId) {
-		Coupon coupon = couponSearchRepository.findById(couponId)
+	public CouponResponse getById(Long couponId) {
+		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 
 		return CouponMapper.toDto(coupon);
 	}
 
-	public List<CouponResponse> getCoupons(CouponSearchRequest request) {
-		LocalDateTime now = LocalDateTime.now();
+	public List<CouponResponse> getAllByStatus(CouponStatusRequest request) {
+		LocalDateTime now = clockHolder.times();
 		List<Coupon> coupons = couponSearchRepository.findAllByStatus(now, request);
 
 		return coupons.stream()
 			.map(CouponMapper::toDto)
 			.toList();
+	}
+
+	public Coupon validatePeriod(String couponName) {
+		LocalDateTime now = clockHolder.times();
+		Coupon coupon = couponRepository.findByName(couponName)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
+
+		if (!now.isBefore(coupon.getStartAt()) && !now.isAfter(coupon.getEndAt())) {
+			return coupon;
+		}
+
+		throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD_END);
+	}
+
+	private void validatePeriod(LocalDateTime startAt, LocalDateTime endAt) {
+		if (startAt.isAfter(endAt)) {
+			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
+		}
 	}
 
 	private void validateAdminRole(AuthorizationMember admin) {
@@ -69,15 +89,9 @@ public class CouponService {
 		}
 	}
 
-	private void validateConflictCouponName(String name) {
-		if (couponRepository.existsByName(name)) {
+	private void validateConflictName(String couponName) {
+		if (couponRepository.existsByName(couponName)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_NAME);
-		}
-	}
-
-	private void validateCouponPeriod(LocalDateTime startAt, LocalDateTime endAt) {
-		if (startAt.isAfter(endAt)) {
-			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
 		}
 	}
 }

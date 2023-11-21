@@ -1,5 +1,6 @@
 package com.moabam.api.presentation;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
+import com.moabam.api.dto.room.ManageRoomResponse;
 import com.moabam.api.dto.room.ModifyRoomRequest;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
@@ -50,6 +52,14 @@ public class RoomController {
 		return roomService.createRoom(authorizationMember.id(), authorizationMember.nickname(), createRoomRequest);
 	}
 
+	@GetMapping("/{roomId}")
+	@ResponseStatus(HttpStatus.OK)
+	public ManageRoomResponse getRoomDetailsBeforeModification(@CurrentMember AuthorizationMember authorizationMember,
+		@PathVariable("roomId") Long roomId) {
+
+		return roomSearchService.getRoomDetailsBeforeModification(authorizationMember.id(), roomId);
+	}
+
 	@PutMapping("/{roomId}")
 	@ResponseStatus(HttpStatus.OK)
 	public void modifyRoom(@CurrentMember AuthorizationMember authorizationMember,
@@ -72,12 +82,12 @@ public class RoomController {
 		roomService.exitRoom(authorizationMember.id(), roomId);
 	}
 
-	@GetMapping("/{roomId}")
+	@GetMapping("/{roomId}/{date}")
 	@ResponseStatus(HttpStatus.OK)
 	public RoomDetailsResponse getRoomDetails(@CurrentMember AuthorizationMember authorizationMember,
-		@PathVariable("roomId") Long roomId) {
+		@PathVariable("roomId") Long roomId, @PathVariable("date") LocalDate date) {
 
-		return roomSearchService.getRoomDetails(authorizationMember.id(), roomId);
+		return roomSearchService.getRoomDetails(authorizationMember.id(), roomId, date);
 	}
 
 	@PostMapping("/{roomId}/certification")
@@ -118,9 +128,18 @@ public class RoomController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public SearchAllRoomsResponse searchAllRooms(@RequestParam(value = "type", required = false) RoomType roomType,
+	public SearchAllRoomsResponse searchAllRooms(@RequestParam(value = "roomType", required = false) RoomType roomType,
 		@RequestParam(value = "roomId", required = false) Long roomId) {
 
 		return roomSearchService.searchAllRooms(roomType, roomId);
+	}
+
+	@GetMapping("/search")
+	@ResponseStatus(HttpStatus.OK)
+	public SearchAllRoomsResponse search(@RequestParam(value = "keyword") String keyword,
+		@RequestParam(value = "roomType", required = false) RoomType roomType,
+		@RequestParam(value = "roomId", required = false) Long roomId) {
+
+		return roomSearchService.search(keyword, roomType, roomId);
 	}
 }

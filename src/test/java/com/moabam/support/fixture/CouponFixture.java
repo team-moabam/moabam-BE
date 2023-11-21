@@ -8,24 +8,22 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
-import com.moabam.api.dto.coupon.CouponSearchRequest;
+import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 
 public final class CouponFixture {
 
 	public static final String DISCOUNT_1000_COUPON_NAME = "황금벌레 1000원 할인";
-	public static final int DISCOUNT_1000_COUPON_STOCK = 100;
-	public static final LocalDateTime DISCOUNT_1000_COUPON_START_AT = LocalDateTime.of(2023, 1, 1, 0, 0);
-	public static final LocalDateTime DISCOUNT_1000_COUPON_END_AT = LocalDateTime.of(2023, 1, 1, 0, 0);
+	public static final String DISCOUNT_10000_COUPON_NAME = "황금벌레 10000원 할인";
 
 	public static Coupon coupon(int point, int stock) {
 		return Coupon.builder()
 			.name("couponName")
 			.point(point)
-			.couponType(CouponType.MORNING_COUPON)
+			.type(CouponType.MORNING_COUPON)
 			.stock(stock)
 			.startAt(LocalDateTime.of(2023, 1, 1, 0, 0))
-			.endAt(LocalDateTime.of(2023, 1, 1, 0, 0))
+			.endAt(LocalDateTime.of(2023, 2, 1, 0, 0))
 			.adminId(1L)
 			.build();
 	}
@@ -34,7 +32,7 @@ public final class CouponFixture {
 		return Coupon.builder()
 			.name(name)
 			.point(10)
-			.couponType(CouponType.MORNING_COUPON)
+			.type(CouponType.MORNING_COUPON)
 			.stock(100)
 			.startAt(LocalDateTime.of(2023, startMonth, 1, 0, 0))
 			.endAt(LocalDateTime.of(2023, endMonth, 1, 0, 0))
@@ -46,10 +44,22 @@ public final class CouponFixture {
 		return Coupon.builder()
 			.name(DISCOUNT_1000_COUPON_NAME)
 			.point(1000)
-			.couponType(CouponType.DISCOUNT_COUPON)
-			.stock(DISCOUNT_1000_COUPON_STOCK)
-			.startAt(DISCOUNT_1000_COUPON_START_AT)
-			.endAt(DISCOUNT_1000_COUPON_END_AT)
+			.type(CouponType.DISCOUNT_COUPON)
+			.stock(100)
+			.startAt(LocalDateTime.of(2023, 1, 1, 0, 0))
+			.endAt(LocalDateTime.of(2023, 1, 1, 0, 0))
+			.adminId(1L)
+			.build();
+	}
+
+	public static Coupon discount10000Coupon() {
+		return Coupon.builder()
+			.name(DISCOUNT_10000_COUPON_NAME)
+			.point(10000)
+			.type(CouponType.DISCOUNT_COUPON)
+			.stock(100)
+			.startAt(LocalDateTime.of(2023, 1, 1, 0, 0))
+			.endAt(LocalDateTime.of(2023, 1, 1, 0, 0))
 			.adminId(1L)
 			.build();
 	}
@@ -59,18 +69,18 @@ public final class CouponFixture {
 			.name("couponName")
 			.description("coupon description")
 			.point(10)
-			.couponType(couponType)
+			.type(couponType)
 			.stock(10)
 			.startAt(LocalDateTime.of(2023, startMonth, 1, 0, 0))
 			.endAt(LocalDateTime.of(2023, endMonth, 1, 0, 0))
 			.build();
 	}
 
-	public static CouponSearchRequest couponSearchRequest(boolean ongoing, boolean notStarted, boolean ended) {
-		return CouponSearchRequest.builder()
-			.couponOngoing(ongoing)
-			.couponNotStarted(notStarted)
-			.couponEnded(ended)
+	public static CouponStatusRequest couponStatusRequest(boolean ongoing, boolean notStarted, boolean ended) {
+		return CouponStatusRequest.builder()
+			.ongoing(ongoing)
+			.notStarted(notStarted)
+			.ended(ended)
 			.build();
 	}
 
