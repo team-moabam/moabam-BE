@@ -20,6 +20,10 @@ public class FcmService {
 
 	// TODO : 세연님 로그인 시, 해당 메서드 사용해서 해당 유저의 FCM TOKEN 저장하면 됩니다. Front와 상의 후 삭제예정
 	public void createToken(AuthorizationMember member, String fcmToken) {
+		if (fcmToken == null || fcmToken.isBlank()) {
+			return;
+		}
+
 		fcmRepository.saveToken(member.id(), fcmToken);
 	}
 

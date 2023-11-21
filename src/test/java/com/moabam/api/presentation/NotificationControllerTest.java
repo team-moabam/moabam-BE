@@ -105,6 +105,20 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember
+	@DisplayName("POST - FCM Token이 BLANK라 아무일도 일어나지 않는다. - Void")
+	@Test
+	void createFcmToken_blank() throws Exception {
+		// When & Then
+		mockMvc.perform(post("/notifications")
+				.param("fcmToken", ""))
+			.andDo(print())
+			.andDo(document("notifications",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint())))
+			.andExpect(status().isOk());
+	}
+
+	@WithMember
 	@DisplayName("GET - 성공적으로 상대에게 콕 알림을 보낸다. - Void")
 	@Test
 	void sendKnock() throws Exception {

@@ -42,6 +42,34 @@ class FcmServiceTest extends WithoutFilterSupporter {
 		verify(fcmRepository).saveToken(any(Long.class), any(String.class));
 	}
 
+	@WithMember
+	@DisplayName("FCM 토큰으로 빈값이 넘어와 아무일도 일어나지 않는다. - Void")
+	@Test
+	void saveToken_Blank() {
+		// Given
+		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+
+		// When
+		fcmService.createToken(member, "");
+
+		// Then
+		verify(fcmRepository, times(0)).saveToken(any(Long.class), any(String.class));
+	}
+
+	@WithMember
+	@DisplayName("FCM 토큰으로 null이 넘어와 아무일도 일어나지 않는다. - Void")
+	@Test
+	void saveToken_Null() {
+		// Given
+		AuthorizationMember member = AuthorizationThreadLocal.getAuthorizationMember();
+
+		// When
+		fcmService.createToken(member, null);
+
+		// Then
+		verify(fcmRepository, times(0)).saveToken(any(Long.class), any(String.class));
+	}
+
 	@DisplayName("FCM 토큰이 성공적으로 삭제된다. - Void")
 	@Test
 	void deleteTokenByMemberId() {
