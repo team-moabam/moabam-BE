@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.application.auth.mapper.AuthMapper;
-import com.moabam.api.application.item.ItemService;
+import com.moabam.api.application.item.InventorySearchService;
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
-	private final ItemService itemService;
+	private final InventorySearchService inventorySearchService;
 	private final MemberSearchRepository memberSearchRepository;
 
 	public Member getById(Long memberId) {
@@ -87,7 +87,8 @@ public class MemberService {
 		}
 
 		MemberInfoSearchResponse memberInfoSearchResponse = findMemberInfo(searchId, isMe);
-		List<Inventory> inventories = itemService.getDefaultSkin(searchId);
+
+		List<Inventory> inventories = inventorySearchService.getDefaultSkin(searchId);
 
 		return MemberMapper.toMemberInfoResponse(memberInfoSearchResponse, inventories);
 	}

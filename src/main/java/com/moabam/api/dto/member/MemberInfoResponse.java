@@ -12,6 +12,7 @@ import lombok.Builder;
 @Builder
 public record MemberInfoResponse(
 	String nickname,
+	String profileImage,
 	String intro,
 	long level,
 	long exp,

@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.application.item.ItemService;
+import com.moabam.api.application.item.InventorySearchService;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
@@ -42,7 +42,7 @@ class MemberServiceTest {
 	MemberService memberService;
 
 	@Mock
-	ItemService itemService;
+	InventorySearchService inventorySearchService;
 
 	@Mock
 	MemberRepository memberRepository;
@@ -163,7 +163,7 @@ class MemberServiceTest {
 
 		given(memberSearchRepository.findMemberAndBadges(authMember.id(), true))
 			.willReturn(List.of(MemberInfoSearchFixture.friendMemberInfo(total)));
-		given(itemService.getDefaultSkin(authMember.id()))
+		given(inventorySearchService.getDefaultSkin(authMember.id()))
 			.willReturn(List.of(
 				InventoryFixture.inventory(authMember.id(), morning),
 				InventoryFixture.inventory(authMember.id(), night)));

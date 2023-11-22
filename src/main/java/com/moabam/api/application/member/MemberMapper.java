@@ -15,7 +15,6 @@ import com.moabam.api.dto.member.BadgeResponse;
 import com.moabam.api.dto.member.DeleteMemberResponse;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
-import com.moabam.global.common.util.GlobalConstant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -43,6 +42,7 @@ public final class MemberMapper {
 
 		return MemberInfoResponse.builder()
 			.nickname(memberInfoSearchResponse.nickname())
+			.profileImage(memberInfoSearchResponse.profileImage())
 			.intro(memberInfoSearchResponse.intro())
 			.level(certifyCount / LEVEL_DIVISOR)
 			.exp(certifyCount % LEVEL_DIVISOR)
