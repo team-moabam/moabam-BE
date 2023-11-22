@@ -14,9 +14,7 @@ import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
-import com.moabam.api.dto.member.DeleteMemberResponse;
-import com.moabam.global.auth.model.AuthMember;
-import com.moabam.global.error.exception.ConflictException;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +26,7 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final MemberSearchRepository memberSearchRepository;
+	private final ClockHolder clockHolder;
 
 	public Member getById(Long memberId) {
 		return memberRepository.findById(memberId)
@@ -47,22 +46,16 @@ public class MemberService {
 	}
 
 	@Transactional
-	public DeleteMemberResponse deleteMember(AuthMember authMember) {
-		Member member = memberSearchRepository.findMemberNotManager(authMember.id())
-			.orElseThrow(() -> new ConflictException(MEMBER_NOT_FOUND));
-
-		String socialId = member.getSocialId();
-		member.delete();
-
-		return MemberMapper.toDeleteMemberResponse(member.getId(), socialId);
+	public Member findMemberToDelete(Long memberId) {
+		return memberSearchRepository.findMemberNotManager(memberId)
+			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
 	}
 
 	@Transactional
-	public void undoDelete(DeleteMemberResponse deleteMemberResponse) {
-		Member member = memberSearchRepository.findMember(deleteMemberResponse.id(), false)
-			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
-
-		member.undoDelete(deleteMemberResponse.socialId());
+	public void delete(Member member) {
+		member.delete(clockHolder.times());
+		memberRepository.flush();
+		memberRepository.delete(member);
 	}
 
 	private Member signUp(Long socialId) {
