@@ -116,6 +116,10 @@ public class Payment {
 		}
 	}
 
+	public boolean isCouponApplied() {
+		return !isNull(this.couponWalletId);
+	}
+
 	public void applyCoupon(Coupon coupon, Long couponWalletId) {
 		this.coupon = coupon;
 		this.couponWalletId = couponWalletId;

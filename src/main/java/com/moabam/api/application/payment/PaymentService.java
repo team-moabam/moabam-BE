@@ -48,7 +48,10 @@ public class PaymentService {
 				TossPaymentMapper.toConfirmRequest(request.paymentKey(), request.orderId(), request.amount())
 			);
 			payment.confirm(response.paymentKey(), response.approvedAt());
-			couponService.use(memberId, payment.getCouponWalletId());
+
+			if (payment.isCouponApplied()) {
+				couponService.use(memberId, payment.getCouponWalletId());
+			}
 			bugService.charge(memberId, payment.getProduct());
 		} catch (MoabamException exception) {
 			payment.fail(request.paymentKey());
