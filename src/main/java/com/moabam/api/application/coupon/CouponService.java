@@ -2,6 +2,7 @@ package com.moabam.api.application.coupon;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +28,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class CouponService {
 
+	private final ClockHolder clockHolder;
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
-	private final ClockHolder clockHolder;
 
 	@Transactional
 	public void create(AuthMember admin, CreateCouponRequest request) {
@@ -64,6 +65,10 @@ public class CouponService {
 		return coupons.stream()
 			.map(CouponMapper::toDto)
 			.toList();
+	}
+
+	public Optional<Coupon> getByStartAt(LocalDate now) {
+		return couponRepository.findByStartAt(now);
 	}
 
 	public Coupon validatePeriod(String couponName) {
