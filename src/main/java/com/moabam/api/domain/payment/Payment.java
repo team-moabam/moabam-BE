@@ -10,7 +10,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.moabam.api.domain.coupon.Coupon;
-import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.product.Product;
 import com.moabam.global.error.exception.BadRequestException;
 
@@ -107,11 +106,10 @@ public class Payment {
 		}
 	}
 
-	public void applyCoupon(CouponWallet couponWallet) {
-		System.out.println(couponWallet.getCoupon().getPoint());
-		this.coupon = couponWallet.getCoupon();
-		this.couponWalletId = couponWallet.getId();
-		this.amount = max(MIN_AMOUNT, this.amount - this.coupon.getPoint());
+	public void applyCoupon(Coupon coupon, Long couponWalletId) {
+		this.coupon = coupon;
+		this.couponWalletId = couponWalletId;
+		this.amount = max(MIN_AMOUNT, this.amount - coupon.getPoint());
 	}
 
 	public void request(String orderId) {
