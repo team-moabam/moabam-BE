@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.product.Product;
 import com.moabam.global.error.exception.BadRequestException;
 
@@ -23,6 +24,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -33,7 +35,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "payment")
+@Table(name = "payment", indexes = @Index(name = "idx_order_id", columnList = "order_id"))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Payment {
@@ -55,6 +57,9 @@ public class Payment {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "coupon_id")
 	private Coupon coupon;
+
+	@Column(name = "coupon_wallet_id")
+	private Long couponWalletId;
 
 	@Embedded
 	private Order order;
@@ -85,7 +90,7 @@ public class Payment {
 		this.product = requireNonNull(product);
 		this.order = requireNonNull(order);
 		this.amount = validateAmount(amount);
-		this.status = requireNonNullElse(status, PaymentStatus.PENDING);
+		this.status = requireNonNullElse(status, PaymentStatus.READY);
 	}
 
 	private int validateAmount(int amount) {
@@ -102,13 +107,15 @@ public class Payment {
 		}
 	}
 
-	public void applyCoupon(Coupon coupon) {
-		this.coupon = coupon;
-		this.amount = max(MIN_AMOUNT, amount - coupon.getPoint());
+	public void applyCoupon(CouponWallet couponWallet) {
+		System.out.println(couponWallet.getCoupon().getPoint());
+		this.coupon = couponWallet.getCoupon();
+		this.couponWalletId = couponWallet.getId();
+		this.amount = max(MIN_AMOUNT, this.amount - this.coupon.getPoint());
 	}
 
 	public void request(String orderId) {
 		this.order.updateId(orderId);
-		this.status = PaymentStatus.REQUEST;
+		this.requestedAt = LocalDateTime.now();
 	}
 }
