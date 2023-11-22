@@ -36,6 +36,8 @@ public enum ErrorMessage {
 	MEMBER_ROOM_EXCEED("참여할 수 있는 방의 개수가 모두 찼습니다."),
 	UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS("카카오 연결 요청 실패로 Rollback하였습니다."),
 
+	INVALID_DEFAULT_SKIN_SIZE("기본 스킨은 2개여야 합니다. 관리자에게 문의하세요"),
+
 	BUG_NOT_ENOUGH("보유한 벌레가 부족합니다."),
 
 	ITEM_NOT_FOUND("존재하지 않는 아이템입니다."),

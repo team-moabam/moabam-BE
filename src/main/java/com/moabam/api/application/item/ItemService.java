@@ -21,6 +21,8 @@ import com.moabam.api.domain.item.repository.ItemSearchRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.item.ItemsResponse;
 import com.moabam.api.dto.item.PurchaseItemRequest;
+import com.moabam.global.common.util.GlobalConstant;
+import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 
@@ -91,5 +93,14 @@ public class ItemService {
 			.ifPresent(inventory -> {
 				throw new ConflictException(INVENTORY_CONFLICT);
 			});
+	}
+
+	public List<Inventory> getDefaultSkin(Long searchId) {
+		List<Inventory> inventories = inventorySearchRepository.findBirdsDefaultSkin(searchId);
+		if (inventories.size() != GlobalConstant.DEFAULT_SKIN_SIZE) {
+			throw new BadRequestException(INVALID_DEFAULT_SKIN_SIZE);
+		}
+
+		return inventories;
 	}
 }
