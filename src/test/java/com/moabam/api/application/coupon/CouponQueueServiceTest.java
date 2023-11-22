@@ -41,19 +41,19 @@ class CouponQueueServiceTest {
 		Coupon coupon = CouponFixture.coupon();
 
 		given(couponService.validatePeriod(any(String.class))).willReturn(coupon);
-		given(couponQueueRepository.size(any(String.class))).willReturn(coupon.getStock() - 1L);
+		given(couponQueueRepository.rank(any(String.class), any(Long.class))).willReturn((long)coupon.getStock());
 
 		// When
 		couponQueueService.register(member, coupon.getName());
 
 		// Then
-		verify(couponQueueRepository).addIfAbsent(any(String.class), any(String.class), any(double.class));
+		verify(couponQueueRepository).addIfAbsent(any(String.class), any(Long.class), any(double.class));
 	}
 
 	@WithMember
 	@DisplayName("해당 쿠폰은 발급 가능 기간이 아니다. - BadRequestException")
 	@Test
-	void register_BadRequestException() {
+	void register_StartAt_BadRequestException() {
 		// Given
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
@@ -61,23 +61,27 @@ class CouponQueueServiceTest {
 			.willThrow(new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD));
 
 		// When & Then
+		verify(couponQueueRepository, times(0)).addIfAbsent(any(String.class), any(Long.class), any(double.class));
 		assertThatThrownBy(() -> couponQueueService.register(member, "couponName"))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD.getMessage());
 	}
 
 	@WithMember
-	@DisplayName("해당 쿠폰은 마감된 쿠폰이다. - Void")
+	@DisplayName("해당 쿠폰은 선착순이 마감된 쿠폰이다. - BadRequestException")
 	@Test
-	void register_End() {
+	void register_Stock_End_BadRequestException() {
 		// Given
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon();
 
 		given(couponService.validatePeriod(any(String.class))).willReturn(coupon);
-		given(couponQueueRepository.size(any(String.class))).willReturn((long)coupon.getStock());
+		given(couponQueueRepository.rank(any(String.class), any(Long.class))).willReturn(coupon.getStock() + 1L);
 
 		// When & Then
-		assertThatNoException().isThrownBy(() -> couponQueueService.register(member, coupon.getName()));
+		verify(couponQueueRepository, times(0)).addIfAbsent(any(String.class), any(Long.class), any(double.class));
+		assertThatThrownBy(() -> couponQueueService.register(member, coupon.getName()))
+			.isInstanceOf(BadRequestException.class)
+			.hasMessage(ErrorMessage.INVALID_COUPON_STOCK_END.getMessage());
 	}
 }

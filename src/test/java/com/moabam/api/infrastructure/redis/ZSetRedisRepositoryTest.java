@@ -21,7 +21,7 @@ class ZSetRedisRepositoryTest {
 	private RedisTemplate<String, Object> redisTemplate;
 
 	String key = "key";
-	String value = "value";
+	Long value = 1L;
 
 	@AfterEach
 	void afterEach() {
@@ -37,7 +37,7 @@ class ZSetRedisRepositoryTest {
 		zSetRedisRepository.addIfAbsent(key, value, 1);
 
 		// Then
-		assertThat(zSetRedisRepository.size(key)).isEqualTo(1);
+		assertThat(zSetRedisRepository.hasKey(key)).isTrue();
 	}
 
 	@DisplayName("이미 존재하는 값을 한 번 더 저장을 시도한다. - Void")

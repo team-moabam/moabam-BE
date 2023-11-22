@@ -24,25 +24,25 @@ class CouponQueueRepositoryTest {
 
 	@DisplayName("특정 쿠폰의 대기열에 사용자가 성공적으로 등록된다. - Void")
 	@Test
-	void addQueue() {
+	void addIfAbsent() {
 		// When
-		couponQueueRepository.addIfAbsent("couponName", "memberNickname", 1);
+		couponQueueRepository.addIfAbsent("couponName", 1L, 1);
 
 		// Then
-		verify(zSetRedisRepository).addIfAbsent(any(String.class), any(String.class), any(Double.class));
+		verify(zSetRedisRepository).addIfAbsent(any(String.class), any(Long.class), any(Double.class));
 	}
 
 	@DisplayName("특정 쿠폰의 대기열에 사용자 등록 시, 필요한 값이 NULL 이다.- NullPointerException")
 	@Test
-	void addQueue_NullPointerException() {
+	void addIfAbsent_NullPointerException() {
 		// When & Then
-		assertThatThrownBy(() -> couponQueueRepository.addIfAbsent(null, "value", 1))
+		assertThatThrownBy(() -> couponQueueRepository.addIfAbsent(null, 1L, 1))
 			.isInstanceOf(NullPointerException.class);
 	}
 
 	@DisplayName("특정 쿠폰을 발급한 사용자가 3명이다. - Long")
 	@Test
-	void queueSize() {
+	void size() {
 		// Given
 		given(zSetRedisRepository.size(any(String.class))).willReturn(3L);
 
@@ -55,7 +55,7 @@ class CouponQueueRepositoryTest {
 
 	@DisplayName("특정 쿠폰을 발급한 사용자 수 조회 시, 필요한 값이 Null이다. - NullPointerException")
 	@Test
-	void queueSize_NullPointerException() {
+	void size_NullPointerException() {
 		// When & Then
 		assertThatThrownBy(() -> couponQueueRepository.size(null))
 			.isInstanceOf(NullPointerException.class);

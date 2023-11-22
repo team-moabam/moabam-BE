@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.coupon.CouponMapper;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
+import com.moabam.api.domain.coupon.repository.CouponQueueRepository;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
@@ -54,6 +55,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	private CouponRepository couponRepository;
+
+	@Autowired
+	private CouponQueueRepository couponQueueRepository;
 
 	@MockBean
 	private ClockHolder clockHolder;
@@ -311,7 +315,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@WithMember(nickname = "member-coupon-2")
 	@DisplayName("POST - 발급 기간이 아닌 쿠폰에 발급 요청을 한다. - BadRequestException")
 	@Test
-	void registerQueue_BadRequestException() throws Exception {
+	void registerQueue_StartAt_BadRequestException() throws Exception {
 		// Given
 		Coupon couponFixture = CouponFixture.coupon();
 		Coupon coupon = couponRepository.save(couponFixture);
@@ -329,6 +333,29 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isBadRequest())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
+	}
+
+	@WithMember
+	@DisplayName("POST - 선착순이 마감된 쿠폰에 발급 요청을 한다. - BadRequestException")
+	@Test
+	void registerQueue_Stock_BadRequestException() throws Exception {
+		// Given
+		Coupon coupon = couponRepository.save(CouponFixture.coupon(1000, 1));
+		couponQueueRepository.addIfAbsent(coupon.getName(), 77L, System.currentTimeMillis());
+
+		given(clockHolder.times()).willReturn(LocalDateTime.of(2023, 2, 1, 1, 1));
+
+		// When & Then
+		mockMvc.perform(post("/coupons")
+				.param("couponName", coupon.getName()))
+			.andDo(print())
+			.andDo(document("coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_STOCK_END.getMessage()));
 	}
 
 	@WithMember

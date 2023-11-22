@@ -16,10 +16,7 @@ class CouponWalletTest {
 		Coupon coupon = CouponFixture.coupon("CouponName", 1, 2);
 
 		// When
-		CouponWallet actual = CouponWallet.builder()
-			.memberId(1L)
-			.coupon(coupon)
-			.build();
+		CouponWallet actual = CouponWallet.create(1L, coupon);
 
 		// Then
 		assertThat(actual.getMemberId()).isEqualTo(1L);
