@@ -2,6 +2,7 @@ package com.moabam.api.domain.member;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -9,11 +10,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.moabam.api.domain.member.repository.BadgeRepository;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.repository.RoomRepository;
+import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
+import com.moabam.support.fixture.BadgeFixture;
 import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.RoomFixture;
 
@@ -28,6 +32,9 @@ class MemberRepositoryTest {
 
 	@Autowired
 	RoomRepository roomRepository;
+
+	@Autowired
+	BadgeRepository badgeRepository;
 
 	@DisplayName("회원 생성 테스트")
 	@Test
@@ -85,6 +92,69 @@ class MemberRepositoryTest {
 
 			// then
 			assertThat(memberOptional).isNotEmpty();
+		}
+	}
+
+	@DisplayName("회원 정보 찾는 Query")
+	@Nested
+	class FindMemberInfo {
+
+		@DisplayName("회원 없어서 실패")
+		@Test
+		void member_not_found() {
+			// Given
+			List<MemberInfoSearchResponse> memberInfoSearchResponses =
+				memberSearchRepository.findMemberAndBadges(1L, false);
+
+			// When + Then
+			assertThat(memberInfoSearchResponses).isEmpty();
+		}
+
+		@DisplayName("성공")
+		@Test
+		void search_info_success() {
+			// given
+			Member member = MemberFixture.member();
+			member.enterMorningRoom();
+			memberRepository.save(member);
+
+			Badge morningBirth = BadgeFixture.badge(member.getId(), BadgeType.MORNING_BIRTH);
+			Badge morningAdult = BadgeFixture.badge(member.getId(), BadgeType.MORNING_ADULT);
+			Badge nightBirth = BadgeFixture.badge(member.getId(), BadgeType.NIGHT_BIRTH);
+			Badge nightAdult = BadgeFixture.badge(member.getId(), BadgeType.NIGHT_ADULT);
+			List<Badge> badges = List.of(morningBirth, morningAdult, nightBirth, nightAdult);
+			badgeRepository.saveAll(badges);
+
+			// when
+			List<MemberInfoSearchResponse> memberInfoSearchResponses =
+				memberSearchRepository.findMemberAndBadges(member.getId(), true);
+
+			// then
+			assertThat(memberInfoSearchResponses).isNotEmpty();
+
+			MemberInfoSearchResponse memberInfoSearchResponse = memberInfoSearchResponses.get(0);
+			assertThat(memberInfoSearchResponse.badges()).hasSize(badges.size());
+		}
+
+		@DisplayName("성공")
+		@Test
+		void no_badges_search_success() {
+			// given
+
+			Member member = MemberFixture.member();
+			member.enterMorningRoom();
+			memberRepository.save(member);
+
+			// when
+			List<MemberInfoSearchResponse> memberInfoSearchResponses =
+				memberSearchRepository.findMemberAndBadges(member.getId(), true);
+
+			// then
+			assertThat(memberInfoSearchResponses).isNotEmpty();
+
+			MemberInfoSearchResponse memberInfoSearchResponse = memberInfoSearchResponses.get(0);
+			assertThat(memberInfoSearchResponse.badges()).isEmpty();
+
 		}
 	}
 }
