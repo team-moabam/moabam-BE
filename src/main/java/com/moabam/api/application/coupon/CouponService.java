@@ -51,6 +51,12 @@ public class CouponService {
 		couponRepository.delete(coupon);
 	}
 
+	@Transactional
+	public void use(Long memberId, Long couponWalletId) {
+		Coupon coupon = getByWallet(memberId, couponWalletId);
+		couponRepository.delete(coupon);
+	}
+
 	public CouponResponse getById(Long couponId) {
 		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
@@ -58,8 +64,8 @@ public class CouponService {
 		return CouponMapper.toDto(coupon);
 	}
 
-	public Coupon getByWallet(Long couponWalletId, Long memberId) {
-		return couponWalletRepository.findByIdAndMemberId(couponWalletId, memberId)
+	public Coupon getByWallet(Long memberId, Long couponWalletId) {
+		return couponWalletRepository.findByIdAndMemberId(memberId, couponWalletId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET))
 			.getCoupon();
 	}

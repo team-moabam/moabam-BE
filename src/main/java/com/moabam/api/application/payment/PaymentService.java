@@ -5,6 +5,8 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.moabam.api.application.bug.BugService;
+import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
 import com.moabam.api.domain.payment.repository.PaymentSearchRepository;
@@ -23,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentService {
 
+	private final BugService bugService;
+	private final CouponService couponService;
 	private final TossPaymentService tossPaymentService;
 	private final PaymentRepository paymentRepository;
 	private final PaymentSearchRepository paymentSearchRepository;
@@ -44,7 +48,8 @@ public class PaymentService {
 				TossPaymentMapper.toConfirmRequest(request.paymentKey(), request.orderId(), request.amount())
 			);
 			payment.confirm(response.paymentKey(), response.approvedAt());
-			// TODO: couponWallet 사용
+			couponService.use(memberId, payment.getCouponWalletId());
+			bugService.charge(memberId, payment.getProduct());
 		} catch (MoabamException exception) {
 			payment.fail(request.paymentKey());
 		}

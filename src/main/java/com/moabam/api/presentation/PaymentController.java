@@ -26,14 +26,14 @@ public class PaymentController {
 
 	@PostMapping("/{paymentId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void request(@CurrentMember AuthorizationMember member, @PathVariable Long paymentId,
+	public void request(@Auth AuthMember member, @PathVariable Long paymentId,
 		@Valid @RequestBody PaymentRequest request) {
 		paymentService.request(member.id(), paymentId, request);
 	}
 
 	@PostMapping("/confirm")
 	@ResponseStatus(HttpStatus.OK)
-	public void confirm(@CurrentMember AuthorizationMember member, @Valid @RequestBody ConfirmPaymentRequest request) {
+	public void confirm(@Auth AuthMember member, @Valid @RequestBody ConfirmPaymentRequest request) {
 		paymentService.confirm(member.id(), request);
 	}
 }
