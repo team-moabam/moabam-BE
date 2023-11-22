@@ -8,6 +8,7 @@ import com.moabam.api.domain.item.repository.InventorySearchRepository;
 import com.moabam.api.domain.item.repository.ItemSearchRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.domain.room.repository.CertificationsSearchRepository;
+import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
@@ -22,7 +23,7 @@ public class TestQuerydslConfig {
 
 	@Bean
 	public JPAQueryFactory jpaQueryFactory() {
-		return new JPAQueryFactory(entityManager);
+		return new JPAQueryFactory(JPQLTemplates.DEFAULT, entityManager);
 	}
 
 	@Bean
