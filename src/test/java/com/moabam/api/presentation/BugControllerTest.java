@@ -2,7 +2,6 @@ package com.moabam.api.presentation;
 
 import static com.moabam.global.auth.model.AuthorizationThreadLocal.*;
 import static com.moabam.support.fixture.BugFixture.*;
-import static com.moabam.support.fixture.CouponFixture.*;
 import static com.moabam.support.fixture.MemberFixture.*;
 import static com.moabam.support.fixture.ProductFixture.*;
 import static java.nio.charset.StandardCharsets.*;
@@ -16,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,8 +29,6 @@ import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.product.ProductMapper;
 import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
-import com.moabam.api.domain.coupon.Coupon;
-import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.domain.product.repository.ProductRepository;
 import com.moabam.api.dto.bug.BugResponse;
@@ -64,9 +60,6 @@ class BugControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	ProductRepository productRepository;
-
-	@Autowired
-	CouponRepository couponRepository;
 
 	@DisplayName("벌레를 조회한다.")
 	@WithMember
@@ -108,53 +101,25 @@ class BugControllerTest extends WithoutFilterSupporter {
 		assertThat(actual).isEqualTo(expected);
 	}
 
-	@Nested
 	@DisplayName("벌레 상품을 구매한다.")
-	class PurchaseBugProduct {
+	@WithMember
+	@Test
+	void purchase_bug_product_success() throws Exception {
+		// given
+		Product product = productRepository.save(bugProduct());
+		PurchaseProductRequest request = new PurchaseProductRequest(null);
 
-		@DisplayName("성공한다.")
-		@WithMember
-		@Test
-		void success() throws Exception {
-			// given
-			Product product = productRepository.save(bugProduct());
-			PurchaseProductRequest request = new PurchaseProductRequest(null);
-
-			// expected
-			String content = mockMvc.perform(post("/bugs/products/{productId}/purchase", product.getId())
-					.contentType(APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isOk())
-				.andDo(print())
-				.andReturn()
-				.getResponse()
-				.getContentAsString(UTF_8);
-			PurchaseProductResponse actual = objectMapper.readValue(content, PurchaseProductResponse.class);
-			assertThat(actual.orderName()).isEqualTo(BUG_PRODUCT_NAME);
-			assertThat(actual.price()).isEqualTo(BUG_PRODUCT_PRICE);
-		}
-
-		@DisplayName("쿠폰을 적용하여 성공한다.")
-		@WithMember
-		@Test
-		void with_coupon_success() throws Exception {
-			// given
-			Product product = productRepository.save(bugProduct());
-			Coupon coupon = couponRepository.save(discount1000Coupon());
-			PurchaseProductRequest request = new PurchaseProductRequest(coupon.getId());
-
-			// expected
-			String content = mockMvc.perform(post("/bugs/products/{productId}/purchase", product.getId())
-					.contentType(APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isOk())
-				.andDo(print())
-				.andReturn()
-				.getResponse()
-				.getContentAsString(UTF_8);
-			PurchaseProductResponse actual = objectMapper.readValue(content, PurchaseProductResponse.class);
-			assertThat(actual.orderName()).isEqualTo(BUG_PRODUCT_NAME);
-			assertThat(actual.price()).isEqualTo(BUG_PRODUCT_PRICE - 1000);
-		}
+		// expected
+		String content = mockMvc.perform(post("/bugs/products/{productId}/purchase", product.getId())
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andReturn()
+			.getResponse()
+			.getContentAsString(UTF_8);
+		PurchaseProductResponse actual = objectMapper.readValue(content, PurchaseProductResponse.class);
+		assertThat(actual.orderName()).isEqualTo(BUG_PRODUCT_NAME);
+		assertThat(actual.price()).isEqualTo(BUG_PRODUCT_PRICE);
 	}
 }

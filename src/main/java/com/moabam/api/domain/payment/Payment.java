@@ -116,8 +116,9 @@ public class Payment {
 		}
 	}
 
-	public void applyCoupon(Coupon coupon) {
+	public void applyCoupon(Coupon coupon, Long couponWalletId) {
 		this.coupon = coupon;
+		this.couponWalletId = couponWalletId;
 		this.amount = Math.max(MIN_AMOUNT, this.amount - coupon.getPoint());
 	}
 

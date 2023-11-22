@@ -69,6 +69,7 @@ public enum ErrorMessage {
 	CONFLICT_COUPON_NAME("쿠폰의 이름이 중복되었습니다."),
 	NOT_FOUND_COUPON_TYPE("존재하지 않는 쿠폰 종류입니다."),
 	NOT_FOUND_COUPON("존재하지 않는 쿠폰입니다."),
+	NOT_FOUND_COUPON_WALLET("보유하지 않은 쿠폰입니다."),
 
 	S3_UPLOAD_FAIL("S3 업로드를 실패했습니다."),
 	S3_INVALID_IMAGE("올바른 이미지(파일) 형식이 아닙니다."),

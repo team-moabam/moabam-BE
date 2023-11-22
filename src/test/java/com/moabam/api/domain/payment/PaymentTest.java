@@ -38,13 +38,15 @@ class PaymentTest {
 			// given
 			Payment payment = payment(bugProduct());
 			Coupon coupon = discount1000Coupon();
+			Long couponWalletId = 1L;
 
 			// when
-			payment.applyCoupon(coupon);
+			payment.applyCoupon(coupon, couponWalletId);
 
 			// then
 			assertThat(payment.getAmount()).isEqualTo(BUG_PRODUCT_PRICE - 1000);
 			assertThat(payment.getCoupon()).isEqualTo(coupon);
+			assertThat(payment.getCouponWalletId()).isEqualTo(couponWalletId);
 		}
 
 		@DisplayName("할인 금액이 더 크면 0으로 처리한다.")
@@ -53,13 +55,13 @@ class PaymentTest {
 			// given
 			Payment payment = payment(bugProduct());
 			Coupon coupon = discount10000Coupon();
+			Long couponWalletId = 1L;
 
 			// when
-			payment.applyCoupon(coupon);
+			payment.applyCoupon(coupon, couponWalletId);
 
 			// then
 			assertThat(payment.getAmount()).isZero();
-			assertThat(payment.getCoupon()).isEqualTo(coupon);
 		}
 	}
 

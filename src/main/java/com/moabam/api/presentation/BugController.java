@@ -41,8 +41,8 @@ public class BugController {
 
 	@PostMapping("/products/{productId}/purchase")
 	@ResponseStatus(HttpStatus.OK)
-	public PurchaseProductResponse purchaseBugProduct(@CurrentMember AuthorizationMember member,
-		@PathVariable Long productId, @Valid @RequestBody PurchaseProductRequest request) {
+	public PurchaseProductResponse purchaseBugProduct(@Auth AuthMember member, @PathVariable Long productId,
+		@Valid @RequestBody PurchaseProductRequest request) {
 		return bugService.purchaseBugProduct(member.id(), productId, request);
 	}
 }
