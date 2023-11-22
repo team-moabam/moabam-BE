@@ -103,7 +103,7 @@ class CouponServiceTest {
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("중복된 쿠폰명을 발행한다. - ConflictException")
 	@Test
-	void create_ConflictException() {
+	void create_Name_ConflictException() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
@@ -117,6 +117,23 @@ class CouponServiceTest {
 	}
 
 	@WithMember(role = Role.ADMIN)
+	@DisplayName("중복된 쿠폰 발행 가능 날짜를 발행한다. - ConflictException")
+	@Test
+	void create_StartAt_ConflictException() {
+		// Given
+		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
+		CreateCouponRequest request = CouponFixture.createCouponRequest();
+
+		given(couponRepository.existsByName(any(String.class))).willReturn(false);
+		given(couponRepository.existsByStartAt(any(LocalDate.class))).willReturn(true);
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.create(admin, request))
+			.isInstanceOf(ConflictException.class)
+			.hasMessage(ErrorMessage.CONFLICT_COUPON_START_AT.getMessage());
+	}
+
+	@WithMember(role = Role.ADMIN)
 	@DisplayName("현재 날짜가 쿠폰 발급 가능 날짜와 같거나 이후이다. - BadRequestException")
 	@Test
 	void create_StartAt_BadRequestException() {
@@ -126,6 +143,7 @@ class CouponServiceTest {
 
 		given(clockHolder.times()).willReturn(LocalDateTime.of(2025, 1, 1, 1, 1));
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
+		given(couponRepository.existsByStartAt(any(LocalDate.class))).willReturn(false);
 
 		// When & Then
 		assertThatThrownBy(() -> couponService.create(admin, request))
@@ -143,6 +161,7 @@ class CouponServiceTest {
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 1);
 
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
+		given(couponRepository.existsByStartAt(any(LocalDate.class))).willReturn(false);
 		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
 
 		// When & Then

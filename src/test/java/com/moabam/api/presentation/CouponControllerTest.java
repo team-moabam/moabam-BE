@@ -130,7 +130,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("POST - 쿠폰명이 중복된 쿠폰을 발행한다. - ConflictException")
 	@Test
-	void create_Coupon_ConflictException() throws Exception {
+	void create_Coupon_Name_ConflictException() throws Exception {
 		// Given
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
 		couponRepository.save(CouponMapper.toEntity(1L, request));
@@ -148,6 +148,30 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isConflict())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_COUPON_NAME.getMessage()));
+	}
+
+	@WithMember(role = Role.ADMIN)
+	@DisplayName("POST - 쿠폰 발행 가능 날짜가 중복된 쿠폰을 발행한다. - ConflictException")
+	@Test
+	void create_Coupon_StartAt_ConflictException() throws Exception {
+		// Given
+		CreateCouponRequest request = CouponFixture.createCouponRequest();
+		Coupon conflictStartAtCoupon = CouponFixture.coupon("NotConflictName", 2, 1);
+		couponRepository.save(conflictStartAtCoupon);
+
+		// When & Then
+		mockMvc.perform(post("/admins/coupons")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andDo(document("admins/coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				CouponSnippetFixture.CREATE_COUPON_REQUEST,
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isConflict())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_COUPON_START_AT.getMessage()));
 	}
 
 	@WithMember(role = Role.ADMIN)

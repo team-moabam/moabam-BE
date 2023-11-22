@@ -55,7 +55,7 @@ public class Coupon extends BaseTimeEntity {
 	@Column(name = "stock", nullable = false)
 	private int stock;
 
-	@Column(name = "start_at", nullable = false)
+	@Column(name = "start_at", unique = true, nullable = false)
 	private LocalDate startAt;
 
 	@Column(name = "open_at", nullable = false)

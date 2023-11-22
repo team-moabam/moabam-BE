@@ -35,6 +35,7 @@ public class CouponService {
 	public void create(AuthMember admin, CreateCouponRequest request) {
 		validateAdminRole(admin);
 		validateConflictName(request.name());
+		validateConflictStartAt(request.startAt());
 		validatePeriod(request.startAt(), request.openAt());
 
 		Coupon coupon = CouponMapper.toEntity(admin.id(), request);
@@ -98,6 +99,12 @@ public class CouponService {
 	private void validateConflictName(String couponName) {
 		if (couponRepository.existsByName(couponName)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_NAME);
+		}
+	}
+
+	private void validateConflictStartAt(LocalDate startAt) {
+		if (couponRepository.existsByStartAt(startAt)) {
+			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_START_AT);
 		}
 	}
 }
