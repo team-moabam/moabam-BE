@@ -1,7 +1,14 @@
 package com.moabam.api.application.room;
 
-import static com.moabam.api.domain.room.RoomType.*;
-import static com.moabam.global.error.model.ErrorMessage.*;
+import static com.moabam.api.domain.room.RoomType.MORNING;
+import static com.moabam.api.domain.room.RoomType.NIGHT;
+import static com.moabam.global.error.model.ErrorMessage.MEMBER_ROOM_EXCEED;
+import static com.moabam.global.error.model.ErrorMessage.PARTICIPANT_NOT_FOUND;
+import static com.moabam.global.error.model.ErrorMessage.ROOM_EXIT_MANAGER_FAIL;
+import static com.moabam.global.error.model.ErrorMessage.ROOM_MAX_USER_REACHED;
+import static com.moabam.global.error.model.ErrorMessage.ROOM_MODIFY_UNAUTHORIZED_REQUEST;
+import static com.moabam.global.error.model.ErrorMessage.ROOM_NOT_FOUND;
+import static com.moabam.global.error.model.ErrorMessage.WRONG_ROOM_PASSWORD;
 
 import java.util.List;
 
@@ -10,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.application.member.MemberService;
+import com.moabam.api.application.room.mapper.ParticipantMapper;
 import com.moabam.api.application.room.mapper.RoomMapper;
 import com.moabam.api.application.room.mapper.RoutineMapper;
 import com.moabam.api.domain.member.Member;
@@ -21,7 +29,6 @@ import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoutineRepository;
-import com.moabam.api.domain.room.repository.RoutineSearchRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
@@ -38,7 +45,6 @@ public class RoomService {
 
 	private final RoomRepository roomRepository;
 	private final RoutineRepository routineRepository;
-	private final RoutineSearchRepository routineSearchRepository;
 	private final ParticipantRepository participantRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
 	private final MemberService memberService;
@@ -47,19 +53,15 @@ public class RoomService {
 	public Long createRoom(Long memberId, String nickname, CreateRoomRequest createRoomRequest) {
 		Room room = RoomMapper.toRoomEntity(createRoomRequest);
 		List<Routine> routines = RoutineMapper.toRoutineEntities(room, createRoomRequest.routines());
-		Participant participant = Participant.builder()
-			.room(room)
-			.memberId(memberId)
-			.build();
+		Participant participant = ParticipantMapper.toParticipantEntity(room, memberId);
 
-		if (!isEnterRoomAvailable(memberId, room.getRoomType())) {
-			throw new BadRequestException(MEMBER_ROOM_EXCEED);
-		}
+		validateEnteredRoomCount(memberId, room.getRoomType());
 
-		increaseRoomCount(memberId, room.getRoomType());
-
+		Member member = memberService.getById(memberId);
+		member.enterRoom(room.getRoomType());
 		participant.enableManager();
 		room.changeManagerNickname(nickname);
+
 		Room savedRoom = roomRepository.save(room);
 		routineRepository.saveAll(routines);
 		participantRepository.save(participant);
@@ -79,7 +81,7 @@ public class RoomService {
 		room.changeCertifyTime(modifyRoomRequest.certifyTime());
 		room.changeMaxCount(modifyRoomRequest.maxUserCount());
 
-		List<Routine> routines = routineSearchRepository.findAllByRoomId(roomId);
+		List<Routine> routines = routineRepository.findAllByRoomId(roomId);
 		routineRepository.deleteAll(routines);
 
 		List<Routine> newRoutines = RoutineMapper.toRoutineEntities(room, modifyRoomRequest.routines());
@@ -91,13 +93,11 @@ public class RoomService {
 		Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
 		validateRoomEnter(memberId, enterRoomRequest.password(), room);
 
+		Member member = memberService.getById(memberId);
+		member.enterRoom(room.getRoomType());
 		room.increaseCurrentUserCount();
-		increaseRoomCount(memberId, room.getRoomType());
 
-		Participant participant = Participant.builder()
-			.room(room)
-			.memberId(memberId)
-			.build();
+		Participant participant = ParticipantMapper.toParticipantEntity(room, memberId);
 		participantRepository.save(participant);
 	}
 
@@ -106,11 +106,11 @@ public class RoomService {
 		Participant participant = getParticipant(memberId, roomId);
 		Room room = participant.getRoom();
 
-		if (participant.isManager() && room.getCurrentUserCount() != 1) {
-			throw new BadRequestException(ROOM_EXIT_MANAGER_FAIL);
-		}
+		validateRoomExit(participant, room);
 
-		decreaseRoomCount(memberId, room.getRoomType());
+		Member member = memberService.getById(memberId);
+		member.exitRoom(room.getRoomType());
+
 		participant.removeRoom();
 		participantRepository.flush();
 		participantRepository.delete(participant);
@@ -124,7 +124,7 @@ public class RoomService {
 	}
 
 	@Transactional
-	public void mandateRoomManager(Long managerId, Long roomId, Long memberId) {
+	public void mandateManager(Long managerId, Long roomId, Long memberId) {
 		Participant managerParticipant = getParticipant(managerId, roomId);
 		Participant memberParticipant = getParticipant(memberId, roomId);
 		validateManagerAuthorization(managerParticipant);
@@ -141,13 +141,14 @@ public class RoomService {
 	public void deportParticipant(Long managerId, Long roomId, Long memberId) {
 		Participant managerParticipant = getParticipant(managerId, roomId);
 		Participant memberParticipant = getParticipant(memberId, roomId);
-		Room room = managerParticipant.getRoom();
-
 		validateManagerAuthorization(managerParticipant);
 
+		Room room = managerParticipant.getRoom();
 		participantRepository.delete(memberParticipant);
 		room.decreaseCurrentUserCount();
-		decreaseRoomCount(memberId, room.getRoomType());
+
+		Member member = memberService.getById(memberId);
+		member.exitRoom(room.getRoomType());
 	}
 
 	public void validateRoomById(Long roomId) {
@@ -168,9 +169,8 @@ public class RoomService {
 	}
 
 	private void validateRoomEnter(Long memberId, String requestPassword, Room room) {
-		if (!isEnterRoomAvailable(memberId, room.getRoomType())) {
-			throw new BadRequestException(MEMBER_ROOM_EXCEED);
-		}
+		validateEnteredRoomCount(memberId, room.getRoomType());
+
 		if (!StringUtils.isEmpty(requestPassword) && !room.getPassword().equals(requestPassword)) {
 			throw new BadRequestException(WRONG_ROOM_PASSWORD);
 		}
@@ -179,38 +179,20 @@ public class RoomService {
 		}
 	}
 
-	private boolean isEnterRoomAvailable(Long memberId, RoomType roomType) {
+	private void validateEnteredRoomCount(Long memberId, RoomType roomType) {
 		Member member = memberService.getById(memberId);
 
 		if (roomType.equals(MORNING) && member.getCurrentMorningCount() >= 3) {
-			return false;
+			throw new BadRequestException(MEMBER_ROOM_EXCEED);
 		}
 		if (roomType.equals(NIGHT) && member.getCurrentNightCount() >= 3) {
-			return false;
+			throw new BadRequestException(MEMBER_ROOM_EXCEED);
 		}
-
-		return true;
 	}
 
-	private void increaseRoomCount(Long memberId, RoomType roomType) {
-		Member member = memberService.getById(memberId);
-
-		if (roomType.equals(MORNING)) {
-			member.enterMorningRoom();
-			return;
+	private void validateRoomExit(Participant participant, Room room) {
+		if (participant.isManager() && room.getCurrentUserCount() != 1) {
+			throw new BadRequestException(ROOM_EXIT_MANAGER_FAIL);
 		}
-
-		member.enterNightRoom();
-	}
-
-	private void decreaseRoomCount(Long memberId, RoomType roomType) {
-		Member member = memberService.getById(memberId);
-
-		if (roomType.equals(MORNING)) {
-			member.exitMorningRoom();
-			return;
-		}
-
-		member.exitNightRoom();
 	}
 }

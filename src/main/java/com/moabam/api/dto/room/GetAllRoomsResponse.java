@@ -5,9 +5,9 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record SearchAllRoomsResponse(
+public record GetAllRoomsResponse(
 	boolean hasNext,
-	List<SearchAllRoomResponse> rooms
+	List<GetAllRoomResponse> rooms
 ) {
 
 }

@@ -131,7 +131,7 @@ class RoomServiceTest {
 		given(memberService.getById(2L)).willReturn(member);
 
 		// when
-		roomService.mandateRoomManager(managerId, room.getId(), memberId);
+		roomService.mandateManager(managerId, room.getId(), memberId);
 
 		// then
 		assertThat(managerParticipant.isManager()).isFalse();
@@ -157,7 +157,7 @@ class RoomServiceTest {
 			Optional.of(managerParticipant));
 
 		// when, then
-		assertThatThrownBy(() -> roomService.mandateRoomManager(managerId, 1L, memberId))
+		assertThatThrownBy(() -> roomService.mandateManager(managerId, 1L, memberId))
 			.isInstanceOf(ForbiddenException.class);
 	}
 }
