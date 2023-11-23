@@ -66,12 +66,6 @@ public class MemberService {
 		memberRepository.delete(member);
 	}
 
-	private Member signUp(Long socialId) {
-		Member member = MemberMapper.toMember(socialId);
-
-		return memberRepository.save(member);
-	}
-
 	public MemberInfoResponse searchInfo(AuthMember authMember, Long memberId) {
 		Long searchId = authMember.id();
 		boolean isMe = confirmMe(searchId, memberId);
@@ -79,12 +73,16 @@ public class MemberService {
 		if (!isMe) {
 			searchId = memberId;
 		}
-
 		MemberInfoSearchResponse memberInfoSearchResponse = findMemberInfo(searchId, isMe);
-
 		List<Inventory> inventories = inventorySearchService.getDefaultSkin(searchId);
 
 		return MemberMapper.toMemberInfoResponse(memberInfoSearchResponse, inventories);
+	}
+
+	private Member signUp(Long socialId) {
+		Member member = MemberMapper.toMember(socialId);
+
+		return memberRepository.save(member);
 	}
 
 	private MemberInfoSearchResponse findMemberInfo(Long searchId, boolean isMe) {
