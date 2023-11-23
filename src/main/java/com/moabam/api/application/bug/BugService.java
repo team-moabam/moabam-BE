@@ -9,11 +9,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.payment.PaymentMapper;
 import com.moabam.api.application.product.ProductMapper;
 import com.moabam.api.domain.coupon.Coupon;
-import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
@@ -33,9 +33,9 @@ import lombok.RequiredArgsConstructor;
 public class BugService {
 
 	private final MemberService memberService;
+	private final CouponService couponService;
 	private final ProductRepository productRepository;
 	private final PaymentRepository paymentRepository;
-	private final CouponRepository couponRepository;
 
 	public BugResponse getBug(Long memberId) {
 		Member member = memberService.getById(memberId);
@@ -54,11 +54,9 @@ public class BugService {
 		Product product = getById(productId);
 		Payment payment = PaymentMapper.toPayment(memberId, product);
 
-		if (!isNull(request.couponId())) {
-			// TODO: (임시) CouponWallet 에 존재하는 할인 쿠폰인지 확인 @홍혁준
-			Coupon coupon = couponRepository.findById(request.couponId())
-				.orElseThrow(() -> new NotFoundException(NOT_FOUND_COUPON));
-			payment.applyCoupon(coupon);
+		if (!isNull(request.couponWalletId())) {
+			Coupon coupon = couponService.getByWallet(request.couponWalletId(), memberId);
+			payment.applyCoupon(coupon, request.couponWalletId());
 		}
 		paymentRepository.save(payment);
 

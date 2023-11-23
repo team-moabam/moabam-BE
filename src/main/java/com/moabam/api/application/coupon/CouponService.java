@@ -1,6 +1,6 @@
 package com.moabam.api.application.coupon;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
+import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
@@ -29,13 +30,14 @@ public class CouponService {
 
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
+	private final CouponWalletSearchRepository couponWalletSearchRepository;
 	private final ClockHolder clockHolder;
 
 	@Transactional
 	public void create(AuthMember admin, CreateCouponRequest request) {
 		validateAdminRole(admin);
 		validateConflictName(request.name());
-		validatePeriod(request.startAt(), request.endAt());
+		validatePeriod(request.startAt(), request.openAt());
 
 		Coupon coupon = CouponMapper.toEntity(admin.id(), request);
 		couponRepository.save(coupon);
@@ -56,8 +58,14 @@ public class CouponService {
 		return CouponMapper.toDto(coupon);
 	}
 
+	public Coupon getByWallet(Long couponWalletId, Long memberId) {
+		return couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET))
+			.getCoupon();
+	}
+
 	public List<CouponResponse> getAllByStatus(CouponStatusRequest request) {
-		LocalDateTime now = clockHolder.times();
+		LocalDate now = LocalDate.from(clockHolder.times());
 		List<Coupon> coupons = couponSearchRepository.findAllByStatus(now, request);
 
 		return coupons.stream()
@@ -66,20 +74,26 @@ public class CouponService {
 	}
 
 	public Coupon validatePeriod(String couponName) {
-		LocalDateTime now = clockHolder.times();
+		LocalDate now = LocalDate.from(clockHolder.times());
 		Coupon coupon = couponRepository.findByName(couponName)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 
-		if (!now.isBefore(coupon.getStartAt()) && !now.isAfter(coupon.getEndAt())) {
-			return coupon;
+		if (!now.equals(coupon.getStartAt())) {
+			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
 		}
 
-		throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD_END);
+		return coupon;
 	}
 
-	private void validatePeriod(LocalDateTime startAt, LocalDateTime endAt) {
-		if (startAt.isAfter(endAt)) {
-			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
+	private void validatePeriod(LocalDate startAt, LocalDate openAt) {
+		LocalDate now = LocalDate.from(clockHolder.times());
+
+		if (!now.isBefore(startAt)) {
+			throw new BadRequestException(ErrorMessage.INVALID_COUPON_START_AT_PERIOD);
+		}
+
+		if (!openAt.isBefore(startAt)) {
+			throw new BadRequestException(ErrorMessage.INVALID_COUPON_OPEN_AT_PERIOD);
 		}
 	}
 

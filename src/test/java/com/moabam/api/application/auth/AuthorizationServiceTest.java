@@ -26,13 +26,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.auth.repository.TokenRepository;
+import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.auth.AuthorizationCodeRequest;
 import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
-import com.moabam.api.dto.member.DeleteMemberResponse;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.cookie.CookieDevUtils;
@@ -40,12 +40,13 @@ import com.moabam.global.common.util.cookie.CookieUtils;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
+import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.AuthorizationResponseFixture;
-import com.moabam.support.fixture.DeleteMemberFixture;
+import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 import jakarta.servlet.http.Cookie;
@@ -304,30 +305,49 @@ class AuthorizationServiceTest {
 
 	@DisplayName("회원 탈퇴 요청 성공")
 	@Test
-	void unlink_success() {
+	void unlink_success(@WithMember AuthMember authMember) {
 		// given
-		DeleteMemberResponse deleteMemberResponse = DeleteMemberFixture.deleteMemberResponse();
+		Member member = MemberFixture.member();
 
+		willReturn(member)
+			.given(memberService)
+			.findMemberToDelete(authMember.id());
 		doNothing().when(oAuth2AuthorizationServerRequestService)
 			.unlinkMemberRequest(eq(oauthConfig.provider().unlink()), eq(oauthConfig.client().adminKey()), any());
 
 		// When + Then
-		assertThatNoException().isThrownBy(() -> authorizationService.unLinkMember(deleteMemberResponse));
+		assertThatNoException().isThrownBy(() -> authorizationService.unLinkMember(authMember));
 	}
 
-	@DisplayName("연결 요청 실패에 따른 성공 실패")
+	@DisplayName("회원이 없어서 찾기 실패")
 	@Test
-	void unlink_fail() {
-		// given
-		DeleteMemberResponse deleteMemberResponse = DeleteMemberFixture.deleteMemberResponse();
+	void unlink_failBy_find_Member(@WithMember AuthMember authMember) {
+		// Given + When
+		willThrow(new NotFoundException(ErrorMessage.MEMBER_NOT_FOUND))
+			.given(memberService)
+			.findMemberToDelete(authMember.id());
 
-		// when
-		willThrow(BadRequestException.class).given(oAuth2AuthorizationServerRequestService)
+		assertThatThrownBy(() -> authorizationService.unLinkMember(authMember))
+			.isInstanceOf(NotFoundException.class)
+			.hasMessage(ErrorMessage.MEMBER_NOT_FOUND.getMessage());
+	}
+
+	@DisplayName("소셜 탈퇴 요청 실패로 인한 실패")
+	@Test
+	void unlink_failBy_(@WithMember AuthMember authMember) {
+		// Given
+		Member member = MemberFixture.member();
+
+		willReturn(member)
+			.given(memberService)
+			.findMemberToDelete(authMember.id());
+		willThrow(BadRequestException.class)
+			.given(oAuth2AuthorizationServerRequestService)
 			.unlinkMemberRequest(eq(oauthConfig.provider().unlink()), eq(oauthConfig.client().adminKey()), any());
-		assertThatThrownBy(() -> authorizationService.unLinkMember(deleteMemberResponse)).isInstanceOf(
-			BadRequestException.class).hasMessage(ErrorMessage.UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS.getMessage());
 
-		// then
-		verify(memberService, times(1)).undoDelete(deleteMemberResponse);
+		// When + Then
+		assertThatThrownBy(() -> authorizationService.unLinkMember(authMember))
+			.isInstanceOf(BadRequestException.class)
+			.hasMessage(ErrorMessage.UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS.getMessage());
 	}
 }

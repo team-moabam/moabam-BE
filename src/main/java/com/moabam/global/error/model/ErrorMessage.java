@@ -55,6 +55,7 @@ public enum ErrorMessage {
 
 	PAYMENT_NOT_FOUND("존재하지 않는 결제 정보입니다."),
 	INVALID_MEMBER_PAYMENT("해당 회원의 결제 정보가 아닙니다."),
+	INVALID_PAYMENT_INFO("결제 정보가 일치하지 않습니다."),
 
 	FAILED_FCM_INIT("파이어베이스 설정을 실패했습니다."),
 	NOT_FOUND_FCM_TOKEN("해당 유저는 접속 중이 아닙니다."),
@@ -63,11 +64,13 @@ public enum ErrorMessage {
 	INVALID_COUPON_POINT("쿠폰의 보너스 포인트는 0 이상이어야 합니다."),
 	INVALID_COUPON_STOCK("쿠폰의 재고는 0 이상이어야 합니다."),
 	INVALID_COUPON_STOCK_END("쿠폰 발급 선착순이 마감되었습니다."),
-	INVALID_COUPON_PERIOD("쿠폰 발급 종료 시각은 시작 시각보다 이후여야 합니다."),
-	INVALID_COUPON_PERIOD_END("쿠폰 발급 가능 기간이 아닙니다."),
+	INVALID_COUPON_START_AT_PERIOD("쿠폰 발급 시작 날짜는 현재 날짜보다 이전이거나 같을 수 없습니다."),
+	INVALID_COUPON_OPEN_AT_PERIOD("쿠폰 정보 오픈 날짜는 시작 날짜보다 이전이여야 합니다."),
+	INVALID_COUPON_PERIOD("쿠폰 발급 가능 기간이 아닙니다."),
 	CONFLICT_COUPON_NAME("쿠폰의 이름이 중복되었습니다."),
 	NOT_FOUND_COUPON_TYPE("존재하지 않는 쿠폰 종류입니다."),
 	NOT_FOUND_COUPON("존재하지 않는 쿠폰입니다."),
+	NOT_FOUND_COUPON_WALLET("보유하지 않은 쿠폰입니다."),
 
 	S3_UPLOAD_FAIL("S3 업로드를 실패했습니다."),
 	S3_INVALID_IMAGE("올바른 이미지(파일) 형식이 아닙니다."),

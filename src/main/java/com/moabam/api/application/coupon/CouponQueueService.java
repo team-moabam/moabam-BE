@@ -17,7 +17,7 @@ public class CouponQueueService {
 	private final CouponService couponService;
 	private final CouponQueueRepository couponQueueRepository;
 
-	public void register(AuthMember member, String couponName) {
+	public void register(AuthMember authMember, String couponName) {
 		double registerTime = System.currentTimeMillis();
 
 		if (canRegister(couponName)) {
@@ -25,7 +25,7 @@ public class CouponQueueService {
 			return;
 		}
 
-		couponQueueRepository.addIfAbsent(couponName, member.nickname(), registerTime);
+		couponQueueRepository.addIfAbsent(couponName, authMember.nickname(), registerTime);
 	}
 
 	private boolean canRegister(String couponName) {

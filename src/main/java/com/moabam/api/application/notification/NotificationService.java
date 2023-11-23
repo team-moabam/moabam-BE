@@ -19,7 +19,6 @@ import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.ConflictException;
-import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 
 import lombok.RequiredArgsConstructor;
@@ -45,11 +44,9 @@ public class NotificationService {
 
 		String knockKey = generateKnockKey(member.id(), targetId, roomId);
 		validateConflictKnock(knockKey);
-		validateFcmToken(targetId);
 
-		String fcmToken = notificationRepository.findFcmTokenByMemberId(targetId);
-		String notificationBody = String.format(KNOCK_BODY, member.nickname());
-		fcmService.sendAsync(fcmToken, notificationBody);
+		String fcmToken = fcmService.findTokenByMemberId(targetId);
+		fcmService.sendAsync(fcmToken, String.format(KNOCK_BODY, member.nickname()));
 		notificationRepository.saveKnock(knockKey);
 	}
 
@@ -60,8 +57,8 @@ public class NotificationService {
 
 		participants.parallelStream().forEach(participant -> {
 			String roomTitle = participant.getRoom().getTitle();
-			String fcmToken = notificationRepository.findFcmTokenByMemberId(participant.getMemberId());
 			String notificationBody = String.format(CERTIFY_TIME_BODY, roomTitle);
+			String fcmToken = fcmService.findTokenByMemberId(participant.getMemberId());
 			fcmService.sendAsync(fcmToken, notificationBody);
 		});
 	}
@@ -71,8 +68,8 @@ public class NotificationService {
 			.filter(participant -> !participant.getMemberId().equals(memberId))
 			.toList();
 
-		Predicate<Long> knockPredicate = targetId ->
-			notificationRepository.existsKnockByKnockKey(generateKnockKey(memberId, targetId, roomId));
+		Predicate<Long> knockPredicate = targetId
+			-> notificationRepository.existsKnockByKey(generateKnockKey(memberId, targetId, roomId));
 
 		Map<Boolean, List<Long>> knockStatus = filteredParticipants.stream()
 			.map(Participant::getMemberId)
@@ -82,14 +79,8 @@ public class NotificationService {
 	}
 
 	private void validateConflictKnock(String knockKey) {
-		if (notificationRepository.existsKnockByKnockKey(knockKey)) {
+		if (notificationRepository.existsKnockByKey(knockKey)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_KNOCK);
-		}
-	}
-
-	private void validateFcmToken(Long memberId) {
-		if (!notificationRepository.existsFcmTokenByMemberId(memberId)) {
-			throw new NotFoundException(ErrorMessage.NOT_FOUND_FCM_TOKEN);
 		}
 	}
 
