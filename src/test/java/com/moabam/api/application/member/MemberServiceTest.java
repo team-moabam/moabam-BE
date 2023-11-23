@@ -1,5 +1,6 @@
 package com.moabam.api.application.member;
 
+import static com.moabam.global.error.model.ErrorMessage.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -9,14 +10,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.application.item.InventorySearchService;
+import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
+import com.moabam.api.domain.item.repository.InventorySearchRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
@@ -42,13 +45,13 @@ class MemberServiceTest {
 	MemberService memberService;
 
 	@Mock
-	InventorySearchService inventorySearchService;
-
-	@Mock
 	MemberRepository memberRepository;
 
 	@Mock
 	MemberSearchRepository memberSearchRepository;
+
+	@Mock
+	InventorySearchRepository inventorySearchRepository;
 
 	@Mock
 	ClockHolder clockHolder;
@@ -144,7 +147,7 @@ class MemberServiceTest {
 
 		given(memberSearchRepository.findMemberAndBadges(authMember.id(), true))
 			.willReturn(List.of(MemberInfoSearchFixture.friendMemberInfo(total)));
-		given(inventorySearchService.getDefaultSkin(authMember.id()))
+		given(inventorySearchRepository.findBirdsDefaultSkin(authMember.id()))
 			.willReturn(List.of(
 				InventoryFixture.inventory(authMember.id(), morning),
 				InventoryFixture.inventory(authMember.id(), night)));
@@ -156,5 +159,69 @@ class MemberServiceTest {
 			() -> assertThat(memberInfoResponse.exp()).isEqualTo(total % 10),
 			() -> assertThat(memberInfoResponse.level()).isEqualTo(total / 10)
 		);
+	}
+
+	@DisplayName("기본 스킨을 가져온다.")
+	@Nested
+	class GetDefaultSkin {
+
+		@DisplayName("성공")
+		@Test
+		void success(@WithMember AuthMember authMember) {
+			// given
+			long searchId = 1L;
+			Item morning = ItemFixture.morningSantaSkin().build();
+			Item night = ItemFixture.nightMageSkin();
+			Inventory morningSkin = InventoryFixture.inventory(searchId, morning);
+			Inventory nightSkin = InventoryFixture.inventory(searchId, night);
+
+			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
+				.willReturn(List.of(MemberInfoSearchFixture.myInfo()));
+			given(inventorySearchRepository.findBirdsDefaultSkin(searchId)).willReturn(List.of(morningSkin, nightSkin));
+
+			// when
+			MemberInfoResponse memberInfoResponse = memberService.searchInfo(authMember, null);
+
+			// then
+			assertThat(memberInfoResponse.birds()).containsEntry("MORNING", morningSkin.getItem().getImage());
+			assertThat(memberInfoResponse.birds()).containsEntry("NIGHT", nightSkin.getItem().getImage());
+		}
+
+		@DisplayName("기본 스킨이 없어서 예외 발생")
+		@Test
+		void failBy_underSize(@WithMember AuthMember authMember) {
+			// given
+			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
+				.willReturn(List.of(MemberInfoSearchFixture.friendMemberInfo()));
+			given(inventorySearchRepository.findBirdsDefaultSkin(anyLong())).willReturn(List.of());
+
+			// when
+			assertThatThrownBy(() -> memberService.searchInfo(authMember, 123L))
+				.isInstanceOf(BadRequestException.class)
+				.hasMessage(INVALID_DEFAULT_SKIN_SIZE.getMessage());
+		}
+
+		@DisplayName("기본 스킨이 3개 이상이어서 예외 발생")
+		@Test
+		void failBy_overSize(@WithMember AuthMember authMember) {
+			// given
+			long searchId = 1L;
+			Item morning = ItemFixture.morningSantaSkin().build();
+			Item night = ItemFixture.nightMageSkin();
+			Item kill = ItemFixture.morningKillerSkin().build();
+			Inventory morningSkin = InventoryFixture.inventory(searchId, morning);
+			Inventory nightSkin = InventoryFixture.inventory(searchId, night);
+			Inventory killSkin = InventoryFixture.inventory(searchId, kill);
+
+			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
+				.willReturn(List.of(MemberInfoSearchFixture.myInfo()));
+			given(inventorySearchRepository.findBirdsDefaultSkin(searchId))
+				.willReturn(List.of(morningSkin, nightSkin, killSkin));
+
+			// when
+			assertThatThrownBy(() -> memberService.searchInfo(authMember, null))
+				.isInstanceOf(BadRequestException.class)
+				.hasMessage(INVALID_DEFAULT_SKIN_SIZE.getMessage());
+		}
 	}
 }

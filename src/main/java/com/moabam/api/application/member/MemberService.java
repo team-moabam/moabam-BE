@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.application.auth.mapper.AuthMapper;
-import com.moabam.api.application.item.InventorySearchService;
 import com.moabam.api.domain.item.Inventory;
+import com.moabam.api.domain.item.repository.InventorySearchRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
@@ -21,6 +21,7 @@ import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
+import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.NotFoundException;
 
@@ -32,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
-	private final InventorySearchService inventorySearchService;
+	private final InventorySearchRepository inventorySearchRepository;
 	private final MemberSearchRepository memberSearchRepository;
 	private final ClockHolder clockHolder;
 
@@ -74,9 +75,18 @@ public class MemberService {
 			searchId = memberId;
 		}
 		MemberInfoSearchResponse memberInfoSearchResponse = findMemberInfo(searchId, isMe);
-		List<Inventory> inventories = inventorySearchService.getDefaultSkin(searchId);
+		List<Inventory> inventories = getDefaultSkin(searchId);
 
 		return MemberMapper.toMemberInfoResponse(memberInfoSearchResponse, inventories);
+	}
+
+	private List<Inventory> getDefaultSkin(Long searchId) {
+		List<Inventory> inventories = inventorySearchRepository.findBirdsDefaultSkin(searchId);
+		if (inventories.size() != GlobalConstant.DEFAULT_SKIN_SIZE) {
+			throw new BadRequestException(INVALID_DEFAULT_SKIN_SIZE);
+		}
+
+		return inventories;
 	}
 
 	private Member signUp(Long socialId) {
