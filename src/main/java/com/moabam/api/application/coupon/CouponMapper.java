@@ -2,8 +2,10 @@ package com.moabam.api.application.coupon;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
+import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
+import com.moabam.api.dto.coupon.MyCouponResponse;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -25,7 +27,7 @@ public final class CouponMapper {
 	}
 
 	// TODO : Admin Table 생성 시, 관리자 명 추가할 예정
-	public static CouponResponse toDto(Coupon coupon) {
+	public static CouponResponse toResponse(Coupon coupon) {
 		return CouponResponse.builder()
 			.id(coupon.getId())
 			.adminName(coupon.getAdminId() + "admin")
@@ -36,6 +38,18 @@ public final class CouponMapper {
 			.type(coupon.getType())
 			.startAt(coupon.getStartAt())
 			.openAt(coupon.getOpenAt())
+			.build();
+	}
+
+	public static MyCouponResponse toMyResponse(CouponWallet couponWallet) {
+		Coupon coupon = couponWallet.getCoupon();
+
+		return MyCouponResponse.builder()
+			.id(coupon.getId())
+			.name(coupon.getName())
+			.description(coupon.getDescription())
+			.point(coupon.getPoint())
+			.type(coupon.getType())
 			.build();
 	}
 }
