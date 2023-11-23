@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
+import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
@@ -32,6 +33,7 @@ public class CouponService {
 
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
+	private final CouponWalletSearchRepository couponWalletSearchRepository;
 
 	@Transactional
 	public void create(AuthMember admin, CreateCouponRequest request) {
@@ -58,6 +60,12 @@ public class CouponService {
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 
 		return CouponMapper.toDto(coupon);
+	}
+
+	public Coupon getByWalletIdAndMemberId(Long couponWalletId, Long memberId) {
+		return couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET))
+			.getCoupon();
 	}
 
 	public List<CouponResponse> getAllByStatus(CouponStatusRequest request) {

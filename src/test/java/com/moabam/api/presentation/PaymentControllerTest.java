@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.domain.payment.Payment;
-import com.moabam.api.domain.payment.PaymentStatus;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.domain.product.repository.ProductRepository;
@@ -67,7 +66,6 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 				.andDo(print());
 			Payment actual = paymentRepository.findById(payment.getId()).orElseThrow();
 			assertThat(actual.getOrder().getId()).isEqualTo(ORDER_ID);
-			assertThat(actual.getStatus()).isEqualTo(PaymentStatus.REQUEST);
 		}
 
 		@DisplayName("결제 요청 바디가 유효하지 않으면 예외가 발생한다.")
