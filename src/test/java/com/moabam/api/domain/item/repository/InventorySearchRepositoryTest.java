@@ -19,6 +19,9 @@ import com.moabam.api.domain.item.ItemType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
+import com.moabam.support.fixture.InventoryFixture;
+import com.moabam.support.fixture.ItemFixture;
+import com.moabam.support.fixture.MemberFixture;
 
 @QuerydslRepositoryTest
 class InventorySearchRepositoryTest {
@@ -106,5 +109,39 @@ class InventorySearchRepositoryTest {
 
 		// then
 		assertThat(actual).isPresent().contains(inventory);
+	}
+
+	@DisplayName("기본 새 찾는 쿼리")
+	@Nested
+	class FindDefaultBird {
+
+		@DisplayName("default 가져오기 성공")
+		@Test
+		void bird_find_success() {
+			// given
+			Member member = MemberFixture.member();
+			member.enterMorningRoom();
+			memberRepository.save(member);
+
+			Item night = ItemFixture.nightMageSkin();
+			Item morning = ItemFixture.morningSantaSkin().build();
+			Item killer = ItemFixture.morningKillerSkin().build();
+			itemRepository.saveAll(List.of(night, morning, killer));
+
+			Inventory nightInven = InventoryFixture.inventory(member.getId(), night);
+			nightInven.select();
+
+			Inventory morningInven = InventoryFixture.inventory(member.getId(), morning);
+			morningInven.select();
+
+			Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
+			inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
+
+			// when
+			List<Inventory> inventories = inventorySearchRepository.findBirdsDefaultSkin(member.getId());
+
+			// then
+			assertThat(inventories).hasSize(2);
+		}
 	}
 }

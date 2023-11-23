@@ -53,4 +53,14 @@ public class InventorySearchRepository {
 			.select(item)
 			.fetch();
 	}
+
+	public List<Inventory> findBirdsDefaultSkin(Long searchId) {
+		return jpaQueryFactory.selectFrom(inventory)
+			.join(inventory.item)
+			.on(inventory.item.id.eq(item.id))
+			.where(
+				inventory.memberId.eq(searchId),
+				inventory.isDefault.isTrue()
+			).fetch();
+	}
 }
