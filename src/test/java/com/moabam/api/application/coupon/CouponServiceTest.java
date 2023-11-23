@@ -257,49 +257,4 @@ class CouponServiceTest {
 		// Then
 		assertThat(actual).hasSize(coupons.size());
 	}
-
-	@DisplayName("해당 쿠폰은 발급 가능 기간입니다. - Coupon")
-	@Test
-	void validatePeriod() {
-		// Given
-		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 0);
-		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
-		given(couponRepository.findByName(any(String.class))).willReturn(Optional.of(coupon));
-		given(clockHolder.times()).willReturn(now);
-
-		// When
-		Coupon actual = couponService.validatePeriod(coupon.getName());
-
-		// Then
-		assertThat(actual.getName()).isEqualTo(coupon.getName());
-	}
-
-	@DisplayName("해당 쿠폰은 발급 가능 기간이 아닙니다. - BadRequestException")
-	@Test
-	void validatePeriod_BadRequestException() {
-		// Given
-		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 0);
-		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
-		given(couponRepository.findByName(any(String.class))).willReturn(Optional.of(coupon));
-		given(clockHolder.times()).willReturn(now);
-
-		// When & Then
-		assertThatThrownBy(() -> couponService.validatePeriod("couponName"))
-			.isInstanceOf(BadRequestException.class)
-			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD.getMessage());
-	}
-
-	@DisplayName("해당 쿠폰은 존재하지 않습니다. - NotFoundException")
-	@Test
-	void validatePeriod_NotFoundException() {
-		// Given
-		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 0);
-		given(couponRepository.findByName(any(String.class))).willReturn(Optional.empty());
-		given(clockHolder.times()).willReturn(now);
-
-		// When & Then
-		assertThatThrownBy(() -> couponService.validatePeriod("Not found coupon name"))
-			.isInstanceOf(NotFoundException.class)
-			.hasMessage(ErrorMessage.NOT_FOUND_COUPON.getMessage());
-	}
 }

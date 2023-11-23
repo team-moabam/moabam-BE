@@ -2,7 +2,6 @@ package com.moabam.api.application.coupon;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 public class CouponService {
 
 	private final ClockHolder clockHolder;
+	private final CouponManageService couponManageService;
+
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
 
@@ -49,6 +50,7 @@ public class CouponService {
 		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 		couponRepository.delete(coupon);
+		couponManageService.deleteCouponManage(coupon.getName());
 	}
 
 	public CouponResponse getById(Long couponId) {
@@ -65,22 +67,6 @@ public class CouponService {
 		return coupons.stream()
 			.map(CouponMapper::toDto)
 			.toList();
-	}
-
-	public Optional<Coupon> getByStartAt(LocalDate now) {
-		return couponRepository.findByStartAt(now);
-	}
-
-	public Coupon validatePeriod(String couponName) {
-		LocalDate now = LocalDate.from(clockHolder.times());
-		Coupon coupon = couponRepository.findByName(couponName)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
-
-		if (!now.equals(coupon.getStartAt())) {
-			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
-		}
-
-		return coupon;
 	}
 
 	private void validatePeriod(LocalDate startAt, LocalDate openAt) {
