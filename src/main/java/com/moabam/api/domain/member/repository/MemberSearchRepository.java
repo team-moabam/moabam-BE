@@ -1,7 +1,7 @@
 package com.moabam.api.domain.member.repository;
 
 import static com.moabam.api.domain.member.QMember.*;
-import static com.moabam.api.domain.room.QRoom.*;
+import static com.moabam.api.domain.room.QParticipant.*;
 
 import java.util.Optional;
 
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import com.moabam.api.domain.member.Member;
 import com.moabam.global.common.util.DynamicQuery;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -37,14 +36,10 @@ public class MemberSearchRepository {
 	public Optional<Member> findMemberNotManager(Long memberId) {
 		return Optional.ofNullable(jpaQueryFactory
 			.selectFrom(member)
+			.leftJoin(participant).on(member.id.eq(participant.memberId))
 			.where(
 				member.id.eq(memberId),
-				JPAExpressions.selectOne()
-					.from(room)
-					.where(
-						member.nickname.eq(room.managerNickname)
-					)
-					.notExists()
+				participant.isManager.isNull().or(participant.isManager.isFalse())
 			)
 			.fetchFirst());
 	}
