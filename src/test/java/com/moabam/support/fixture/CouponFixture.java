@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
+import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 
@@ -73,6 +74,13 @@ public final class CouponFixture {
 			.startAt(LocalDate.of(2023, 2, 1))
 			.openAt(LocalDate.of(2023, 2, 1))
 			.adminId(1L)
+			.build();
+	}
+
+	public static CouponWallet couponWallet(Long memberId, Coupon coupon) {
+		return CouponWallet.builder()
+			.memberId(memberId)
+			.coupon(coupon)
 			.build();
 	}
 
