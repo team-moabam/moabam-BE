@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.Role;
+import com.moabam.api.domain.room.RoomType;
 import com.moabam.global.common.util.BaseImageUrl;
 import com.moabam.support.fixture.MemberFixture;
 
@@ -40,7 +41,7 @@ class MemberTest {
 				.build();
 
 			assertAll(
-				() -> assertThat(member.getProfileImage()).isEqualTo(BaseImageUrl.PROFILE_URL),
+				() -> assertThat(member.getProfileImage()).isEqualTo(BaseImageUrl.MEMBER_PROFILE_URL),
 				() -> assertThat(member.getRole()).isEqualTo(Role.USER),
 				() -> assertThat(member.getBug().getNightBug()).isZero(),
 				() -> assertThat(member.getBug().getGoldenBug()).isZero(),
@@ -82,10 +83,10 @@ class MemberTest {
 
 			// when
 			int beforeMorningCount = member.getCurrentMorningCount();
-			member.enterMorningRoom();
+			member.enterRoom(RoomType.MORNING);
 
 			int beforeNightCount = member.getCurrentNightCount();
-			member.enterNightRoom();
+			member.enterRoom(RoomType.NIGHT);
 
 			// then
 			assertThat(member.getCurrentMorningCount()).isEqualTo(beforeMorningCount + 1);
