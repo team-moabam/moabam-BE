@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class StringRedisRepository {
+public class ValueRedisRepository {
 
 	private final RedisTemplate<String, Object> redisTemplate;
 

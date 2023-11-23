@@ -13,9 +13,9 @@ import com.moabam.support.fixture.CouponFixture;
 
 class CouponTest {
 
-	@DisplayName("쿠폰이 정상적으로 생성된다. - Coupon")
+	@DisplayName("쿠폰이 성공적으로 생성된다. - Coupon")
 	@Test
-	void coupon() {
+	void coupon_success() {
 		// Given
 		LocalDate startAt = LocalDate.of(2023, 2, 1);
 		LocalDate openAt = LocalDate.of(2023, 1, 1);
@@ -44,7 +44,7 @@ class CouponTest {
 
 	@DisplayName("쿠폰 보너스 포인트가 1보다 작다. - BadRequestException")
 	@Test
-	void coupon_validatePoint_Point_BadRequestException() {
+	void validatePoint_BadRequestException() {
 		// When& Then
 		assertThatThrownBy(() -> CouponFixture.coupon(0, 1))
 			.isInstanceOf(BadRequestException.class)
@@ -53,7 +53,7 @@ class CouponTest {
 
 	@DisplayName("쿠폰 재고가 1보다 작다. - BadRequestException")
 	@Test
-	void coupon_validatePoint_Stock_BadRequestException() {
+	void validateStock_BadRequestException() {
 		// When& Then
 		assertThatThrownBy(() -> CouponFixture.coupon(1, 0))
 			.isInstanceOf(BadRequestException.class)

@@ -30,7 +30,6 @@ public class NotificationService {
 
 	private static final String KNOCK_BODY = "%s님이 콕 찔렀습니다.";
 	private static final String CERTIFY_TIME_BODY = "%s방 인증 시간입니다.";
-	private static final String KNOCK_KEY = "room_%s_member_%s_knocks_%s";
 
 	private final FcmService fcmService;
 	private final RoomService roomService;
@@ -41,13 +40,11 @@ public class NotificationService {
 	@Transactional
 	public void sendKnock(AuthMember member, Long targetId, Long roomId) {
 		roomService.validateRoomById(roomId);
-
-		String knockKey = generateKnockKey(member.id(), targetId, roomId);
-		validateConflictKnock(knockKey);
+		validateConflictKnock(member.id(), targetId, roomId);
 
 		String fcmToken = fcmService.findTokenByMemberId(targetId);
 		fcmService.sendAsync(fcmToken, String.format(KNOCK_BODY, member.nickname()));
-		notificationRepository.saveKnock(knockKey);
+		notificationRepository.saveKnock(member.id(), targetId, roomId);
 	}
 
 	@Scheduled(cron = "0 50 * * * *")
@@ -68,8 +65,8 @@ public class NotificationService {
 			.filter(participant -> !participant.getMemberId().equals(memberId))
 			.toList();
 
-		Predicate<Long> knockPredicate = targetId
-			-> notificationRepository.existsKnockByKey(generateKnockKey(memberId, targetId, roomId));
+		Predicate<Long> knockPredicate = targetId ->
+			notificationRepository.existsKnockByKey(memberId, targetId, roomId);
 
 		Map<Boolean, List<Long>> knockStatus = filteredParticipants.stream()
 			.map(Participant::getMemberId)
@@ -78,13 +75,9 @@ public class NotificationService {
 		return knockStatus.get(true);
 	}
 
-	private void validateConflictKnock(String knockKey) {
-		if (notificationRepository.existsKnockByKey(knockKey)) {
+	private void validateConflictKnock(Long memberId, Long targetId, Long roomId) {
+		if (notificationRepository.existsKnockByKey(memberId, targetId, roomId)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_KNOCK);
 		}
-	}
-
-	private String generateKnockKey(Long memberId, Long targetId, Long roomId) {
-		return String.format(KNOCK_KEY, roomId, memberId, targetId);
 	}
 }
