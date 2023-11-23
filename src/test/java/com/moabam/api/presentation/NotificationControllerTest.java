@@ -33,9 +33,9 @@ import com.moabam.api.infrastructure.redis.ValueRedisRepository;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
-import com.moabam.support.fixture.ErrorSnippetFixture;
 import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.RoomFixture;
+import com.moabam.support.snippet.ErrorSnippet;
 
 @Transactional
 @SpringBootTest
@@ -142,7 +142,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 			.andDo(document("notifications/rooms/roomId/members/memberId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isNotFound())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_FCM_TOKEN.getMessage()));
@@ -162,7 +162,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 			.andDo(document("notifications/rooms/roomId/members/memberId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isConflict())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_KNOCK.getMessage()));

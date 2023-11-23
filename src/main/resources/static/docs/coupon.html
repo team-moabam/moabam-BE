@@ -496,7 +496,7 @@ Vary: Access-Control-Request-Headers</code></pre>
 <h4 id="_요청_2" class="discrete">요청</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admins/coupons/27 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admins/coupons/33 HTTP/1.1
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -522,7 +522,7 @@ Vary: Access-Control-Request-Headers</code></pre>
 <h4 id="_요청_3">요청</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /coupons/16 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /coupons/22 HTTP/1.1
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -537,7 +537,7 @@ Content-Type: application/json
 Content-Length: 205
 
 {
-  "id" : 16,
+  "id" : 22,
   "adminName" : "1admin",
   "name" : "couponName",
   "description" : "",
@@ -585,7 +585,7 @@ Content-Type: application/json
 Content-Length: 206
 
 [ {
-  "id" : 17,
+  "id" : 23,
   "adminName" : "1admin",
   "name" : "coupon1",
   "description" : "",
@@ -644,7 +644,59 @@ Content-Length: 64
 <pre>사용자가 자신의 보관함에 있는 쿠폰들을 조회합니다.</pre>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_요청_6">요청</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /my-coupons HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<h4 id="_응답_6" class="discrete">응답</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 507
+
+[ {
+  "id" : 17,
+  "name" : "c1",
+  "description" : "",
+  "point" : 10,
+  "type" : "MORNING_COUPON"
+}, {
+  "id" : 18,
+  "name" : "c2",
+  "description" : "",
+  "point" : 10,
+  "type" : "MORNING_COUPON"
+}, {
+  "id" : 19,
+  "name" : "c3",
+  "description" : "",
+  "point" : 10,
+  "type" : "MORNING_COUPON"
+}, {
+  "id" : 20,
+  "name" : "c4",
+  "description" : "",
+  "point" : 10,
+  "type" : "MORNING_COUPON"
+}, {
+  "id" : 21,
+  "name" : "c5",
+  "description" : "",
+  "point" : 10,
+  "type" : "MORNING_COUPON"
+} ]</code></pre>
+</div>
+</div>
 <hr>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_쿠폰_사용_진행_중">쿠폰 사용 (진행 중)</h3>
@@ -660,7 +712,7 @@ Content-Length: 64
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-20 17:19:12 +0900
+Last updated 2023-11-24 01:42:57 +0900
 </div>
 </div>
 </body>

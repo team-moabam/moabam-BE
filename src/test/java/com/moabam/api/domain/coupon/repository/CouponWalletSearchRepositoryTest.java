@@ -13,7 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponWallet;
+import com.moabam.global.error.exception.NotFoundException;
+import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
+import com.moabam.support.fixture.CouponFixture;
 
 @QuerydslRepositoryTest
 class CouponWalletSearchRepositoryTest {
@@ -26,6 +29,22 @@ class CouponWalletSearchRepositoryTest {
 
 	@Autowired
 	private CouponWalletSearchRepository couponWalletSearchRepository;
+
+	@DisplayName("나의 쿠폰함의 특정 쿠폰을 조회한다.. - List<CouponWallet>")
+	@Test
+	void findAllByCouponIdAndMemberId_success() {
+		// Given
+		Coupon coupon = couponRepository.save(CouponFixture.coupon());
+		CouponWallet couponWallet = couponWalletRepository.save(CouponWallet.create(1L, coupon));
+
+		// When
+		List<CouponWallet> actual = couponWalletSearchRepository.findAllByCouponIdAndMemberId(coupon.getId(), 1L);
+
+		// Then
+		assertThat(actual).hasSize(1);
+		assertThat(actual.get(0).getCoupon().getName()).isEqualTo(coupon.getName());
+		assertThat(actual.get(0).getMemberId()).isEqualTo(couponWallet.getMemberId());
+	}
 
 	@DisplayName("ID가 1인 회원은 쿠폰 1개를 가지고 있다. - List<CouponWallet>")
 	@MethodSource("com.moabam.support.fixture.CouponWalletFixture#provideCouponWalletAll")
@@ -82,13 +101,12 @@ class CouponWalletSearchRepositoryTest {
 	@Test
 	void findByIdAndMemberId_success() {
 		// given
-		Long id = 1L;
-		Long memberId = 1L;
 		Coupon coupon = couponRepository.save(discount1000Coupon());
-		couponWalletRepository.save(CouponWallet.create(memberId, coupon));
+		CouponWallet couponWallet = couponWalletRepository.save(CouponWallet.create(1L, coupon));
 
 		// when
-		CouponWallet actual = couponWalletSearchRepository.findByIdAndMemberId(id, memberId).orElseThrow();
+		CouponWallet actual = couponWalletSearchRepository.findByIdAndMemberId(couponWallet.getId(), 1L)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 
 		// then
 		assertThat(actual.getCoupon()).isEqualTo(coupon);

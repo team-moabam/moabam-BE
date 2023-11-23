@@ -28,7 +28,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.coupon.CouponMapper;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
+import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
+import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
@@ -37,8 +39,9 @@ import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.CouponFixture;
-import com.moabam.support.fixture.CouponSnippetFixture;
-import com.moabam.support.fixture.ErrorSnippetFixture;
+import com.moabam.support.snippet.CouponSnippet;
+import com.moabam.support.snippet.CouponWalletSnippet;
+import com.moabam.support.snippet.ErrorSnippet;
 
 @Transactional
 @SpringBootTest
@@ -54,6 +57,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	CouponRepository couponRepository;
+
+	@Autowired
+	CouponWalletRepository couponWalletRepository;
 
 	@MockBean
 	ClockHolder clockHolder;
@@ -74,7 +80,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("admins/coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.CREATE_COUPON_REQUEST))
+				CouponSnippet.CREATE_COUPON_REQUEST))
 			.andExpect(status().isCreated());
 	}
 
@@ -95,8 +101,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("admins/coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.CREATE_COUPON_REQUEST,
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				CouponSnippet.CREATE_COUPON_REQUEST,
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isBadRequest())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_START_AT_PERIOD.getMessage()));
@@ -120,8 +126,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("admins/coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.CREATE_COUPON_REQUEST,
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				CouponSnippet.CREATE_COUPON_REQUEST,
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isBadRequest())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_OPEN_AT_PERIOD.getMessage()));
@@ -143,8 +149,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("admins/coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.CREATE_COUPON_REQUEST,
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				CouponSnippet.CREATE_COUPON_REQUEST,
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isConflict())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_COUPON_NAME.getMessage()));
@@ -167,8 +173,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("admins/coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.CREATE_COUPON_REQUEST,
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				CouponSnippet.CREATE_COUPON_REQUEST,
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isConflict())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_COUPON_START_AT.getMessage()));
@@ -200,7 +206,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("admins/coupons/couponId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isNotFound())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON.getMessage()));
@@ -218,7 +224,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("coupons/couponId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.COUPON_RESPONSE))
+				CouponSnippet.COUPON_RESPONSE))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.id").value(coupon.getId()));
@@ -233,7 +239,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("coupons/couponId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isNotFound())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON.getMessage()));
@@ -257,8 +263,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("coupons/search",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.COUPON_STATUS_REQUEST,
-				CouponSnippetFixture.COUPON_STATUS_RESPONSE))
+				CouponSnippet.COUPON_STATUS_REQUEST,
+				CouponSnippet.COUPON_STATUS_RESPONSE))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$", hasSize(coupon.size())));
@@ -282,7 +288,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("coupons/search",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				CouponSnippetFixture.COUPON_STATUS_REQUEST))
+				CouponSnippet.COUPON_STATUS_REQUEST))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$", hasSize(1)));
@@ -325,7 +331,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isBadRequest())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
@@ -348,7 +354,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isBadRequest())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
@@ -370,9 +376,69 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(document("coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isBadRequest())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
+	}
+
+	@WithMember
+	@DisplayName("GET - 나의 쿠폰함에서 특정 쿠폰을 조회한다. - List<MyCouponResponse>")
+	@Test
+	void getWallet_success() throws Exception {
+		// Given
+		Coupon coupon = couponRepository.save(CouponFixture.coupon());
+		couponWalletRepository.save(CouponWallet.create(1L, coupon));
+
+		// When & Then
+		mockMvc.perform(get("/my-coupons/" + coupon.getId()))
+			.andDo(print())
+			.andDo(document("my-coupons/couponId",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				CouponWalletSnippet.COUPON_WALLET_RESPONSE))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$", hasSize(1)))
+			.andExpect(jsonPath("$[0].id").value(coupon.getId()))
+			.andExpect(jsonPath("$[0].name").value(coupon.getName()));
+	}
+
+	@WithMember
+	@DisplayName("GET - 나의 쿠폰 보관함에 있는 모든 쿠폰을 조회한다. - List<MyCouponResponse>")
+	@MethodSource("com.moabam.support.fixture.CouponWalletFixture#provideCouponWalletByCouponId1_total5")
+	@ParameterizedTest
+	void getWallet_all_success(List<CouponWallet> couponWallets) throws Exception {
+		// Given
+		couponWallets.forEach(couponWallet -> {
+			Coupon coupon = couponRepository.save(couponWallet.getCoupon());
+			couponWalletRepository.save(CouponWallet.create(1L, coupon));
+		});
+
+		// When & Then
+		mockMvc.perform(get("/my-coupons"))
+			.andDo(print())
+			.andDo(document("my-coupons/couponId",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				CouponWalletSnippet.COUPON_WALLET_RESPONSE))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$", hasSize(couponWallets.size())));
+	}
+
+	@WithMember
+	@DisplayName("GET - 쿠폰이 없는 사용자의 쿠폰함을 조회한다. - List<MyCouponResponse>")
+	@Test
+	void getWallet_no_coupon() throws Exception {
+		// When & Then
+		mockMvc.perform(get("/my-coupons"))
+			.andDo(print())
+			.andDo(document("my-coupons/couponId",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint())))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$", hasSize(0)));
 	}
 }
