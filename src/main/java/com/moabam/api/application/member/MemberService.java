@@ -20,6 +20,7 @@ import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
+import com.moabam.api.dto.member.ModifyMemberRequest;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.common.util.GlobalConstant;
@@ -32,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
-
+	
 	private final MemberRepository memberRepository;
 	private final InventorySearchRepository inventorySearchRepository;
 	private final MemberSearchRepository memberSearchRepository;
@@ -80,6 +81,18 @@ public class MemberService {
 		List<Inventory> inventories = getDefaultSkin(searchId);
 
 		return MemberMapper.toMemberInfoResponse(memberInfoSearchResponse, inventories);
+	}
+
+	@Transactional
+	public void modifyInfo(AuthMember authMember, ModifyMemberRequest modifyMemberRequest, String newProfileUri) {
+		Member member = memberSearchRepository.findMember(authMember.id())
+			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
+
+		member.changeNickName(modifyMemberRequest.nickname());
+		member.changeIntro(modifyMemberRequest.intro());
+		member.changeProfileUri(newProfileUri);
+
+		memberRepository.save(member);
 	}
 
 	private List<Inventory> getDefaultSkin(Long searchId) {

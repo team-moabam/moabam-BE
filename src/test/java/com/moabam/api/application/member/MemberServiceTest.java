@@ -26,6 +26,7 @@ import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.MemberInfoResponse;
+import com.moabam.api.dto.member.ModifyMemberRequest;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
@@ -37,6 +38,7 @@ import com.moabam.support.fixture.InventoryFixture;
 import com.moabam.support.fixture.ItemFixture;
 import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.MemberInfoSearchFixture;
+import com.moabam.support.fixture.ModifyImageFixture;
 
 @ExtendWith({MockitoExtension.class, FilterProcessExtension.class})
 class MemberServiceTest {
@@ -224,4 +226,24 @@ class MemberServiceTest {
 				.hasMessage(INVALID_DEFAULT_SKIN_SIZE.getMessage());
 		}
 	}
+
+	@DisplayName("사용자 정보 수정 성공")
+	@Test
+	void modify_success_test(@WithMember AuthMember authMember) {
+		// given
+		Member member = MemberFixture.member();
+		ModifyMemberRequest modifyMemberRequest = ModifyImageFixture.modifyMemberRequest();
+		given(memberSearchRepository.findMember(authMember.id())).willReturn(Optional.ofNullable(member));
+
+		// when
+		memberService.modifyInfo(authMember, modifyMemberRequest, "/main");
+
+		// Then
+		assertAll(
+			() -> assertThat(member.getNickname()).isEqualTo(modifyMemberRequest.nickname()),
+			() -> assertThat(member.getIntro()).isEqualTo(modifyMemberRequest.intro()),
+			() -> assertThat(member.getProfileImage()).isEqualTo("/main")
+		);
+	}
+
 }
