@@ -40,21 +40,24 @@ import com.moabam.support.fixture.CouponFixture;
 class CouponServiceTest {
 
 	@InjectMocks
-	private CouponService couponService;
+	CouponService couponService;
 
 	@Mock
-	private CouponRepository couponRepository;
+	CouponManageService couponManageService;
 
 	@Mock
-	private CouponSearchRepository couponSearchRepository;
+	CouponRepository couponRepository;
 
 	@Mock
-	private ClockHolder clockHolder;
+	CouponSearchRepository couponSearchRepository;
+
+	@Mock
+	ClockHolder clockHolder;
 
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("쿠폰을 성공적으로 발행한다. - Void")
 	@Test
-	void create() {
+	void create_success() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
@@ -171,9 +174,9 @@ class CouponServiceTest {
 	}
 
 	@WithMember(role = Role.ADMIN)
-	@DisplayName("쿠폰 아이디와 일치하는 쿠폰을 삭제한다. - Void")
+	@DisplayName("쿠폰 아이디와 일치하는 쿠폰을 성공적으로 삭제한다. - Void")
 	@Test
-	void delete() {
+	void delete_success() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon(10, 100);
@@ -184,6 +187,7 @@ class CouponServiceTest {
 
 		// Then
 		verify(couponRepository).delete(coupon);
+		verify(couponManageService).deleteCouponManage(any(String.class));
 	}
 
 	@WithMember(role = Role.USER)
@@ -213,9 +217,9 @@ class CouponServiceTest {
 			.hasMessage(ErrorMessage.NOT_FOUND_COUPON.getMessage());
 	}
 
-	@DisplayName("특정 쿠폰을 조회한다. - CouponResponse")
+	@DisplayName("특정 쿠폰을 성공적으로 조회한다. - CouponResponse")
 	@Test
-	void getById() {
+	void getById_success() {
 		// Given
 		Coupon coupon = CouponFixture.coupon(10, 100);
 		given(couponRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
@@ -240,10 +244,10 @@ class CouponServiceTest {
 			.hasMessage(ErrorMessage.NOT_FOUND_COUPON.getMessage());
 	}
 
-	@DisplayName("모든 쿠폰을 조회한다. - List<CouponResponse>")
+	@DisplayName("모든 쿠폰을 성공적으로 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void getAllByStatus(List<Coupon> coupons) {
+	void getAllByStatus_success(List<Coupon> coupons) {
 		// Given
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false);
 

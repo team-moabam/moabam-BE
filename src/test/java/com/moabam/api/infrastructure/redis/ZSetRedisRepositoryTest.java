@@ -18,13 +18,13 @@ import com.moabam.global.config.EmbeddedRedisConfig;
 class ZSetRedisRepositoryTest {
 
 	@Autowired
-	private ZSetRedisRepository zSetRedisRepository;
+	ZSetRedisRepository zSetRedisRepository;
 
 	@Autowired
-	private StringRedisRepository stringRedisRepository;
+	StringRedisRepository stringRedisRepository;
 
 	@Autowired
-	private RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> redisTemplate;
 
 	String key = "key";
 	Long value = 1L;

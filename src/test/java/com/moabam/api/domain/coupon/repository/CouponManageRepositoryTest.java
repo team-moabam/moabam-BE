@@ -23,13 +23,13 @@ import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
 class CouponManageRepositoryTest {
 
 	@InjectMocks
-	private CouponManageRepository couponManageRepository;
+	CouponManageRepository couponManageRepository;
 
 	@Mock
-	private ZSetRedisRepository zSetRedisRepository;
+	ZSetRedisRepository zSetRedisRepository;
 
 	@Mock
-	private StringRedisRepository stringRedisRepository;
+	StringRedisRepository stringRedisRepository;
 
 	@DisplayName("쿠폰 대기열에 사용자가 성공적으로 등록된다. - Void")
 	@Test

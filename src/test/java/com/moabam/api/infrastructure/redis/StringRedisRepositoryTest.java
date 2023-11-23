@@ -17,10 +17,11 @@ import com.moabam.global.config.EmbeddedRedisConfig;
 class StringRedisRepositoryTest {
 
 	@Autowired
-	private StringRedisRepository stringRedisRepository;
+	StringRedisRepository stringRedisRepository;
 
 	String key = "key";
 	String value = "value";
+	String stockKey = "key_INCR";
 	Duration duration = Duration.ofMillis(5000);
 
 	@BeforeEach
@@ -32,6 +33,10 @@ class StringRedisRepositoryTest {
 	void setDown() {
 		if (stringRedisRepository.hasKey(key)) {
 			stringRedisRepository.delete(key);
+		}
+
+		if (stringRedisRepository.hasKey(stockKey)) {
+			stringRedisRepository.delete(stockKey);
 		}
 	}
 
@@ -73,7 +78,7 @@ class StringRedisRepositoryTest {
 	@Test
 	void increment_success() {
 		// When
-		Long actual = stringRedisRepository.increment(key + "_INCR");
+		Long actual = stringRedisRepository.increment(stockKey);
 
 		// Then
 		assertThat(actual).isEqualTo(1L);
