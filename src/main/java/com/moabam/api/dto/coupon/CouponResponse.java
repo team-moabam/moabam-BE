@@ -1,6 +1,6 @@
 package com.moabam.api.dto.coupon;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.moabam.api.domain.coupon.CouponType;
@@ -16,10 +16,10 @@ public record CouponResponse(
 	int point,
 	int stock,
 	CouponType type,
-	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-	LocalDateTime startAt,
-	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-	LocalDateTime endAt
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	LocalDate startAt,
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	LocalDate openAt
 ) {
 
 }

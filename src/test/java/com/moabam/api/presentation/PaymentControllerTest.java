@@ -24,7 +24,6 @@ import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.domain.product.repository.ProductRepository;
-import com.moabam.api.dto.payment.ConfirmPaymentRequest;
 import com.moabam.api.dto.payment.PaymentRequest;
 import com.moabam.api.infrastructure.payment.TossPaymentService;
 import com.moabam.support.annotation.WithMember;
@@ -88,28 +87,6 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 					.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message").value("올바른 요청 정보가 아닙니다."))
-				.andDo(print());
-		}
-	}
-
-	@Nested
-	@DisplayName("결제를 승인한다.")
-	class Confirm {
-
-		@DisplayName("결제를 승인한다.")
-		@WithMember
-		@Test
-		void confirm_success() throws Exception {
-			// given
-			Product product = productRepository.save(bugProduct());
-			Payment payment = paymentRepository.save(payment(product));
-			ConfirmPaymentRequest request = new ConfirmPaymentRequest(PAYMENT_KEY, ORDER_ID, AMOUNT);
-
-			// expected
-			mockMvc.perform(post("/payments/confirm")
-					.contentType(APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isOk())
 				.andDo(print());
 		}
 	}

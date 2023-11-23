@@ -19,7 +19,7 @@ public final class CouponMapper {
 			.point(coupon.point())
 			.stock(coupon.stock())
 			.startAt(coupon.startAt())
-			.endAt(coupon.endAt())
+			.openAt(coupon.openAt())
 			.adminId(adminId)
 			.build();
 	}
@@ -35,7 +35,7 @@ public final class CouponMapper {
 			.stock(coupon.getStock())
 			.type(coupon.getType())
 			.startAt(coupon.getStartAt())
-			.endAt(coupon.getEndAt())
+			.openAt(coupon.getOpenAt())
 			.build();
 	}
 }

@@ -4,8 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record CouponStatusRequest(
-	boolean ongoing,
-	boolean notStarted,
+	boolean opened,
 	boolean ended
 ) {
 

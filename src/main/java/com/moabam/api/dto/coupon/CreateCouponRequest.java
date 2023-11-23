@@ -1,6 +1,6 @@
 package com.moabam.api.dto.coupon;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -18,10 +18,10 @@ public record CreateCouponRequest(
 	@NotBlank(message = "쿠폰 종류를 입력해주세요.") String type,
 	@Min(value = 1, message = "벌레 수 혹은 할인 금액은 1 이상이어야 합니다.") int point,
 	@Min(value = 1, message = "쿠폰 재고는 1 이상이어야 합니다.") int stock,
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
-	@NotNull(message = "쿠폰 발급 시작 시각을 입력해주세요.") LocalDateTime startAt,
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
-	@NotNull(message = "쿠폰 발급 종료 시각을 입력해주세요.") LocalDateTime endAt
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@NotNull(message = "쿠폰 발급이 가능한 날짜(년, 월, 일)를 입력해주세요.") LocalDate startAt,
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@NotNull(message = "쿠폰 정보창이 열리는 날짜(년, 월, 일)를 입력해주세요.") LocalDate openAt
 ) {
 
 }

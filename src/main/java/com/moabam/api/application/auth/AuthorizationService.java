@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -12,6 +13,7 @@ import com.moabam.api.application.auth.mapper.AuthMapper;
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.auth.repository.TokenRepository;
+import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.auth.AuthorizationCodeRequest;
 import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
@@ -19,7 +21,6 @@ import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.auth.TokenSaveValue;
-import com.moabam.api.dto.member.DeleteMemberResponse;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.GlobalConstant;
@@ -119,16 +120,22 @@ public class AuthorizationService {
 			});
 	}
 
-	public void unLinkMember(DeleteMemberResponse deleteMemberResponse) {
+	@Transactional
+	public void unLinkMember(AuthMember authMember) {
+		Member member = memberService.findMemberToDelete(authMember.id());
+		unlinkRequest(member.getSocialId());
+		memberService.delete(member);
+	}
+
+	private void unlinkRequest(String socialId) {
 		try {
 			oauth2AuthorizationServerRequestService.unlinkMemberRequest(
 				oAuthConfig.provider().unlink(),
 				oAuthConfig.client().adminKey(),
-				unlinkRequestParam(deleteMemberResponse.socialId()));
-			log.info("회원 탈퇴 성공 : [id={}, socialId={}]", deleteMemberResponse.id(), deleteMemberResponse.socialId());
+				unlinkRequestParam(socialId));
+			log.info("회원 탈퇴 성공 : [socialId={}]", socialId);
 		} catch (BadRequestException badRequestException) {
 			log.warn("회원 탈퇴요청 실패 : 카카오 연결 오류");
-			memberService.undoDelete(deleteMemberResponse);
 			throw new BadRequestException(ErrorMessage.UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS);
 		}
 	}
