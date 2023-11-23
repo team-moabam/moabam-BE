@@ -50,7 +50,9 @@ import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.BadgeRepository;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
+import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.global.config.OAuthConfig;
@@ -62,6 +64,7 @@ import com.moabam.support.fixture.BadgeFixture;
 import com.moabam.support.fixture.InventoryFixture;
 import com.moabam.support.fixture.ItemFixture;
 import com.moabam.support.fixture.MemberFixture;
+import com.moabam.support.fixture.ParticipantFixture;
 import com.moabam.support.fixture.RoomFixture;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
@@ -98,6 +101,9 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	InventoryRepository inventoryRepository;
+
+	@Autowired
+	ParticipantRepository participantRepository;
 
 	@Autowired
 	OAuth2AuthorizationServerRequestService oAuth2AuthorizationServerRequestService;
@@ -150,6 +156,8 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@WithMember
 	@Test
 	void delete_member_success() throws Exception {
+		// Given
+		String nickname = member.getNickname();
 
 		// expected
 		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().unlink()))
@@ -160,16 +168,24 @@ class MemberControllerTest extends WithoutFilterSupporter {
 			.andExpect(method(HttpMethod.POST))
 			.andRespond(withStatus(HttpStatus.OK));
 
-		ResultActions result = mockMvc.perform(delete("/members"));
+		mockMvc.perform(delete("/members"));
+		memberRepository.flush();
+
+		Optional<Member> deletedMemberOptional = memberRepository.findById(member.getId());
+		assertThat(deletedMemberOptional).isNotEmpty();
+
+		Member deletedMEmber = deletedMemberOptional.get();
+		assertThat(deletedMEmber.getDeletedAt()).isNotNull();
+		assertThat(deletedMEmber.getNickname()).isEqualTo(nickname);
 	}
 
 	@DisplayName("회원이 없어서 회원 삭제 실패")
 	@WithMember(id = 123L)
 	@Test
-	void delete_member_failby_not_found_member() throws Exception {
+	void delete_member_failBy_not_found_member() throws Exception {
 		// expected
 		mockMvc.perform(delete("/members"))
-			.andExpect(status().isConflict());
+			.andExpect(status().isNotFound());
 	}
 
 	@DisplayName("연결 오류로 인한 카카오 연결 끊기 실패로 롤백")
@@ -207,11 +223,14 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		Room room = RoomFixture.room();
 		room.changeManagerNickname(member.getNickname());
 
+		Participant participant = ParticipantFixture.participant(room, member.getId());
+		participant.enableManager();
 		roomRepository.save(room);
+		participantRepository.save(participant);
 
 		// then
-		ResultActions result = mockMvc.perform(delete("/members"))
-			.andExpect(status().isConflict());
+		mockMvc.perform(delete("/members"))
+			.andExpect(status().isNotFound());
 	}
 
 	@DisplayName("내 정보 조회 성공")
@@ -317,10 +336,13 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@Test
 	void search_friend_info_success() throws Exception {
 		// given
-		Badge morningBirth = BadgeFixture.badge(member.getId(), BadgeType.MORNING_BIRTH);
-		Badge morningAdult = BadgeFixture.badge(member.getId(), BadgeType.MORNING_ADULT);
-		Badge nightBirth = BadgeFixture.badge(member.getId(), BadgeType.NIGHT_BIRTH);
-		Badge nightAdult = BadgeFixture.badge(member.getId(), BadgeType.NIGHT_ADULT);
+		Member friend = MemberFixture.member("123456789", "nick");
+		memberRepository.save(friend);
+
+		Badge morningBirth = BadgeFixture.badge(friend.getId(), BadgeType.MORNING_BIRTH);
+		Badge morningAdult = BadgeFixture.badge(friend.getId(), BadgeType.MORNING_ADULT);
+		Badge nightBirth = BadgeFixture.badge(friend.getId(), BadgeType.NIGHT_BIRTH);
+		Badge nightAdult = BadgeFixture.badge(friend.getId(), BadgeType.NIGHT_ADULT);
 		List<Badge> badges = List.of(morningBirth, morningAdult, nightBirth, nightAdult);
 		badgeRepository.saveAll(badges);
 
@@ -329,24 +351,24 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		Item killer = ItemFixture.morningKillerSkin().build();
 		itemRepository.saveAll(List.of(night, morning, killer));
 
-		Inventory nightInven = InventoryFixture.inventory(member.getId(), night);
+		Inventory nightInven = InventoryFixture.inventory(friend.getId(), night);
 		nightInven.select();
 
-		Inventory morningInven = InventoryFixture.inventory(member.getId(), morning);
+		Inventory morningInven = InventoryFixture.inventory(friend.getId(), morning);
 		morningInven.select();
 
-		Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
+		Inventory killerInven = InventoryFixture.inventory(friend.getId(), killer);
 		inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
 
 		// expected
-		mockMvc.perform(get("/members/{memberId}", 123L))
+		mockMvc.perform(get("/members/{memberId}", friend.getId()))
 			.andExpect(status().isOk())
 			.andExpectAll(
-				MockMvcResultMatchers.jsonPath("$.nickname").value(member.getNickname()),
-				MockMvcResultMatchers.jsonPath("$.profileImage").value(member.getProfileImage()),
-				MockMvcResultMatchers.jsonPath("$.intro").value(member.getIntro()),
-				MockMvcResultMatchers.jsonPath("$.level").value(member.getTotalCertifyCount() / LEVEL_DIVISOR),
-				MockMvcResultMatchers.jsonPath("$.exp").value(member.getTotalCertifyCount() % LEVEL_DIVISOR),
+				MockMvcResultMatchers.jsonPath("$.nickname").value(friend.getNickname()),
+				MockMvcResultMatchers.jsonPath("$.profileImage").value(friend.getProfileImage()),
+				MockMvcResultMatchers.jsonPath("$.intro").value(friend.getIntro()),
+				MockMvcResultMatchers.jsonPath("$.level").value(friend.getTotalCertifyCount() / LEVEL_DIVISOR),
+				MockMvcResultMatchers.jsonPath("$.exp").value(friend.getTotalCertifyCount() % LEVEL_DIVISOR),
 
 				MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
 				MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),

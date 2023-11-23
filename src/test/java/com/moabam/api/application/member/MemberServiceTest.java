@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,15 +22,14 @@ import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
-import com.moabam.api.dto.member.DeleteMemberResponse;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.global.auth.model.AuthMember;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.AuthorizationResponseFixture;
-import com.moabam.support.fixture.DeleteMemberFixture;
 import com.moabam.support.fixture.InventoryFixture;
 import com.moabam.support.fixture.ItemFixture;
 import com.moabam.support.fixture.MemberFixture;
@@ -49,6 +49,9 @@ class MemberServiceTest {
 
 	@Mock
 	MemberSearchRepository memberSearchRepository;
+
+	@Mock
+	ClockHolder clockHolder;
 
 	@DisplayName("회원 존재하고 로그인 성공")
 	@Test
@@ -90,41 +93,19 @@ class MemberServiceTest {
 		assertThat(result.isSignUp()).isTrue();
 	}
 
-	@DisplayName("멤버 삭제 성공")
-	@Test
-	void delete_member_test(@WithMember AuthMember authMember) {
-		// given
-		Member member = MemberFixture.member();
-		String beforeSocialId = member.getSocialId();
-
-		given(memberSearchRepository.findMemberNotManager(authMember.id()))
-			.willReturn(Optional.ofNullable(member));
-
-		// when
-		DeleteMemberResponse deleteMemberResponse = memberService.deleteMember(authMember);
-
-		// then
-		assertThat(member).isNotNull();
-		assertThat(deleteMemberResponse.socialId()).isEqualTo(beforeSocialId);
-		assertThat(member.getSocialId()).contains("delete");
-	}
-
-	@DisplayName("회원 삭제 반환")
+	@DisplayName("회원 삭제 성공")
 	@Test
 	void undo_delete_member(@WithMember AuthMember authMember) {
 		// given
 		Member member = MemberFixture.member();
-		DeleteMemberResponse deleteMemberResponse = DeleteMemberFixture.deleteMemberResponse();
+		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
-		given(memberSearchRepository.findMember(authMember.id(), false))
-			.willReturn(Optional.ofNullable(member));
-
-		// when
-		memberService.undoDelete(deleteMemberResponse);
+		// When
+		memberService.delete(member);
 
 		// then
 		assertThat(member).isNotNull();
-		assertThat(deleteMemberResponse.socialId()).isEqualTo(member.getSocialId());
+		assertThat(member.getSocialId()).contains("delete");
 	}
 
 	@DisplayName("내 회원 정보가 없어서 예외 발생")

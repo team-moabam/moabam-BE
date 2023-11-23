@@ -16,7 +16,6 @@ import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
-import com.moabam.api.dto.member.DeleteMemberResponse;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
@@ -59,8 +58,7 @@ public class MemberController {
 	@DeleteMapping
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteMember(@Auth AuthMember authMember) {
-		DeleteMemberResponse deleteMemberResponse = memberService.deleteMember(authMember);
-		authorizationService.unLinkMember(deleteMemberResponse);
+		authorizationService.unLinkMember(authMember);
 	}
 
 	@GetMapping(value = {"", "/{memberId}"})
