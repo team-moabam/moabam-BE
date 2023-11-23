@@ -1,11 +1,16 @@
 package com.moabam.api.presentation;
 
-import static com.moabam.api.domain.room.RoomType.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.http.MediaType.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static com.moabam.api.domain.room.RoomType.MORNING;
+import static com.moabam.api.domain.room.RoomType.NIGHT;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,6 +30,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moabam.api.domain.item.Inventory;
+import com.moabam.api.domain.item.Item;
+import com.moabam.api.domain.item.repository.InventoryRepository;
+import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.room.Certification;
@@ -41,13 +50,14 @@ import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoutineRepository;
-import com.moabam.api.domain.room.repository.RoutineSearchRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.BugFixture;
+import com.moabam.support.fixture.InventoryFixture;
+import com.moabam.support.fixture.ItemFixture;
 import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.RoomFixture;
 
@@ -70,9 +80,6 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	private RoutineRepository routineRepository;
 
 	@Autowired
-	private RoutineSearchRepository routineSearchRepository;
-
-	@Autowired
 	private ParticipantRepository participantRepository;
 
 	@Autowired
@@ -89,6 +96,12 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	private ParticipantSearchRepository participantSearchRepository;
+
+	@Autowired
+	private ItemRepository itemRepository;
+
+	@Autowired
+	private InventoryRepository inventoryRepository;
 
 	Member member;
 
@@ -310,7 +323,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andDo(print());
 
 		Room modifiedRoom = roomRepository.findById(room.getId()).orElseThrow();
-		List<Routine> modifiedRoutines = routineSearchRepository.findAllByRoomId(room.getId());
+		List<Routine> modifiedRoutines = routineRepository.findAllByRoomId(room.getId());
 
 		assertThat(modifiedRoom.getTitle()).isEqualTo("수정할 방임!");
 		assertThat(modifiedRoom.getCertifyTime()).isEqualTo(10);
@@ -500,7 +513,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.build();
 
 		for (int i = 0; i < 3; i++) {
-			member.enterMorningRoom();
+			member.enterRoom(MORNING);
 		}
 
 		memberRepository.save(member);
@@ -528,7 +541,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.build();
 
 		for (int i = 0; i < 3; i++) {
-			member.enterNightRoom();
+			member.enterRoom(NIGHT);
 		}
 
 		memberRepository.save(member);
@@ -715,7 +728,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Participant participant = RoomFixture.participant(room, 1L);
 
 		for (int i = 0; i < 3; i++) {
-			member.enterMorningRoom();
+			member.enterRoom(RoomType.MORNING);
 		}
 
 		memberRepository.save(member);
@@ -748,7 +761,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Participant participant = RoomFixture.participant(room, 1L);
 
 		for (int i = 0; i < 3; i++) {
-			member.enterNightRoom();
+			member.enterRoom(NIGHT);
 		}
 
 		memberRepository.save(member);
@@ -791,8 +804,20 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		roomRepository.save(room);
 		routineRepository.saveAll(routines);
-		memberRepository.save(member2);
-		memberRepository.save(member3);
+		member2 = memberRepository.save(member2);
+		member3 = memberRepository.save(member3);
+
+		Item item = ItemFixture.nightMageSkin();
+
+		Inventory inventory1 = InventoryFixture.inventory(1L, item);
+		Inventory inventory2 = InventoryFixture.inventory(member2.getId(), item);
+		Inventory inventory3 = InventoryFixture.inventory(member3.getId(), item);
+		inventory1.select();
+		inventory2.select();
+		inventory3.select();
+
+		itemRepository.save(item);
+		inventoryRepository.saveAll(List.of(inventory1, inventory2, inventory3));
 
 		Participant participant2 = RoomFixture.participant(room, member2.getId());
 		Participant participant3 = RoomFixture.participant(room, member3.getId());
