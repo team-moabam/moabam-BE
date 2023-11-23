@@ -75,6 +75,7 @@ public class MemberService {
 		if (!isMe) {
 			searchId = memberId;
 		}
+
 		MemberInfoSearchResponse memberInfoSearchResponse = findMemberInfo(searchId, isMe);
 		List<Inventory> inventories = getDefaultSkin(searchId);
 
