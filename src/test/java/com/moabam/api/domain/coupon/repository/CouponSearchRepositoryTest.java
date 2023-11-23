@@ -2,7 +2,7 @@ package com.moabam.api.domain.coupon.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -27,13 +27,31 @@ class CouponSearchRepositoryTest {
 	@Autowired
 	private CouponSearchRepository couponSearchRepository;
 
-	@DisplayName("모든 쿠폰을 조회한다. - List<CouponResponse>")
+	@DisplayName("발급 가능한 쿠폰을 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void couponSearchRepository_findAllByStatus(List<Coupon> coupons) {
+	void findAllByStatus(List<Coupon> coupons) {
 		// Given
-		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, true, true);
-		LocalDateTime now = LocalDateTime.now();
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false);
+		LocalDate now = LocalDate.of(2023, 7, 1);
+
+		couponRepository.saveAll(coupons);
+
+		// When
+		List<Coupon> actual = couponSearchRepository.findAllByStatus(now, request);
+
+		// Then
+		assertThat(actual).hasSize(1);
+		assertThat(actual.get(0).getStartAt()).isEqualTo(LocalDate.of(2023, 7, 1));
+	}
+
+	@DisplayName("모든 쿠폰을 발급 가능 날짜 순으로 조회한다. - List<CouponResponse>")
+	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
+	@ParameterizedTest
+	void findAllByStatus_order_by_startAt(List<Coupon> coupons) {
+		// Given
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, true);
+		LocalDate now = LocalDate.now();
 
 		couponRepository.saveAll(coupons);
 
@@ -42,66 +60,16 @@ class CouponSearchRepositoryTest {
 
 		// Then
 		assertThat(actual).hasSize(coupons.size());
+		assertThat(actual.get(0).getStartAt()).isEqualTo(LocalDate.of(2023, 3, 1));
 	}
 
-	@DisplayName("시작 전이거나 진행 중인 쿠폰들을 조회한다. - List<CouponResponse>")
+	@DisplayName("발급 가능한 쿠폰 포함하여 쿠폰 정보 오픈 중인 쿠폰들을 발급 가능 날짜 순으로 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void couponSearchRepository_findAllByStatus_and_ongoing_notStarted(List<Coupon> coupons) {
+	void findAllByStatus_opened_order_by_startAt(List<Coupon> coupons) {
 		// Given
-		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, true, false);
-		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
-
-		couponRepository.saveAll(coupons);
-
-		// When
-		List<Coupon> actual = couponSearchRepository.findAllByStatus(now, request);
-
-		// Then
-		assertThat(actual).hasSize(8);
-	}
-
-	@DisplayName("종료 됐거나 진행 중인 쿠폰들을 조회한다. - List<CouponResponse>")
-	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
-	@ParameterizedTest
-	void couponSearchRepository_findAllByStatus_and_ongoing_ended(List<Coupon> coupons) {
-		// Given
-		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, false, true);
-		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
-
-		couponRepository.saveAll(coupons);
-
-		// When
-		List<Coupon> actual = couponSearchRepository.findAllByStatus(now, request);
-
-		// Then
-		assertThat(actual).hasSize(5);
-	}
-
-	@DisplayName("진행 중이 아니고, 시작 전이거나, 종료된 쿠폰들을 조회한다. - List<CouponResponse>")
-	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
-	@ParameterizedTest
-	void couponSearchRepository_findAllByStatus_ongoing_and_ended(List<Coupon> coupons) {
-		// Given
-		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, true, true);
-		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
-
-		couponRepository.saveAll(coupons);
-
-		// When
-		List<Coupon> actual = couponSearchRepository.findAllByStatus(now, request);
-
-		// Then
-		assertThat(actual).hasSize(7);
-	}
-
-	@DisplayName("진행 중인 쿠폰을 조회한다. - List<CouponResponse>")
-	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
-	@ParameterizedTest
-	void couponSearchRepository_findAllByStatus_ongoing(List<Coupon> coupons) {
-		// Given
-		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, false, false);
-		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, false);
+		LocalDate now = LocalDate.of(2023, 7, 1);
 
 		couponRepository.saveAll(coupons);
 
@@ -110,15 +78,16 @@ class CouponSearchRepositoryTest {
 
 		// Then
 		assertThat(actual).hasSize(3);
+		assertThat(actual.get(0).getStartAt()).isEqualTo(LocalDate.of(2023, 7, 1));
 	}
 
-	@DisplayName("시작 적인 쿠폰들을 조회한다. - List<CouponResponse>")
+	@DisplayName("종료된 쿠폰들을 발급 가능 날짜 순으로 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void couponSearchRepository_findAllByStatus_notStarted(List<Coupon> coupons) {
+	void findAllByStatus_ended_order_by_startAt(List<Coupon> coupons) {
 		// Given
-		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, true, false);
-		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
+		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, true);
+		LocalDate now = LocalDate.of(2023, 8, 1);
 
 		couponRepository.saveAll(coupons);
 
@@ -127,39 +96,6 @@ class CouponSearchRepositoryTest {
 
 		// Then
 		assertThat(actual).hasSize(5);
-	}
-
-	@DisplayName("종료된 쿠폰들을 조회한다. - List<CouponResponse>")
-	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
-	@ParameterizedTest
-	void couponSearchRepository_findAllByStatus_ended(List<Coupon> coupons) {
-		// Given
-		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false, true);
-		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
-
-		couponRepository.saveAll(coupons);
-
-		// When
-		List<Coupon> actual = couponSearchRepository.findAllByStatus(now, request);
-
-		// Then
-		assertThat(actual).hasSize(2);
-	}
-
-	@DisplayName("상태조건을 걸지 않아서 모든 쿠폰이 조회되지 않는다. - List<CouponResponse>")
-	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
-	@ParameterizedTest
-	void couponSearchRepository_findAllByStatus__not_status(List<Coupon> coupons) {
-		// Given
-		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false, false);
-		LocalDateTime now = LocalDateTime.of(2023, 5, 1, 0, 0);
-
-		couponRepository.saveAll(coupons);
-
-		// When
-		List<Coupon> actual = couponSearchRepository.findAllByStatus(now, request);
-
-		// Then
-		assertThat(actual).isEmpty();
+		assertThat(actual.get(0).getStartAt()).isEqualTo(LocalDate.of(2023, 3, 1));
 	}
 }
