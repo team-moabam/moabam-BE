@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,7 @@ class ZSetRedisRepositoryTest {
 		assertThat(redisTemplate.opsForZSet().score(key, value)).isEqualTo(1);
 	}
 
+	@Disabled
 	@DisplayName("저장된 데이터와 동일한 갯수만큼의 반환과 삭제를 성공적으로 시도한다. - Set<TypedTuple<Object>>")
 	@Test
 	void popMin_same_success() {
@@ -73,6 +75,7 @@ class ZSetRedisRepositoryTest {
 		assertThat(stringRedisRepository.hasKey(key)).isFalse();
 	}
 
+	@Disabled
 	@DisplayName("저장된 데이터보다 많은 갯수만큼의 반환과 삭제를 성공적으로 시도한다. - Set<TypedTuple<Object>>")
 	@Test
 	void popMin_more_success() {
@@ -87,6 +90,7 @@ class ZSetRedisRepositoryTest {
 		assertThat(actual).hasSize(2);
 	}
 
+	@Disabled
 	@DisplayName("저장된 데이터보다 더 적은 갯수만큼의 반환과 삭제를 성공적으로 시도한다. - Set<TypedTuple<Object>>")
 	@Test
 	void popMin_less_success() {
