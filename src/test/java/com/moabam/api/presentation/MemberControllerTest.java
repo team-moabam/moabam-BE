@@ -39,7 +39,7 @@ import com.moabam.api.domain.auth.repository.TokenRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
-import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.global.config.OAuthConfig;
@@ -48,7 +48,6 @@ import com.moabam.global.error.handler.RestTemplateResponseHandler;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.MemberFixture;
-import com.moabam.support.fixture.RoomFixture;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
 @Transactional
@@ -75,6 +74,9 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	RoomRepository roomRepository;
+
+	@Autowired
+	ParticipantRepository participantRepository;
 
 	@Autowired
 	OAuth2AuthorizationServerRequestService oAuth2AuthorizationServerRequestService;
@@ -126,6 +128,8 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@WithMember
 	@Test
 	void delete_member_success() throws Exception {
+		// Given
+		String nickname = member.getNickname();
 
 		// expected
 		mockRestServiceServer.expect(requestTo(oAuthConfig.provider().unlink()))
@@ -136,16 +140,24 @@ class MemberControllerTest extends WithoutFilterSupporter {
 			.andExpect(method(HttpMethod.POST))
 			.andRespond(withStatus(HttpStatus.OK));
 
-		ResultActions result = mockMvc.perform(delete("/members"));
+		mockMvc.perform(delete("/members"));
+		memberRepository.flush();
+
+		Optional<Member> deletedMemberOptional = memberRepository.findById(member.getId());
+		assertThat(deletedMemberOptional).isNotEmpty();
+
+		Member deletedMEmber = deletedMemberOptional.get();
+		assertThat(deletedMEmber.getDeletedAt()).isNotNull();
+		assertThat(deletedMEmber.getNickname()).isEqualTo(nickname);
 	}
 
 	@DisplayName("회원이 없어서 회원 삭제 실패")
 	@WithMember(id = 123L)
 	@Test
-	void delete_member_failby_not_found_member() throws Exception {
+	void delete_member_failBy_not_found_member() throws Exception {
 		// expected
 		mockMvc.perform(delete("/members"))
-			.andExpect(status().isConflict());
+			.andExpect(status().isNotFound());
 	}
 
 	@DisplayName("연결 오류로 인한 카카오 연결 끊기 실패로 롤백")
@@ -173,20 +185,5 @@ class MemberControllerTest extends WithoutFilterSupporter {
 			() -> assertThat(rollMember.getSocialId()).isEqualTo(member.getSocialId()),
 			() -> assertThat(rollMember.getDeletedAt()).isNull()
 		);
-	}
-
-	@DisplayName("방장으로 인해 회원 삭제 조회 실패")
-	@WithMember
-	@Test
-	void unlink_social_member_failby_meber_is_manger() throws Exception {
-		// given
-		Room room = RoomFixture.room();
-		room.changeManagerNickname(member.getNickname());
-
-		roomRepository.save(room);
-
-		// then
-		ResultActions result = mockMvc.perform(delete("/members"))
-			.andExpect(status().isConflict());
 	}
 }

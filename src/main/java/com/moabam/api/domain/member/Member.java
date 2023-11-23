@@ -116,14 +116,8 @@ public class Member extends BaseTimeEntity {
 		this.totalCertifyCount++;
 	}
 
-	public void delete() {
-		deletedAt = LocalDateTime.now();
-		socialId = deleteSocialId(deletedAt);
-	}
-
-	public void undoDelete(String socialId) {
-		this.socialId = socialId;
-		deletedAt = null;
+	public void delete(LocalDateTime now) {
+		socialId = deleteSocialId(now);
 	}
 
 	public void changeNickName(String nickname) {
