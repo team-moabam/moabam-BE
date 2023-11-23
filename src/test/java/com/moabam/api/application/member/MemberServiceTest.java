@@ -146,7 +146,7 @@ class MemberServiceTest {
 		Item morning = ItemFixture.morningSantaSkin().build();
 
 		given(memberSearchRepository.findMemberAndBadges(authMember.id(), true))
-			.willReturn(List.of(MemberInfoSearchFixture.friendMemberInfo(total)));
+			.willReturn(MemberInfoSearchFixture.friendMemberInfo(total));
 		given(inventorySearchRepository.findBirdsDefaultSkin(authMember.id()))
 			.willReturn(List.of(
 				InventoryFixture.inventory(authMember.id(), morning),
@@ -176,7 +176,7 @@ class MemberServiceTest {
 			Inventory nightSkin = InventoryFixture.inventory(searchId, night);
 
 			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
-				.willReturn(List.of(MemberInfoSearchFixture.myInfo()));
+				.willReturn(MemberInfoSearchFixture.myInfo());
 			given(inventorySearchRepository.findBirdsDefaultSkin(searchId)).willReturn(List.of(morningSkin, nightSkin));
 
 			// when
@@ -192,7 +192,7 @@ class MemberServiceTest {
 		void failBy_underSize(@WithMember AuthMember authMember) {
 			// given
 			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
-				.willReturn(List.of(MemberInfoSearchFixture.friendMemberInfo()));
+				.willReturn(MemberInfoSearchFixture.friendMemberInfo());
 			given(inventorySearchRepository.findBirdsDefaultSkin(anyLong())).willReturn(List.of());
 
 			// when
@@ -214,7 +214,7 @@ class MemberServiceTest {
 			Inventory killSkin = InventoryFixture.inventory(searchId, kill);
 
 			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
-				.willReturn(List.of(MemberInfoSearchFixture.myInfo()));
+				.willReturn(MemberInfoSearchFixture.myInfo());
 			given(inventorySearchRepository.findBirdsDefaultSkin(searchId))
 				.willReturn(List.of(morningSkin, nightSkin, killSkin));
 

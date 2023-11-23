@@ -2,8 +2,10 @@ package com.moabam.api.application.member;
 
 import static com.moabam.global.common.util.GlobalConstant.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,7 +14,7 @@ import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.member.BadgeType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.member.BadgeResponse;
-import com.moabam.api.dto.member.DeleteMemberResponse;
+import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
 
@@ -29,10 +31,22 @@ public final class MemberMapper {
 			.build();
 	}
 
-	public static DeleteMemberResponse toDeleteMemberResponse(Long memberId, String socialId) {
-		return DeleteMemberResponse.builder()
-			.socialId(socialId)
-			.id(memberId)
+	public static MemberInfoSearchResponse toMemberInfoSearchResponse(List<MemberInfo> memberInfos) {
+		MemberInfo infos = memberInfos.get(0);
+		List<BadgeType> badgeTypes = memberInfos.stream()
+			.map(MemberInfo::badges)
+			.filter(Objects::nonNull)
+			.toList();
+
+		return MemberInfoSearchResponse.builder()
+			.nickname(infos.nickname())
+			.profileImage(infos.profileImage())
+			.intro(infos.intro())
+			.totalCertifyCount(infos.totalCertifyCount())
+			.badges(new HashSet<>(badgeTypes))
+			.goldenBug(infos.goldenBug())
+			.morningBug(infos.morningBug())
+			.nightBug(infos.nightBug())
 			.build();
 	}
 

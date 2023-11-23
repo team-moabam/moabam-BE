@@ -17,6 +17,7 @@ import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.global.auth.model.AuthMember;
@@ -96,14 +97,13 @@ public class MemberService {
 	}
 
 	private MemberInfoSearchResponse findMemberInfo(Long searchId, boolean isMe) {
-		List<MemberInfoSearchResponse> memberInfoSearchResponses =
-			memberSearchRepository.findMemberAndBadges(searchId, isMe);
+		List<MemberInfo> memberInfos = memberSearchRepository.findMemberAndBadges(searchId, isMe);
 
-		if (memberInfoSearchResponses.isEmpty()) {
+		if (memberInfos.isEmpty()) {
 			throw new BadRequestException(MEMBER_NOT_FOUND);
 		}
 
-		return memberInfoSearchResponses.get(0);
+		return MemberMapper.toMemberInfoSearchResponse(memberInfos);
 	}
 
 	private boolean confirmMe(Long myId, Long memberId) {

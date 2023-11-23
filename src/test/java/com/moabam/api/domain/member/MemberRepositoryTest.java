@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.moabam.api.application.member.MemberMapper;
 import com.moabam.api.domain.member.repository.BadgeRepository;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
@@ -17,6 +18,7 @@ import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
+import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
 import com.moabam.support.fixture.BadgeFixture;
@@ -111,11 +113,10 @@ class MemberRepositoryTest {
 		@Test
 		void member_not_found() {
 			// Given
-			List<MemberInfoSearchResponse> memberInfoSearchResponses =
-				memberSearchRepository.findMemberAndBadges(1L, false);
+			List<MemberInfo> memberInfos = memberSearchRepository.findMemberAndBadges(1L, false);
 
 			// When + Then
-			assertThat(memberInfoSearchResponses).isEmpty();
+			assertThat(memberInfos).isEmpty();
 		}
 
 		@DisplayName("성공")
@@ -134,13 +135,12 @@ class MemberRepositoryTest {
 			badgeRepository.saveAll(badges);
 
 			// when
-			List<MemberInfoSearchResponse> memberInfoSearchResponses =
-				memberSearchRepository.findMemberAndBadges(member.getId(), true);
+			List<MemberInfo> memberInfos = memberSearchRepository.findMemberAndBadges(member.getId(), true);
 
 			// then
-			assertThat(memberInfoSearchResponses).isNotEmpty();
+			assertThat(memberInfos).isNotEmpty();
 
-			MemberInfoSearchResponse memberInfoSearchResponse = memberInfoSearchResponses.get(0);
+			MemberInfoSearchResponse memberInfoSearchResponse = MemberMapper.toMemberInfoSearchResponse(memberInfos);
 			assertThat(memberInfoSearchResponse.badges()).hasSize(badges.size());
 		}
 
@@ -148,19 +148,17 @@ class MemberRepositoryTest {
 		@Test
 		void no_badges_search_success() {
 			// given
-
 			Member member = MemberFixture.member();
 			member.enterMorningRoom();
 			memberRepository.save(member);
 
 			// when
-			List<MemberInfoSearchResponse> memberInfoSearchResponses =
-				memberSearchRepository.findMemberAndBadges(member.getId(), true);
+			List<MemberInfo> memberInfos = memberSearchRepository.findMemberAndBadges(member.getId(), true);
 
 			// then
-			assertThat(memberInfoSearchResponses).isNotEmpty();
+			assertThat(memberInfos).isNotEmpty();
 
-			MemberInfoSearchResponse memberInfoSearchResponse = memberInfoSearchResponses.get(0);
+			MemberInfoSearchResponse memberInfoSearchResponse = MemberMapper.toMemberInfoSearchResponse(memberInfos);
 			assertThat(memberInfoSearchResponse.badges()).isEmpty();
 		}
 	}
