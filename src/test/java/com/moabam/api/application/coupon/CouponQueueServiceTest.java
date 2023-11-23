@@ -35,10 +35,10 @@ class CouponQueueServiceTest {
 	@WithMember
 	@DisplayName("쿠폰 발급 요청을 성공적으로 큐에 등록한다. - Void")
 	@Test
-	void couponQueueService_register() {
+	void register() {
 		// Given
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
-		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
+		Coupon coupon = CouponFixture.coupon();
 
 		given(couponService.validatePeriod(any(String.class))).willReturn(coupon);
 		given(couponQueueRepository.size(any(String.class))).willReturn(coupon.getStock() - 1L);
@@ -53,25 +53,26 @@ class CouponQueueServiceTest {
 	@WithMember
 	@DisplayName("해당 쿠폰은 발급 가능 기간이 아니다. - BadRequestException")
 	@Test
-	void couponQueueService_register_BadRequestException() {
+	void register_BadRequestException() {
 		// Given
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
+
 		given(couponService.validatePeriod(any(String.class)))
-			.willThrow(new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD_END));
+			.willThrow(new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD));
 
 		// When & Then
 		assertThatThrownBy(() -> couponQueueService.register(member, "couponName"))
 			.isInstanceOf(BadRequestException.class)
-			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD_END.getMessage());
+			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD.getMessage());
 	}
 
 	@WithMember
 	@DisplayName("해당 쿠폰은 마감된 쿠폰이다. - Void")
 	@Test
-	void couponQueueService_register_End() {
+	void register_End() {
 		// Given
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
-		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
+		Coupon coupon = CouponFixture.coupon();
 
 		given(couponService.validatePeriod(any(String.class))).willReturn(coupon);
 		given(couponQueueRepository.size(any(String.class))).willReturn((long)coupon.getStock());
