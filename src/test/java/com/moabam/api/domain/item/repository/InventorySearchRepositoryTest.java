@@ -18,6 +18,7 @@ import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.ItemType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
+import com.moabam.api.domain.room.RoomType;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
 
 @QuerydslRepositoryTest
@@ -106,5 +107,26 @@ class InventorySearchRepositoryTest {
 
 		// then
 		assertThat(actual).isPresent().contains(inventory);
+	}
+
+	@DisplayName("여러 회원의 밤 타입에 적용된 인벤토리를 조회한다.")
+	@Test
+	void find_all_default_type_night_success() {
+		// given
+		Member member1 = memberRepository.save(member("1", "회원1"));
+		Member member2 = memberRepository.save(member("2", "회원2"));
+		Item item = itemRepository.save(nightMageSkin());
+		Inventory inventory1 = inventoryRepository.save(inventory(member1.getId(), item));
+		Inventory inventory2 = inventoryRepository.save(inventory(member2.getId(), item));
+		inventory1.select();
+		inventory2.select();
+
+		// when
+		List<Inventory> actual = inventorySearchRepository.findDefaultInventories(List.of(member1.getId(),
+			member2.getId()), RoomType.NIGHT.name());
+
+		// then
+		assertThat(actual).hasSize(2);
+		assertThat(actual.get(0).getItem().getName()).isEqualTo(nightMageSkin().getName());
 	}
 }

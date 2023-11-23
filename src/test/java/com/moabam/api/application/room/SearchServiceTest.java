@@ -26,18 +26,18 @@ import com.moabam.api.domain.room.repository.CertificationsSearchRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoomSearchRepository;
-import com.moabam.api.domain.room.repository.RoutineSearchRepository;
+import com.moabam.api.domain.room.repository.RoutineRepository;
+import com.moabam.api.dto.room.GetAllRoomsResponse;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
-import com.moabam.api.dto.room.SearchAllRoomsResponse;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith(MockitoExtension.class)
-class RoomSearchServiceTest {
+class SearchServiceTest {
 
 	@InjectMocks
-	private RoomSearchService roomSearchService;
+	private SearchService searchService;
 
 	@Mock
 	private CertificationsSearchRepository certificationsSearchRepository;
@@ -46,7 +46,7 @@ class RoomSearchServiceTest {
 	private ParticipantSearchRepository participantSearchRepository;
 
 	@Mock
-	private RoutineSearchRepository routineSearchRepository;
+	private RoutineRepository routineRepository;
 
 	@Mock
 	private RoomSearchRepository roomSearchRepository;
@@ -55,7 +55,7 @@ class RoomSearchServiceTest {
 	private MemberService memberService;
 
 	@Mock
-	private RoomCertificationService certificationService;
+	private CertificationService certificationService;
 
 	@Mock
 	private RoomRepository roomRepository;
@@ -91,10 +91,10 @@ class RoomSearchServiceTest {
 		given(certificationService.existsRoomCertification(room2.getId(), today)).willReturn(false);
 		given(certificationService.existsRoomCertification(room3.getId(), today)).willReturn(false);
 
-		given(clockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.date()).willReturn(LocalDate.now());
 
 		// when
-		MyRoomsResponse myRooms = roomSearchService.getMyRooms(memberId);
+		MyRoomsResponse myRooms = searchService.getMyRooms(memberId);
 
 		// then
 		assertThat(myRooms.participatingRooms()).hasSize(3);
@@ -133,7 +133,7 @@ class RoomSearchServiceTest {
 		given(participantSearchRepository.findAllParticipantsByMemberId(memberId)).willReturn(participants);
 
 		// when
-		RoomsHistoryResponse response = roomSearchService.getJoinHistory(memberId);
+		RoomsHistoryResponse response = searchService.getJoinHistory(memberId);
 
 		// then
 		assertThat(response.roomHistory()).hasSize(3);
@@ -253,16 +253,16 @@ class RoomSearchServiceTest {
 			routine28);
 
 		given(roomSearchRepository.findAllWithNoOffset(null, null)).willReturn(rooms);
-		given(routineSearchRepository.findAllByRoomIds(anyList())).willReturn(routines);
+		given(routineRepository.findAllByRoomIdIn(anyList())).willReturn(routines);
 
 		// when
-		SearchAllRoomsResponse searchAllRoomsResponse = roomSearchService.searchAllRooms(null, null);
+		GetAllRoomsResponse getAllRoomsResponse = searchService.getAllRooms(null, null);
 
 		// then
-		assertThat(searchAllRoomsResponse.hasNext()).isTrue();
-		assertThat(searchAllRoomsResponse.rooms()).hasSize(10);
-		assertThat(searchAllRoomsResponse.rooms().get(0).id()).isEqualTo(1L);
-		assertThat(searchAllRoomsResponse.rooms().get(9).id()).isEqualTo(10L);
+		assertThat(getAllRoomsResponse.hasNext()).isTrue();
+		assertThat(getAllRoomsResponse.rooms()).hasSize(10);
+		assertThat(getAllRoomsResponse.rooms().get(0).id()).isEqualTo(1L);
+		assertThat(getAllRoomsResponse.rooms().get(9).id()).isEqualTo(10L);
 	}
 
 	@DisplayName("아침, 저녁 전체 방 조회 성공, 마지막 페이 조회, 다음 페이지 없음")
@@ -306,16 +306,16 @@ class RoomSearchServiceTest {
 			routine28);
 
 		given(roomSearchRepository.findAllWithNoOffset(null, 10L)).willReturn(rooms);
-		given(routineSearchRepository.findAllByRoomIds(anyList())).willReturn(routines);
+		given(routineRepository.findAllByRoomIdIn(anyList())).willReturn(routines);
 
 		// when
-		SearchAllRoomsResponse searchAllRoomsResponse = roomSearchService.searchAllRooms(null, 10L);
+		GetAllRoomsResponse getAllRoomsResponse = searchService.getAllRooms(null, 10L);
 
 		// then
-		assertThat(searchAllRoomsResponse.hasNext()).isFalse();
-		assertThat(searchAllRoomsResponse.rooms()).hasSize(4);
-		assertThat(searchAllRoomsResponse.rooms().get(0).id()).isEqualTo(11L);
-		assertThat(searchAllRoomsResponse.rooms().get(3).id()).isEqualTo(14L);
+		assertThat(getAllRoomsResponse.hasNext()).isFalse();
+		assertThat(getAllRoomsResponse.rooms()).hasSize(4);
+		assertThat(getAllRoomsResponse.rooms().get(0).id()).isEqualTo(11L);
+		assertThat(getAllRoomsResponse.rooms().get(3).id()).isEqualTo(14L);
 	}
 
 	@DisplayName("전체 방 제목, 방장 이름, 루틴 내용으로 검색 성공 - 최초 조회")
@@ -405,13 +405,13 @@ class RoomSearchServiceTest {
 			routine25, routine26, routine27, routine28);
 
 		given(roomRepository.searchByKeyword("번째")).willReturn(rooms);
-		given(routineSearchRepository.findAllByRoomIds(anyList())).willReturn(routines);
+		given(routineRepository.findAllByRoomIdIn(anyList())).willReturn(routines);
 
 		// when
-		SearchAllRoomsResponse searchAllRoomsResponse = roomSearchService.search("번째", null, null);
+		GetAllRoomsResponse getAllRoomsResponse = searchService.searchRooms("번째", null, null);
 
 		// then
-		assertThat(searchAllRoomsResponse.hasNext()).isTrue();
-		assertThat(searchAllRoomsResponse.rooms()).hasSize(10);
+		assertThat(getAllRoomsResponse.hasNext()).isTrue();
+		assertThat(getAllRoomsResponse.rooms()).hasSize(10);
 	}
 }

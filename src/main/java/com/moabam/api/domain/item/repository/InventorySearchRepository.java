@@ -53,4 +53,15 @@ public class InventorySearchRepository {
 			.select(item)
 			.fetch();
 	}
+
+	public List<Inventory> findDefaultInventories(List<Long> memberId, String roomType) {
+		return jpaQueryFactory.selectFrom(inventory)
+			.join(inventory.item, item).fetchJoin()
+			.where(
+				inventory.memberId.in(memberId),
+				inventory.isDefault.isTrue(),
+				inventory.item.type.eq(ItemType.valueOf(roomType))
+			)
+			.fetch();
+	}
 }
