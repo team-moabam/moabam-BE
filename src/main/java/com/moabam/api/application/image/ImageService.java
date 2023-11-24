@@ -51,4 +51,10 @@ public class ImageService {
 	public void deleteImage(String imageUrl) {
 		s3Manager.deleteImage(imageUrl);
 	}
+
+	public void validImage(MultipartFile newImage) {
+		if (newImage == null || newImage.isEmpty()) {
+
+		}
+	}
 }

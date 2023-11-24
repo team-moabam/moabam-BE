@@ -26,6 +26,7 @@ import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.ModifyMemberRequest;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
+import com.moabam.global.error.exception.BadRequestException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -78,7 +79,14 @@ public class MemberController {
 	public void modifyMember(@Auth AuthMember authMember,
 		@RequestPart(required = false) ModifyMemberRequest modifyMemberRequest,
 		@RequestPart(name = "profileImage", required = false) MultipartFile newProfileImage) {
-		String newProfileUri = imageService.uploadImages(List.of(newProfileImage), ImageType.PROFILE_IMAGE).get(0);
+		String newProfileUri = null;
+
+		try {
+			newProfileUri = imageService.uploadImages(List.of(newProfileImage), ImageType.PROFILE_IMAGE).get(0);
+		} catch (BadRequestException | NullPointerException e) {
+			// Do nothing
+		}
+
 		memberService.modifyInfo(authMember, modifyMemberRequest, newProfileUri);
 	}
 }

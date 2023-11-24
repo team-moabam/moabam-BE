@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -119,7 +119,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@Autowired
 	OAuthConfig oAuthConfig;
 
-	@MockBean
+	@SpyBean
 	ImageService imageService;
 
 	RestTemplateBuilder restTemplateBuilder;
@@ -468,5 +468,40 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				.characterEncoding("UTF-8"))
 			.andExpect(status().is2xxSuccessful())
 			.andDo(print());
+	}
+
+	@DisplayName("회원 프로필없이 성공 ")
+	@WithMember
+	@ParameterizedTest
+	@CsvSource({"intro, null", "null, nickname", "null, null", "intro, nickname"})
+	void member_modify_no_image_request_success(String intro, String nickname) throws Exception {
+		// given
+		if (intro.equals("null")) {
+			intro = null;
+		}
+		if (nickname.equals("null")) {
+			nickname = null;
+		}
+
+		ModifyMemberRequest request = new ModifyMemberRequest(intro, nickname);
+		MockMultipartFile modifyMemberRequest =
+			new MockMultipartFile(
+				"modifyMemberRequest",
+				null,
+				"application/json",
+				objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8));
+
+		willThrow(NullPointerException.class)
+			.given(imageService).uploadImages(any(), any());
+
+		// expected
+		mockMvc.perform(multipart(HttpMethod.POST, "/members/modify")
+				.file(modifyMemberRequest)
+				.contentType("multipart/form-data")
+
+				.characterEncoding("UTF-8"))
+			.andExpect(status().is2xxSuccessful())
+			.andDo(print());
+
 	}
 }
