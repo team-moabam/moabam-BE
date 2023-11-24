@@ -100,12 +100,12 @@ class MemberTest {
 			Member member = MemberFixture.member();
 
 			// when
-			member.exitMorningRoom();
-			member.exitNightRoom();
+			member.exitRoom(RoomType.MORNING);
+			member.exitRoom(RoomType.NIGHT);
 
 			// then
 			assertThat(member.getCurrentMorningCount()).isZero();
-			assertThat(member.getCurrentMorningCount()).isZero();
+			assertThat(member.getCurrentNightCount()).isZero();
 		}
 	}
 }

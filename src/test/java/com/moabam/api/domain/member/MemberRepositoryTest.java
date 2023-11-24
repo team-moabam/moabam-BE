@@ -16,6 +16,7 @@ import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.dto.member.MemberInfo;
@@ -124,7 +125,7 @@ class MemberRepositoryTest {
 		void search_info_success() {
 			// given
 			Member member = MemberFixture.member();
-			member.enterMorningRoom();
+			member.enterRoom(RoomType.MORNING);
 			memberRepository.save(member);
 
 			Badge morningBirth = BadgeFixture.badge(member.getId(), BadgeType.MORNING_BIRTH);
@@ -149,7 +150,7 @@ class MemberRepositoryTest {
 		void no_badges_search_success() {
 			// given
 			Member member = MemberFixture.member();
-			member.enterMorningRoom();
+			member.enterRoom(RoomType.MORNING);
 			memberRepository.save(member);
 
 			// when

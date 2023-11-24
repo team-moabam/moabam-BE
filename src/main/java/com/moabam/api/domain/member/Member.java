@@ -101,25 +101,13 @@ public class Member extends BaseTimeEntity {
 	}
 
 	public void exitRoom(RoomType roomType) {
-		if (roomType.equals(RoomType.MORNING) || currentMorningCount > 0) {
+		if (roomType.equals(RoomType.MORNING) && currentMorningCount > 0) {
 			this.currentMorningCount--;
 			return;
 		}
 
-		if (roomType.equals(RoomType.NIGHT) || currentNightCount > 0) {
+		if (roomType.equals(RoomType.NIGHT) && currentNightCount > 0) {
 			this.currentNightCount--;
-		}
-	}
-
-	public void exitMorningRoom() {
-		if (currentMorningCount > 0) {
-			currentMorningCount--;
-		}
-	}
-
-	public void exitNightRoom() {
-		if (currentNightCount > 0) {
-			currentNightCount--;
 		}
 	}
 
