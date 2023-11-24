@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ParticipantMapper {
 
-	public static Participant toParticipantEntity(Room room, Long memberId) {
+	public static Participant toParticipant(Room room, Long memberId) {
 		return Participant.builder()
 			.room(room)
 			.memberId(memberId)
