@@ -121,11 +121,13 @@ public class Member extends BaseTimeEntity {
 	}
 
 	public void changeNickName(String nickname) {
-		this.nickname = requireNonNull(nickname, this.nickname);
+		this.nickname = requireNonNullElse(nickname, this.nickname);
 	}
 
 	public void changeIntro(String intro) {
-		this.intro = requireNonNull(intro, this.intro);
+		if (intro != null) {
+			this.intro = intro;
+		}
 	}
 
 	public void changeProfileUri(String newProfileUri) {

@@ -25,7 +25,9 @@ import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.error.exception.BadRequestException;
+import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
+import com.moabam.global.error.model.ErrorMessage;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
-	
+
 	private final MemberRepository memberRepository;
 	private final InventorySearchRepository inventorySearchRepository;
 	private final MemberSearchRepository memberSearchRepository;
@@ -85,6 +87,8 @@ public class MemberService {
 
 	@Transactional
 	public void modifyInfo(AuthMember authMember, ModifyMemberRequest modifyMemberRequest, String newProfileUri) {
+		validateNickname(modifyMemberRequest.nickname());
+
 		Member member = memberSearchRepository.findMember(authMember.id())
 			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
 
@@ -93,6 +97,12 @@ public class MemberService {
 		member.changeProfileUri(newProfileUri);
 
 		memberRepository.save(member);
+	}
+
+	private void validateNickname(String nickname) {
+		if (Objects.nonNull(nickname) && memberRepository.existsByNickname(nickname)) {
+			throw new ConflictException(ErrorMessage.CONFLICT_NICKNAME);
+		}
 	}
 
 	private List<Inventory> getDefaultSkin(Long searchId) {
