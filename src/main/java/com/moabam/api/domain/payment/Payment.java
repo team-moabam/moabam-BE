@@ -83,9 +83,12 @@ public class Payment {
 	private LocalDateTime approvedAt;
 
 	@Builder
-	public Payment(Long memberId, Product product, Order order, int amount, PaymentStatus status) {
+	public Payment(Long memberId, Product product, Coupon coupon, Long couponWalletId, Order order, int amount,
+		PaymentStatus status) {
 		this.memberId = requireNonNull(memberId);
 		this.product = requireNonNull(product);
+		this.coupon = coupon;
+		this.couponWalletId = couponWalletId;
 		this.order = requireNonNull(order);
 		this.amount = validateAmount(amount);
 		this.status = requireNonNullElse(status, PaymentStatus.READY);

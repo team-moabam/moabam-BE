@@ -2,6 +2,7 @@ package com.moabam.support.fixture;
 
 import java.time.LocalDateTime;
 
+import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.payment.Order;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.product.Product;
@@ -19,6 +20,17 @@ public final class PaymentFixture {
 		return Payment.builder()
 			.memberId(1L)
 			.product(product)
+			.order(order(product))
+			.amount(product.getPrice())
+			.build();
+	}
+
+	public static Payment paymentWithCoupon(Product product, Coupon coupon, Long couponWalletId) {
+		return Payment.builder()
+			.memberId(1L)
+			.product(product)
+			.coupon(coupon)
+			.couponWalletId(couponWalletId)
 			.order(order(product))
 			.amount(product.getPrice())
 			.build();
