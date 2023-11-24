@@ -7,7 +7,7 @@ import com.moabam.api.domain.room.RoomType;
 import lombok.Builder;
 
 @Builder
-public record SearchAllRoomResponse(
+public record GetAllRoomResponse(
 	Long id,
 	String title,
 	String image,
