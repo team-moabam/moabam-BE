@@ -157,6 +157,11 @@ public class RoomService {
 		}
 	}
 
+	public Room findRoom(Long roomId) {
+		return roomRepository.findById(roomId)
+			.orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
+	}
+
 	private Participant getParticipant(Long memberId, Long roomId) {
 		return participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
