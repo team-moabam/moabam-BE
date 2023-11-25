@@ -68,7 +68,7 @@ class BugControllerTest extends WithoutFilterSupporter {
 		// given
 		Long memberId = getAuthMember().id();
 		BugResponse expected = BugMapper.toBugResponse(bug());
-		given(memberService.getById(memberId)).willReturn(member());
+		given(memberService.findMember(memberId)).willReturn(member());
 
 		// expected
 		String content = mockMvc.perform(get("/bugs")

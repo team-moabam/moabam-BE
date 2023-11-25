@@ -114,7 +114,7 @@ class ItemControllerTest extends WithoutFilterSupporter {
 			Long memberId = getAuthMember().id();
 			Item item = itemRepository.save(nightMageSkin());
 			PurchaseItemRequest request = new PurchaseItemRequest(BugType.NIGHT);
-			given(memberService.getById(memberId)).willReturn(member());
+			given(memberService.findMember(memberId)).willReturn(member());
 
 			// expected
 			mockMvc.perform(post("/items/{itemId}/purchase", item.getId())

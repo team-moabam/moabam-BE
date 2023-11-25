@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -191,7 +192,13 @@ class MemberRepositoryTest {
 		// then
 		Optional<Member> deletedMember = memberSearchRepository.findMember(member.getId(), false);
 
-		assertThat(deletedMember).isPresent();
-		assertThat(deletedMember.get().getSocialId()).contains("delete");
+		Assertions.assertAll(
+			() -> assertThat(deletedMember).isPresent(),
+			() -> {
+				Member delete = deletedMember.get();
+				assertThat(delete.getSocialId()).contains("delete");
+				assertThat(delete.getDeletedAt()).isNotNull();
+			}
+		);
 	}
 }

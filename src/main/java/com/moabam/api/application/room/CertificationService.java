@@ -61,7 +61,7 @@ public class CertificationService {
 		Participant participant = participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
 		Room room = participant.getRoom();
-		Member member = memberService.getById(memberId);
+		Member member = memberService.findMember(memberId);
 		BugType bugType = switch (room.getRoomType()) {
 			case MORNING -> BugType.MORNING;
 			case NIGHT -> BugType.NIGHT;

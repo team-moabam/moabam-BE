@@ -38,7 +38,7 @@ public class BugService {
 	private final PaymentRepository paymentRepository;
 
 	public BugResponse getBug(Long memberId) {
-		Member member = memberService.getById(memberId);
+		Member member = memberService.findMember(memberId);
 
 		return BugMapper.toBugResponse(member.getBug());
 	}
