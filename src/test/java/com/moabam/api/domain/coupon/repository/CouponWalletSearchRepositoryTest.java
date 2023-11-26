@@ -4,6 +4,7 @@ import static com.moabam.support.fixture.CouponFixture.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -97,7 +98,7 @@ class CouponWalletSearchRepositoryTest {
 		assertThat(actual).hasSize(3);
 	}
 
-	@DisplayName("회원의 특정 쿠폰 지갑을 성공적으로 조회한다.")
+	@DisplayName("회원의 특정 쿠폰 지갑을 성공적으로 조회한다. - CouponWallet")
 	@Test
 	void findByIdAndMemberId_success() {
 		// given
@@ -110,5 +111,30 @@ class CouponWalletSearchRepositoryTest {
 
 		// then
 		assertThat(actual.getCoupon()).isEqualTo(coupon);
+	}
+
+	@DisplayName("특정 회원의 특정 쿠폰을 조회한다. - CouponWallet")
+	@Test
+	void findByMemberIdAndCouponId_success() {
+		// Given
+		Coupon coupon = couponRepository.save(CouponFixture.coupon());
+		couponWalletRepository.save(CouponWallet.create(1L, coupon));
+
+		// When
+		CouponWallet actual = couponWalletSearchRepository.findByMemberIdAndCouponId(1L, coupon.getId())
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
+
+		// Then
+		assertThat(actual.getCoupon()).isEqualTo(coupon);
+	}
+
+	@DisplayName("특정 회원의 특정 쿠폰이 조회되지 않는다. - CouponWallet")
+	@Test
+	void findByMemberIdAndCouponId_notFound() {
+		// When
+		Optional<CouponWallet> actual = couponWalletSearchRepository.findByMemberIdAndCouponId(1L, 1L);
+
+		// Then
+		assertThat(actual).isEmpty();
 	}
 }

@@ -114,7 +114,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@Test
 	void create_Coupon_OpenAt_BadRequestException() throws Exception {
 		// Given
-		String couponType = CouponType.GOLDEN_COUPON.getName();
+		String couponType = CouponType.GOLDEN.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 1);
 
 		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));

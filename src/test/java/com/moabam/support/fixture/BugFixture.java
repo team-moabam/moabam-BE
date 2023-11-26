@@ -15,4 +15,12 @@ public final class BugFixture {
 			.goldenBug(GOLDEN_BUG)
 			.build();
 	}
+
+	public static Bug zeroBug() {
+		return Bug.builder()
+			.morningBug(0)
+			.nightBug(0)
+			.goldenBug(0)
+			.build();
+	}
 }

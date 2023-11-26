@@ -1,5 +1,6 @@
 package com.moabam.support.fixture;
 
+import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.member.Member;
 
 public final class MemberFixture {
@@ -11,6 +12,13 @@ public final class MemberFixture {
 		return Member.builder()
 			.socialId(SOCIAL_ID)
 			.bug(BugFixture.bug())
+			.build();
+	}
+
+	public static Member member(Bug bug) {
+		return Member.builder()
+			.socialId(SOCIAL_ID)
+			.bug(bug)
 			.build();
 	}
 

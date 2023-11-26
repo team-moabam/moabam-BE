@@ -166,7 +166,7 @@ class CouponServiceTest {
 	void create_OpenAt_BadRequestException() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
-		String couponType = CouponType.GOLDEN_COUPON.getName();
+		String couponType = CouponType.GOLDEN.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 1);
 
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);

@@ -14,10 +14,10 @@ class CouponTypeTest {
 	@Test
 	void from_success() {
 		// When
-		CouponType actual = CouponType.from(CouponType.GOLDEN_COUPON.getName());
+		CouponType actual = CouponType.from(CouponType.GOLDEN.getName());
 
 		// Then
-		assertThat(actual).isEqualTo(CouponType.GOLDEN_COUPON);
+		assertThat(actual).isEqualTo(CouponType.GOLDEN);
 	}
 
 	@DisplayName("존재하지 않는 쿠폰을 가져온다. - NotFoundException")
