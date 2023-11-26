@@ -60,7 +60,7 @@ public class CouponService {
 
 	@Transactional
 	public void use(Long memberId, Long couponWalletId) {
-		Coupon coupon = getByWallet(memberId, couponWalletId);
+		Coupon coupon = getByWalletIdAndMemberId(couponWalletId, memberId);
 		couponRepository.delete(coupon);
 	}
 
@@ -69,12 +69,6 @@ public class CouponService {
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 
 		return CouponMapper.toResponse(coupon);
-	}
-
-	public Coupon getByWallet(Long memberId, Long couponWalletId) {
-		return couponWalletRepository.findByIdAndMemberId(couponWalletId, memberId)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET))
-			.getCoupon();
 	}
 
 	public List<CouponResponse> getAllByStatus(CouponStatusRequest request) {
