@@ -1,18 +1,12 @@
 package com.moabam.api.application.room;
 
-import static com.moabam.api.domain.room.RoomType.MORNING;
-import static com.moabam.api.domain.room.RoomType.NIGHT;
-import static com.moabam.global.error.model.ErrorMessage.MEMBER_ROOM_EXCEED;
-import static com.moabam.global.error.model.ErrorMessage.PARTICIPANT_NOT_FOUND;
-import static com.moabam.global.error.model.ErrorMessage.ROOM_EXIT_MANAGER_FAIL;
-import static com.moabam.global.error.model.ErrorMessage.ROOM_MAX_USER_REACHED;
-import static com.moabam.global.error.model.ErrorMessage.ROOM_MODIFY_UNAUTHORIZED_REQUEST;
-import static com.moabam.global.error.model.ErrorMessage.ROOM_NOT_FOUND;
-import static com.moabam.global.error.model.ErrorMessage.WRONG_ROOM_PASSWORD;
+import static com.moabam.api.domain.room.RoomType.*;
+import static com.moabam.global.error.model.ErrorMessage.*;
 
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,9 +31,11 @@ import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.global.error.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class RoomService {
 
@@ -90,12 +86,19 @@ public class RoomService {
 
 	@Transactional
 	public void enterRoom(Long memberId, Long roomId, EnterRoomRequest enterRoomRequest) {
-		Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
+		Room room = roomRepository.findWithOptimisticLockById(roomId).orElseThrow(
+			() -> new NotFoundException(ROOM_NOT_FOUND));
 		validateRoomEnter(memberId, enterRoomRequest.password(), room);
-
 		Member member = memberService.getById(memberId);
-		member.enterRoom(room.getRoomType());
-		room.increaseCurrentUserCount();
+
+		try {
+			member.enterRoom(room.getRoomType());
+			room.increaseCurrentUserCount();
+		} catch (ObjectOptimisticLockingFailureException e) {
+			log.error("방 동시 입장 감지", e);
+			handleOptimisticLockException(member, room);
+			throw new BadRequestException(MEMBER_ROOM_EXCEED);
+		}
 
 		Participant participant = ParticipantMapper.toParticipant(room, memberId);
 		participantRepository.save(participant);
@@ -194,5 +197,10 @@ public class RoomService {
 		if (participant.isManager() && room.getCurrentUserCount() != 1) {
 			throw new BadRequestException(ROOM_EXIT_MANAGER_FAIL);
 		}
+	}
+
+	private void handleOptimisticLockException(Member member, Room room) {
+		member.exitRoom(room.getRoomType());
+		room.decreaseCurrentUserCount();
 	}
 }

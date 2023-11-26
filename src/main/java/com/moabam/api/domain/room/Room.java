@@ -17,6 +17,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -79,6 +80,9 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "manager_nickname", length = 30)
 	private String managerNickname;
 
+	@Version
+	private Long version;
+
 	@Builder
 	private Room(Long id, String title, String password, RoomType roomType, int certifyTime, int maxUserCount) {
 		this.id = id;
@@ -128,10 +132,6 @@ public class Room extends BaseTimeEntity {
 
 	public void increaseCurrentUserCount() {
 		this.currentUserCount += 1;
-
-		if (this.currentUserCount > this.maxUserCount) {
-			throw new BadRequestException(ROOM_MAX_USER_REACHED);
-		}
 	}
 
 	public void decreaseCurrentUserCount() {

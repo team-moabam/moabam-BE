@@ -1,14 +1,21 @@
 package com.moabam.api.domain.room.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.moabam.api.domain.room.Room;
 
+import jakarta.persistence.LockModeType;
+
 public interface RoomRepository extends JpaRepository<Room, Long> {
+
+	@Lock(LockModeType.OPTIMISTIC)
+	Optional<Room> findWithOptimisticLockById(Long id);
 
 	@Query(value = "select distinct rm.* from room rm left join routine rt on rm.id = rt.room_id "
 		+ "where rm.title like %:keyword% "
