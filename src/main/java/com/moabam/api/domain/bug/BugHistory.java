@@ -53,8 +53,9 @@ public class BugHistory extends BaseTimeEntity {
 	private int quantity;
 
 	@Builder
-	private BugHistory(Long memberId, BugType bugType, BugActionType actionType, int quantity) {
+	private BugHistory(Long memberId, Payment payment, BugType bugType, BugActionType actionType, int quantity) {
 		this.memberId = requireNonNull(memberId);
+		this.payment = payment;
 		this.bugType = requireNonNull(bugType);
 		this.actionType = requireNonNull(actionType);
 		this.quantity = validateQuantity(quantity);

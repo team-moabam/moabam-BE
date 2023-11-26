@@ -20,7 +20,7 @@ public class BugHistorySearchRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	public List<BugHistoryDto> findByMemberIdWithPayment(Long memberId) {
-		return jpaQueryFactory.select(Projections.fields(
+		return jpaQueryFactory.select(Projections.constructor(
 				BugHistoryDto.class,
 				bugHistory.id,
 				bugHistory.bugType,

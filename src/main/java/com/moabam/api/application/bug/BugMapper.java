@@ -1,6 +1,7 @@
 package com.moabam.api.application.bug;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.bug.BugActionType;
@@ -37,17 +38,19 @@ public final class BugMapper {
 	}
 
 	public static BugHistoryItemResponse toBugHistoryItemResponse(BugHistoryDto dto) {
-		BugHistoryItemResponse.PaymentResponse payment = BugHistoryItemResponse.PaymentResponse.builder()
-			.id(dto.payment().getId())
-			.orderName(dto.payment().getOrder().getName())
-			.discountAmount(dto.payment().getDiscountAmount())
-			.totalAmount(dto.payment().getTotalAmount())
-			.build();
+		BugHistoryItemResponse.PaymentResponse payment = Optional.ofNullable(dto.payment())
+			.map(p -> BugHistoryItemResponse.PaymentResponse.builder()
+				.id(p.getId())
+				.orderName(p.getOrder().getName())
+				.discountAmount(p.getDiscountAmount())
+				.totalAmount(p.getTotalAmount())
+				.build())
+			.orElse(null);
 
 		return BugHistoryItemResponse.builder()
 			.id(dto.id())
-			.bugType(dto.bugType().name())
-			.actionType(dto.actionType().name())
+			.bugType(dto.bugType())
+			.actionType(dto.actionType())
 			.quantity(dto.quantity())
 			.date(DateUtils.format(dto.createdAt()))
 			.payment(payment)
