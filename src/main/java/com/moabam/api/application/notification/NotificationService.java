@@ -31,11 +31,12 @@ public class NotificationService {
 	private static final String KNOCK_BODY = "%s님이 콕 찔렀습니다.";
 	private static final String CERTIFY_TIME_BODY = "%s방 인증 시간입니다.";
 
+	private final ClockHolder clockHolder;
 	private final FcmService fcmService;
 	private final RoomService roomService;
+
 	private final NotificationRepository notificationRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
-	private final ClockHolder clockHolder;
 
 	@Transactional
 	public void sendKnock(AuthMember member, Long targetId, Long roomId) {

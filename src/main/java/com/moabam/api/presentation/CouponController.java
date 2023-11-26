@@ -17,6 +17,7 @@ import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
+import com.moabam.api.dto.coupon.MyCouponResponse;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
 
@@ -57,5 +58,11 @@ public class CouponController {
 	@PostMapping("/coupons")
 	public void registerQueue(@Auth AuthMember authMember, @RequestParam("couponName") String couponName) {
 		couponManageService.register(authMember, couponName);
+	}
+
+	@GetMapping({"/my-coupons", "/my-coupons/{couponId}"})
+	public List<MyCouponResponse> getWallet(@Auth AuthMember authMember,
+		@PathVariable(value = "couponId", required = false) Long couponId) {
+		return couponService.getWallet(couponId, authMember);
 	}
 }

@@ -32,6 +32,18 @@ public final class CouponFixture {
 			.build();
 	}
 
+	public static Coupon coupon(String name, int startAt) {
+		return Coupon.builder()
+			.name(name)
+			.point(10)
+			.type(CouponType.MORNING_COUPON)
+			.stock(100)
+			.startAt(LocalDate.of(2023, startAt, 1))
+			.openAt(LocalDate.of(2023, 1, 1))
+			.adminId(1L)
+			.build();
+	}
+
 	public static Coupon coupon(int point, int stock) {
 		return Coupon.builder()
 			.name("couponName")

@@ -1,5 +1,6 @@
 package com.moabam.api.application.coupon;
 
+import static com.moabam.support.fixture.CouponFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -18,12 +19,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
+import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
+import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
+import com.moabam.api.dto.coupon.MyCouponResponse;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.common.util.ClockHolder;
@@ -49,6 +53,9 @@ class CouponServiceTest {
 
 	@Mock
 	CouponSearchRepository couponSearchRepository;
+
+	@Mock
+	CouponWalletSearchRepository couponWalletSearchRepository;
 
 	@Mock
 	ClockHolder clockHolder;
@@ -262,5 +269,40 @@ class CouponServiceTest {
 
 		// Then
 		assertThat(actual).hasSize(coupons.size());
+	}
+
+	@WithMember
+	@DisplayName("나의 쿠폰함을 성공적으로 조회한다.")
+	@MethodSource("com.moabam.support.fixture.CouponWalletFixture#provideCouponWalletByCouponId1_total5")
+	@ParameterizedTest
+	void getWallet_success(List<CouponWallet> couponWallets) {
+		// Given
+		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
+
+		given(couponWalletSearchRepository.findAllByCouponIdAndMemberId(isNull(), any(Long.class)))
+			.willReturn(couponWallets);
+
+		// When
+		List<MyCouponResponse> actual = couponService.getWallet(null, authMember);
+
+		// Then
+		assertThat(actual).hasSize(couponWallets.size());
+	}
+
+	@WithMember
+	@DisplayName("지갑에서 특정 쿠폰을 성공적으로 조회한다.")
+	@Test
+	void getByWalletIdAndMemberId_success() {
+		// Given
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon());
+
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.of(couponWallet));
+
+		// When
+		Coupon actual = couponService.getByWalletIdAndMemberId(1L, 1L);
+
+		// Then
+		assertThat(actual.getName()).isEqualTo(couponWallet.getCoupon().getName());
 	}
 }
