@@ -7,6 +7,8 @@ import static org.mockito.BDDMockito.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,7 +31,7 @@ import com.moabam.support.fixture.ReportFixture;
 import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith({MockitoExtension.class, FilterProcessExtension.class})
-public class ReportServiceTest {
+class ReportServiceTest {
 
 	@InjectMocks
 	ReportService reportService;
@@ -59,20 +61,30 @@ public class ReportServiceTest {
 	}
 
 	@DisplayName("신고 성공")
-	@Test
-	void report_success(@WithMember AuthMember authMember) {
+	@ParameterizedTest
+	@CsvSource({"true, false", "false, true"})
+	void report_success(boolean roomFilter, boolean certificationFilter, @WithMember AuthMember authMember) {
 		// given
 		Room room = RoomFixture.room();
 		Routine routine = RoomFixture.routine(room, "ets");
 		Certification certification = RoomFixture.certification(routine);
-		ReportRequest reportRequest = ReportFixture.reportRequest();
 		Member member = spy(MemberFixture.member());
 
-		given(member.getId()).willReturn(authMember.id());
+		Long roomId = null;
+		Long certificationId = null;
+
+		if (roomFilter) {
+			given(roomService.findRoom(any())).willReturn(RoomFixture.room());
+			roomId = 1L;
+		}
+		if (certificationFilter) {
+			given(certificationService.findCertification(any())).willReturn(certification);
+			certificationId = 1L;
+		}
+
+		ReportRequest reportRequest = ReportFixture.reportRequest(2L, roomId, certificationId);
+		given(member.getId()).willReturn(2L);
 		given(memberService.findMember(reportRequest.reportedId())).willReturn(member);
-		given(roomService.findRoom(reportRequest.roomId())).willReturn(RoomFixture.room());
-		given(certificationService.findCertification(reportRequest.certificationId()))
-			.willReturn(certification);
 
 		// When + Then
 		assertThatNoException()

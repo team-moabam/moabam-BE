@@ -32,12 +32,24 @@ public class ReportService {
 	@Transactional
 	public void report(AuthMember authMember, ReportRequest reportRequest) {
 		validateNoReportSubject(reportRequest.roomId(), reportRequest.certificationId());
-		Member reportedMember = memberService.findMember(reportRequest.reportedId());
-		Room room = roomService.findRoom(reportRequest.roomId());
-		Certification certification = certificationService.findCertification(reportRequest.certificationId());
-		Report report = ReportMapper.toReport(authMember.id(), reportedMember.getId(),
-			room, certification, reportRequest.description());
+		Report report = createReport(authMember.id(), reportRequest);
 		reportRepository.save(report);
+	}
+
+	private Report createReport(Long reporterId, ReportRequest reportRequest) {
+		Member reportedMember = memberService.findMember(reportRequest.reportedId());
+
+		if (nonNull(reportRequest.certificationId())) {
+			Certification certification = certificationService.findCertification(reportRequest.certificationId());
+
+			return ReportMapper.toReport(reporterId, reportedMember.getId(),
+				null, certification, reportRequest.description());
+		}
+
+		Room room = roomService.findRoom(reportRequest.roomId());
+
+		return ReportMapper.toReport(reporterId, reportedMember.getId(),
+			room, null, reportRequest.description());
 	}
 
 	private void validateNoReportSubject(Long roomId, Long certificationId) {

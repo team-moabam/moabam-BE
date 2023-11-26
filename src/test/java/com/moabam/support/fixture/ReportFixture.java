@@ -23,4 +23,8 @@ public class ReportFixture {
 	public static ReportRequest reportRequest() {
 		return new ReportRequest(reportedId, roomId, certificationId, "description");
 	}
+
+	public static ReportRequest reportRequest(Long reportedId, Long roomId, Long certificationId) {
+		return new ReportRequest(reportedId, roomId, certificationId, "description");
+	}
 }

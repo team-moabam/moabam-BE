@@ -20,7 +20,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "reports")
+@Table(name = "report")
 @Entity
 public class Report extends BaseTimeEntity {
 
@@ -51,5 +51,6 @@ public class Report extends BaseTimeEntity {
 		this.reportedMemberId = requireNonNull(reportedMemberId);
 		this.room = room;
 		this.certification = certification;
+		this.description = description;
 	}
 }
