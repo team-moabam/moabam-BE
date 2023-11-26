@@ -13,6 +13,8 @@ import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.payment.PaymentMapper;
 import com.moabam.api.application.product.ProductMapper;
+import com.moabam.api.domain.bug.BugType;
+import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.payment.Payment;
@@ -34,6 +36,7 @@ public class BugService {
 
 	private final MemberService memberService;
 	private final CouponService couponService;
+	private final BugHistoryRepository bugHistoryRepository;
 	private final ProductRepository productRepository;
 	private final PaymentRepository paymentRepository;
 
@@ -61,6 +64,12 @@ public class BugService {
 		paymentRepository.save(payment);
 
 		return ProductMapper.toPurchaseProductResponse(payment);
+	}
+
+	@Transactional
+	public void use(Member member, BugType bugType, int price) {
+		member.getBug().use(bugType, price);
+		bugHistoryRepository.save(BugMapper.toUseBugHistory(member.getId(), bugType, price));
 	}
 
 	private Product getById(Long productId) {
