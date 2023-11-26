@@ -1,10 +1,8 @@
 package com.moabam.api.application.room;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.lenient;
-import static org.mockito.BDDMockito.spy;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,6 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.application.image.ImageService;
 import com.moabam.api.application.member.MemberService;
+import com.moabam.api.application.room.mapper.CertificationsMapper;
+import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.room.DailyMemberCertification;
 import com.moabam.api.domain.room.DailyRoomCertification;
@@ -37,6 +37,7 @@ import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.domain.room.repository.RoutineRepository;
+import com.moabam.api.dto.room.CertifiedMemberInfo;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.RoomFixture;
@@ -111,15 +112,16 @@ class CertificationServiceTest {
 		room.levelUp();
 	}
 
-	@DisplayName("이미 인증되어 있는 방에서 루틴 인증 성공")
+	@DisplayName("방 인증 전 개인 인증 후 정보 불러오기 성공")
 	@Test
-	void already_certified_room_routine_success() {
+	void get_certified_member_info_success() {
 		// given
 		List<Routine> routines = RoomFixture.routines(room);
-		DailyRoomCertification dailyRoomCertification = RoomFixture.dailyRoomCertification(roomId, today);
-		List<String> uploadImages = new ArrayList<>();
-		uploadImages.add("https://image.moabam.com/certifications/20231108/1_asdfsdfxcv-4815vcx-asfd");
-		uploadImages.add("https://image.moabam.com/certifications/20231108/2_asdfsdfxcv-4815vcx-asfd");
+		DailyMemberCertification dailyMemberCertification =
+			RoomFixture.dailyMemberCertification(memberId, roomId, participant);
+		List<String> imageUrls = new ArrayList<>();
+		imageUrls.add("https://image.moabam.com/certifications/20231108/1_asdfsdfxcv-4815vcx-asfd");
+		imageUrls.add("https://image.moabam.com/certifications/20231108/2_asdfsdfxcv-4815vcx-asfd");
 
 		given(clockHolder.times()).willReturn(LocalDateTime.now().withHour(9).withMinute(58));
 		given(clockHolder.date()).willReturn(today);
@@ -127,42 +129,59 @@ class CertificationServiceTest {
 		given(memberService.getById(memberId)).willReturn(member1);
 		given(routineRepository.findById(1L)).willReturn(Optional.of(routines.get(0)));
 		given(routineRepository.findById(2L)).willReturn(Optional.of(routines.get(1)));
+		given(dailyMemberCertificationRepository.save(any(DailyMemberCertification.class))).willReturn(
+			dailyMemberCertification);
+		given(certificationRepository.saveAll(anyList())).willReturn(List.of());
+
+		// when
+		CertifiedMemberInfo certifiedMemberInfo = certificationService.getCertifiedMemberInfo(memberId, roomId,
+			imageUrls);
+
+		// then
+		assertThat(certifiedMemberInfo.member().getNickname()).isEqualTo(member1.getNickname());
+		assertThat(certifiedMemberInfo.bugType()).isEqualTo(BugType.MORNING);
+		assertThat(certifiedMemberInfo.date()).isEqualTo(today);
+	}
+
+	@DisplayName("이미 인증되어 있는 방에서 루틴 인증 성공")
+	@Test
+	void already_certified_room_routine_success() {
+		// given
+		DailyRoomCertification dailyRoomCertification = RoomFixture.dailyRoomCertification(roomId, today);
+
+		given(clockHolder.date()).willReturn(today);
 		given(certificationsSearchRepository.findDailyRoomCertification(roomId, today)).willReturn(
 			Optional.of(dailyRoomCertification));
 
+		CertifiedMemberInfo certifyInfo = CertificationsMapper.toCertifiedMemberInfo(clockHolder.date(),
+			BugType.MORNING, room,
+			member1);
+
 		// when
-		certificationService.certifyRoom(memberId, roomId, uploadImages);
+		certificationService.certifyRoom(certifyInfo);
 
 		// then
 		assertThat(member1.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member1.getTotalCertifyCount()).isEqualTo(1);
 	}
 
 	@DisplayName("인증되지 않은 방에서 루틴 인증 후 방의 인증 성공")
 	@Test
 	void not_certified_room_routine_success() {
 		// given
-		List<Routine> routines = RoomFixture.routines(room);
 		List<DailyMemberCertification> dailyMemberCertifications =
 			RoomFixture.dailyMemberCertifications(roomId, participant);
-		List<String> uploadImages = new ArrayList<>();
-		uploadImages.add("https://image.moabam.com/certifications/20231108/1_asdfsdfxcv-4815vcx-asfd");
-		uploadImages.add("https://image.moabam.com/certifications/20231108/2_asdfsdfxcv-4815vcx-asfd");
 
-		given(clockHolder.times()).willReturn(LocalDateTime.now().withHour(9).withMinute(58));
 		given(clockHolder.date()).willReturn(today);
-		given(participantSearchRepository.findOne(memberId, roomId)).willReturn(Optional.of(participant));
-		given(memberService.getById(memberId)).willReturn(member1);
-		given(routineRepository.findById(1L)).willReturn(Optional.of(routines.get(0)));
-		given(routineRepository.findById(2L)).willReturn(Optional.of(routines.get(1)));
-		given(certificationsSearchRepository.findDailyRoomCertification(roomId, today))
-			.willReturn(Optional.empty());
 		given(certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today))
 			.willReturn(dailyMemberCertifications);
 		given(memberService.getRoomMembers(anyList())).willReturn(List.of(member1, member2, member3));
 
+		CertifiedMemberInfo certifyInfo = CertificationsMapper.toCertifiedMemberInfo(clockHolder.date(),
+			BugType.MORNING, room,
+			member1);
+
 		// when
-		certificationService.certifyRoom(memberId, roomId, uploadImages);
+		certificationService.certifyRoom(certifyInfo);
 
 		// then
 		assertThat(member1.getBug().getMorningBug()).isEqualTo(12);
@@ -173,5 +192,4 @@ class CertificationServiceTest {
 		assertThat(room.getExp()).isEqualTo(1);
 		assertThat(room.getLevel()).isEqualTo(2);
 	}
-
 }

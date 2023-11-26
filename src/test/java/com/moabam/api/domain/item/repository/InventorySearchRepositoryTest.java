@@ -85,7 +85,7 @@ class InventorySearchRepositoryTest {
 	@Test
 	void find_one_success() {
 		// given
-		Member member = memberRepository.save(member());
+		Member member = memberRepository.save(member("999", "test"));
 		Item item = itemRepository.save(nightMageSkin());
 		Inventory inventory = inventoryRepository.save(inventory(member.getId(), item));
 
@@ -100,7 +100,7 @@ class InventorySearchRepositoryTest {
 	@Test
 	void find_default_success() {
 		// given
-		Member member = memberRepository.save(member());
+		Member member = memberRepository.save(member("11314", "test"));
 		Item item = itemRepository.save(nightMageSkin());
 		Inventory inventory = inventoryRepository.save(inventory(member.getId(), item));
 		inventory.select();
@@ -116,8 +116,8 @@ class InventorySearchRepositoryTest {
 	@Test
 	void find_all_default_type_night_success() {
 		// given
-		Member member1 = memberRepository.save(member("1", "회원1"));
-		Member member2 = memberRepository.save(member("2", "회원2"));
+		Member member1 = memberRepository.save(member("625", "회원1"));
+		Member member2 = memberRepository.save(member("255", "회원2"));
 		Item item = itemRepository.save(nightMageSkin());
 		Inventory inventory1 = inventoryRepository.save(inventory(member1.getId(), item));
 		Inventory inventory2 = inventoryRepository.save(inventory(member2.getId(), item));

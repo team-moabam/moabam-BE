@@ -49,7 +49,7 @@ class MemberRepositoryTest {
 	@Test
 	void test() {
 		// given
-		Member member = MemberFixture.member();
+		Member member = MemberFixture.member("313", "test");
 		memberRepository.save(member);
 
 		// when
@@ -67,7 +67,7 @@ class MemberRepositoryTest {
 		@Test
 		void room_exist_and_manager_error() {
 			// given
-			Member member = MemberFixture.member();
+			Member member = MemberFixture.member("1111", "test");
 			memberRepository.save(member);
 
 			Room room = RoomFixture.room();
@@ -93,7 +93,7 @@ class MemberRepositoryTest {
 			room.changeManagerNickname("test");
 			roomRepository.save(room);
 
-			Member member = MemberFixture.member();
+			Member member = MemberFixture.member("44", "test");
 			member.changeNickName("not");
 			memberRepository.save(member);
 
