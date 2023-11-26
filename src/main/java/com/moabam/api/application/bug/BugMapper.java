@@ -28,4 +28,13 @@ public final class BugMapper {
 			.quantity(quantity)
 			.build();
 	}
+
+	public static BugHistory toRewardBugHistory(Long memberId, BugType bugType, int quantity) {
+		return BugHistory.builder()
+			.memberId(memberId)
+			.bugType(bugType)
+			.actionType(BugActionType.REWARD)
+			.quantity(quantity)
+			.build();
+	}
 }

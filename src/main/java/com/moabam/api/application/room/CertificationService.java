@@ -1,9 +1,6 @@
 package com.moabam.api.application.room;
 
-import static com.moabam.global.error.model.ErrorMessage.DUPLICATED_DAILY_MEMBER_CERTIFICATION;
-import static com.moabam.global.error.model.ErrorMessage.INVALID_CERTIFY_TIME;
-import static com.moabam.global.error.model.ErrorMessage.PARTICIPANT_NOT_FOUND;
-import static com.moabam.global.error.model.ErrorMessage.ROUTINE_NOT_FOUND;
+import static com.moabam.global.error.model.ErrorMessage.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +12,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.moabam.api.application.bug.BugService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.room.mapper.CertificationsMapper;
 import com.moabam.api.domain.bug.BugType;
@@ -53,6 +51,7 @@ public class CertificationService {
 	private final DailyRoomCertificationRepository dailyRoomCertificationRepository;
 	private final DailyMemberCertificationRepository dailyMemberCertificationRepository;
 	private final MemberService memberService;
+	private final BugService bugService;
 	private final ClockHolder clockHolder;
 
 	@Transactional
@@ -81,7 +80,7 @@ public class CertificationService {
 			return;
 		}
 
-		member.getBug().increaseBug(bugType, roomLevel);
+		bugService.reward(member, bugType, roomLevel);
 	}
 
 	public boolean existsMemberCertification(Long memberId, Long roomId, LocalDate date) {
@@ -175,6 +174,6 @@ public class CertificationService {
 			.toList();
 
 		memberService.getRoomMembers(memberIds)
-			.forEach(completedMember -> completedMember.getBug().increaseBug(bugType, expAppliedRoomLevel));
+			.forEach(completedMember -> bugService.reward(completedMember, bugType, expAppliedRoomLevel));
 	}
 }

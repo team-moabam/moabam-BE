@@ -72,6 +72,12 @@ public class BugService {
 		bugHistoryRepository.save(BugMapper.toUseBugHistory(member.getId(), bugType, price));
 	}
 
+	@Transactional
+	public void reward(Member member, BugType bugType, int count) {
+		member.getBug().increase(bugType, count);
+		bugHistoryRepository.save(BugMapper.toRewardBugHistory(member.getId(), bugType, count));
+	}
+
 	private Product getById(Long productId) {
 		return productRepository.findById(productId)
 			.orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
