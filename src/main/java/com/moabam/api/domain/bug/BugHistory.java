@@ -3,6 +3,7 @@ package com.moabam.api.domain.bug;
 import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
+import com.moabam.api.domain.payment.Payment;
 import com.moabam.global.common.entity.BaseTimeEntity;
 import com.moabam.global.error.exception.BadRequestException;
 
@@ -10,9 +11,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -32,6 +36,10 @@ public class BugHistory extends BaseTimeEntity {
 
 	@Column(name = "member_id", updatable = false, nullable = false)
 	private Long memberId;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "payment_id")
+	private Payment payment;
 
 	@Enumerated(value = EnumType.STRING)
 	@Column(name = "bug_type", nullable = false)
