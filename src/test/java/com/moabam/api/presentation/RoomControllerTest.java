@@ -887,6 +887,37 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		assertThat(participantSearchRepository.findOne(member.getId(), room.getId())).isEmpty();
 	}
 
+	@DisplayName("방장 위임 성공")
+	@WithMember(id = 1L)
+	@Test
+	void mandate_manager_success() throws Exception {
+		// given
+		Member member2 = MemberFixture.member("1234", "방장될 멤버");
+		memberRepository.save(member2);
+
+		Room room = RoomFixture.room();
+		Participant participant1 = RoomFixture.participant(room, member.getId());
+		participant1.enableManager();
+		Participant participant2 = RoomFixture.participant(room, member2.getId());
+
+		roomRepository.save(room);
+		participantRepository.save(participant1);
+		participantRepository.save(participant2);
+
+		// expected
+		mockMvc.perform(put("/rooms/" + room.getId() + "/members/" + member2.getId() + "/mandate"))
+			.andExpect(status().isOk())
+			.andDo(print());
+
+		Room savedRoom = roomRepository.findById(room.getId()).orElseThrow();
+		Participant savedParticipant1 = participantRepository.findById(participant1.getId()).orElseThrow();
+		Participant savedParticipant2 = participantRepository.findById(participant2.getId()).orElseThrow();
+
+		assertThat(savedRoom.getManagerNickname()).isEqualTo(member2.getNickname());
+		assertThat(savedParticipant1.isManager()).isFalse();
+		assertThat(savedParticipant2.isManager()).isTrue();
+	}
+
 	@DisplayName("현재 참여중인 모든 방 조회 성공 - 첫번째 방은 개인과 방 모두 인증 성공")
 	@WithMember(id = 1L)
 	@Test
