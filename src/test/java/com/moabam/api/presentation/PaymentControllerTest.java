@@ -118,7 +118,7 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 			ConfirmPaymentRequest request = confirmPaymentRequest();
 			given(tossPaymentService.confirm(confirmTossPaymentRequest())).willReturn(confirmTossPaymentResponse());
 			given(memberService.getById(memberId)).willReturn(member());
-			
+
 			// expected
 			mockMvc.perform(post("/payments/confirm")
 					.contentType(APPLICATION_JSON)
