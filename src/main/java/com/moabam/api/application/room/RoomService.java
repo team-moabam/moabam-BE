@@ -6,7 +6,6 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,19 +85,13 @@ public class RoomService {
 
 	@Transactional
 	public void enterRoom(Long memberId, Long roomId, EnterRoomRequest enterRoomRequest) {
-		Room room = roomRepository.findWithOptimisticLockById(roomId).orElseThrow(
+		Room room = roomRepository.findWithPessimisticLockById(roomId).orElseThrow(
 			() -> new NotFoundException(ROOM_NOT_FOUND));
 		validateRoomEnter(memberId, enterRoomRequest.password(), room);
-		Member member = memberService.getById(memberId);
 
-		try {
-			member.enterRoom(room.getRoomType());
-			room.increaseCurrentUserCount();
-		} catch (ObjectOptimisticLockingFailureException e) {
-			log.error("방 동시 입장 감지", e);
-			handleOptimisticLockException(member, room);
-			throw new BadRequestException(MEMBER_ROOM_EXCEED);
-		}
+		Member member = memberService.getById(memberId);
+		member.enterRoom(room.getRoomType());
+		room.increaseCurrentUserCount();
 
 		Participant participant = ParticipantMapper.toParticipant(room, memberId);
 		participantRepository.save(participant);
@@ -197,10 +190,5 @@ public class RoomService {
 		if (participant.isManager() && room.getCurrentUserCount() != 1) {
 			throw new BadRequestException(ROOM_EXIT_MANAGER_FAIL);
 		}
-	}
-
-	private void handleOptimisticLockException(Member member, Room room) {
-		member.exitRoom(room.getRoomType());
-		room.decreaseCurrentUserCount();
 	}
 }

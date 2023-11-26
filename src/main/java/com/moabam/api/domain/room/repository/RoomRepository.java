@@ -14,8 +14,8 @@ import jakarta.persistence.LockModeType;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
-	@Lock(LockModeType.OPTIMISTIC)
-	Optional<Room> findWithOptimisticLockById(Long id);
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	Optional<Room> findWithPessimisticLockById(Long id);
 
 	@Query(value = "select distinct rm.* from room rm left join routine rt on rm.id = rt.room_id "
 		+ "where rm.title like %:keyword% "

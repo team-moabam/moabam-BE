@@ -2,6 +2,7 @@ package com.moabam.api.application.room;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -74,10 +75,12 @@ class RoomServiceConcurrencyTest {
 		CountDownLatch countDownLatch = new CountDownLatch(threadCount);
 
 		EnterRoomRequest enterRoomRequest = new EnterRoomRequest(null);
+		List<Member> newMembers = new ArrayList<>();
 
 		// when
 		for (int i = 0; i < threadCount; i++) {
 			Member member = MemberFixture.member(String.valueOf(i + 100), "test");
+			newMembers.add(member);
 			memberRepository.save(member);
 			final Long memberId = member.getId();
 
@@ -93,8 +96,16 @@ class RoomServiceConcurrencyTest {
 		countDownLatch.await();
 
 		List<Participant> actual = participantSearchRepository.findParticipantsByRoomId(room.getId());
+		Member newMember1 = memberRepository.findById(newMembers.get(0).getId()).orElseThrow();
+		Member newMember2 = memberRepository.findById(newMembers.get(1).getId()).orElseThrow();
+		Member newMember3 = memberRepository.findById(newMembers.get(2).getId()).orElseThrow();
 
 		// then
 		assertThat(actual).hasSize(4);
+		assertThat(newMember1.getCurrentMorningCount() + newMember2.getCurrentMorningCount()
+			+ newMember3.getCurrentMorningCount()).isEqualTo(1);
+
+		memberRepository.deleteAllById(List.of(member1.getId(), member2.getId(), member3.getId()));
+		memberRepository.deleteAll(newMembers);
 	}
 }

@@ -141,7 +141,7 @@ class InventorySearchRepositoryTest {
 		@Test
 		void bird_find_success() {
 			// given
-			Member member = MemberFixture.member();
+			Member member = MemberFixture.member("fffdd", "test");
 			member.exitRoom(RoomType.MORNING);
 			memberRepository.save(member);
 

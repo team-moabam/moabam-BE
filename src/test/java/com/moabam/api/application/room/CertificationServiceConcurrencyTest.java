@@ -120,6 +120,8 @@ class CertificationServiceConcurrencyTest {
 		assertThat(dailyRoomCertification).hasSize(1);
 
 		participantRepository.deleteAll();
+		memberRepository.deleteAllById(
+			List.of(member1.getId(), member2.getId(), member3.getId(), member4.getId(), member5.getId()));
 		dailyRoomCertificationRepository.deleteAll();
 		dailyMemberCertificationRepository.deleteAll();
 	}
