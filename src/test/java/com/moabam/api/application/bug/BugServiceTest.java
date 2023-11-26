@@ -103,7 +103,7 @@ class BugServiceTest {
 			PurchaseProductRequest request = new PurchaseProductRequest(couponWalletId);
 			given(productRepository.findById(productId)).willReturn(Optional.of(bugProduct()));
 			given(paymentRepository.save(any(Payment.class))).willReturn(payment);
-			given(couponService.getByWallet(memberId, couponWalletId)).willReturn(discount1000Coupon());
+			given(couponService.getByWalletIdAndMemberId(couponWalletId, memberId)).willReturn(discount1000Coupon());
 
 			// when
 			PurchaseProductResponse response = bugService.purchaseBugProduct(memberId, productId, request);

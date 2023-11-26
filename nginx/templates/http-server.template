@@ -1,6 +1,6 @@
 server {
-	listen          80;
-	server_name     ${SERVER_DOMAIN};
+    listen          80;
+    server_name     ${SERVER_DOMAIN};
 
     location / {
         return 301 https://$http_host$request_uri;

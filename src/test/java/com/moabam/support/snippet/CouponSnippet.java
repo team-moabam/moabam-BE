@@ -1,4 +1,4 @@
-package com.moabam.support.fixture;
+package com.moabam.support.snippet;
 
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -7,7 +7,7 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.snippet.Snippet;
 
-public final class CouponSnippetFixture {
+public final class CouponSnippet {
 
 	public static final RequestFieldsSnippet CREATE_COUPON_REQUEST = requestFields(
 		fieldWithPath("name").type(STRING).description("쿠폰명"),

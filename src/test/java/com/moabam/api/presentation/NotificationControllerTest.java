@@ -29,13 +29,13 @@ import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.infrastructure.fcm.FcmRepository;
 import com.moabam.api.infrastructure.fcm.FcmService;
-import com.moabam.api.infrastructure.redis.StringRedisRepository;
+import com.moabam.api.infrastructure.redis.ValueRedisRepository;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
-import com.moabam.support.fixture.ErrorSnippetFixture;
 import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.RoomFixture;
+import com.moabam.support.snippet.ErrorSnippet;
 
 @Transactional
 @SpringBootTest
@@ -43,41 +43,39 @@ import com.moabam.support.fixture.RoomFixture;
 @AutoConfigureRestDocs
 class NotificationControllerTest extends WithoutFilterSupporter {
 
-	private static final String KNOCK_KEY = "room_%s_member_%s_knocks_%s";
+	@Autowired
+	MockMvc mockMvc;
 
 	@Autowired
-	private MockMvc mockMvc;
+	MemberRepository memberRepository;
 
 	@Autowired
-	private MemberRepository memberRepository;
+	RoomRepository roomRepository;
 
 	@Autowired
-	private RoomRepository roomRepository;
+	NotificationRepository notificationRepository;
 
 	@Autowired
-	private NotificationRepository notificationRepository;
+	ValueRedisRepository valueRedisRepository;
 
 	@Autowired
-	private StringRedisRepository stringRedisRepository;
+	FcmService fcmService;
 
 	@Autowired
-	private FcmService fcmService;
-
-	@Autowired
-	private FcmRepository fcmRepository;
+	FcmRepository fcmRepository;
 
 	@MockBean
-	private FirebaseMessaging firebaseMessaging;
+	FirebaseMessaging firebaseMessaging;
 
-	private Member target;
-	private Room room;
-	private String knockKey;
+	Member target;
+	Room room;
+	String knockKey;
 
 	@BeforeEach
 	void setUp() {
 		target = memberRepository.save(MemberFixture.member("123", "targetName"));
 		room = roomRepository.save(RoomFixture.room());
-		knockKey = String.format(KNOCK_KEY, room.getId(), 1, target.getId());
+		knockKey = String.format("room_%s_member_%s_knocks_%s", room.getId(), 1, target.getId());
 
 		willReturn(null)
 			.given(firebaseMessaging)
@@ -87,13 +85,13 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 	@AfterEach
 	void setDown() {
 		fcmService.deleteTokenByMemberId(target.getId());
-		stringRedisRepository.delete(knockKey);
+		valueRedisRepository.delete(knockKey);
 	}
 
 	@WithMember
 	@DisplayName("POST - 성공적으로 FCM Token을 저장한다. - Void")
 	@Test
-	void createFcmToken() throws Exception {
+	void createFcmToken_success() throws Exception {
 		// When & Then
 		mockMvc.perform(post("/notifications")
 				.param("fcmToken", "FCM-TOKEN"))
@@ -119,9 +117,9 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember
-	@DisplayName("GET - 성공적으로 상대에게 콕 알림을 보낸다. - Void")
+	@DisplayName("GET - 상대에게 콕 알림을 성공적으로 보낸다. - Void")
 	@Test
-	void sendKnock() throws Exception {
+	void sendKnock_success() throws Exception {
 		// Given
 		fcmRepository.saveToken(target.getId(), "FCM_TOKEN");
 
@@ -144,7 +142,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 			.andDo(document("notifications/rooms/roomId/members/memberId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isNotFound())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_FCM_TOKEN.getMessage()));
@@ -156,7 +154,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 	void sendKnock_ConflictException() throws Exception {
 		// Given
 		fcmRepository.saveToken(target.getId(), "FCM_TOKEN");
-		notificationRepository.saveKnock(knockKey);
+		notificationRepository.saveKnock(1L, target.getId(), room.getId());
 
 		// When & Then
 		mockMvc.perform(get("/notifications/rooms/" + room.getId() + "/members/" + target.getId()))
@@ -164,7 +162,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 			.andDo(document("notifications/rooms/roomId/members/memberId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isConflict())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_KNOCK.getMessage()));
