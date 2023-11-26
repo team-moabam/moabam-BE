@@ -6,11 +6,16 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.moabam.api.application.member.MemberService;
+import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.CouponType;
 import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
+import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
+import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
@@ -31,10 +36,12 @@ import lombok.RequiredArgsConstructor;
 public class CouponService {
 
 	private final ClockHolder clockHolder;
+	private final MemberService memberService;
 	private final CouponManageService couponManageService;
 
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
+	private final CouponWalletRepository couponWalletRepository;
 	private final CouponWalletSearchRepository couponWalletSearchRepository;
 
 	@Transactional
@@ -46,6 +53,19 @@ public class CouponService {
 
 		Coupon coupon = CouponMapper.toEntity(admin.id(), request);
 		couponRepository.save(coupon);
+	}
+
+	@Transactional
+	public void use(AuthMember authMember, Long couponId) {
+		CouponWallet couponWallet = couponWalletSearchRepository.findByMemberIdAndCouponId(authMember.id(), couponId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
+
+		Coupon coupon = couponWallet.getCoupon();
+		coupon.getType().validateNotDiscount();
+		Member member = memberService.getById(authMember.id());
+		increaseBug(member, coupon.getType(), coupon.getPoint());
+
+		couponWalletRepository.delete(couponWallet);
 	}
 
 	@Transactional
@@ -82,6 +102,14 @@ public class CouponService {
 		return couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET))
 			.getCoupon();
+	}
+
+	private void increaseBug(Member member, CouponType couponType, int point) {
+		switch (couponType) {
+			case MORNING -> member.getBug().increaseBug(BugType.MORNING, point);
+			case NIGHT -> member.getBug().increaseBug(BugType.NIGHT, point);
+			case GOLDEN -> member.getBug().increaseBug(BugType.GOLDEN, point);
+		}
 	}
 
 	private void validatePeriod(LocalDate startAt, LocalDate openAt) {

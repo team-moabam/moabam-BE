@@ -17,12 +17,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
 import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
+import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
+import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
@@ -37,7 +40,9 @@ import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.FilterProcessExtension;
+import com.moabam.support.fixture.BugFixture;
 import com.moabam.support.fixture.CouponFixture;
+import com.moabam.support.fixture.MemberFixture;
 
 @ExtendWith({MockitoExtension.class, FilterProcessExtension.class})
 class CouponServiceTest {
@@ -49,7 +54,13 @@ class CouponServiceTest {
 	CouponManageService couponManageService;
 
 	@Mock
+	MemberService memberService;
+
+	@Mock
 	CouponRepository couponRepository;
+
+	@Mock
+	CouponWalletRepository couponWalletRepository;
 
 	@Mock
 	CouponSearchRepository couponSearchRepository;
@@ -304,5 +315,60 @@ class CouponServiceTest {
 
 		// Then
 		assertThat(actual.getName()).isEqualTo(couponWallet.getCoupon().getName());
+	}
+
+	@WithMember
+	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있는 특정 쿠폰을 사용한다. - Void")
+	@Test
+	void use_success() {
+		// Given
+		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
+		Member member = MemberFixture.member(BugFixture.zeroBug());
+		Coupon coupon = CouponFixture.coupon(CouponType.GOLDEN, 1000);
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
+
+		given(memberService.getById(any(Long.class))).willReturn(member);
+		given(couponWalletSearchRepository.findByMemberIdAndCouponId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.of(couponWallet));
+
+		// When
+		couponService.use(authMember, 1L);
+
+		// Then
+		verify(couponWalletRepository).delete(any(CouponWallet.class));
+	}
+
+	@WithMember
+	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있는 할인 쿠폰을 사용한다. - BadRequestException")
+	@Test
+	void use_BadRequestException() {
+		// Given
+		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
+		Coupon coupon = CouponFixture.coupon(CouponType.DISCOUNT, 1000);
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
+
+		given(couponWalletSearchRepository.findByMemberIdAndCouponId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.of(couponWallet));
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.use(authMember, 1L))
+			.isInstanceOf(BadRequestException.class)
+			.hasMessage(ErrorMessage.INVALID_DISCOUNT_COUPON.getMessage());
+	}
+
+	@WithMember
+	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있지 않은 쿠폰을 사용한다. - NotFoundException")
+	@Test
+	void use_NotFoundException() {
+		// Given
+		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
+
+		given(couponWalletSearchRepository.findByMemberIdAndCouponId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.use(authMember, 1L))
+			.isInstanceOf(NotFoundException.class)
+			.hasMessage(ErrorMessage.NOT_FOUND_COUPON_WALLET.getMessage());
 	}
 }
