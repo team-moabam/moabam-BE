@@ -22,15 +22,15 @@ import com.moabam.support.fixture.CouponFixture;
 class CouponSearchRepositoryTest {
 
 	@Autowired
-	private CouponRepository couponRepository;
+	CouponRepository couponRepository;
 
 	@Autowired
-	private CouponSearchRepository couponSearchRepository;
+	CouponSearchRepository couponSearchRepository;
 
-	@DisplayName("발급 가능한 쿠폰을 조회한다. - List<CouponResponse>")
+	@DisplayName("발급 가능한 쿠폰을 성공적으로 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void findAllByStatus(List<Coupon> coupons) {
+	void findAllByStatus_success(List<Coupon> coupons) {
 		// Given
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false);
 		LocalDate now = LocalDate.of(2023, 7, 1);

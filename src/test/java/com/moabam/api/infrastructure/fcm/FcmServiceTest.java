@@ -20,18 +20,18 @@ import com.moabam.support.common.WithoutFilterSupporter;
 class FcmServiceTest extends WithoutFilterSupporter {
 
 	@Autowired
-	private FcmService fcmService;
+	FcmService fcmService;
 
 	@MockBean
-	private FirebaseMessaging firebaseMessaging;
+	FirebaseMessaging firebaseMessaging;
 
 	@MockBean
-	private FcmRepository fcmRepository;
+	FcmRepository fcmRepository;
 
 	@WithMember
 	@DisplayName("FCM 토큰이 성공적으로 저장된다. - Void")
 	@Test
-	void saveToken() {
+	void saveToken_success() {
 		// Given
 		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
 
@@ -72,7 +72,7 @@ class FcmServiceTest extends WithoutFilterSupporter {
 
 	@DisplayName("FCM 토큰이 성공적으로 삭제된다. - Void")
 	@Test
-	void deleteTokenByMemberId() {
+	void deleteTokenByMemberId_success() {
 		// When
 		fcmRepository.deleteTokenByMemberId(1L);
 
@@ -82,7 +82,7 @@ class FcmServiceTest extends WithoutFilterSupporter {
 
 	@DisplayName("FCM 토큰을 성공적으로 조회된다. - (String) FCM TOKEN")
 	@Test
-	void findTokenByMemberId() {
+	void findTokenByMemberId_success() {
 		// When
 		fcmRepository.findTokenByMemberId(1L);
 
@@ -92,7 +92,7 @@ class FcmServiceTest extends WithoutFilterSupporter {
 
 	@DisplayName("비동기 FCM 알림을 성공적으로 보낸다. - Void")
 	@Test
-	void sendAsync() {
+	void sendAsync_success() {
 		// When
 		fcmService.sendAsync("FCM-TOKEN", "알림");
 

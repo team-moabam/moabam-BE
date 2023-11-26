@@ -9,17 +9,14 @@ import com.moabam.support.fixture.CouponFixture;
 
 class CouponWalletTest {
 
-	@DisplayName("쿠폰 지갑 엔티티를 생성한다. - Void")
+	@DisplayName("쿠폰 지갑 엔티티를 성공적으로 생성한다. - Void")
 	@Test
-	void couponWallet() {
+	void couponWallet_success() {
 		// Given
 		Coupon coupon = CouponFixture.coupon("CouponName", 1, 2);
 
 		// When
-		CouponWallet actual = CouponWallet.builder()
-			.memberId(1L)
-			.coupon(coupon)
-			.build();
+		CouponWallet actual = CouponWallet.create(1L, coupon);
 
 		// Then
 		assertThat(actual.getMemberId()).isEqualTo(1L);

@@ -114,11 +114,11 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	@AfterEach
 	void cleanUp() {
 		while (member.getCurrentMorningCount() > 0) {
-			member.exitMorningRoom();
+			member.exitRoom(MORNING);
 		}
 
 		while (member.getCurrentNightCount() > 0) {
-			member.exitNightRoom();
+			member.exitRoom(NIGHT);
 		}
 	}
 

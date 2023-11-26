@@ -53,7 +53,7 @@ public class RoomService {
 	public Long createRoom(Long memberId, String nickname, CreateRoomRequest createRoomRequest) {
 		Room room = RoomMapper.toRoomEntity(createRoomRequest);
 		List<Routine> routines = RoutineMapper.toRoutineEntities(room, createRoomRequest.routines());
-		Participant participant = ParticipantMapper.toParticipantEntity(room, memberId);
+		Participant participant = ParticipantMapper.toParticipant(room, memberId);
 
 		validateEnteredRoomCount(memberId, room.getRoomType());
 
@@ -97,7 +97,7 @@ public class RoomService {
 		member.enterRoom(room.getRoomType());
 		room.increaseCurrentUserCount();
 
-		Participant participant = ParticipantMapper.toParticipantEntity(room, memberId);
+		Participant participant = ParticipantMapper.toParticipant(room, memberId);
 		participantRepository.save(participant);
 	}
 
