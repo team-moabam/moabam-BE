@@ -24,7 +24,7 @@ public final class PaymentFixture {
 			.memberId(1L)
 			.product(product)
 			.order(order(product))
-			.amount(product.getPrice())
+			.totalAmount(product.getPrice())
 			.build();
 	}
 
@@ -32,10 +32,10 @@ public final class PaymentFixture {
 		return Payment.builder()
 			.memberId(1L)
 			.product(product)
-			.coupon(coupon)
 			.couponWalletId(couponWalletId)
 			.order(order(product))
-			.amount(product.getPrice())
+			.totalAmount(product.getPrice())
+			.discountAmount(coupon.getPoint())
 			.build();
 	}
 

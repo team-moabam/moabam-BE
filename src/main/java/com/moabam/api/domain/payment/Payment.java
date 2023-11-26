@@ -52,18 +52,17 @@ public class Payment {
 	@JoinColumn(name = "product_id", updatable = false, nullable = false)
 	private Product product;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "coupon_id")
-	private Coupon coupon;
-
 	@Column(name = "coupon_wallet_id")
 	private Long couponWalletId;
 
 	@Embedded
 	private Order order;
 
-	@Column(name = "amount", nullable = false)
-	private int amount;
+	@Column(name = "total_amount", nullable = false)
+	private int totalAmount;
+
+	@Column(name = "discount_amount", nullable = false)
+	private int discountAmount;
 
 	@Column(name = "payment_key")
 	private String paymentKey;
@@ -83,14 +82,14 @@ public class Payment {
 	private LocalDateTime approvedAt;
 
 	@Builder
-	public Payment(Long memberId, Product product, Coupon coupon, Long couponWalletId, Order order, int amount,
-		PaymentStatus status) {
+	public Payment(Long memberId, Product product, Long couponWalletId, Order order, int totalAmount,
+		int discountAmount, PaymentStatus status) {
 		this.memberId = requireNonNull(memberId);
 		this.product = requireNonNull(product);
-		this.coupon = coupon;
 		this.couponWalletId = couponWalletId;
 		this.order = requireNonNull(order);
-		this.amount = validateAmount(amount);
+		this.totalAmount = validateAmount(totalAmount);
+		this.discountAmount = validateAmount(discountAmount);
 		this.status = requireNonNullElse(status, PaymentStatus.READY);
 	}
 
@@ -104,7 +103,7 @@ public class Payment {
 
 	public void validateInfo(Long memberId, int amount) {
 		validateByMember(memberId);
-		validateByAmount(amount);
+		validateByTotalAmount(amount);
 	}
 
 	public void validateByMember(Long memberId) {
@@ -113,8 +112,8 @@ public class Payment {
 		}
 	}
 
-	private void validateByAmount(int amount) {
-		if (this.amount != amount) {
+	private void validateByTotalAmount(int amount) {
+		if (this.totalAmount != amount) {
 			throw new BadRequestException(INVALID_PAYMENT_INFO);
 		}
 	}
@@ -124,9 +123,9 @@ public class Payment {
 	}
 
 	public void applyCoupon(Coupon coupon, Long couponWalletId) {
-		this.coupon = coupon;
 		this.couponWalletId = couponWalletId;
-		this.amount = Math.max(MIN_AMOUNT, this.amount - coupon.getPoint());
+		this.discountAmount = coupon.getPoint();
+		this.totalAmount = Math.max(MIN_AMOUNT, this.totalAmount - coupon.getPoint());
 	}
 
 	public void request(String orderId) {
