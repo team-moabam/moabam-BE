@@ -415,6 +415,5 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		// expected
 		mockMvc.perform(get("/members/{memberId}", 123L))
 			.andExpect(status().is4xxClientError());
-
 	}
 }

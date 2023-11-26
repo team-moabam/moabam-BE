@@ -146,19 +146,9 @@ class ReportControllerTest extends WithoutFilterSupporter {
 	@DisplayName("방이나 인증 하나 신고 실패")
 	@WithMember
 	@ParameterizedTest
-	@CsvSource({"true, false", "false, true", "true, true"})
-	void reports_failBy_room_certification(boolean roomFilter, boolean certificationFilter) throws Exception {
+	@CsvSource({"12394,", ",123415", "12394, 123415"})
+	void reports_failBy_room_certification(Long roomId, Long certificationId) throws Exception {
 		// given
-		Long roomId = null;
-		Long certificationId = null;
-
-		if (roomFilter) {
-			roomId = 12394L;
-		}
-		if (certificationFilter) {
-			certificationId = 123415L;
-		}
-
 		ReportRequest reportRequest = ReportFixture.reportRequest(reportedMember.getId(), roomId,
 			certificationId);
 		String request = objectMapper.writeValueAsString(reportRequest);

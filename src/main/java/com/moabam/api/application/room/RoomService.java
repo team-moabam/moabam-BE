@@ -1,14 +1,7 @@
 package com.moabam.api.application.room;
 
-import static com.moabam.api.domain.room.RoomType.MORNING;
-import static com.moabam.api.domain.room.RoomType.NIGHT;
-import static com.moabam.global.error.model.ErrorMessage.MEMBER_ROOM_EXCEED;
-import static com.moabam.global.error.model.ErrorMessage.PARTICIPANT_NOT_FOUND;
-import static com.moabam.global.error.model.ErrorMessage.ROOM_EXIT_MANAGER_FAIL;
-import static com.moabam.global.error.model.ErrorMessage.ROOM_MAX_USER_REACHED;
-import static com.moabam.global.error.model.ErrorMessage.ROOM_MODIFY_UNAUTHORIZED_REQUEST;
-import static com.moabam.global.error.model.ErrorMessage.ROOM_NOT_FOUND;
-import static com.moabam.global.error.model.ErrorMessage.WRONG_ROOM_PASSWORD;
+import static com.moabam.api.domain.room.RoomType.*;
+import static com.moabam.global.error.model.ErrorMessage.*;
 
 import java.util.List;
 
