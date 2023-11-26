@@ -31,13 +31,10 @@ import com.moabam.api.domain.coupon.CouponType;
 import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
-import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
-import com.moabam.global.auth.model.AuthMember;
-import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
@@ -456,10 +453,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@Test
 	void use_success() throws Exception {
 		// Given
-		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
-		Member member = memberRepository.save(MemberFixture.member(authMember.id()));
 		Coupon coupon = couponRepository.save(CouponFixture.coupon());
-		couponWalletRepository.save(CouponWallet.create(member.getId(), coupon));
+		couponWalletRepository.save(CouponWallet.create(1L, coupon));
+		memberRepository.save(MemberFixture.member(1L));
 
 		// When & Then
 		mockMvc.perform(post("/my-coupons/" + coupon.getId()))
@@ -479,7 +475,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andDo(print())
 			.andDo(document("my-coupons/couponId",
 				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint())))
+				preprocessResponse(prettyPrint()),
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isNotFound())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON_WALLET.getMessage()));
@@ -491,17 +488,16 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@Test
 	void use_BadRequestException() throws Exception {
 		// Given
-		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
-		Member member = memberRepository.save(MemberFixture.member(authMember.id()));
 		Coupon coupon = couponRepository.save(CouponFixture.coupon(CouponType.DISCOUNT, 1000));
-		couponWalletRepository.save(CouponWallet.create(member.getId(), coupon));
+		couponWalletRepository.save(CouponWallet.create(1L, coupon));
 
 		// When & Then
 		mockMvc.perform(post("/my-coupons/" + coupon.getId()))
 			.andDo(print())
 			.andDo(document("my-coupons/couponId",
 				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint())))
+				preprocessResponse(prettyPrint()),
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isBadRequest())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_DISCOUNT_COUPON.getMessage()));
