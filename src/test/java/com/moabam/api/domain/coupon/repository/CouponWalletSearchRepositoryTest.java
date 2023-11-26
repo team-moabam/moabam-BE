@@ -23,9 +23,9 @@ class CouponWalletSearchRepositoryTest {
 	@Autowired
 	private CouponWalletSearchRepository couponWalletSearchRepository;
 
-	@DisplayName("회원의 특정 쿠폰 지갑을 조회한다.")
+	@DisplayName("회원의 특정 쿠폰 지갑을 성공적으로 조회한다.")
 	@Test
-	void find_by_id_and_member_id() {
+	void findByIdAndMemberId_success() {
 		// given
 		Long id = 1L;
 		Long memberId = 1L;

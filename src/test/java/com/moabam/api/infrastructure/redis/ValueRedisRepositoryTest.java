@@ -13,11 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.moabam.global.config.EmbeddedRedisConfig;
 
-@SpringBootTest(classes = {EmbeddedRedisConfig.class, StringRedisRepository.class})
-class StringRedisRepositoryTest {
+@SpringBootTest(classes = {EmbeddedRedisConfig.class, ValueRedisRepository.class})
+class ValueRedisRepositoryTest {
 
 	@Autowired
-	StringRedisRepository stringRedisRepository;
+	ValueRedisRepository valueRedisRepository;
 
 	String key = "key";
 	String value = "value";
@@ -26,17 +26,17 @@ class StringRedisRepositoryTest {
 
 	@BeforeEach
 	void setUp() {
-		stringRedisRepository.save(key, value, duration);
+		valueRedisRepository.save(key, value, duration);
 	}
 
 	@AfterEach
 	void setDown() {
-		if (stringRedisRepository.hasKey(key)) {
-			stringRedisRepository.delete(key);
+		if (valueRedisRepository.hasKey(key)) {
+			valueRedisRepository.delete(key);
 		}
 
-		if (stringRedisRepository.hasKey(stockKey)) {
-			stringRedisRepository.delete(stockKey);
+		if (valueRedisRepository.hasKey(stockKey)) {
+			valueRedisRepository.delete(stockKey);
 		}
 	}
 
@@ -44,41 +44,41 @@ class StringRedisRepositoryTest {
 	@Test
 	void save_success() {
 		// Then
-		assertThat(stringRedisRepository.get(key)).isEqualTo(value);
+		assertThat(valueRedisRepository.get(key)).isEqualTo(value);
 	}
 
 	@DisplayName("레디스의 특정 데이터가 성공적으로 조회된다. - String(Value)")
 	@Test
 	void get_success() {
 		// When
-		String actual = stringRedisRepository.get(key);
+		String actual = valueRedisRepository.get(key);
 
 		// Then
-		assertThat(actual).isEqualTo(stringRedisRepository.get(key));
+		assertThat(actual).isEqualTo(valueRedisRepository.get(key));
 	}
 
 	@DisplayName("레디스의 특정 데이터 존재 여부를 성공적으로 체크한다. - Boolean")
 	@Test
 	void hasKey_success() {
 		// When & Then
-		assertThat(stringRedisRepository.hasKey("not found key")).isFalse();
+		assertThat(valueRedisRepository.hasKey("not found key")).isFalse();
 	}
 
 	@DisplayName("레디스의 특정 데이터가 성공적으로 삭제된다. - Void")
 	@Test
 	void delete_success() {
 		// When
-		stringRedisRepository.delete(key);
+		valueRedisRepository.delete(key);
 
 		// Then
-		assertThat(stringRedisRepository.hasKey(key)).isFalse();
+		assertThat(valueRedisRepository.hasKey(key)).isFalse();
 	}
 
 	@DisplayName("레디스의 특정 데이터의 값이 1 증가한다.")
 	@Test
 	void increment_success() {
 		// When
-		Long actual = stringRedisRepository.increment(stockKey);
+		Long actual = valueRedisRepository.increment(stockKey);
 
 		// Then
 		assertThat(actual).isEqualTo(1L);

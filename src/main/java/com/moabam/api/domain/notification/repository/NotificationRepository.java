@@ -7,7 +7,7 @@ import java.time.Duration;
 
 import org.springframework.stereotype.Repository;
 
-import com.moabam.api.infrastructure.redis.StringRedisRepository;
+import com.moabam.api.infrastructure.redis.ValueRedisRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,19 +15,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationRepository {
 
+	private static final String KNOCK_KEY = "room_%s_member_%s_knocks_%s";
 	private static final long EXPIRE_KNOCK = 12;
 
-	private final StringRedisRepository stringRedisRepository;
+	private final ValueRedisRepository valueRedisRepository;
 
-	public void saveKnock(String key) {
-		stringRedisRepository.save(
-			requireNonNull(key),
-			BLANK,
-			Duration.ofHours(EXPIRE_KNOCK)
-		);
+	public void saveKnock(Long memberId, Long targetId, Long roomId) {
+		String knockKey =
+			String.format(KNOCK_KEY, requireNonNull(roomId), requireNonNull(memberId), requireNonNull(targetId));
+
+		valueRedisRepository.save(knockKey, BLANK, Duration.ofHours(EXPIRE_KNOCK));
 	}
 
-	public boolean existsKnockByKey(String key) {
-		return stringRedisRepository.hasKey(requireNonNull(key));
+	public boolean existsKnockByKey(Long memberId, Long targetId, Long roomId) {
+		String knockKey =
+			String.format(KNOCK_KEY, requireNonNull(roomId), requireNonNull(memberId), requireNonNull(targetId));
+
+		return valueRedisRepository.hasKey(requireNonNull(knockKey));
 	}
 }
