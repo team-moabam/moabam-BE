@@ -469,9 +469,11 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers</code></pre>
+Access-Control-Allow-Origin:
+Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 3600</code></pre>
 </div>
 </div>
 </div>
@@ -497,9 +499,11 @@ fcmToken=FCM-TOKEN</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers</code></pre>
+Access-Control-Allow-Origin:
+Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 3600</code></pre>
 </div>
 </div>
 </div>

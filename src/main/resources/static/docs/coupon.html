@@ -479,9 +479,11 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers</code></pre>
+Access-Control-Allow-Origin:
+Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 3600</code></pre>
 </div>
 </div>
 <hr>
@@ -504,9 +506,11 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers</code></pre>
+Access-Control-Allow-Origin:
+Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 3600</code></pre>
 </div>
 </div>
 <hr>
@@ -530,9 +534,11 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
+Access-Control-Allow-Origin:
+Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 3600
 Content-Type: application/json
 Content-Length: 205
 
@@ -578,9 +584,11 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
+Access-Control-Allow-Origin:
+Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 3600
 Content-Type: application/json
 Content-Length: 206
 
@@ -623,9 +631,11 @@ couponName=couponName</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
+Access-Control-Allow-Origin:
+Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 3600
 Content-Type: application/json
 Content-Length: 64
 
@@ -656,9 +666,11 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
+Access-Control-Allow-Origin:
+Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 3600
 Content-Type: application/json
 Content-Length: 507
 
@@ -712,7 +724,7 @@ Content-Length: 507
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-24 01:42:57 +0900
+Last updated 2023-11-26 13:42:48 +0900
 </div>
 </div>
 </body>

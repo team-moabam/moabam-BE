@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,7 +69,7 @@ class CouponServiceTest {
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
 
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
 
 		// When
 		couponService.create(admin, request);
@@ -102,7 +101,7 @@ class CouponServiceTest {
 		CreateCouponRequest request = CouponFixture.createCouponRequest("UNKNOWN", 2, 1);
 
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
 
 		// When & Then
 		assertThatThrownBy(() -> couponService.create(admin, request))
@@ -151,7 +150,7 @@ class CouponServiceTest {
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
 
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2025, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2025, 1, 1));
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
 		given(couponRepository.existsByStartAt(any(LocalDate.class))).willReturn(false);
 
@@ -172,7 +171,7 @@ class CouponServiceTest {
 
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
 		given(couponRepository.existsByStartAt(any(LocalDate.class))).willReturn(false);
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
 
 		// When & Then
 		assertThatThrownBy(() -> couponService.create(admin, request))
@@ -186,7 +185,8 @@ class CouponServiceTest {
 	void delete_success() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
-		Coupon coupon = coupon(10, 100);
+		Coupon coupon = CouponFixture.coupon(10, 100);
+
 		given(couponRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
 
 		// When
@@ -216,6 +216,7 @@ class CouponServiceTest {
 	void delete_NotFoundException() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
+
 		given(couponRepository.findById(any(Long.class))).willReturn(Optional.empty());
 
 		// When & Then
@@ -228,7 +229,8 @@ class CouponServiceTest {
 	@Test
 	void getById_success() {
 		// Given
-		Coupon coupon = coupon(10, 100);
+		Coupon coupon = CouponFixture.coupon(10, 100);
+
 		given(couponRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
 
 		// When
@@ -258,7 +260,7 @@ class CouponServiceTest {
 		// Given
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false);
 
-		given(clockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponSearchRepository.findAllByStatus(any(LocalDate.class), any(CouponStatusRequest.class)))
 			.willReturn(coupons);
 

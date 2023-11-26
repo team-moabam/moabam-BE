@@ -147,7 +147,7 @@ class MemberServiceTest {
 
 		given(memberSearchRepository.findMemberAndBadges(authMember.id(), true))
 			.willReturn(MemberInfoSearchFixture.friendMemberInfo(total));
-		given(inventorySearchRepository.findBirdsDefaultSkin(authMember.id()))
+		given(inventorySearchRepository.findDefaultSkin(authMember.id()))
 			.willReturn(List.of(
 				InventoryFixture.inventory(authMember.id(), morning),
 				InventoryFixture.inventory(authMember.id(), night)));
@@ -177,7 +177,7 @@ class MemberServiceTest {
 
 			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
 				.willReturn(MemberInfoSearchFixture.myInfo());
-			given(inventorySearchRepository.findBirdsDefaultSkin(searchId)).willReturn(List.of(morningSkin, nightSkin));
+			given(inventorySearchRepository.findDefaultSkin(searchId)).willReturn(List.of(morningSkin, nightSkin));
 
 			// when
 			MemberInfoResponse memberInfoResponse = memberService.searchInfo(authMember, null);
@@ -193,7 +193,7 @@ class MemberServiceTest {
 			// given
 			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
 				.willReturn(MemberInfoSearchFixture.friendMemberInfo());
-			given(inventorySearchRepository.findBirdsDefaultSkin(anyLong())).willReturn(List.of());
+			given(inventorySearchRepository.findDefaultSkin(anyLong())).willReturn(List.of());
 
 			// when
 			assertThatThrownBy(() -> memberService.searchInfo(authMember, 123L))
@@ -215,7 +215,7 @@ class MemberServiceTest {
 
 			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
 				.willReturn(MemberInfoSearchFixture.myInfo());
-			given(inventorySearchRepository.findBirdsDefaultSkin(searchId))
+			given(inventorySearchRepository.findDefaultSkin(searchId))
 				.willReturn(List.of(morningSkin, nightSkin, killSkin));
 
 			// when

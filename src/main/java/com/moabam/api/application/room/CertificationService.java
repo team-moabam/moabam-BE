@@ -1,7 +1,9 @@
 package com.moabam.api.application.room;
 
-import static com.moabam.api.domain.image.ImageType.*;
-import static com.moabam.global.error.model.ErrorMessage.*;
+import static com.moabam.global.error.model.ErrorMessage.DUPLICATED_DAILY_MEMBER_CERTIFICATION;
+import static com.moabam.global.error.model.ErrorMessage.INVALID_CERTIFY_TIME;
+import static com.moabam.global.error.model.ErrorMessage.PARTICIPANT_NOT_FOUND;
+import static com.moabam.global.error.model.ErrorMessage.ROUTINE_NOT_FOUND;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,9 +14,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.moabam.api.application.image.ImageService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.room.mapper.CertificationsMapper;
 import com.moabam.api.domain.bug.BugType;
@@ -42,7 +42,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RoomCertificationService {
+public class CertificationService {
+
+	private static final int REQUIRED_ROOM_CERTIFICATION = 75;
 
 	private final RoutineRepository routineRepository;
 	private final CertificationRepository certificationRepository;
@@ -51,12 +53,11 @@ public class RoomCertificationService {
 	private final DailyRoomCertificationRepository dailyRoomCertificationRepository;
 	private final DailyMemberCertificationRepository dailyMemberCertificationRepository;
 	private final MemberService memberService;
-	private final ImageService imageService;
 	private final ClockHolder clockHolder;
 
 	@Transactional
-	public void certifyRoom(Long memberId, Long roomId, List<MultipartFile> multipartFiles) {
-		LocalDate today = LocalDate.now();
+	public void certifyRoom(Long memberId, Long roomId, List<String> imageUrls) {
+		LocalDate today = clockHolder.date();
 		Participant participant = participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
 		Room room = participant.getRoom();
@@ -70,47 +71,17 @@ public class RoomCertificationService {
 		validateCertifyTime(clockHolder.times(), room.getCertifyTime());
 		validateAlreadyCertified(memberId, roomId, today);
 
-		DailyMemberCertification dailyMemberCertification = CertificationsMapper.toDailyMemberCertification(memberId,
-			roomId, participant);
-		dailyMemberCertificationRepository.save(dailyMemberCertification);
-
-		member.increaseTotalCertifyCount();
-		participant.updateCertifyCount();
-
-		List<String> result = imageService.uploadImages(multipartFiles, CERTIFICATION);
-		saveNewCertifications(result, memberId);
+		certifyMember(memberId, roomId, participant, member, imageUrls);
 
 		Optional<DailyRoomCertification> dailyRoomCertification =
 			certificationsSearchRepository.findDailyRoomCertification(roomId, today);
 
 		if (dailyRoomCertification.isEmpty()) {
-			List<DailyMemberCertification> dailyMemberCertifications =
-				certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today);
-			double completePercentage = calculateCompletePercentage(dailyMemberCertifications.size(),
-				room.getCurrentUserCount());
-
-			if (completePercentage >= 75) {
-				DailyRoomCertification createDailyRoomCertification = CertificationsMapper.toDailyRoomCertification(
-					roomId, today);
-
-				dailyRoomCertificationRepository.save(createDailyRoomCertification);
-
-				int expAppliedRoomLevel = getRoomLevelAfterExpApply(roomLevel, room);
-
-				List<Long> memberIds = dailyMemberCertifications.stream()
-					.map(DailyMemberCertification::getMemberId)
-					.toList();
-
-				memberService.getRoomMembers(memberIds)
-					.forEach(completedMember -> completedMember.getBug().increaseBug(bugType, expAppliedRoomLevel));
-
-				return;
-			}
+			certifyRoomIfAvailable(roomId, today, room, bugType, roomLevel);
+			return;
 		}
 
-		if (dailyRoomCertification.isPresent()) {
-			member.getBug().increaseBug(bugType, roomLevel);
-		}
+		member.getBug().increaseBug(bugType, roomLevel);
 	}
 
 	public boolean existsMemberCertification(Long memberId, Long roomId, LocalDate date) {
@@ -138,7 +109,17 @@ public class RoomCertificationService {
 		}
 	}
 
-	private void saveNewCertifications(List<String> imageUrls, Long memberId) {
+	private void certifyMember(Long memberId, Long roomId, Participant participant, Member member, List<String> urls) {
+		DailyMemberCertification dailyMemberCertification = CertificationsMapper.toDailyMemberCertification(memberId,
+			roomId, participant);
+		dailyMemberCertificationRepository.save(dailyMemberCertification);
+		member.increaseTotalCertifyCount();
+		participant.updateCertifyCount();
+
+		saveNewCertifications(memberId, urls);
+	}
+
+	private void saveNewCertifications(Long memberId, List<String> imageUrls) {
 		List<Certification> certifications = new ArrayList<>();
 
 		for (String imageUrl : imageUrls) {
@@ -151,6 +132,23 @@ public class RoomCertificationService {
 		}
 
 		certificationRepository.saveAll(certifications);
+	}
+
+	private void certifyRoomIfAvailable(Long roomId, LocalDate today, Room room, BugType bugType, int roomLevel) {
+		List<DailyMemberCertification> dailyMemberCertifications =
+			certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, today);
+		double completePercentage = calculateCompletePercentage(dailyMemberCertifications.size(),
+			room.getCurrentUserCount());
+
+		if (completePercentage >= REQUIRED_ROOM_CERTIFICATION) {
+			DailyRoomCertification createDailyRoomCertification = CertificationsMapper.toDailyRoomCertification(
+				roomId, today);
+
+			dailyRoomCertificationRepository.save(createDailyRoomCertification);
+			int expAppliedRoomLevel = getRoomLevelAfterExpApply(roomLevel, room);
+
+			provideBugToCompletedMembers(bugType, dailyMemberCertifications, expAppliedRoomLevel);
+		}
 	}
 
 	private double calculateCompletePercentage(int certifiedMembersCount, int currentsMembersCount) {
@@ -168,5 +166,15 @@ public class RoomCertificationService {
 		}
 
 		return room.getLevel();
+	}
+
+	private void provideBugToCompletedMembers(BugType bugType, List<DailyMemberCertification> dailyMemberCertifications,
+		int expAppliedRoomLevel) {
+		List<Long> memberIds = dailyMemberCertifications.stream()
+			.map(DailyMemberCertification::getMemberId)
+			.toList();
+
+		memberService.getRoomMembers(memberIds)
+			.forEach(completedMember -> completedMember.getBug().increaseBug(bugType, expAppliedRoomLevel));
 	}
 }

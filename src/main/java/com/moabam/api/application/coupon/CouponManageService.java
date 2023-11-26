@@ -35,7 +35,7 @@ public class CouponManageService {
 
 	@Scheduled(fixedDelay = 1000)
 	public void issue() {
-		LocalDate now = LocalDate.from(clockHolder.times());
+		LocalDate now = clockHolder.date();
 		Optional<Coupon> isCoupon = couponRepository.findByStartAt(now);
 
 		if (!canIssue(isCoupon)) {
@@ -69,7 +69,7 @@ public class CouponManageService {
 	}
 
 	private void validateRegister(String couponName) {
-		LocalDate now = LocalDate.from(clockHolder.times());
+		LocalDate now = clockHolder.date();
 		Optional<Coupon> coupon = couponRepository.findByStartAt(now);
 
 		if (coupon.isEmpty() || !coupon.get().getName().equals(couponName)) {

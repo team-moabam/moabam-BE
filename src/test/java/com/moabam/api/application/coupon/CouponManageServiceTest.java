@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -56,7 +55,7 @@ class CouponManageServiceTest {
 		Coupon coupon = CouponFixture.coupon(1000, 100);
 		Set<Long> membersId = new HashSet<>(Set.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L));
 
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2023, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
 		given(couponManageRepository.getIssuedStock(any(String.class))).willReturn(10);
 		given(couponManageRepository.popMinQueue(any(String.class), any(long.class))).willReturn(membersId);
@@ -73,7 +72,7 @@ class CouponManageServiceTest {
 	@Test
 	void issue_notStartAt() {
 		// Given
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2023, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.empty());
 
 		// When
@@ -92,7 +91,7 @@ class CouponManageServiceTest {
 		// Given
 		Coupon coupon = CouponFixture.coupon(1000, 100);
 
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2023, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
 		given(couponManageRepository.getIssuedStock(any(String.class))).willReturn(coupon.getStock());
 
@@ -112,7 +111,7 @@ class CouponManageServiceTest {
 		Coupon coupon = CouponFixture.coupon(1000, 100);
 		Set<Long> membersId = new HashSet<>(Set.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L));
 
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2023, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
 		given(couponManageRepository.getIssuedStock(any(String.class))).willReturn(10);
 		given(couponManageRepository.popMinQueue(any(String.class), any(long.class))).willReturn(membersId);
@@ -133,7 +132,7 @@ class CouponManageServiceTest {
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon();
 
-		given(clockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
 
 		// When
@@ -150,7 +149,7 @@ class CouponManageServiceTest {
 		// Given
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
-		given(clockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.empty());
 
 		// When & Then
@@ -167,7 +166,7 @@ class CouponManageServiceTest {
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon();
 
-		given(clockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
 
 		// When & Then
