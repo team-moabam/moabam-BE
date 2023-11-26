@@ -35,7 +35,7 @@ public enum ErrorMessage {
 	MEMBER_NOT_FOUND_BY_MANAGER_OR_NULL("방의 매니저거나 회원이 존재하지 않습니다."),
 	MEMBER_ROOM_EXCEED("참여할 수 있는 방의 개수가 모두 찼습니다."),
 	UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS("카카오 연결 요청 실패로 Rollback하였습니다."),
-	CONFLICT_NICKNAME("이미 존재하는 닉네임 입니다."),
+	CONFLICT_NICKNAME("이미 존재하는 닉네임입니다."),
 
 	INVALID_DEFAULT_SKIN_SIZE("기본 스킨은 2개여야 합니다. 관리자에게 문의하세요"),
 

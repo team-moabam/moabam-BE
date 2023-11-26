@@ -84,6 +84,7 @@ public class Member extends BaseTimeEntity {
 		this.id = id;
 		this.socialId = requireNonNull(socialId);
 		this.nickname = createNickName();
+		this.intro = "";
 		this.profileImage = BaseImageUrl.MEMBER_PROFILE_URL;
 		this.bug = requireNonNull(bug);
 		this.role = Role.USER;
@@ -128,9 +129,7 @@ public class Member extends BaseTimeEntity {
 	}
 
 	public void changeIntro(String intro) {
-		if (intro != null) {
-			this.intro = intro;
-		}
+		this.intro = requireNonNullElse(intro, this.intro);
 	}
 
 	public void changeProfileUri(String newProfileUri) {

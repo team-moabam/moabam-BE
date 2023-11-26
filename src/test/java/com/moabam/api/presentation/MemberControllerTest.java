@@ -432,16 +432,9 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@DisplayName("회원 정보 요청 성공")
 	@WithMember
 	@ParameterizedTest
-	@CsvSource({"intro, null", "null, nickname", "null, null", "intro, nickname"})
+	@CsvSource({"intro,", ", nickname", ",", "intro, nickname"})
 	void member_modify_request_success(String intro, String nickname) throws Exception {
 		// given
-		if (intro.equals("null")) {
-			intro = null;
-		}
-		if (nickname.equals("null")) {
-			nickname = null;
-		}
-
 		ModifyMemberRequest request = new ModifyMemberRequest(intro, nickname);
 		MockMultipartFile newProfileImage =
 			new MockMultipartFile(
@@ -473,16 +466,9 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@DisplayName("회원 프로필없이 성공 ")
 	@WithMember
 	@ParameterizedTest
-	@CsvSource({"intro, null", "null, nickname", "null, null", "intro, nickname"})
+	@CsvSource({"intro,", ", nickname", ",", "intro, nickname"})
 	void member_modify_no_image_request_success(String intro, String nickname) throws Exception {
 		// given
-		if (intro.equals("null")) {
-			intro = null;
-		}
-		if (nickname.equals("null")) {
-			nickname = null;
-		}
-
 		ModifyMemberRequest request = new ModifyMemberRequest(intro, nickname);
 		MockMultipartFile modifyMemberRequest =
 			new MockMultipartFile(
@@ -502,6 +488,5 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				.characterEncoding("UTF-8"))
 			.andExpect(status().is2xxSuccessful())
 			.andDo(print());
-
 	}
 }
