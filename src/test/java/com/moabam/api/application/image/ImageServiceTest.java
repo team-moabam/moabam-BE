@@ -1,4 +1,4 @@
-package com.moabam.api.application;
+package com.moabam.api.application.image;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.moabam.api.application.image.ImageService;
 import com.moabam.api.domain.image.ImageType;
 import com.moabam.api.domain.image.ResizedImage;
 import com.moabam.api.infrastructure.s3.S3Manager;
