@@ -1,11 +1,14 @@
 package com.moabam.api.application.coupon;
 
+import java.util.List;
+
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
 import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.api.dto.coupon.MyCouponResponse;
+import com.moabam.global.common.util.StreamUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -41,6 +44,10 @@ public final class CouponMapper {
 			.build();
 	}
 
+	public static List<CouponResponse> toResponses(List<Coupon> coupons) {
+		return StreamUtils.map(coupons, CouponMapper::toResponse);
+	}
+
 	public static MyCouponResponse toMyResponse(CouponWallet couponWallet) {
 		Coupon coupon = couponWallet.getCoupon();
 
@@ -51,5 +58,9 @@ public final class CouponMapper {
 			.point(coupon.getPoint())
 			.type(coupon.getType())
 			.build();
+	}
+
+	public static List<MyCouponResponse> toMyResponses(List<CouponWallet> couponWallets) {
+		return StreamUtils.map(couponWallets, CouponMapper::toMyResponse);
 	}
 }

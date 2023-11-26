@@ -68,18 +68,14 @@ public class CouponService {
 		LocalDate now = clockHolder.date();
 		List<Coupon> coupons = couponSearchRepository.findAllByStatus(now, request);
 
-		return coupons.stream()
-			.map(CouponMapper::toResponse)
-			.toList();
+		return CouponMapper.toResponses(coupons);
 	}
 
 	public List<MyCouponResponse> getWallet(Long couponId, AuthMember authMember) {
 		List<CouponWallet> couponWallets =
 			couponWalletSearchRepository.findAllByCouponIdAndMemberId(couponId, authMember.id());
 
-		return couponWallets.stream()
-			.map(CouponMapper::toMyResponse)
-			.toList();
+		return CouponMapper.toMyResponses(couponWallets);
 	}
 
 	public Coupon getByWalletIdAndMemberId(Long couponWalletId, Long memberId) {
