@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -64,7 +65,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	void create_Coupon_success() throws Exception {
 		// Given
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
+
+		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
 
 		// When & Then
 		mockMvc.perform(post("/admins/coupons")
@@ -85,7 +87,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		// Given
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
 
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2025, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2025, 1, 1));
 
 		// When & Then
 		mockMvc.perform(post("/admins/coupons")
@@ -110,7 +112,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		String couponType = CouponType.GOLDEN_COUPON.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 1);
 
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
 
 		// When & Then
 		mockMvc.perform(post("/admins/coupons")
@@ -272,7 +274,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false);
 		couponRepository.saveAll(coupons);
 
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2023, 3, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2023, 3, 1));
 
 		// When & Then
 		mockMvc.perform(post("/coupons/search")
@@ -296,7 +298,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		Coupon couponFixture = CouponFixture.coupon();
 		Coupon coupon = couponRepository.save(couponFixture);
 
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2023, 2, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2023, 2, 1));
 
 		// When & Then
 		mockMvc.perform(post("/coupons")

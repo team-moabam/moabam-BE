@@ -69,7 +69,7 @@ public class CouponService {
 	}
 
 	public List<CouponResponse> getAllByStatus(CouponStatusRequest request) {
-		LocalDate now = LocalDate.from(clockHolder.times());
+		LocalDate now = clockHolder.date();
 		List<Coupon> coupons = couponSearchRepository.findAllByStatus(now, request);
 
 		return coupons.stream()
@@ -78,7 +78,7 @@ public class CouponService {
 	}
 
 	private void validatePeriod(LocalDate startAt, LocalDate openAt) {
-		LocalDate now = LocalDate.from(clockHolder.times());
+		LocalDate now = clockHolder.date();
 
 		if (!now.isBefore(startAt)) {
 			throw new BadRequestException(ErrorMessage.INVALID_COUPON_START_AT_PERIOD);
