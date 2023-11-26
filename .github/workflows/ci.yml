@@ -38,6 +38,10 @@ jobs:
       - name: Gradle Grant 권한 부여
         run: chmod +x gradlew
 
+      - name: 테스트용 MySQL 도커 컨테이너 실행
+        run: |
+          sudo docker run -d -p 3305:3306 --env MYSQL_DATABASE=moabam --env MYSQL_ROOT_PASSWORD=1234 mysql:8.0.33
+
       - name: SonarCloud 캐싱
         uses: actions/cache@v3
         with:

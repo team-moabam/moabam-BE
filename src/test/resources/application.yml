@@ -9,11 +9,20 @@ spring:
   profiles:
     active: test
 
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3305/moabam?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 1234
+  
   jpa:
+    hibernate:
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
         highlight_sql: true
+    database: mysql
 
   # Redis
   data:
