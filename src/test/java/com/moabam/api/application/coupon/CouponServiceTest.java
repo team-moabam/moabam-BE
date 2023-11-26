@@ -40,21 +40,24 @@ import com.moabam.support.fixture.CouponFixture;
 class CouponServiceTest {
 
 	@InjectMocks
-	private CouponService couponService;
+	CouponService couponService;
 
 	@Mock
-	private CouponRepository couponRepository;
+	CouponManageService couponManageService;
 
 	@Mock
-	private CouponSearchRepository couponSearchRepository;
+	CouponRepository couponRepository;
 
 	@Mock
-	private ClockHolder clockHolder;
+	CouponSearchRepository couponSearchRepository;
+
+	@Mock
+	ClockHolder clockHolder;
 
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("쿠폰을 성공적으로 발행한다. - Void")
 	@Test
-	void create() {
+	void create_success() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
@@ -103,7 +106,7 @@ class CouponServiceTest {
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("중복된 쿠폰명을 발행한다. - ConflictException")
 	@Test
-	void create_ConflictException() {
+	void create_Name_ConflictException() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
@@ -117,6 +120,23 @@ class CouponServiceTest {
 	}
 
 	@WithMember(role = Role.ADMIN)
+	@DisplayName("중복된 쿠폰 발행 가능 날짜를 발행한다. - ConflictException")
+	@Test
+	void create_StartAt_ConflictException() {
+		// Given
+		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
+		CreateCouponRequest request = CouponFixture.createCouponRequest();
+
+		given(couponRepository.existsByName(any(String.class))).willReturn(false);
+		given(couponRepository.existsByStartAt(any(LocalDate.class))).willReturn(true);
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.create(admin, request))
+			.isInstanceOf(ConflictException.class)
+			.hasMessage(ErrorMessage.CONFLICT_COUPON_START_AT.getMessage());
+	}
+
+	@WithMember(role = Role.ADMIN)
 	@DisplayName("현재 날짜가 쿠폰 발급 가능 날짜와 같거나 이후이다. - BadRequestException")
 	@Test
 	void create_StartAt_BadRequestException() {
@@ -126,6 +146,7 @@ class CouponServiceTest {
 
 		given(clockHolder.times()).willReturn(LocalDateTime.of(2025, 1, 1, 1, 1));
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
+		given(couponRepository.existsByStartAt(any(LocalDate.class))).willReturn(false);
 
 		// When & Then
 		assertThatThrownBy(() -> couponService.create(admin, request))
@@ -143,6 +164,7 @@ class CouponServiceTest {
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 1);
 
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
+		given(couponRepository.existsByStartAt(any(LocalDate.class))).willReturn(false);
 		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
 
 		// When & Then
@@ -152,9 +174,9 @@ class CouponServiceTest {
 	}
 
 	@WithMember(role = Role.ADMIN)
-	@DisplayName("쿠폰 아이디와 일치하는 쿠폰을 삭제한다. - Void")
+	@DisplayName("쿠폰 아이디와 일치하는 쿠폰을 성공적으로 삭제한다. - Void")
 	@Test
-	void delete() {
+	void delete_success() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon(10, 100);
@@ -165,6 +187,7 @@ class CouponServiceTest {
 
 		// Then
 		verify(couponRepository).delete(coupon);
+		verify(couponManageService).deleteCouponManage(any(String.class));
 	}
 
 	@WithMember(role = Role.USER)
@@ -194,9 +217,9 @@ class CouponServiceTest {
 			.hasMessage(ErrorMessage.NOT_FOUND_COUPON.getMessage());
 	}
 
-	@DisplayName("특정 쿠폰을 조회한다. - CouponResponse")
+	@DisplayName("특정 쿠폰을 성공적으로 조회한다. - CouponResponse")
 	@Test
-	void getById() {
+	void getById_success() {
 		// Given
 		Coupon coupon = CouponFixture.coupon(10, 100);
 		given(couponRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
@@ -221,10 +244,10 @@ class CouponServiceTest {
 			.hasMessage(ErrorMessage.NOT_FOUND_COUPON.getMessage());
 	}
 
-	@DisplayName("모든 쿠폰을 조회한다. - List<CouponResponse>")
+	@DisplayName("모든 쿠폰을 성공적으로 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void getAllByStatus(List<Coupon> coupons) {
+	void getAllByStatus_success(List<Coupon> coupons) {
 		// Given
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false);
 
@@ -237,50 +260,5 @@ class CouponServiceTest {
 
 		// Then
 		assertThat(actual).hasSize(coupons.size());
-	}
-
-	@DisplayName("해당 쿠폰은 발급 가능 기간입니다. - Coupon")
-	@Test
-	void validatePeriod() {
-		// Given
-		LocalDateTime now = LocalDateTime.of(2023, 1, 1, 1, 0);
-		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
-		given(couponRepository.findByName(any(String.class))).willReturn(Optional.of(coupon));
-		given(clockHolder.times()).willReturn(now);
-
-		// When
-		Coupon actual = couponService.validatePeriod(coupon.getName());
-
-		// Then
-		assertThat(actual.getName()).isEqualTo(coupon.getName());
-	}
-
-	@DisplayName("해당 쿠폰은 발급 가능 기간이 아닙니다. - BadRequestException")
-	@Test
-	void validatePeriod_BadRequestException() {
-		// Given
-		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 0);
-		Coupon coupon = CouponFixture.coupon("couponName", 1, 2);
-		given(couponRepository.findByName(any(String.class))).willReturn(Optional.of(coupon));
-		given(clockHolder.times()).willReturn(now);
-
-		// When & Then
-		assertThatThrownBy(() -> couponService.validatePeriod("couponName"))
-			.isInstanceOf(BadRequestException.class)
-			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD.getMessage());
-	}
-
-	@DisplayName("해당 쿠폰은 존재하지 않습니다. - NotFoundException")
-	@Test
-	void validatePeriod_NotFoundException() {
-		// Given
-		LocalDateTime now = LocalDateTime.of(2022, 1, 1, 1, 0);
-		given(couponRepository.findByName(any(String.class))).willReturn(Optional.empty());
-		given(clockHolder.times()).willReturn(now);
-
-		// When & Then
-		assertThatThrownBy(() -> couponService.validatePeriod("Not found coupon name"))
-			.isInstanceOf(NotFoundException.class)
-			.hasMessage(ErrorMessage.NOT_FOUND_COUPON.getMessage());
 	}
 }

@@ -12,7 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -34,9 +33,12 @@ public class CouponWallet extends BaseTimeEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Coupon coupon;
 
-	@Builder
 	private CouponWallet(Long memberId, Coupon coupon) {
 		this.memberId = memberId;
 		this.coupon = coupon;
+	}
+
+	public static CouponWallet create(Long memberId, Coupon coupon) {
+		return new CouponWallet(memberId, coupon);
 	}
 }

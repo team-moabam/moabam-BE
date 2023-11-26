@@ -30,7 +30,7 @@ class CouponWalletSearchRepositoryTest {
 		Long id = 1L;
 		Long memberId = 1L;
 		Coupon coupon = couponRepository.save(discount1000Coupon());
-		couponWalletRepository.save(couponWallet(memberId, coupon));
+		couponWalletRepository.save(CouponWallet.create(memberId, coupon));
 
 		// when
 		CouponWallet actual = couponWalletSearchRepository.findByIdAndMemberId(id, memberId).orElseThrow();

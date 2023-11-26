@@ -28,15 +28,18 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class CouponService {
 
+	private final ClockHolder clockHolder;
+	private final CouponManageService couponManageService;
+
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
 	private final CouponWalletSearchRepository couponWalletSearchRepository;
-	private final ClockHolder clockHolder;
 
 	@Transactional
 	public void create(AuthMember admin, CreateCouponRequest request) {
 		validateAdminRole(admin);
 		validateConflictName(request.name());
+		validateConflictStartAt(request.startAt());
 		validatePeriod(request.startAt(), request.openAt());
 
 		Coupon coupon = CouponMapper.toEntity(admin.id(), request);
@@ -49,6 +52,7 @@ public class CouponService {
 		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 		couponRepository.delete(coupon);
+		couponManageService.deleteCouponManage(coupon.getName());
 	}
 
 	public CouponResponse getById(Long couponId) {
@@ -58,7 +62,7 @@ public class CouponService {
 		return CouponMapper.toDto(coupon);
 	}
 
-	public Coupon getByWallet(Long couponWalletId, Long memberId) {
+	public Coupon getByWalletIdAndMemberId(Long couponWalletId, Long memberId) {
 		return couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET))
 			.getCoupon();
@@ -71,18 +75,6 @@ public class CouponService {
 		return coupons.stream()
 			.map(CouponMapper::toDto)
 			.toList();
-	}
-
-	public Coupon validatePeriod(String couponName) {
-		LocalDate now = LocalDate.from(clockHolder.times());
-		Coupon coupon = couponRepository.findByName(couponName)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
-
-		if (!now.equals(coupon.getStartAt())) {
-			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
-		}
-
-		return coupon;
 	}
 
 	private void validatePeriod(LocalDate startAt, LocalDate openAt) {
@@ -106,6 +98,12 @@ public class CouponService {
 	private void validateConflictName(String couponName) {
 		if (couponRepository.existsByName(couponName)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_NAME);
+		}
+	}
+
+	private void validateConflictStartAt(LocalDate startAt) {
+		if (couponRepository.existsByStartAt(startAt)) {
+			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_START_AT);
 		}
 	}
 }

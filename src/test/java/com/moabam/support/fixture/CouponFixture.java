@@ -1,14 +1,17 @@
 package com.moabam.support.fixture;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.provider.Arguments;
+import org.springframework.data.redis.core.DefaultTypedTuple;
+import org.springframework.data.redis.core.ZSetOperations;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
-import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 
@@ -77,13 +80,6 @@ public final class CouponFixture {
 			.build();
 	}
 
-	public static CouponWallet couponWallet(Long memberId, Coupon coupon) {
-		return CouponWallet.builder()
-			.memberId(memberId)
-			.coupon(coupon)
-			.build();
-	}
-
 	public static CreateCouponRequest createCouponRequest() {
 		return CreateCouponRequest.builder()
 			.name("couponName")
@@ -130,5 +126,21 @@ public final class CouponFixture {
 				coupon("coupon10", 12, 10)
 			))
 		);
+	}
+
+	public static Stream<Arguments> provideTypedTuples() {
+		Set<ZSetOperations.TypedTuple<Object>> tuples = new HashSet<>();
+		tuples.add(new DefaultTypedTuple<>(1L, 1.0));
+		tuples.add(new DefaultTypedTuple<>(2L, 2.0));
+		tuples.add(new DefaultTypedTuple<>(3L, 3.0));
+		tuples.add(new DefaultTypedTuple<>(4L, 4.0));
+		tuples.add(new DefaultTypedTuple<>(5L, 5.0));
+		tuples.add(new DefaultTypedTuple<>(6L, 6.0));
+		tuples.add(new DefaultTypedTuple<>(7L, 7.0));
+		tuples.add(new DefaultTypedTuple<>(8L, 8.0));
+		tuples.add(new DefaultTypedTuple<>(9L, 9.0));
+		tuples.add(new DefaultTypedTuple<>(10L, 10.0));
+
+		return Stream.of(Arguments.of(tuples));
 	}
 }

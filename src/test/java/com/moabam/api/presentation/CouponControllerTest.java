@@ -47,21 +47,21 @@ import com.moabam.support.fixture.ErrorSnippetFixture;
 class CouponControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
-	private MockMvc mockMvc;
+	MockMvc mockMvc;
 
 	@Autowired
-	private ObjectMapper objectMapper;
+	ObjectMapper objectMapper;
 
 	@Autowired
-	private CouponRepository couponRepository;
+	CouponRepository couponRepository;
 
 	@MockBean
-	private ClockHolder clockHolder;
+	ClockHolder clockHolder;
 
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("POST - 쿠폰을 성공적으로 발행한다. - Void")
 	@Test
-	void create_Coupon() throws Exception {
+	void create_Coupon_success() throws Exception {
 		// Given
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
 		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
@@ -130,7 +130,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("POST - 쿠폰명이 중복된 쿠폰을 발행한다. - ConflictException")
 	@Test
-	void create_Coupon_ConflictException() throws Exception {
+	void create_Coupon_Name_ConflictException() throws Exception {
 		// Given
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
 		couponRepository.save(CouponMapper.toEntity(1L, request));
@@ -151,9 +151,33 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember(role = Role.ADMIN)
+	@DisplayName("POST - 쿠폰 발행 가능 날짜가 중복된 쿠폰을 발행한다. - ConflictException")
+	@Test
+	void create_Coupon_StartAt_ConflictException() throws Exception {
+		// Given
+		CreateCouponRequest request = CouponFixture.createCouponRequest();
+		Coupon conflictStartAtCoupon = CouponFixture.coupon("NotConflictName", 2, 1);
+		couponRepository.save(conflictStartAtCoupon);
+
+		// When & Then
+		mockMvc.perform(post("/admins/coupons")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andDo(document("admins/coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				CouponSnippetFixture.CREATE_COUPON_REQUEST,
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isConflict())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_COUPON_START_AT.getMessage()));
+	}
+
+	@WithMember(role = Role.ADMIN)
 	@DisplayName("DELETE - 쿠폰을 성공적으로 삭제한다. - Void")
 	@Test
-	void delete_Coupon() throws Exception {
+	void delete_Coupon_success() throws Exception {
 		// Given
 		Coupon coupon = couponRepository.save(CouponFixture.coupon(10, 100));
 
@@ -182,9 +206,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON.getMessage()));
 	}
 
-	@DisplayName("GET - 특정 쿠폰을 조회한다. - CouponResponse")
+	@DisplayName("GET - 특정 쿠폰을 성공적으로 조회한다. - CouponResponse")
 	@Test
-	void getById_Coupon() throws Exception {
+	void getById_Coupon_success() throws Exception {
 		// Given
 		Coupon coupon = couponRepository.save(CouponFixture.coupon(10, 100));
 
@@ -218,7 +242,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@DisplayName("POST - 모든 쿠폰을 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void getAllByStatus_Coupons(List<Coupon> coupons) throws Exception {
+	void getAllByStatus_Coupons_success(List<Coupon> coupons) throws Exception {
 		// Given
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(true, true);
 		List<Coupon> coupon = couponRepository.saveAll(coupons);
@@ -240,10 +264,10 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$", hasSize(coupon.size())));
 	}
 
-	@DisplayName("POST - 발급 가능한 쿠폰만 조회한다.. - List<CouponResponse>")
+	@DisplayName("POST - 발급 가능한 쿠폰만 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void getAllByStatus_Coupon(List<Coupon> coupons) throws Exception {
+	void getAllByStatus_Coupon_success(List<Coupon> coupons) throws Exception {
 		// Given
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false);
 		couponRepository.saveAll(coupons);
@@ -264,10 +288,10 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$", hasSize(1)));
 	}
 
-	@WithMember(nickname = "member-coupon-1")
-	@DisplayName("POST - 쿠폰 발급 요청을 한다. - Void")
+	@WithMember
+	@DisplayName("POST - 쿠폰 발급 요청을 성공적으로 한다. - Void")
 	@Test
-	void registerQueue() throws Exception {
+	void registerQueue_success() throws Exception {
 		// Given
 		Coupon couponFixture = CouponFixture.coupon();
 		Coupon coupon = couponRepository.save(couponFixture);
@@ -284,15 +308,15 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isOk());
 	}
 
-	@WithMember(nickname = "member-coupon-2")
-	@DisplayName("POST - 발급 기간이 아닌 쿠폰에 발급 요청을 한다. - BadRequestException")
+	@WithMember
+	@DisplayName("POST - 발급이 가능한 쿠폰이 없는 상황에 쿠폰 발급 요청을 한다. - BadRequestException")
 	@Test
-	void registerQueue_BadRequestException() throws Exception {
+	void registerQueue_Zero_StartAt_BadRequestException() throws Exception {
 		// Given
 		Coupon couponFixture = CouponFixture.coupon();
 		Coupon coupon = couponRepository.save(couponFixture);
 
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 2, 1, 1, 1));
+		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
 
 		// When & Then
 		mockMvc.perform(post("/coupons")
@@ -308,11 +332,34 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember
+	@DisplayName("POST - 발급 기간이 아닌 쿠폰에 발급 요청을 한다. - BadRequestException")
+	@Test
+	void registerQueue_Not_StartAt_BadRequestException() throws Exception {
+		// Given
+		Coupon couponFixture = CouponFixture.coupon();
+		couponRepository.save(couponFixture);
+
+		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 2, 1, 1, 1));
+
+		// When & Then
+		mockMvc.perform(post("/coupons")
+				.param("couponName", "not start couponName"))
+			.andDo(print())
+			.andDo(document("coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
+	}
+
+	@WithMember
 	@DisplayName("POST - 존재하지 않는 쿠폰에 발급 요청을 한다. - NotFoundException")
 	@Test
 	void registerQueue_NotFoundException() throws Exception {
 		// Given
-		Coupon coupon = CouponFixture.coupon("Not found coupon name", 2, 1);
+		Coupon coupon = CouponFixture.coupon("Not found couponName", 2, 1);
 
 		given(clockHolder.times()).willReturn(LocalDateTime.of(2023, 2, 1, 1, 1));
 
@@ -324,8 +371,8 @@ class CouponControllerTest extends WithoutFilterSupporter {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				ErrorSnippetFixture.ERROR_MESSAGE_RESPONSE))
-			.andExpect(status().isNotFound())
+			.andExpect(status().isBadRequest())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON.getMessage()));
+			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
 	}
 }

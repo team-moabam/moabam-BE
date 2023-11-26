@@ -55,7 +55,7 @@ public class BugService {
 		Payment payment = PaymentMapper.toPayment(memberId, product);
 
 		if (!isNull(request.couponWalletId())) {
-			Coupon coupon = couponService.getByWallet(request.couponWalletId(), memberId);
+			Coupon coupon = couponService.getByWalletIdAndMemberId(request.couponWalletId(), memberId);
 			payment.applyCoupon(coupon, request.couponWalletId());
 		}
 		paymentRepository.save(payment);
