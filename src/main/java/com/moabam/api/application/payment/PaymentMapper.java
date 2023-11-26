@@ -19,7 +19,7 @@ public final class PaymentMapper {
 			.memberId(memberId)
 			.product(product)
 			.order(order)
-			.amount(product.getPrice())
+			.totalAmount(product.getPrice())
 			.build();
 	}
 }

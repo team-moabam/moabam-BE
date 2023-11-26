@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
-import com.moabam.api.infrastructure.redis.StringRedisRepository;
+import com.moabam.api.infrastructure.redis.ValueRedisRepository;
 import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class CouponManageRepository {
 	private static final String STOCK_KEY = "%s_INCR";
 
 	private final ZSetRedisRepository zSetRedisRepository;
-	private final StringRedisRepository stringRedisRepository;
+	private final ValueRedisRepository valueRedisRepository;
 
 	public void addIfAbsentQueue(String couponName, Long memberId, double registerTime) {
 		zSetRedisRepository.addIfAbsent(requireNonNull(couponName), requireNonNull(memberId), registerTime);
@@ -34,20 +34,20 @@ public class CouponManageRepository {
 	}
 
 	public void deleteQueue(String couponName) {
-		stringRedisRepository.delete(requireNonNull(couponName));
+		valueRedisRepository.delete(requireNonNull(couponName));
 	}
 
 	public int increaseIssuedStock(String couponName) {
 		String stockKey = String.format(STOCK_KEY, requireNonNull(couponName));
 
-		return stringRedisRepository
+		return valueRedisRepository
 			.increment(requireNonNull(stockKey))
 			.intValue();
 	}
 
 	public int getIssuedStock(String couponName) {
 		String stockKey = String.format(STOCK_KEY, requireNonNull(couponName));
-		String stockValue = stringRedisRepository.get(requireNonNull(stockKey));
+		String stockValue = valueRedisRepository.get(requireNonNull(stockKey));
 
 		if (stockValue == null) {
 			return 0;
@@ -58,6 +58,6 @@ public class CouponManageRepository {
 
 	public void deleteIssuedStock(String couponName) {
 		String stockKey = String.format(STOCK_KEY, requireNonNull(couponName));
-		stringRedisRepository.delete(requireNonNull(stockKey));
+		valueRedisRepository.delete(requireNonNull(stockKey));
 	}
 }

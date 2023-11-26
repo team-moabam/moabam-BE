@@ -40,8 +40,8 @@ public final class BugMapper {
 		BugHistoryItemResponse.PaymentResponse payment = BugHistoryItemResponse.PaymentResponse.builder()
 			.id(dto.payment().getId())
 			.orderName(dto.payment().getOrder().getName())
-			.discountAmount(dto.payment().getCoupon().getPoint())
-			.totalAmount(dto.payment().getAmount())
+			.discountAmount(dto.payment().getDiscountAmount())
+			.totalAmount(dto.payment().getTotalAmount())
 			.build();
 
 		return BugHistoryItemResponse.builder()

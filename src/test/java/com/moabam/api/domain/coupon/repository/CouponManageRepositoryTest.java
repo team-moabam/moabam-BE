@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 
-import com.moabam.api.infrastructure.redis.StringRedisRepository;
+import com.moabam.api.infrastructure.redis.ValueRedisRepository;
 import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,7 +29,7 @@ class CouponManageRepositoryTest {
 	ZSetRedisRepository zSetRedisRepository;
 
 	@Mock
-	StringRedisRepository stringRedisRepository;
+	ValueRedisRepository valueRedisRepository;
 
 	@DisplayName("쿠폰 대기열에 사용자가 성공적으로 등록된다. - Void")
 	@Test
@@ -57,7 +57,7 @@ class CouponManageRepositoryTest {
 			.isInstanceOf(NullPointerException.class);
 	}
 
-	@DisplayName("쿠폰 대기열에서 10명을 꺼내고 삭제한다.")
+	@DisplayName("쿠폰 대기열에서 성공적으로 10명을 꺼내고 삭제한다.")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideTypedTuples")
 	@ParameterizedTest
 	void popMinQueue_success(Set<TypedTuple<Object>> tuples) {
@@ -86,7 +86,7 @@ class CouponManageRepositoryTest {
 		couponManageRepository.deleteQueue("couponName");
 
 		// Then
-		verify(stringRedisRepository).delete(any(String.class));
+		verify(valueRedisRepository).delete(any(String.class));
 	}
 
 	@DisplayName("쿠폰명이 Null인 대기열을 삭제한다. - NullPointerException")
@@ -101,7 +101,7 @@ class CouponManageRepositoryTest {
 	@Test
 	void increaseIssuedStock_success() {
 		// Given
-		given(stringRedisRepository.increment(any(String.class))).willReturn(77L);
+		given(valueRedisRepository.increment(any(String.class))).willReturn(77L);
 
 		// When
 		int actual = couponManageRepository.increaseIssuedStock("couponName");
@@ -122,7 +122,7 @@ class CouponManageRepositoryTest {
 	@Test
 	void getIssuedStock_success() {
 		// Given
-		given(stringRedisRepository.get(any(String.class))).willReturn("1");
+		given(valueRedisRepository.get(any(String.class))).willReturn("1");
 
 		// When
 		int actual = couponManageRepository.getIssuedStock("couponName");
@@ -135,7 +135,7 @@ class CouponManageRepositoryTest {
 	@Test
 	void getIssuedStock_zero() {
 		// Given
-		given(stringRedisRepository.get(any(String.class))).willReturn(null);
+		given(valueRedisRepository.get(any(String.class))).willReturn(null);
 
 		// When
 		int actual = couponManageRepository.getIssuedStock("couponName");
@@ -159,7 +159,7 @@ class CouponManageRepositoryTest {
 		couponManageRepository.deleteIssuedStock("couponName");
 
 		// Then
-		verify(stringRedisRepository).delete(any(String.class));
+		verify(valueRedisRepository).delete(any(String.class));
 	}
 
 	@DisplayName("쿠폰명이 Null인 할당된 쿠폰 재고를 삭제한다. - NullPointerException")

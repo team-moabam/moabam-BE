@@ -6,7 +6,7 @@ import java.time.Duration;
 
 import org.springframework.stereotype.Repository;
 
-import com.moabam.api.infrastructure.redis.StringRedisRepository;
+import com.moabam.api.infrastructure.redis.ValueRedisRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,10 +16,10 @@ public class FcmRepository {
 
 	private static final long EXPIRE_FCM_TOKEN = 60;
 
-	private final StringRedisRepository stringRedisRepository;
+	private final ValueRedisRepository valueRedisRepository;
 
 	public void saveToken(Long memberId, String fcmToken) {
-		stringRedisRepository.save(
+		valueRedisRepository.save(
 			String.valueOf(requireNonNull(memberId)),
 			requireNonNull(fcmToken),
 			Duration.ofDays(EXPIRE_FCM_TOKEN)
@@ -27,14 +27,14 @@ public class FcmRepository {
 	}
 
 	public void deleteTokenByMemberId(Long memberId) {
-		stringRedisRepository.delete(String.valueOf(requireNonNull(memberId)));
+		valueRedisRepository.delete(String.valueOf(requireNonNull(memberId)));
 	}
 
 	public String findTokenByMemberId(Long memberId) {
-		return stringRedisRepository.get(String.valueOf(requireNonNull(memberId)));
+		return valueRedisRepository.get(String.valueOf(requireNonNull(memberId)));
 	}
 
 	public boolean existsTokenByMemberId(Long memberId) {
-		return stringRedisRepository.hasKey(String.valueOf(requireNonNull(memberId)));
+		return valueRedisRepository.hasKey(String.valueOf(requireNonNull(memberId)));
 	}
 }

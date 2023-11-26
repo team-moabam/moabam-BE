@@ -10,9 +10,9 @@ import com.moabam.global.error.model.ErrorMessage;
 
 class CouponTypeTest {
 
-	@DisplayName("존재하는 쿠폰을 가져온다. - CouponType")
+	@DisplayName("존재하는 쿠폰을 성공적으로 가져온다. - CouponType")
 	@Test
-	void couponType_from() {
+	void from_success() {
 		// When
 		CouponType actual = CouponType.from(CouponType.GOLDEN_COUPON.getName());
 
@@ -22,7 +22,7 @@ class CouponTypeTest {
 
 	@DisplayName("존재하지 않는 쿠폰을 가져온다. - NotFoundException")
 	@Test
-	void couponType_from_NotFoundException() {
+	void from_NotFoundException() {
 		// When & Then
 		assertThatThrownBy(() -> CouponType.from("Not-Coupon"))
 			.isInstanceOf(NotFoundException.class)

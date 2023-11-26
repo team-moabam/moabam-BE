@@ -15,14 +15,14 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 
 import com.moabam.global.config.EmbeddedRedisConfig;
 
-@SpringBootTest(classes = {EmbeddedRedisConfig.class, ZSetRedisRepository.class, StringRedisRepository.class})
+@SpringBootTest(classes = {EmbeddedRedisConfig.class, ZSetRedisRepository.class, ValueRedisRepository.class})
 class ZSetRedisRepositoryTest {
 
 	@Autowired
 	ZSetRedisRepository zSetRedisRepository;
 
 	@Autowired
-	StringRedisRepository stringRedisRepository;
+	ValueRedisRepository valueRedisRepository;
 
 	@Autowired
 	RedisTemplate<String, Object> redisTemplate;
@@ -32,8 +32,8 @@ class ZSetRedisRepositoryTest {
 
 	@AfterEach
 	void afterEach() {
-		if (stringRedisRepository.hasKey(key)) {
-			stringRedisRepository.delete(key);
+		if (valueRedisRepository.hasKey(key)) {
+			valueRedisRepository.delete(key);
 		}
 	}
 
@@ -44,7 +44,7 @@ class ZSetRedisRepositoryTest {
 		zSetRedisRepository.addIfAbsent(key, value, 1);
 
 		// Then
-		assertThat(stringRedisRepository.hasKey(key)).isTrue();
+		assertThat(valueRedisRepository.hasKey(key)).isTrue();
 	}
 
 	@DisplayName("이미 존재하는 값을 한 번 더 저장을 시도한다. - Void")
@@ -72,7 +72,7 @@ class ZSetRedisRepositoryTest {
 
 		// Then
 		assertThat(actual).hasSize(3);
-		assertThat(stringRedisRepository.hasKey(key)).isFalse();
+		assertThat(valueRedisRepository.hasKey(key)).isFalse();
 	}
 
 	@Disabled
@@ -106,6 +106,6 @@ class ZSetRedisRepositoryTest {
 
 		// Then
 		assertThat(actual).hasSize(3);
-		assertThat(stringRedisRepository.hasKey(key)).isTrue();
+		assertThat(valueRedisRepository.hasKey(key)).isTrue();
 	}
 }

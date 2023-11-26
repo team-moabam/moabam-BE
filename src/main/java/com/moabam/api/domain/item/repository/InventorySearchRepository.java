@@ -23,23 +23,23 @@ public class InventorySearchRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	public Optional<Inventory> findOne(Long memberId, Long itemId) {
-		return Optional.ofNullable(
-			jpaQueryFactory.selectFrom(inventory)
-				.where(
-					DynamicQuery.generateEq(memberId, inventory.memberId::eq),
-					DynamicQuery.generateEq(itemId, inventory.item.id::eq))
-				.fetchOne()
+		return Optional.ofNullable(jpaQueryFactory
+			.selectFrom(inventory)
+			.where(
+				DynamicQuery.generateEq(memberId, inventory.memberId::eq),
+				DynamicQuery.generateEq(itemId, inventory.item.id::eq))
+			.fetchOne()
 		);
 	}
 
 	public Optional<Inventory> findDefault(Long memberId, ItemType type) {
-		return Optional.ofNullable(
-			jpaQueryFactory.selectFrom(inventory)
-				.where(
-					DynamicQuery.generateEq(memberId, inventory.memberId::eq),
-					DynamicQuery.generateEq(type, inventory.item.type::eq),
-					inventory.isDefault.isTrue())
-				.fetchOne()
+		return Optional.ofNullable(jpaQueryFactory
+			.selectFrom(inventory)
+			.where(
+				DynamicQuery.generateEq(memberId, inventory.memberId::eq),
+				DynamicQuery.generateEq(type, inventory.item.type::eq),
+				inventory.isDefault.isTrue())
+			.fetchOne()
 		);
 	}
 

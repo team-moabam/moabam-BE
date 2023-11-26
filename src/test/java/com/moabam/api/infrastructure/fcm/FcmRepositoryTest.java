@@ -13,46 +13,54 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.infrastructure.redis.StringRedisRepository;
+import com.moabam.api.infrastructure.redis.ValueRedisRepository;
 
 @ExtendWith(MockitoExtension.class)
 class FcmRepositoryTest {
 
 	@InjectMocks
-	private FcmRepository fcmRepository;
+	FcmRepository fcmRepository;
 
 	@Mock
-	private StringRedisRepository stringRedisRepository;
+	ValueRedisRepository valueRedisRepository;
 
 	@DisplayName("FCM 토큰이 성공적으로 저장된다. - Void")
 	@Test
-	void saveToken() {
+	void saveToken_success() {
 		// When
 		fcmRepository.saveToken(1L, "value1");
 
 		// Then
-		verify(stringRedisRepository).save(any(String.class), any(String.class), any(Duration.class));
+		verify(valueRedisRepository).save(any(String.class), any(String.class), any(Duration.class));
 	}
 
-	@DisplayName("FCM 토큰 저장 시, 필요한 값이 NULL 이다. - NullPointerException")
+	@DisplayName("ID가 Null인 사용자가 FCM 토큰을 저장한다. - NullPointerException")
 	@Test
-	void saveToken_NullPointerException() {
+	void saveToken_MemberId_NullPointerException() {
 		// When & Then
 		assertThatThrownBy(() -> fcmRepository.saveToken(null, "value"))
 			.isInstanceOf(NullPointerException.class);
 	}
 
+	@DisplayName("토큰이 Null인 FCM 토큰을 저장한다. - NullPointerException")
+	@Test
+	void saveToken_FcmToken_NullPointerException() {
+		// When & Then
+		assertThatThrownBy(() -> fcmRepository.saveToken(1L, null))
+			.isInstanceOf(NullPointerException.class);
+	}
+
 	@DisplayName("FCM 토큰이 성공적으로 삭제된다. - Void")
 	@Test
-	void deleteTokenByMemberId() {
+	void deleteTokenByMemberId_success() {
 		// When
 		fcmRepository.deleteTokenByMemberId(1L);
 
 		// Then
-		verify(stringRedisRepository).delete(any(String.class));
+		verify(valueRedisRepository).delete(any(String.class));
 	}
 
-	@DisplayName("FCM 토큰 삭제 시, 필요한 값이 NULL 이다. - NullPointerException")
+	@DisplayName("ID가 Null인 사용자가 FCM 토큰을 삭제한다.. - NullPointerException")
 	@Test
 	void deleteTokenByMemberId_NullPointerException() {
 		// When & Then
@@ -62,15 +70,15 @@ class FcmRepositoryTest {
 
 	@DisplayName("FCM 토큰을 성공적으로 조회된다. - (String) FCM TOKEN")
 	@Test
-	void findTokenByMemberId() {
+	void findTokenByMemberId_success() {
 		// When
 		fcmRepository.findTokenByMemberId(1L);
 
 		// Then
-		verify(stringRedisRepository).get(any(String.class));
+		verify(valueRedisRepository).get(any(String.class));
 	}
 
-	@DisplayName("FCM 토큰 조회 시, 필요한 값이 NULL 이다. - NullPointerException")
+	@DisplayName("ID가 Null인 사용자가 FCM 토큰을 조회한다. - NullPointerException")
 	@Test
 	void findTokenByMemberId_NullPointerException() {
 		// When & Then
@@ -80,15 +88,15 @@ class FcmRepositoryTest {
 
 	@DisplayName("FCM 토큰 존재 여부를 성공적으로 확인한다. - Boolean")
 	@Test
-	void existsTokenByMemberId() {
+	void existsTokenByMemberId_success() {
 		// When
 		fcmRepository.existsTokenByMemberId(1L);
 
 		// Then
-		verify(stringRedisRepository).hasKey(any(String.class));
+		verify(valueRedisRepository).hasKey(any(String.class));
 	}
 
-	@DisplayName("FCM 토큰 존재 여부 체크 시, 필요한 값이 NULL 이다. - NullPointerException")
+	@DisplayName("ID가 Null인 사용자가 FCM 토큰 존재 여부를 확인한다. - NullPointerException")
 	@Test
 	void existsTokenByMemberId_NullPointerException() {
 		// When & Then

@@ -74,10 +74,17 @@ public class Bug {
 	}
 
 	public void increaseBug(BugType bugType, int bug) {
-		switch (bugType) {
-			case MORNING -> this.morningBug += bug;
-			case NIGHT -> this.nightBug += bug;
-			case GOLDEN -> this.goldenBug += bug;
+		if (bugType.equals(BugType.MORNING)) {
+			this.morningBug += bug;
+			return;
 		}
+
+		if (bugType.equals(BugType.NIGHT)) {
+			this.nightBug += bug;
+		}
+	}
+
+	public void charge(int quantity) {
+		this.goldenBug += quantity;
 	}
 }

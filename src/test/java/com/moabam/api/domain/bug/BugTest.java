@@ -70,11 +70,9 @@ class BugTest {
 		// when
 		bug.increaseBug(BugType.MORNING, 5);
 		bug.increaseBug(BugType.NIGHT, 5);
-		bug.increaseBug(BugType.GOLDEN, 5);
 
 		// then
 		assertThat(bug.getMorningBug()).isEqualTo(MORNING_BUG + 5);
 		assertThat(bug.getNightBug()).isEqualTo(NIGHT_BUG + 5);
-		assertThat(bug.getGoldenBug()).isEqualTo(GOLDEN_BUG + 5);
 	}
 }

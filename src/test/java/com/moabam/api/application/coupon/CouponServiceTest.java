@@ -1,10 +1,10 @@
 package com.moabam.api.application.coupon;
 
+import static com.moabam.support.fixture.CouponFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,12 +19,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
+import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
+import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
+import com.moabam.api.dto.coupon.MyCouponResponse;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.common.util.ClockHolder;
@@ -52,6 +55,9 @@ class CouponServiceTest {
 	CouponSearchRepository couponSearchRepository;
 
 	@Mock
+	CouponWalletSearchRepository couponWalletSearchRepository;
+
+	@Mock
 	ClockHolder clockHolder;
 
 	@WithMember(role = Role.ADMIN)
@@ -63,7 +69,7 @@ class CouponServiceTest {
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
 
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
 
 		// When
 		couponService.create(admin, request);
@@ -95,7 +101,7 @@ class CouponServiceTest {
 		CreateCouponRequest request = CouponFixture.createCouponRequest("UNKNOWN", 2, 1);
 
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
 
 		// When & Then
 		assertThatThrownBy(() -> couponService.create(admin, request))
@@ -144,7 +150,7 @@ class CouponServiceTest {
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		CreateCouponRequest request = CouponFixture.createCouponRequest();
 
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2025, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2025, 1, 1));
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
 		given(couponRepository.existsByStartAt(any(LocalDate.class))).willReturn(false);
 
@@ -165,7 +171,7 @@ class CouponServiceTest {
 
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
 		given(couponRepository.existsByStartAt(any(LocalDate.class))).willReturn(false);
-		given(clockHolder.times()).willReturn(LocalDateTime.of(2022, 1, 1, 1, 1));
+		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
 
 		// When & Then
 		assertThatThrownBy(() -> couponService.create(admin, request))
@@ -180,6 +186,7 @@ class CouponServiceTest {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon(10, 100);
+
 		given(couponRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
 
 		// When
@@ -209,6 +216,7 @@ class CouponServiceTest {
 	void delete_NotFoundException() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
+
 		given(couponRepository.findById(any(Long.class))).willReturn(Optional.empty());
 
 		// When & Then
@@ -222,6 +230,7 @@ class CouponServiceTest {
 	void getById_success() {
 		// Given
 		Coupon coupon = CouponFixture.coupon(10, 100);
+
 		given(couponRepository.findById(any(Long.class))).willReturn(Optional.of(coupon));
 
 		// When
@@ -251,7 +260,7 @@ class CouponServiceTest {
 		// Given
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false);
 
-		given(clockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponSearchRepository.findAllByStatus(any(LocalDate.class), any(CouponStatusRequest.class)))
 			.willReturn(coupons);
 
@@ -260,5 +269,40 @@ class CouponServiceTest {
 
 		// Then
 		assertThat(actual).hasSize(coupons.size());
+	}
+
+	@WithMember
+	@DisplayName("나의 쿠폰함을 성공적으로 조회한다.")
+	@MethodSource("com.moabam.support.fixture.CouponWalletFixture#provideCouponWalletByCouponId1_total5")
+	@ParameterizedTest
+	void getWallet_success(List<CouponWallet> couponWallets) {
+		// Given
+		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
+
+		given(couponWalletSearchRepository.findAllByCouponIdAndMemberId(isNull(), any(Long.class)))
+			.willReturn(couponWallets);
+
+		// When
+		List<MyCouponResponse> actual = couponService.getWallet(null, authMember);
+
+		// Then
+		assertThat(actual).hasSize(couponWallets.size());
+	}
+
+	@WithMember
+	@DisplayName("지갑에서 특정 쿠폰을 성공적으로 조회한다.")
+	@Test
+	void getByWalletIdAndMemberId_success() {
+		// Given
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon());
+
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.of(couponWallet));
+
+		// When
+		Coupon actual = couponService.getByWalletIdAndMemberId(1L, 1L);
+
+		// Then
+		assertThat(actual.getName()).isEqualTo(couponWallet.getCoupon().getName());
 	}
 }
