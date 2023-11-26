@@ -10,6 +10,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 
 import com.moabam.api.domain.bug.Bug;
+import com.moabam.api.domain.room.RoomType;
 import com.moabam.global.common.entity.BaseTimeEntity;
 import com.moabam.global.common.util.BaseImageUrl;
 
@@ -83,28 +84,30 @@ public class Member extends BaseTimeEntity {
 		this.id = id;
 		this.socialId = requireNonNull(socialId);
 		this.nickname = createNickName();
-		this.profileImage = BaseImageUrl.PROFILE_URL;
+		this.profileImage = BaseImageUrl.MEMBER_PROFILE_URL;
 		this.bug = requireNonNull(bug);
 		this.role = Role.USER;
 	}
 
-	public void enterMorningRoom() {
-		currentMorningCount++;
-	}
+	public void enterRoom(RoomType roomType) {
+		if (roomType.equals(RoomType.MORNING)) {
+			this.currentMorningCount++;
+			return;
+		}
 
-	public void enterNightRoom() {
-		currentNightCount++;
-	}
-
-	public void exitMorningRoom() {
-		if (currentMorningCount > 0) {
-			currentMorningCount--;
+		if (roomType.equals(RoomType.NIGHT)) {
+			this.currentNightCount++;
 		}
 	}
 
-	public void exitNightRoom() {
-		if (currentNightCount > 0) {
-			currentNightCount--;
+	public void exitRoom(RoomType roomType) {
+		if (roomType.equals(RoomType.MORNING) && currentMorningCount > 0) {
+			this.currentMorningCount--;
+			return;
+		}
+
+		if (roomType.equals(RoomType.NIGHT) && currentNightCount > 0) {
+			this.currentNightCount--;
 		}
 	}
 

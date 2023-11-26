@@ -471,7 +471,13 @@ Host: localhost:8080</code></pre>
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Vary: Origin
 Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers</code></pre>
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 64
+
+{
+  "message" : "해당 유저는 접속 중이 아닙니다."
+}</code></pre>
 </div>
 </div>
 </div>

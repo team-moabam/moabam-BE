@@ -6,6 +6,8 @@ import java.util.List;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.dto.room.CreateRoomRequest;
+import com.moabam.api.dto.room.GetAllRoomResponse;
+import com.moabam.api.dto.room.GetAllRoomsResponse;
 import com.moabam.api.dto.room.ManageRoomResponse;
 import com.moabam.api.dto.room.MyRoomResponse;
 import com.moabam.api.dto.room.MyRoomsResponse;
@@ -14,8 +16,6 @@ import com.moabam.api.dto.room.RoomDetailsResponse;
 import com.moabam.api.dto.room.RoomHistoryResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
 import com.moabam.api.dto.room.RoutineResponse;
-import com.moabam.api.dto.room.SearchAllRoomResponse;
-import com.moabam.api.dto.room.SearchAllRoomsResponse;
 import com.moabam.api.dto.room.TodayCertificateRankResponse;
 
 import lombok.AccessLevel;
@@ -107,9 +107,9 @@ public final class RoomMapper {
 			.build();
 	}
 
-	public static SearchAllRoomResponse toSearchAllRoomResponse(Room room, List<RoutineResponse> routineResponses,
+	public static GetAllRoomResponse toSearchAllRoomResponse(Room room, List<RoutineResponse> routineResponses,
 		boolean isPassword) {
-		return SearchAllRoomResponse.builder()
+		return GetAllRoomResponse.builder()
 			.id(room.getId())
 			.title(room.getTitle())
 			.image(room.getRoomImage())
@@ -124,11 +124,11 @@ public final class RoomMapper {
 			.build();
 	}
 
-	public static SearchAllRoomsResponse toSearchAllRoomsResponse(boolean hasNext,
-		List<SearchAllRoomResponse> searchAllRoomResponses) {
-		return SearchAllRoomsResponse.builder()
+	public static GetAllRoomsResponse toSearchAllRoomsResponse(boolean hasNext,
+		List<GetAllRoomResponse> getAllRoomResponse) {
+		return GetAllRoomsResponse.builder()
 			.hasNext(hasNext)
-			.rooms(searchAllRoomResponses)
+			.rooms(getAllRoomResponse)
 			.build();
 	}
 }

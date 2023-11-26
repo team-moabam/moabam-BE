@@ -139,7 +139,7 @@ class AuthorizationFilterTest {
 				eq(null), any(UnauthorizedException.class));
 	}
 
-	@DisplayName("새로운 도큰 발급 성공")
+	@DisplayName("새로운 토큰 발급 성공")
 	@Test
 	void issue_new_token_success() throws ServletException, IOException {
 		// given

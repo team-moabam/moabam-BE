@@ -54,13 +54,24 @@ public class InventorySearchRepository {
 			.fetch();
 	}
 
-	public List<Inventory> findBirdsDefaultSkin(Long searchId) {
+	public List<Inventory> findDefaultSkin(Long memberId) {
 		return jpaQueryFactory.selectFrom(inventory)
 			.join(inventory.item)
 			.on(inventory.item.id.eq(item.id))
 			.where(
-				inventory.memberId.eq(searchId),
+				inventory.memberId.eq(memberId),
 				inventory.isDefault.isTrue()
 			).fetch();
+	}
+
+	public List<Inventory> findDefaultInventories(List<Long> memberId, String roomType) {
+		return jpaQueryFactory.selectFrom(inventory)
+			.join(inventory.item, item).fetchJoin()
+			.where(
+				inventory.memberId.in(memberId),
+				inventory.isDefault.isTrue(),
+				inventory.item.type.eq(ItemType.valueOf(roomType))
+			)
+			.fetch();
 	}
 }
