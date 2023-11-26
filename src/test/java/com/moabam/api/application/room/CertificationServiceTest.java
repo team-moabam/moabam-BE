@@ -1,8 +1,10 @@
 package com.moabam.api.application.room;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.lenient;
+import static org.mockito.BDDMockito.spy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,12 +20,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.moabam.api.application.image.ImageService;
 import com.moabam.api.application.member.MemberService;
-import com.moabam.api.domain.image.ImageType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.room.DailyMemberCertification;
 import com.moabam.api.domain.room.DailyRoomCertification;
@@ -43,10 +42,10 @@ import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith(MockitoExtension.class)
-class RoomCertificationServiceTest {
+class CertificationServiceTest {
 
 	@InjectMocks
-	private RoomCertificationService roomCertificationService;
+	private CertificationService certificationService;
 
 	@Mock
 	private MemberService memberService;
@@ -118,14 +117,12 @@ class RoomCertificationServiceTest {
 		// given
 		List<Routine> routines = RoomFixture.routines(room);
 		DailyRoomCertification dailyRoomCertification = RoomFixture.dailyRoomCertification(roomId, today);
-		MockMultipartFile image = RoomFixture.makeMultipartFile1();
-		List<MultipartFile> images = List.of(image, image, image);
 		List<String> uploadImages = new ArrayList<>();
 		uploadImages.add("https://image.moabam.com/certifications/20231108/1_asdfsdfxcv-4815vcx-asfd");
 		uploadImages.add("https://image.moabam.com/certifications/20231108/2_asdfsdfxcv-4815vcx-asfd");
 
-		given(imageService.uploadImages(images, ImageType.CERTIFICATION)).willReturn(uploadImages);
 		given(clockHolder.times()).willReturn(LocalDateTime.now().withHour(9).withMinute(58));
+		given(clockHolder.date()).willReturn(today);
 		given(participantSearchRepository.findOne(memberId, roomId)).willReturn(Optional.of(participant));
 		given(memberService.getById(memberId)).willReturn(member1);
 		given(routineRepository.findById(1L)).willReturn(Optional.of(routines.get(0)));
@@ -134,7 +131,7 @@ class RoomCertificationServiceTest {
 			Optional.of(dailyRoomCertification));
 
 		// when
-		roomCertificationService.certifyRoom(memberId, roomId, images);
+		certificationService.certifyRoom(memberId, roomId, uploadImages);
 
 		// then
 		assertThat(member1.getBug().getMorningBug()).isEqualTo(12);
@@ -146,16 +143,14 @@ class RoomCertificationServiceTest {
 	void not_certified_room_routine_success() {
 		// given
 		List<Routine> routines = RoomFixture.routines(room);
-		MockMultipartFile image = RoomFixture.makeMultipartFile1();
 		List<DailyMemberCertification> dailyMemberCertifications =
 			RoomFixture.dailyMemberCertifications(roomId, participant);
-		List<MultipartFile> images = List.of(image, image, image);
 		List<String> uploadImages = new ArrayList<>();
 		uploadImages.add("https://image.moabam.com/certifications/20231108/1_asdfsdfxcv-4815vcx-asfd");
 		uploadImages.add("https://image.moabam.com/certifications/20231108/2_asdfsdfxcv-4815vcx-asfd");
 
-		given(imageService.uploadImages(images, ImageType.CERTIFICATION)).willReturn(uploadImages);
 		given(clockHolder.times()).willReturn(LocalDateTime.now().withHour(9).withMinute(58));
+		given(clockHolder.date()).willReturn(today);
 		given(participantSearchRepository.findOne(memberId, roomId)).willReturn(Optional.of(participant));
 		given(memberService.getById(memberId)).willReturn(member1);
 		given(routineRepository.findById(1L)).willReturn(Optional.of(routines.get(0)));
@@ -167,7 +162,7 @@ class RoomCertificationServiceTest {
 		given(memberService.getRoomMembers(anyList())).willReturn(List.of(member1, member2, member3));
 
 		// when
-		roomCertificationService.certifyRoom(memberId, roomId, images);
+		certificationService.certifyRoom(memberId, roomId, uploadImages);
 
 		// then
 		assertThat(member1.getBug().getMorningBug()).isEqualTo(12);

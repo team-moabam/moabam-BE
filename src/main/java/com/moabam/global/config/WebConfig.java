@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.moabam.api.application.auth.mapper.PathMapper;
@@ -17,19 +16,6 @@ import com.moabam.global.auth.handler.PathResolver;
 @Configuration
 @EnableScheduling
 public class WebConfig implements WebMvcConfigurer {
-
-	private static final String ALLOWED_METHOD_NAMES = "GET,HEAD,POST,PUT,DELETE,TRACE,OPTIONS,PATCH";
-	private static final String ALLOW_ORIGIN_PATTERN = "https:\\/\\/[a-z]+\\.moabam.com";
-
-	@Override
-	public void addCorsMappings(final CorsRegistry registry) {
-		registry.addMapping("/**")
-			.allowedOriginPatterns(ALLOW_ORIGIN_PATTERN)
-			.allowedMethods(ALLOWED_METHOD_NAMES.split(","))
-			.allowedHeaders("*")
-			.allowCredentials(true)
-			.maxAge(3600);
-	}
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {

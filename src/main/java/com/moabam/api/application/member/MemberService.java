@@ -106,7 +106,7 @@ public class MemberService {
 	}
 
 	private List<Inventory> getDefaultSkin(Long searchId) {
-		List<Inventory> inventories = inventorySearchRepository.findBirdsDefaultSkin(searchId);
+		List<Inventory> inventories = inventorySearchRepository.findDefaultSkin(searchId);
 		if (inventories.size() != GlobalConstant.DEFAULT_SKIN_SIZE) {
 			throw new BadRequestException(INVALID_DEFAULT_SKIN_SIZE);
 		}

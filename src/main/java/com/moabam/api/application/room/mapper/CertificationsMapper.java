@@ -1,7 +1,6 @@
 package com.moabam.api.application.room.mapper;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.moabam.api.domain.member.Member;
@@ -11,6 +10,7 @@ import com.moabam.api.domain.room.DailyRoomCertification;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Routine;
 import com.moabam.api.dto.room.CertificationImageResponse;
+import com.moabam.api.dto.room.CertificationImagesResponse;
 import com.moabam.api.dto.room.TodayCertificateRankResponse;
 
 import lombok.AccessLevel;
@@ -19,29 +19,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CertificationsMapper {
 
-	public static List<CertificationImageResponse> toCertificateImageResponses(Long memberId,
-		List<Certification> certifications) {
+	public static CertificationImageResponse toCertificateImageResponse(Long routineId, String image) {
+		return CertificationImageResponse.builder()
+			.routineId(routineId)
+			.image(image)
+			.build();
+	}
 
-		List<CertificationImageResponse> cftImageResponses = new ArrayList<>();
-		List<Certification> filteredCertifications = certifications.stream()
-			.filter(certification -> certification.getMemberId().equals(memberId))
-			.toList();
-
-		for (Certification certification : filteredCertifications) {
-			CertificationImageResponse cftImageResponse = CertificationImageResponse.builder()
-				.routineId(certification.getRoutine().getId())
-				.image(certification.getImage())
-				.build();
-
-			cftImageResponses.add(cftImageResponse);
-		}
-
-		return cftImageResponses;
+	public static CertificationImagesResponse toCertificateImagesResponse(List<CertificationImageResponse> images) {
+		return CertificationImagesResponse.builder()
+			.images(images)
+			.build();
 	}
 
 	public static TodayCertificateRankResponse toTodayCertificateRankResponse(int rank, Member member,
 		int contributionPoint, String awakeImage, String sleepImage,
-		List<CertificationImageResponse> certificationImageResponses, boolean isNotificationSent) {
+		CertificationImagesResponse certificationImagesResponses, boolean isNotificationSent) {
 
 		return TodayCertificateRankResponse.builder()
 			.rank(rank)
@@ -52,13 +45,12 @@ public final class CertificationsMapper {
 			.contributionPoint(contributionPoint)
 			.awakeImage(awakeImage)
 			.sleepImage(sleepImage)
-			.certificationImage(certificationImageResponses)
+			.certificationImage(certificationImagesResponses)
 			.build();
 	}
 
 	public static DailyMemberCertification toDailyMemberCertification(Long memberId, Long roomId,
 		Participant participant) {
-
 		return DailyMemberCertification.builder()
 			.memberId(memberId)
 			.roomId(roomId)

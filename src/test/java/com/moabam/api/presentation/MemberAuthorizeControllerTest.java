@@ -1,10 +1,16 @@
 package com.moabam.api.presentation;
 
-import static org.mockito.BDDMockito.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.doReturn;
+import static org.mockito.BDDMockito.willReturn;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +43,7 @@ import com.moabam.api.application.auth.OAuth2AuthorizationServerRequestService;
 import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
+import com.moabam.global.auth.filter.CorsFilter;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
@@ -58,6 +65,9 @@ class MemberAuthorizeControllerTest {
 	@SpyBean
 	AuthorizationService authorizationService;
 
+	@SpyBean
+	CorsFilter corsFilter;
+
 	@Autowired
 	OAuthConfig oAuthConfig;
 
@@ -77,6 +87,7 @@ class MemberAuthorizeControllerTest {
 		RestTemplate restTemplate = restTemplateBuilder.build();
 		ReflectionTestUtils.setField(oAuth2AuthorizationServerRequestService, "restTemplate", restTemplate);
 		mockRestServiceServer = MockRestServiceServer.createServer(restTemplate);
+		willReturn(true).given(corsFilter).secureMatch(any(), any());
 	}
 
 	@DisplayName("인가 코드 받기 위한 로그인 페이지 요청")

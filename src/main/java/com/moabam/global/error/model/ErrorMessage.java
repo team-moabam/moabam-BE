@@ -71,6 +71,7 @@ public enum ErrorMessage {
 	INVALID_COUPON_OPEN_AT_PERIOD("쿠폰 정보 오픈 날짜는 시작 날짜보다 이전이여야 합니다."),
 	INVALID_COUPON_PERIOD("쿠폰 발급 가능 기간이 아닙니다."),
 	CONFLICT_COUPON_NAME("쿠폰의 이름이 중복되었습니다."),
+	CONFLICT_COUPON_START_AT("쿠폰 발급 가능 날짜가 중복되었습니다."),
 	NOT_FOUND_COUPON_TYPE("존재하지 않는 쿠폰 종류입니다."),
 	NOT_FOUND_COUPON("존재하지 않는 쿠폰입니다."),
 	NOT_FOUND_COUPON_WALLET("보유하지 않은 쿠폰입니다."),
