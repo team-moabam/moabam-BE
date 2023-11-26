@@ -27,8 +27,8 @@ import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
-import com.moabam.global.error.model.ErrorMessage;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -100,8 +100,8 @@ public class MemberService {
 	}
 
 	private void validateNickname(String nickname) {
-		if (Objects.nonNull(nickname) && memberRepository.existsByNickname(nickname)) {
-			throw new ConflictException(ErrorMessage.CONFLICT_NICKNAME);
+		if (StringUtils.isEmpty(nickname) && memberRepository.existsByNickname(nickname)) {
+			throw new ConflictException(NICKNAME_CONFLICT);
 		}
 	}
 
