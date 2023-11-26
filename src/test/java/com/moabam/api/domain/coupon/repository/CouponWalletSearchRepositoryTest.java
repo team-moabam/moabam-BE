@@ -113,7 +113,7 @@ class CouponWalletSearchRepositoryTest {
 		assertThat(actual.getCoupon()).isEqualTo(coupon);
 	}
 
-	@DisplayName("특정 회원의 특정 쿠폰을 조회한다. - CouponWallet")
+	@DisplayName("특정 회원의 특정 쿠폰을 성공적으로 조회한다. - CouponWallet")
 	@Test
 	void findByMemberIdAndCouponId_success() {
 		// Given

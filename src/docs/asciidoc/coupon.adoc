@@ -87,6 +87,21 @@ include::{snippets}/coupons/http-response.adoc[]
 
 ==== 요청
 
+include::{snippets}/my-coupons/http-request.adoc[]
+
+[discrete]
+==== 응답
+
+include::{snippets}/my-coupons/http-response.adoc[]
+
+---
+
+=== 쿠폰을 사용
+
+ 사용자가 자신의 보관함에 있는 쿠폰들을 사용합니다.
+
+==== 요청
+
 include::{snippets}/my-coupons/couponId/http-request.adoc[]
 
 [discrete]
@@ -95,7 +110,3 @@ include::{snippets}/my-coupons/couponId/http-request.adoc[]
 include::{snippets}/my-coupons/couponId/http-response.adoc[]
 
 ---
-
-=== 쿠폰 사용 (진행 중)
-
- 사용자가 자신의 보관함에 있는 쿠폰들을 사용합니다.

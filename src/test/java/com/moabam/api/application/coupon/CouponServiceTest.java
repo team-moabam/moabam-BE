@@ -318,7 +318,7 @@ class CouponServiceTest {
 	}
 
 	@WithMember
-	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있는 특정 쿠폰을 사용한다. - Void")
+	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있는 특정 쿠폰을 성공적으로 사용한다. - Void")
 	@Test
 	void use_success() {
 		// Given
