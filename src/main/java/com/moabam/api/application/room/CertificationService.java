@@ -1,9 +1,6 @@
 package com.moabam.api.application.room;
 
-import static com.moabam.global.error.model.ErrorMessage.DUPLICATED_DAILY_MEMBER_CERTIFICATION;
-import static com.moabam.global.error.model.ErrorMessage.INVALID_CERTIFY_TIME;
-import static com.moabam.global.error.model.ErrorMessage.PARTICIPANT_NOT_FOUND;
-import static com.moabam.global.error.model.ErrorMessage.ROUTINE_NOT_FOUND;
+import static com.moabam.global.error.model.ErrorMessage.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -81,7 +78,7 @@ public class CertificationService {
 			return;
 		}
 
-		member.getBug().increaseBug(bugType, roomLevel);
+		member.getBug().increase(bugType, roomLevel);
 	}
 
 	public boolean existsMemberCertification(Long memberId, Long roomId, LocalDate date) {
@@ -175,6 +172,6 @@ public class CertificationService {
 			.toList();
 
 		memberService.getRoomMembers(memberIds)
-			.forEach(completedMember -> completedMember.getBug().increaseBug(bugType, expAppliedRoomLevel));
+			.forEach(completedMember -> completedMember.getBug().increase(bugType, expAppliedRoomLevel));
 	}
 }
