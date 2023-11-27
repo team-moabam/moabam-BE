@@ -1,6 +1,5 @@
 package com.moabam.api.presentation;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -37,7 +36,6 @@ import com.moabam.api.dto.room.UnJoinedRoomDetailsResponse;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -91,11 +89,9 @@ public class RoomController {
 	}
 
 	@GetMapping("/{roomId}/check")
-	@ResponseStatus(HttpStatus.FOUND)
-	public void checkIfParticipant(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId,
-		HttpServletResponse response) throws IOException {
-		String urlToRedirect = roomService.checkIfParticipant(authMember.id(), roomId);
-		response.sendRedirect(urlToRedirect);
+	@ResponseStatus(HttpStatus.OK)
+	public boolean checkIfParticipant(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId) {
+		return roomService.checkIfParticipant(authMember.id(), roomId);
 	}
 
 	@GetMapping("/{roomId}/un-joined")

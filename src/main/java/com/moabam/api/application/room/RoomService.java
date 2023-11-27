@@ -3,7 +3,6 @@ package com.moabam.api.application.room;
 import static com.moabam.api.domain.room.RoomType.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -148,12 +147,12 @@ public class RoomService {
 		member.exitRoom(room.getRoomType());
 	}
 
-	public String checkIfParticipant(Long memberId, Long roomId) {
+	public boolean checkIfParticipant(Long memberId, Long roomId) {
 		try {
 			getParticipant(memberId, roomId);
-			return String.format("https://dev-api.moabam.com/%d/%s", roomId, LocalDate.now());
+			return true;
 		} catch (NotFoundException e) {
-			return String.format("https://dev-api.moabam.com/%d/un-joined", roomId);
+			return false;
 		}
 	}
 

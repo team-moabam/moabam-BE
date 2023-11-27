@@ -971,7 +971,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andDo(print());
 	}
 
-	@DisplayName("참여중이지 않은 방에 대한 리다이렉션 반환 성공")
+	@DisplayName("참여중이지 않은 방에 대한 확인 성공")
 	@WithMember
 	@Test
 	void check_if_participant_false_success() throws Exception {
@@ -981,8 +981,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		// expected
 		mockMvc.perform(get("/rooms/" + savedRoom.getId() + "/check"))
-			.andExpect(status().isFound())
-			.andExpect(redirectedUrl(String.format("https://dev-api.moabam.com/%d/un-joined", savedRoom.getId())))
+			.andExpect(status().isOk())
 			.andDo(print());
 	}
 
@@ -1021,7 +1020,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andDo(print());
 	}
 
-	@DisplayName("참여중인 방에 대한 리다이렉션 반환 성공")
+	@DisplayName("참여중인 방에 대한 확인 성공")
 	@WithMember
 	@Test
 	void check_if_participant_true_success() throws Exception {
@@ -1034,9 +1033,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		// expected
 		mockMvc.perform(get("/rooms/" + savedRoom.getId() + "/check"))
-			.andExpect(status().isFound())
-			.andExpect(
-				redirectedUrl(String.format("https://dev-api.moabam.com/%d/%s", savedRoom.getId(), LocalDate.now())))
+			.andExpect(status().isOk())
 			.andDo(print());
 	}
 
