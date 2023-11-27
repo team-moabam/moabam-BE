@@ -80,4 +80,8 @@ public class Bug {
 			case GOLDEN -> this.goldenBug += bug;
 		}
 	}
+
+	public void charge(int quantity) {
+		this.goldenBug += quantity;
+	}
 }

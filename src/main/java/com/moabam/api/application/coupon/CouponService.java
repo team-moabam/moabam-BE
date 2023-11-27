@@ -32,7 +32,6 @@ public class CouponService {
 
 	private final ClockHolder clockHolder;
 	private final CouponManageService couponManageService;
-
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
 	private final CouponWalletSearchRepository couponWalletSearchRepository;
@@ -55,6 +54,12 @@ public class CouponService {
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 		couponRepository.delete(coupon);
 		couponManageService.deleteCouponManage(coupon.getName());
+	}
+
+	@Transactional
+	public void use(Long memberId, Long couponWalletId) {
+		Coupon coupon = getByWalletIdAndMemberId(couponWalletId, memberId);
+		couponRepository.delete(coupon);
 	}
 
 	public CouponResponse getById(Long couponId) {
