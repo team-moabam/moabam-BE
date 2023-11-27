@@ -19,4 +19,5 @@ public class GlobalConstant {
 	public static final int ROOM_FIXED_SEARCH_SIZE = 10;
 	public static final int LEVEL_DIVISOR = 10;
 	public static final int DEFAULT_SKIN_SIZE = 2;
+	public static final String IMAGE_EXTENSION = ".png";
 }
