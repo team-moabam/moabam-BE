@@ -28,4 +28,13 @@ public final class BugMapper {
 			.quantity(quantity)
 			.build();
 	}
+
+	public static BugHistory toChargeBugHistory(Long memberId, int quantity) {
+		return BugHistory.builder()
+			.memberId(memberId)
+			.bugType(BugType.GOLDEN)
+			.actionType(BugActionType.CHARGE)
+			.quantity(quantity)
+			.build();
+	}
 }

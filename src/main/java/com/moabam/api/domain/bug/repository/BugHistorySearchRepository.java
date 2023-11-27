@@ -22,8 +22,7 @@ public class BugHistorySearchRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	public List<BugHistory> find(Long memberId, BugActionType actionType, LocalDateTime dateTime) {
-		return jpaQueryFactory
-			.selectFrom(bugHistory)
+		return jpaQueryFactory.selectFrom(bugHistory)
 			.where(
 				DynamicQuery.generateEq(memberId, bugHistory.memberId::eq),
 				DynamicQuery.generateEq(actionType, bugHistory.actionType::eq),
