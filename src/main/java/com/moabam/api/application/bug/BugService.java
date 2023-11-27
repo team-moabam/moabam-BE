@@ -16,7 +16,7 @@ import com.moabam.api.application.product.ProductMapper;
 import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
-import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
 import com.moabam.api.domain.product.Product;
@@ -67,8 +67,8 @@ public class BugService {
 		Payment payment = PaymentMapper.toPayment(memberId, product);
 
 		if (!isNull(request.couponWalletId())) {
-			Coupon coupon = couponService.getByWalletIdAndMemberId(request.couponWalletId(), memberId);
-			payment.applyCoupon(coupon, request.couponWalletId());
+			CouponWallet couponWallet = couponService.getWalletByIdAndMemberId(request.couponWalletId(), memberId);
+			payment.applyCoupon(couponWallet);
 		}
 		paymentRepository.save(payment);
 

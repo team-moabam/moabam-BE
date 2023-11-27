@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.global.error.exception.BadRequestException;
 
 class PaymentTest {
@@ -38,15 +39,14 @@ class PaymentTest {
 			// given
 			Payment payment = payment(bugProduct());
 			Coupon coupon = discount1000Coupon();
-			Long couponWalletId = 1L;
+			CouponWallet couponWallet = CouponWallet.create(1L, coupon);
 
 			// when
-			payment.applyCoupon(coupon, couponWalletId);
+			payment.applyCoupon(couponWallet);
 
 			// then
 			assertThat(payment.getTotalAmount()).isEqualTo(BUG_PRODUCT_PRICE - 1000);
 			assertThat(payment.getDiscountAmount()).isEqualTo(coupon.getPoint());
-			assertThat(payment.getCouponWalletId()).isEqualTo(couponWalletId);
 		}
 
 		@DisplayName("할인 금액이 더 크면 0으로 처리한다.")
@@ -55,10 +55,10 @@ class PaymentTest {
 			// given
 			Payment payment = payment(bugProduct());
 			Coupon coupon = discount10000Coupon();
-			Long couponWalletId = 1L;
+			CouponWallet couponWallet = CouponWallet.create(1L, coupon);
 
 			// when
-			payment.applyCoupon(coupon, couponWalletId);
+			payment.applyCoupon(couponWallet);
 
 			// then
 			assertThat(payment.getTotalAmount()).isZero();

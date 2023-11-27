@@ -33,13 +33,13 @@ public class CouponController {
 
 	@PostMapping("/admins/coupons")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createCoupon(@Auth AuthMember admin, @Valid @RequestBody CreateCouponRequest request) {
+	public void create(@Auth AuthMember admin, @Valid @RequestBody CreateCouponRequest request) {
 		couponService.create(admin, request);
 	}
 
 	@DeleteMapping("/admins/coupons/{couponId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void deleteCoupon(@Auth AuthMember admin, @PathVariable("couponId") Long couponId) {
+	public void delete(@Auth AuthMember admin, @PathVariable("couponId") Long couponId) {
 		couponService.delete(admin, couponId);
 	}
 
@@ -56,13 +56,21 @@ public class CouponController {
 	}
 
 	@PostMapping("/coupons")
+	@ResponseStatus(HttpStatus.OK)
 	public void registerQueue(@Auth AuthMember authMember, @RequestParam("couponName") String couponName) {
 		couponManageService.register(authMember, couponName);
 	}
 
 	@GetMapping({"/my-coupons", "/my-coupons/{couponId}"})
+	@ResponseStatus(HttpStatus.OK)
 	public List<MyCouponResponse> getWallet(@Auth AuthMember authMember,
 		@PathVariable(value = "couponId", required = false) Long couponId) {
 		return couponService.getWallet(couponId, authMember);
+	}
+
+	@PostMapping("/my-coupons/{couponWalletId}")
+	@ResponseStatus(HttpStatus.OK)
+	public void use(@Auth AuthMember authMember, @PathVariable("couponWalletId") Long couponWalletId) {
+		couponService.use(authMember.id(), couponWalletId);
 	}
 }
