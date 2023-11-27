@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moabam.api.application.bug.BugService;
 import com.moabam.api.application.item.ItemMapper;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.bug.BugType;
@@ -53,6 +54,9 @@ class ItemControllerTest extends WithoutFilterSupporter {
 
 	@MockBean
 	MemberService memberService;
+
+	@MockBean
+	BugService bugService;
 
 	@Autowired
 	ItemRepository itemRepository;

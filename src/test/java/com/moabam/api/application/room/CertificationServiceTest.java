@@ -1,10 +1,8 @@
 package com.moabam.api.application.room;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.lenient;
-import static org.mockito.BDDMockito.spy;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,8 +19,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.application.bug.BugService;
 import com.moabam.api.application.image.ImageService;
 import com.moabam.api.application.member.MemberService;
+import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.room.DailyMemberCertification;
 import com.moabam.api.domain.room.DailyRoomCertification;
@@ -49,6 +49,9 @@ class CertificationServiceTest {
 
 	@Mock
 	private MemberService memberService;
+
+	@Mock
+	private BugService bugService;
 
 	@Mock
 	private RoomRepository roomRepository;
@@ -134,7 +137,7 @@ class CertificationServiceTest {
 		certificationService.certifyRoom(memberId, roomId, uploadImages);
 
 		// then
-		assertThat(member1.getBug().getMorningBug()).isEqualTo(12);
+		verify(bugService).reward(any(Member.class), any(BugType.class), anyInt());
 		assertThat(member1.getTotalCertifyCount()).isEqualTo(1);
 	}
 
@@ -165,11 +168,7 @@ class CertificationServiceTest {
 		certificationService.certifyRoom(memberId, roomId, uploadImages);
 
 		// then
-		assertThat(member1.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member2.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member3.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member3.getBug().getNightBug()).isEqualTo(20);
-		assertThat(member3.getBug().getGoldenBug()).isEqualTo(30);
+		verify(bugService, times(3)).reward(any(Member.class), any(BugType.class), anyInt());
 		assertThat(room.getExp()).isEqualTo(1);
 		assertThat(room.getLevel()).isEqualTo(2);
 	}
