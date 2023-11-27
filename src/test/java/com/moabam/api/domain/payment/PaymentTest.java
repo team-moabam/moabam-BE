@@ -21,7 +21,7 @@ class PaymentTest {
 			.memberId(1L)
 			.product(bugProduct())
 			.order(order(bugProduct()))
-			.amount(-1000);
+			.totalAmount(-1000);
 
 		assertThatThrownBy(paymentBuilder::build)
 			.isInstanceOf(BadRequestException.class)
@@ -44,8 +44,8 @@ class PaymentTest {
 			payment.applyCoupon(coupon, couponWalletId);
 
 			// then
-			assertThat(payment.getAmount()).isEqualTo(BUG_PRODUCT_PRICE - 1000);
-			assertThat(payment.getCoupon()).isEqualTo(coupon);
+			assertThat(payment.getTotalAmount()).isEqualTo(BUG_PRODUCT_PRICE - 1000);
+			assertThat(payment.getDiscountAmount()).isEqualTo(coupon.getPoint());
 			assertThat(payment.getCouponWalletId()).isEqualTo(couponWalletId);
 		}
 
@@ -61,7 +61,7 @@ class PaymentTest {
 			payment.applyCoupon(coupon, couponWalletId);
 
 			// then
-			assertThat(payment.getAmount()).isZero();
+			assertThat(payment.getTotalAmount()).isZero();
 		}
 	}
 

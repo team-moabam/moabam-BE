@@ -20,12 +20,15 @@ import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
+import com.moabam.api.dto.member.ModifyMemberRequest;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.error.exception.BadRequestException;
+import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -38,8 +41,8 @@ public class MemberService {
 	private final MemberSearchRepository memberSearchRepository;
 	private final ClockHolder clockHolder;
 
-	public Member getById(Long memberId) {
-		return memberRepository.findById(memberId)
+	public Member findMember(Long memberId) {
+		return memberSearchRepository.findMember(memberId)
 			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
 	}
 
@@ -80,6 +83,26 @@ public class MemberService {
 		List<Inventory> inventories = getDefaultSkin(searchId);
 
 		return MemberMapper.toMemberInfoResponse(memberInfoSearchResponse, inventories);
+	}
+
+	@Transactional
+	public void modifyInfo(AuthMember authMember, ModifyMemberRequest modifyMemberRequest, String newProfileUri) {
+		validateNickname(modifyMemberRequest.nickname());
+
+		Member member = memberSearchRepository.findMember(authMember.id())
+			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
+
+		member.changeNickName(modifyMemberRequest.nickname());
+		member.changeIntro(modifyMemberRequest.intro());
+		member.changeProfileUri(newProfileUri);
+
+		memberRepository.save(member);
+	}
+
+	private void validateNickname(String nickname) {
+		if (StringUtils.isEmpty(nickname) && memberRepository.existsByNickname(nickname)) {
+			throw new ConflictException(NICKNAME_CONFLICT);
+		}
 	}
 
 	private List<Inventory> getDefaultSkin(Long searchId) {

@@ -98,7 +98,7 @@ class ItemServiceTest {
 			PurchaseItemRequest request = new PurchaseItemRequest(BugType.GOLDEN);
 			Member member = member();
 			Item item = nightMageSkin();
-			given(memberService.getById(memberId)).willReturn(member);
+			given(memberService.findMember(memberId)).willReturn(member);
 			given(itemRepository.findById(itemId)).willReturn(Optional.of(item));
 			given(inventorySearchRepository.findOne(memberId, itemId)).willReturn(Optional.empty());
 
@@ -106,7 +106,7 @@ class ItemServiceTest {
 			itemService.purchaseItem(memberId, itemId, request);
 
 			// Then
-			verify(memberService).getById(memberId);
+			verify(memberService).findMember(memberId);
 			verify(itemRepository).findById(itemId);
 			verify(inventorySearchRepository).findOne(memberId, itemId);
 			verify(inventoryRepository).save(any(Inventory.class));
