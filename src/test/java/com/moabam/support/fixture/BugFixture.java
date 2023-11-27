@@ -14,7 +14,6 @@ public final class BugFixture {
 	public static final int NIGHT_BUG = 20;
 	public static final int GOLDEN_BUG = 30;
 	public static final int REWARD_MORNING_BUG = 3;
-	public static final int USE_NIGHT_BUG = 5;
 
 	public static Bug bug() {
 		return Bug.builder()

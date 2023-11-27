@@ -79,10 +79,6 @@ public class Bug {
 			case NIGHT -> this.nightBug += bug;
 			case GOLDEN -> this.goldenBug += bug;
 		}
-
-		if (bugType.equals(BugType.NIGHT)) {
-			this.nightBug += bug;
-		}
 	}
 
 	public void charge(int quantity) {
