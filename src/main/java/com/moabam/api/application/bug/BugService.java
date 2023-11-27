@@ -46,7 +46,7 @@ public class BugService {
 	private final PaymentRepository paymentRepository;
 
 	public BugResponse getBug(Long memberId) {
-		Bug bug = memberService.getById(memberId).getBug();
+		Bug bug = getByMemberId(memberId);
 
 		return BugMapper.toBugResponse(bug);
 	}
@@ -65,7 +65,7 @@ public class BugService {
 
 	@Transactional
 	public PurchaseProductResponse purchaseBugProduct(Long memberId, Long productId, PurchaseProductRequest request) {
-		Product product = getById(productId);
+		Product product = getProductById(productId);
 		Payment payment = PaymentMapper.toPayment(memberId, product);
 
 		if (!isNull(request.couponWalletId())) {
@@ -79,25 +79,34 @@ public class BugService {
 
 	@Transactional
 	public void use(Member member, BugType bugType, int price) {
-		member.getBug().use(bugType, price);
+		Bug bug = member.getBug();
+
+		bug.use(bugType, price);
 		bugHistoryRepository.save(BugMapper.toUseBugHistory(member.getId(), bugType, price));
 	}
 
 	@Transactional
 	public void reward(Member member, BugType bugType, int count) {
-		member.getBug().increase(bugType, count);
+		Bug bug = member.getBug();
+
+		bug.increase(bugType, count);
 		bugHistoryRepository.save(BugMapper.toRewardBugHistory(member.getId(), bugType, count));
 	}
 
 	@Transactional
 	public void charge(Long memberId, Product bugProduct) {
-		Bug bug = memberService.getById(memberId).getBug();
+		Bug bug = getByMemberId(memberId);
 
 		bug.charge(bugProduct.getQuantity());
 		bugHistoryRepository.save(BugMapper.toChargeBugHistory(memberId, bugProduct.getQuantity()));
 	}
 
-	private Product getById(Long productId) {
+	private Bug getByMemberId(Long memberId) {
+		return memberService.getById(memberId)
+			.getBug();
+	}
+
+	private Product getProductById(Long productId) {
 		return productRepository.findById(productId)
 			.orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
 	}
