@@ -87,9 +87,9 @@ public class CertificationService {
 			certifyRoomIfAvailable(room.getId(), date, room, bugType, room.getLevel());
 			return;
 		}
-    
-	  member.getBug().increaseBug(bugType, room.getLevel());
-  }
+
+		member.getBug().increase(bugType, room.getLevel());
+	}
 
 	public boolean existsMemberCertification(Long memberId, Long roomId, LocalDate date) {
 		return dailyMemberCertificationRepository.existsByMemberIdAndRoomIdAndCreatedAtBetween(memberId, roomId,
