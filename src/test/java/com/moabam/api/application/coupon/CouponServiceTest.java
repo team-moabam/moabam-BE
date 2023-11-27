@@ -311,10 +311,10 @@ class CouponServiceTest {
 			.willReturn(Optional.of(couponWallet));
 
 		// When
-		Coupon actual = couponService.getByWalletIdAndMemberId(1L, 1L);
+		CouponWallet actual = couponService.getWalletByIdAndMemberId(1L, 1L);
 
 		// Then
-		assertThat(actual.getName()).isEqualTo(couponWallet.getCoupon().getName());
+		assertThat(actual.getCoupon().getName()).isEqualTo(couponWallet.getCoupon().getName());
 	}
 
 	@WithMember
@@ -327,12 +327,12 @@ class CouponServiceTest {
 		Coupon coupon = CouponFixture.coupon(CouponType.GOLDEN, 1000);
 		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
 
-		given(memberService.getById(any(Long.class))).willReturn(member);
-		given(couponWalletSearchRepository.findByMemberIdAndCouponId(any(Long.class), any(Long.class)))
+		given(memberService.findMember(any(Long.class))).willReturn(member);
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
 			.willReturn(Optional.of(couponWallet));
 
 		// When
-		couponService.use(authMember, 1L);
+		couponService.use(authMember.id(), 1L);
 
 		// Then
 		verify(couponWalletRepository).delete(any(CouponWallet.class));
@@ -345,13 +345,13 @@ class CouponServiceTest {
 		// Given
 		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon(CouponType.DISCOUNT, 1000);
-		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
+		CouponWallet couponWallet = CouponWallet.create(authMember.id(), coupon);
 
-		given(couponWalletSearchRepository.findByMemberIdAndCouponId(any(Long.class), any(Long.class)))
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
 			.willReturn(Optional.of(couponWallet));
 
 		// When & Then
-		assertThatThrownBy(() -> couponService.use(authMember, 1L))
+		assertThatThrownBy(() -> couponService.use(authMember.id(), 1L))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.INVALID_DISCOUNT_COUPON.getMessage());
 	}
@@ -363,11 +363,11 @@ class CouponServiceTest {
 		// Given
 		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
 
-		given(couponWalletSearchRepository.findByMemberIdAndCouponId(any(Long.class), any(Long.class)))
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
 			.willReturn(Optional.empty());
 
 		// When & Then
-		assertThatThrownBy(() -> couponService.use(authMember, 1L))
+		assertThatThrownBy(() -> couponService.use(authMember.id(), 1L))
 			.isInstanceOf(NotFoundException.class)
 			.hasMessage(ErrorMessage.NOT_FOUND_COUPON_WALLET.getMessage());
 	}

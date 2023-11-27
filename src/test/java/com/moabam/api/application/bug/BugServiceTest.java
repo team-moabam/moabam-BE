@@ -22,6 +22,7 @@ import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.payment.PaymentMapper;
 import com.moabam.api.domain.bug.Bug;
+import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
@@ -103,7 +104,8 @@ class BugServiceTest {
 			PurchaseProductRequest request = new PurchaseProductRequest(couponWalletId);
 			given(productRepository.findById(productId)).willReturn(Optional.of(bugProduct()));
 			given(paymentRepository.save(any(Payment.class))).willReturn(payment);
-			given(couponService.getByWalletIdAndMemberId(couponWalletId, memberId)).willReturn(discount1000Coupon());
+			given(couponService.getWalletByIdAndMemberId(couponWalletId, memberId)).willReturn(
+				CouponWallet.create(memberId, discount1000Coupon()));
 
 			// when
 			PurchaseProductResponse response = bugService.purchaseBugProduct(memberId, productId, request);

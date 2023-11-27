@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.moabam.api.domain.bug.BugType;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -37,9 +38,23 @@ public enum CouponType {
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_TYPE));
 	}
 
-	public void validateNotDiscount() {
-		if (this == CouponType.DISCOUNT) {
-			throw new BadRequestException(ErrorMessage.INVALID_DISCOUNT_COUPON);
+	public boolean isDiscount() {
+		return this == CouponType.DISCOUNT;
+	}
+
+	public BugType getBugType() {
+		if (this == CouponType.MORNING) {
+			return BugType.MORNING;
 		}
+
+		if (this == CouponType.NIGHT) {
+			return BugType.NIGHT;
+		}
+
+		if (this == CouponType.GOLDEN) {
+			return BugType.GOLDEN;
+		}
+
+		throw new BadRequestException(ErrorMessage.INVALID_DISCOUNT_COUPON);
 	}
 }

@@ -113,26 +113,11 @@ class CouponWalletSearchRepositoryTest {
 		assertThat(actual.getCoupon()).isEqualTo(coupon);
 	}
 
-	@DisplayName("특정 회원의 특정 쿠폰을 성공적으로 조회한다. - CouponWallet")
+	@DisplayName("특정 회원의 특정 쿠폰 지갑이 조회되지 않는다. - CouponWallet")
 	@Test
-	void findByMemberIdAndCouponId_success() {
-		// Given
-		Coupon coupon = couponRepository.save(CouponFixture.coupon());
-		couponWalletRepository.save(CouponWallet.create(1L, coupon));
-
+	void findByIdAndMemberId_notFound() {
 		// When
-		CouponWallet actual = couponWalletSearchRepository.findByMemberIdAndCouponId(1L, coupon.getId())
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
-
-		// Then
-		assertThat(actual.getCoupon()).isEqualTo(coupon);
-	}
-
-	@DisplayName("특정 회원의 특정 쿠폰이 조회되지 않는다. - CouponWallet")
-	@Test
-	void findByMemberIdAndCouponId_notFound() {
-		// When
-		Optional<CouponWallet> actual = couponWalletSearchRepository.findByMemberIdAndCouponId(1L, 1L);
+		Optional<CouponWallet> actual = couponWalletSearchRepository.findByIdAndMemberId(1L, 1L);
 
 		// Then
 		assertThat(actual).isEmpty();

@@ -399,7 +399,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		// When & Then
 		mockMvc.perform(get("/my-coupons/" + coupon.getId()))
 			.andDo(print())
-			.andDo(document("my-coupons",
+			.andDo(document("my-coupons/couponId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				CouponWalletSnippet.COUPON_WALLET_RESPONSE))
@@ -424,7 +424,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		// When & Then
 		mockMvc.perform(get("/my-coupons"))
 			.andDo(print())
-			.andDo(document("my-coupons",
+			.andDo(document("my-coupons/couponId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				CouponWalletSnippet.COUPON_WALLET_RESPONSE))
@@ -440,7 +440,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		// When & Then
 		mockMvc.perform(get("/my-coupons"))
 			.andDo(print())
-			.andDo(document("my-coupons",
+			.andDo(document("my-coupons/couponId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint())))
 			.andExpect(status().isOk())
@@ -454,13 +454,13 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	void use_success() throws Exception {
 		// Given
 		Coupon coupon = couponRepository.save(CouponFixture.coupon());
-		couponWalletRepository.save(CouponWallet.create(1L, coupon));
+		CouponWallet couponWallet = couponWalletRepository.save(CouponWallet.create(1L, coupon));
 		memberRepository.save(MemberFixture.member(1L));
 
 		// When & Then
-		mockMvc.perform(post("/my-coupons/" + coupon.getId()))
+		mockMvc.perform(post("/my-coupons/" + couponWallet.getId()))
 			.andDo(print())
-			.andDo(document("my-coupons/couponId",
+			.andDo(document("my-coupons/couponWalletId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint())))
 			.andExpect(status().isOk());
@@ -473,7 +473,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		// When & Then
 		mockMvc.perform(post("/my-coupons/" + 777L))
 			.andDo(print())
-			.andDo(document("my-coupons/couponId",
+			.andDo(document("my-coupons/couponWalletId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
@@ -489,12 +489,12 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	void use_BadRequestException() throws Exception {
 		// Given
 		Coupon coupon = couponRepository.save(CouponFixture.coupon(CouponType.DISCOUNT, 1000));
-		couponWalletRepository.save(CouponWallet.create(1L, coupon));
+		CouponWallet couponWallet = couponWalletRepository.save(CouponWallet.create(1L, coupon));
 
 		// When & Then
-		mockMvc.perform(post("/my-coupons/" + coupon.getId()))
+		mockMvc.perform(post("/my-coupons/" + couponWallet.getId()))
 			.andDo(print())
-			.andDo(document("my-coupons/couponId",
+			.andDo(document("my-coupons/couponWalletId",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				ErrorSnippet.ERROR_MESSAGE_RESPONSE))

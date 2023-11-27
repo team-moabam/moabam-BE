@@ -41,14 +41,4 @@ public class CouponWalletSearchRepository {
 			.fetchOne()
 		);
 	}
-
-	public Optional<CouponWallet> findByMemberIdAndCouponId(Long memberId, Long couponId) {
-		return Optional.ofNullable(jpaQueryFactory
-			.selectFrom(couponWallet)
-			.join(couponWallet.coupon, coupon).fetchJoin()
-			.where(
-				couponWallet.coupon.id.eq(couponId),
-				couponWallet.memberId.eq(memberId))
-			.fetchOne());
-	}
 }

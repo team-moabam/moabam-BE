@@ -87,12 +87,12 @@ include::{snippets}/coupons/http-response.adoc[]
 
 ==== 요청
 
-include::{snippets}/my-coupons/http-request.adoc[]
+include::{snippets}/my-coupons/couponId/http-request.adoc[]
 
 [discrete]
 ==== 응답
 
-include::{snippets}/my-coupons/http-response.adoc[]
+include::{snippets}/my-coupons/couponId/http-response.adoc[]
 
 ---
 
@@ -102,11 +102,11 @@ include::{snippets}/my-coupons/http-response.adoc[]
 
 ==== 요청
 
-include::{snippets}/my-coupons/couponId/http-request.adoc[]
+include::{snippets}/my-coupons/couponWalletId/http-request.adoc[]
 
 [discrete]
 ==== 응답
 
-include::{snippets}/my-coupons/couponId/http-response.adoc[]
+include::{snippets}/my-coupons/couponWalletId/http-response.adoc[]
 
 ---

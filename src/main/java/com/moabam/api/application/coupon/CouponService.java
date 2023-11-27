@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.coupon.Coupon;
-import com.moabam.api.domain.coupon.CouponType;
 import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
@@ -55,14 +54,25 @@ public class CouponService {
 	}
 
 	@Transactional
-	public void use(AuthMember authMember, Long couponId) {
-		CouponWallet couponWallet = couponWalletSearchRepository.findByMemberIdAndCouponId(authMember.id(), couponId)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
-
+	public void use(Long memberId, Long couponWalletId) {
+		CouponWallet couponWallet = getWalletByIdAndMemberId(couponWalletId, memberId);
 		Coupon coupon = couponWallet.getCoupon();
-		coupon.getType().validateNotDiscount();
-		Member member = memberService.getById(authMember.id());
-		increaseBug(member, coupon.getType(), coupon.getPoint());
+		BugType bugType = coupon.getType().getBugType();
+
+		Member member = memberService.findMember(memberId);
+		member.getBug().increase(bugType, coupon.getPoint());
+
+		couponWalletRepository.delete(couponWallet);
+	}
+
+	@Transactional
+	public void discount(Long memberId, Long couponWalletId) {
+		CouponWallet couponWallet = getWalletByIdAndMemberId(couponWalletId, memberId);
+		Coupon coupon = couponWallet.getCoupon();
+
+		if (!coupon.getType().isDiscount()) {
+			throw new BadRequestException(ErrorMessage.INVALID_BUG_COUPON);
+		}
 
 		couponWalletRepository.delete(couponWallet);
 	}
@@ -74,12 +84,6 @@ public class CouponService {
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 		couponRepository.delete(coupon);
 		couponManageService.deleteCouponManage(coupon.getName());
-	}
-
-	@Transactional
-	public void use(Long memberId, Long couponWalletId) {
-		Coupon coupon = getByWalletIdAndMemberId(couponWalletId, memberId);
-		couponRepository.delete(coupon);
 	}
 
 	public CouponResponse getById(Long couponId) {
@@ -103,18 +107,9 @@ public class CouponService {
 		return CouponMapper.toMyResponses(couponWallets);
 	}
 
-	public Coupon getByWalletIdAndMemberId(Long couponWalletId, Long memberId) {
+	public CouponWallet getWalletByIdAndMemberId(Long couponWalletId, Long memberId) {
 		return couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET))
-			.getCoupon();
-	}
-
-	private void increaseBug(Member member, CouponType couponType, int point) {
-		switch (couponType) {
-			case MORNING -> member.getBug().increaseBug(BugType.MORNING, point);
-			case NIGHT -> member.getBug().increaseBug(BugType.NIGHT, point);
-			case GOLDEN -> member.getBug().increaseBug(BugType.GOLDEN, point);
-		}
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 	}
 
 	private void validatePeriod(LocalDate startAt, LocalDate openAt) {

@@ -68,9 +68,9 @@ public class CouponController {
 		return couponService.getWallet(couponId, authMember);
 	}
 
-	@PostMapping("/my-coupons/{couponId}")
+	@PostMapping("/my-coupons/{couponWalletId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void use(@Auth AuthMember authMember, @PathVariable("couponId") Long couponId) {
-		couponService.use(authMember, couponId);
+	public void use(@Auth AuthMember authMember, @PathVariable("couponWalletId") Long couponWalletId) {
+		couponService.use(authMember.id(), couponWalletId);
 	}
 }
