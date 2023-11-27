@@ -61,6 +61,7 @@ public class ImageResizer {
 		ImageSize imageSize = switch (imageType) {
 			case PROFILE_IMAGE -> ImageSize.PROFILE_IMAGE;
 			case CERTIFICATION -> ImageSize.CERTIFICATION_IMAGE;
+			case BIRD_SKIN -> ImageSize.BIRD_SKIN;
 			case DEFAULT -> ImageSize.CAGE;
 		};
 

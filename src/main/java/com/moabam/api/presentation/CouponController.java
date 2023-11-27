@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moabam.api.application.coupon.CouponQueueService;
+import com.moabam.api.application.coupon.CouponManageService;
 import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
+import com.moabam.api.dto.coupon.MyCouponResponse;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
 
@@ -28,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class CouponController {
 
 	private final CouponService couponService;
-	private final CouponQueueService couponQueueService;
+	private final CouponManageService couponManageService;
 
 	@PostMapping("/admins/coupons")
 	@ResponseStatus(HttpStatus.CREATED)
@@ -55,7 +56,13 @@ public class CouponController {
 	}
 
 	@PostMapping("/coupons")
-	public void registerCouponQueue(@Auth AuthMember authMember, @RequestParam("couponName") String couponName) {
-		couponQueueService.register(authMember, couponName);
+	public void registerQueue(@Auth AuthMember authMember, @RequestParam("couponName") String couponName) {
+		couponManageService.register(authMember, couponName);
+	}
+
+	@GetMapping({"/my-coupons", "/my-coupons/{couponId}"})
+	public List<MyCouponResponse> getWallet(@Auth AuthMember authMember,
+		@PathVariable(value = "couponId", required = false) Long couponId) {
+		return couponService.getWallet(couponId, authMember);
 	}
 }

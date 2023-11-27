@@ -9,4 +9,6 @@ import com.moabam.api.domain.member.Member;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	Optional<Member> findBySocialId(String id);
+
+	boolean existsByNickname(String nickname);
 }

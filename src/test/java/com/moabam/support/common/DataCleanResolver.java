@@ -31,24 +31,24 @@ public class DataCleanResolver {
 	}
 
 	private List<String> getTableInfos() {
-		List<Object[]> tableInfos = entityManager.createNativeQuery("show tables").getResultList();
+		List<Object> tableInfos = entityManager.createNativeQuery("show tables").getResultList();
 
 		return tableInfos.stream()
-			.map(tableInfo -> (String)tableInfo[0])
+			.map(tableInfo -> (String)tableInfo)
 			.toList();
 	}
 
 	private void doClean(List<String> tableInfos) {
-		setForeignKeyCheck(false);
+		setForeignKeyCheck(0);
 		tableInfos.stream()
 			.map(tableInfo -> entityManager.createNativeQuery(
-				String.format("TRUNCATE TABLE %s RESTART IDENTITY", tableInfo)))
+				String.format("TRUNCATE TABLE %s", tableInfo)))
 			.forEach(Query::executeUpdate);
-		setForeignKeyCheck(true);
+		setForeignKeyCheck(1);
 	}
 
-	private void setForeignKeyCheck(boolean data) {
-		entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY " + data)
+	private void setForeignKeyCheck(int data) {
+		entityManager.createNativeQuery(String.format("SET foreign_key_checks = %d", data))
 			.executeUpdate();
 	}
 }

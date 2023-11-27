@@ -3,12 +3,14 @@ package com.moabam.api.presentation;
 import static com.moabam.global.common.util.GlobalConstant.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,15 +21,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
@@ -39,7 +44,9 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.auth.OAuth2AuthorizationServerRequestService;
+import com.moabam.api.application.image.ImageService;
 import com.moabam.api.domain.auth.repository.TokenRepository;
+import com.moabam.api.domain.image.ImageType;
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.repository.InventoryRepository;
@@ -55,6 +62,7 @@ import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.dto.auth.TokenSaveValue;
+import com.moabam.api.dto.member.ModifyMemberRequest;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
@@ -110,6 +118,9 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	OAuthConfig oAuthConfig;
+
+	@SpyBean
+	ImageService imageService;
 
 	RestTemplateBuilder restTemplateBuilder;
 
@@ -415,5 +426,66 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		// expected
 		mockMvc.perform(get("/members/{memberId}", 123L))
 			.andExpect(status().is4xxClientError());
+	}
+
+	@DisplayName("회원 정보 요청 성공")
+	@WithMember
+	@ParameterizedTest
+	@CsvSource({"intro,", ", nickname", ",", "intro, nickname"})
+	void member_modify_request_success(String intro, String nickname) throws Exception {
+		// given
+		ModifyMemberRequest request = new ModifyMemberRequest(intro, nickname);
+		MockMultipartFile newProfileImage =
+			new MockMultipartFile(
+				"profileImage",
+				"tooth.png",
+				"multipart/form-data",
+				"uploadFile".getBytes(StandardCharsets.UTF_8));
+		MockMultipartFile modifyMemberRequest =
+			new MockMultipartFile(
+				"modifyMemberRequest",
+				null,
+				"application/json",
+				objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8));
+
+		willReturn(List.of("/main"))
+			.given(imageService).uploadImages(List.of(newProfileImage), ImageType.PROFILE_IMAGE);
+
+		// expected
+		mockMvc.perform(multipart(HttpMethod.POST, "/members/modify")
+				.file(modifyMemberRequest)
+				.file(newProfileImage)
+				.contentType("multipart/form-data")
+
+				.characterEncoding("UTF-8"))
+			.andExpect(status().is2xxSuccessful())
+			.andDo(print());
+	}
+
+	@DisplayName("회원 프로필없이 성공 ")
+	@WithMember
+	@ParameterizedTest
+	@CsvSource({"intro,", ", nickname", ",", "intro, nickname"})
+	void member_modify_no_image_request_success(String intro, String nickname) throws Exception {
+		// given
+		ModifyMemberRequest request = new ModifyMemberRequest(intro, nickname);
+		MockMultipartFile modifyMemberRequest =
+			new MockMultipartFile(
+				"modifyMemberRequest",
+				null,
+				"application/json",
+				objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8));
+
+		willThrow(NullPointerException.class)
+			.given(imageService).uploadImages(any(), any());
+
+		// expected
+		mockMvc.perform(multipart(HttpMethod.POST, "/members/modify")
+				.file(modifyMemberRequest)
+				.contentType("multipart/form-data")
+
+				.characterEncoding("UTF-8"))
+			.andExpect(status().is2xxSuccessful())
+			.andDo(print());
 	}
 }

@@ -30,9 +30,11 @@ import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.global.error.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class RoomService {
 
@@ -83,7 +85,8 @@ public class RoomService {
 
 	@Transactional
 	public void enterRoom(Long memberId, Long roomId, EnterRoomRequest enterRoomRequest) {
-		Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
+		Room room = roomRepository.findWithPessimisticLockById(roomId).orElseThrow(
+			() -> new NotFoundException(ROOM_NOT_FOUND));
 		validateRoomEnter(memberId, enterRoomRequest.password(), room);
 
 		Member member = memberService.findMember(memberId);

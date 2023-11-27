@@ -9,6 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
@@ -18,19 +20,20 @@ import com.moabam.global.config.JpaConfig;
 import com.moabam.support.fixture.CouponFixture;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 @Import({JpaConfig.class, CouponSearchRepository.class})
 class CouponSearchRepositoryTest {
 
 	@Autowired
-	private CouponRepository couponRepository;
+	CouponRepository couponRepository;
 
 	@Autowired
-	private CouponSearchRepository couponSearchRepository;
+	CouponSearchRepository couponSearchRepository;
 
-	@DisplayName("발급 가능한 쿠폰을 조회한다. - List<CouponResponse>")
+	@DisplayName("발급 가능한 쿠폰을 성공적으로 조회한다. - List<CouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideCoupons")
 	@ParameterizedTest
-	void findAllByStatus(List<Coupon> coupons) {
+	void findAllByStatus_success(List<Coupon> coupons) {
 		// Given
 		CouponStatusRequest request = CouponFixture.couponStatusRequest(false, false);
 		LocalDate now = LocalDate.of(2023, 7, 1);

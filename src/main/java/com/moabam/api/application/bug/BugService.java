@@ -13,12 +13,16 @@ import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.payment.PaymentMapper;
 import com.moabam.api.application.product.ProductMapper;
+import com.moabam.api.domain.bug.Bug;
+import com.moabam.api.domain.bug.repository.BugHistoryRepository;
+import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
 import com.moabam.api.domain.coupon.Coupon;
-import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.domain.product.repository.ProductRepository;
+import com.moabam.api.dto.bug.BugHistoryResponse;
+import com.moabam.api.dto.bug.BugHistoryWithPayment;
 import com.moabam.api.dto.bug.BugResponse;
 import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.api.dto.product.PurchaseProductRequest;
@@ -34,13 +38,21 @@ public class BugService {
 
 	private final MemberService memberService;
 	private final CouponService couponService;
+	private final BugHistoryRepository bugHistoryRepository;
+	private final BugHistorySearchRepository bugHistorySearchRepository;
 	private final ProductRepository productRepository;
 	private final PaymentRepository paymentRepository;
 
 	public BugResponse getBug(Long memberId) {
-		Member member = memberService.findMember(memberId);
+		Bug bug = memberService.findMember(memberId).getBug();
 
-		return BugMapper.toBugResponse(member.getBug());
+		return BugMapper.toBugResponse(bug);
+	}
+
+	public BugHistoryResponse getBugHistory(Long memberId) {
+		List<BugHistoryWithPayment> history = bugHistorySearchRepository.findByMemberIdWithPayment(memberId);
+
+		return BugMapper.toBugHistoryResponse(history);
 	}
 
 	public ProductsResponse getBugProducts() {
@@ -55,12 +67,20 @@ public class BugService {
 		Payment payment = PaymentMapper.toPayment(memberId, product);
 
 		if (!isNull(request.couponWalletId())) {
-			Coupon coupon = couponService.getByWallet(request.couponWalletId(), memberId);
+			Coupon coupon = couponService.getByWalletIdAndMemberId(request.couponWalletId(), memberId);
 			payment.applyCoupon(coupon, request.couponWalletId());
 		}
 		paymentRepository.save(payment);
 
 		return ProductMapper.toPurchaseProductResponse(payment);
+	}
+
+	@Transactional
+	public void charge(Long memberId, Product bugProduct) {
+		Bug bug = memberService.findMember(memberId).getBug();
+
+		bug.charge(bugProduct.getQuantity());
+		bugHistoryRepository.save(BugMapper.toChargeBugHistory(memberId, bugProduct.getQuantity()));
 	}
 
 	private Product getById(Long productId) {

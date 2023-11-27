@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class StringRedisRepository {
+public class ValueRedisRepository {
 
 	private final RedisTemplate<String, Object> redisTemplate;
 
@@ -19,8 +19,10 @@ public class StringRedisRepository {
 			.set(key, value, timeout);
 	}
 
-	public void delete(String key) {
-		redisTemplate.delete(key);
+	public Long increment(String key) {
+		return redisTemplate
+			.opsForValue()
+			.increment(key);
 	}
 
 	public String get(String key) {
@@ -31,5 +33,9 @@ public class StringRedisRepository {
 
 	public Boolean hasKey(String key) {
 		return redisTemplate.hasKey(key);
+	}
+
+	public void delete(String key) {
+		redisTemplate.delete(key);
 	}
 }

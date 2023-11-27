@@ -23,6 +23,7 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.application.room.SearchService;
 import com.moabam.api.domain.image.ImageType;
 import com.moabam.api.domain.room.RoomType;
+import com.moabam.api.dto.room.CertifiedMemberInfo;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.GetAllRoomsResponse;
@@ -98,7 +99,8 @@ public class RoomController {
 	public void certifyRoom(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId,
 		@RequestPart List<MultipartFile> multipartFiles) {
 		List<String> imageUrls = imageService.uploadImages(multipartFiles, ImageType.CERTIFICATION);
-		certificationService.certifyRoom(authMember.id(), roomId, imageUrls);
+		CertifiedMemberInfo info = certificationService.getCertifiedMemberInfo(authMember.id(), roomId, imageUrls);
+		certificationService.certifyRoom(info);
 	}
 
 	@PutMapping("/{roomId}/members/{memberId}/mandate")
