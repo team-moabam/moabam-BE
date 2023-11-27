@@ -1,9 +1,8 @@
 package com.moabam.api.application.room;
 
-import static com.moabam.global.common.util.GlobalConstant.NOT_COMPLETED_RANK;
-import static com.moabam.global.common.util.GlobalConstant.ROOM_FIXED_SEARCH_SIZE;
+import static com.moabam.global.common.util.GlobalConstant.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -195,7 +194,7 @@ public class SearchService {
 		List<DailyMemberCertification> sortedDailyMemberCertifications =
 			certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, clockHolder.date());
 		List<Long> memberIds = sortedDailyMemberCertifications.stream()
-			.map(DailyMemberCertification::getId)
+			.map(DailyMemberCertification::getMemberId)
 			.toList();
 		List<Member> members = memberService.getRoomMembers(memberIds);
 		List<Inventory> inventories = inventorySearchRepository.findDefaultInventories(memberIds,
