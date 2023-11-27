@@ -1,6 +1,5 @@
 package com.moabam.api.dto.room;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import com.moabam.api.domain.room.RoomType;
@@ -8,11 +7,10 @@ import com.moabam.api.domain.room.RoomType;
 import lombok.Builder;
 
 @Builder
-public record RoomDetailsResponse(
+public record UnJoinedRoomDetailsResponse(
 	Long roomId,
-	Long myMemberId,
+	boolean isPassword,
 	String title,
-	String managerNickName,
 	String roomImage,
 	int level,
 	int exp,
@@ -21,10 +19,8 @@ public record RoomDetailsResponse(
 	int currentUserCount,
 	int maxUserCount,
 	String announcement,
-	double completePercentage,
-	List<LocalDate> certifiedDates,
 	List<RoutineResponse> routines,
-	List<TodayCertificateRankResponse> todayCertificateRank
+	List<UnJoinedRoomCertificateRankResponse> certifiedRanks
 ) {
 
 }
