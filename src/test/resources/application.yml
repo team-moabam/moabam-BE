@@ -71,3 +71,9 @@ token:
   secret-key: testestestestestestestestestesttestestestestestestestestestest
 
 allow: ""
+
+# Payment
+payment:
+  toss:
+    base-url: "https://api.tosspayments.com"
+    secret-key: "test_sk_4yKeq5bgrpWk4XYdDoBxVGX0lzW6:"

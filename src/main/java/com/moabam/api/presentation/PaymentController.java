@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.payment.PaymentService;
+import com.moabam.api.dto.payment.ConfirmPaymentRequest;
 import com.moabam.api.dto.payment.PaymentRequest;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
@@ -25,9 +26,14 @@ public class PaymentController {
 
 	@PostMapping("/{paymentId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void requestPayment(@Auth AuthMember member,
-		@PathVariable Long paymentId,
+	public void request(@Auth AuthMember member, @PathVariable Long paymentId,
 		@Valid @RequestBody PaymentRequest request) {
 		paymentService.request(member.id(), paymentId, request);
+	}
+
+	@PostMapping("/confirm")
+	@ResponseStatus(HttpStatus.OK)
+	public void confirm(@Auth AuthMember member, @Valid @RequestBody ConfirmPaymentRequest request) {
+		paymentService.confirm(member.id(), request);
 	}
 }
