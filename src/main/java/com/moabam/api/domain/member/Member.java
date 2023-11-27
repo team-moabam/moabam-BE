@@ -1,5 +1,6 @@
 package com.moabam.api.domain.member;
 
+import static com.moabam.global.common.util.BaseImageUrl.*;
 import static com.moabam.global.common.util.GlobalConstant.*;
 import static com.moabam.global.common.util.RandomUtils.*;
 import static java.util.Objects.*;
@@ -12,7 +13,6 @@ import org.hibernate.annotations.SQLDelete;
 import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.global.common.entity.BaseTimeEntity;
-import com.moabam.global.common.util.BaseImageUrl;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -85,7 +85,7 @@ public class Member extends BaseTimeEntity {
 		this.socialId = requireNonNull(socialId);
 		this.nickname = createNickName();
 		this.intro = "";
-		this.profileImage = BaseImageUrl.MEMBER_PROFILE_URL;
+		this.profileImage = IMAGE_DOMAIN + MEMBER_PROFILE_URL;
 		this.bug = requireNonNull(bug);
 		this.role = Role.USER;
 	}

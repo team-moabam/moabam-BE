@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.item.Inventory;
+import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.member.BadgeType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.member.BadgeResponse;
@@ -65,6 +66,14 @@ public final class MemberMapper {
 			.goldenBug(memberInfoSearchResponse.goldenBug())
 			.morningBug(memberInfoSearchResponse.morningBug())
 			.nightBug(memberInfoSearchResponse.nightBug())
+			.build();
+	}
+
+	public static Inventory toInventory(Long memberId, Item item) {
+		return Inventory.builder()
+			.memberId(memberId)
+			.item(item)
+			.isDefault(true)
 			.build();
 	}
 

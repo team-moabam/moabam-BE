@@ -1,5 +1,6 @@
 package com.moabam.api.domain.entity;
 
+import static com.moabam.global.common.util.BaseImageUrl.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,7 +12,6 @@ import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.domain.room.RoomType;
-import com.moabam.global.common.util.BaseImageUrl;
 import com.moabam.support.fixture.MemberFixture;
 
 class MemberTest {
@@ -41,7 +41,7 @@ class MemberTest {
 				.build();
 
 			assertAll(
-				() -> assertThat(member.getProfileImage()).isEqualTo(BaseImageUrl.MEMBER_PROFILE_URL),
+				() -> assertThat(member.getProfileImage()).isEqualTo(IMAGE_DOMAIN + MEMBER_PROFILE_URL),
 				() -> assertThat(member.getRole()).isEqualTo(Role.USER),
 				() -> assertThat(member.getBug().getNightBug()).isZero(),
 				() -> assertThat(member.getBug().getGoldenBug()).isZero(),

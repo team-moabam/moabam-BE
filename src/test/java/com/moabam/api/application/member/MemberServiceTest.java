@@ -19,7 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
+import com.moabam.api.domain.item.repository.InventoryRepository;
 import com.moabam.api.domain.item.repository.InventorySearchRepository;
+import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
@@ -56,6 +58,12 @@ class MemberServiceTest {
 	InventorySearchRepository inventorySearchRepository;
 
 	@Mock
+	InventoryRepository inventoryRepository;
+
+	@Mock
+	ItemRepository itemRepository;
+
+	@Mock
 	ClockHolder clockHolder;
 
 	@DisplayName("회원 존재하고 로그인 성공")
@@ -89,6 +97,9 @@ class MemberServiceTest {
 		given(member.getId()).willReturn(1L);
 		willReturn(member)
 			.given(memberRepository).save(any(Member.class));
+		willReturn(List.of(ItemFixture.morningSantaSkin().build(),
+			ItemFixture.nightMageSkin()))
+			.given(itemRepository).findAllById(any());
 
 		// when
 		LoginResponse result = memberService.login(authorizationTokenInfoResponse);

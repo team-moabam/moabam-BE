@@ -160,7 +160,6 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 		Assertions.assertThatThrownBy(() -> tokenRepository.getTokenSaveValue(member.getId()))
 			.isInstanceOf(UnauthorizedException.class);
-
 	}
 
 	@DisplayName("회원 삭제 성공 테스트")

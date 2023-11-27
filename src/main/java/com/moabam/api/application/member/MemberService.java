@@ -11,7 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.application.auth.mapper.AuthMapper;
 import com.moabam.api.domain.item.Inventory;
+import com.moabam.api.domain.item.Item;
+import com.moabam.api.domain.item.repository.InventoryRepository;
 import com.moabam.api.domain.item.repository.InventorySearchRepository;
+import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
@@ -22,6 +25,7 @@ import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.api.dto.member.ModifyMemberRequest;
 import com.moabam.global.auth.model.AuthMember;
+import com.moabam.global.common.util.BaseDataCode;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.error.exception.BadRequestException;
@@ -38,6 +42,8 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final InventorySearchRepository inventorySearchRepository;
+	private final InventoryRepository inventoryRepository;
+	private final ItemRepository itemRepository;
 	private final MemberSearchRepository memberSearchRepository;
 	private final ClockHolder clockHolder;
 
@@ -116,8 +122,24 @@ public class MemberService {
 
 	private Member signUp(Long socialId) {
 		Member member = MemberMapper.toMember(socialId);
+		Member savedMember = memberRepository.save(member);
+		List<Item> items = getBasicEggs();
+		List<Inventory> inventories = items.stream()
+			.map(item -> MemberMapper.toInventory(savedMember.getId(), item))
+			.toList();
+		inventoryRepository.saveAll(inventories);
 
-		return memberRepository.save(member);
+		return savedMember;
+	}
+
+	private List<Item> getBasicEggs() {
+		List<Item> items = itemRepository.findAllById(List.of(BaseDataCode.MORNING_EGG, BaseDataCode.NIGHT_EGG));
+
+		if (items.isEmpty()) {
+			throw new BadRequestException(BASIC_SKIN_NOT_FOUND);
+		}
+
+		return items;
 	}
 
 	private MemberInfoSearchResponse findMemberInfo(Long searchId, boolean isMe) {
