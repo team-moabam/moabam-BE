@@ -10,7 +10,6 @@ import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
-import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
@@ -35,7 +34,6 @@ public class CouponService {
 	private final CouponManageService couponManageService;
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
-	private final CouponWalletRepository couponWalletRepository;
 	private final CouponWalletSearchRepository couponWalletSearchRepository;
 
 	@Transactional
@@ -69,12 +67,6 @@ public class CouponService {
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 
 		return CouponMapper.toResponse(coupon);
-	}
-
-	public Coupon getByWallet(Long memberId, Long couponWalletId) {
-		return couponWalletRepository.findByIdAndMemberId(couponWalletId, memberId)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET))
-			.getCoupon();
 	}
 
 	public List<CouponResponse> getAllByStatus(CouponStatusRequest request) {
