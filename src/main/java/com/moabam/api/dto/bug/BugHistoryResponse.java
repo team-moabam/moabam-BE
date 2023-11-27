@@ -6,7 +6,6 @@ import lombok.Builder;
 
 @Builder
 public record BugHistoryResponse(
-
 	List<BugHistoryItemResponse> history
 ) {
 
