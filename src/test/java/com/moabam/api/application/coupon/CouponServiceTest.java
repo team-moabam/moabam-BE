@@ -317,12 +317,10 @@ class CouponServiceTest {
 		assertThat(actual.getCoupon().getName()).isEqualTo(couponWallet.getCoupon().getName());
 	}
 
-	@WithMember
 	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있는 특정 쿠폰을 성공적으로 사용한다. - Void")
 	@Test
 	void use_success() {
 		// Given
-		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
 		Member member = MemberFixture.member(BugFixture.zeroBug());
 		Coupon coupon = CouponFixture.coupon(CouponType.GOLDEN, 1000);
 		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
@@ -332,43 +330,71 @@ class CouponServiceTest {
 			.willReturn(Optional.of(couponWallet));
 
 		// When
-		couponService.use(authMember.id(), 1L);
+		couponService.use(1L, 1L);
 
 		// Then
 		verify(couponWalletRepository).delete(any(CouponWallet.class));
 	}
 
-	@WithMember
 	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있는 할인 쿠폰을 사용한다. - BadRequestException")
 	@Test
 	void use_BadRequestException() {
 		// Given
-		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
 		Coupon coupon = CouponFixture.coupon(CouponType.DISCOUNT, 1000);
-		CouponWallet couponWallet = CouponWallet.create(authMember.id(), coupon);
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
 
 		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
 			.willReturn(Optional.of(couponWallet));
 
 		// When & Then
-		assertThatThrownBy(() -> couponService.use(authMember.id(), 1L))
+		assertThatThrownBy(() -> couponService.use(1L, 1L))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.INVALID_DISCOUNT_COUPON.getMessage());
 	}
 
-	@WithMember
 	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있지 않은 쿠폰을 사용한다. - NotFoundException")
 	@Test
 	void use_NotFoundException() {
 		// Given
-		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
-
 		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
 			.willReturn(Optional.empty());
 
 		// When & Then
-		assertThatThrownBy(() -> couponService.use(authMember.id(), 1L))
+		assertThatThrownBy(() -> couponService.use(1L, 1L))
 			.isInstanceOf(NotFoundException.class)
 			.hasMessage(ErrorMessage.NOT_FOUND_COUPON_WALLET.getMessage());
+	}
+
+	@DisplayName("결제할 때, 할인 쿠폰을 사용한다. - Void")
+	@Test
+	void discount_success() {
+		// Given
+		Coupon coupon = CouponFixture.coupon(CouponType.DISCOUNT, 1000);
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
+
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.of(couponWallet));
+
+		// When
+		couponService.discount(1L, 1L);
+
+		// Then
+		verify(couponWalletRepository).delete(couponWallet);
+	}
+
+	@DisplayName("결제할 때, 벌레 쿠폰을 사용한다. - BadRequestException")
+	@Test
+	void discount_BadRequestException() {
+		// Given
+		Coupon coupon = CouponFixture.coupon(CouponType.GOLDEN, 1000);
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
+
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.of(couponWallet));
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.discount(1L, 1L))
+			.isInstanceOf(BadRequestException.class)
+			.hasMessage(ErrorMessage.INVALID_BUG_COUPON.getMessage());
 	}
 }
