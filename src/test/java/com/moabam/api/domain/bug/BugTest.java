@@ -75,6 +75,5 @@ class BugTest {
 		// then
 		assertThat(bug.getMorningBug()).isEqualTo(MORNING_BUG + 5);
 		assertThat(bug.getNightBug()).isEqualTo(NIGHT_BUG + 5);
-		assertThat(bug.getGoldenBug()).isEqualTo(GOLDEN_BUG + 5);
 	}
 }

@@ -1,16 +1,14 @@
 package com.moabam.api.domain.bug.repository;
 
 import static com.moabam.api.domain.bug.QBugHistory.*;
+import static com.moabam.api.domain.payment.QPayment.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.moabam.api.domain.bug.BugActionType;
-import com.moabam.api.domain.bug.BugHistory;
-import com.moabam.global.common.util.DynamicQuery;
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.moabam.api.dto.bug.BugHistoryWithPayment;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -21,19 +19,20 @@ public class BugHistorySearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public List<BugHistory> find(Long memberId, BugActionType actionType, LocalDateTime dateTime) {
-		return jpaQueryFactory.selectFrom(bugHistory)
-			.where(
-				DynamicQuery.generateEq(memberId, bugHistory.memberId::eq),
-				DynamicQuery.generateEq(actionType, bugHistory.actionType::eq),
-				DynamicQuery.generateEq(dateTime, this::equalDate)
+	public List<BugHistoryWithPayment> findByMemberIdWithPayment(Long memberId) {
+		return jpaQueryFactory.select(Projections.constructor(
+				BugHistoryWithPayment.class,
+				bugHistory.id,
+				bugHistory.bugType,
+				bugHistory.actionType,
+				bugHistory.quantity,
+				bugHistory.createdAt,
+				payment)
 			)
+			.from(bugHistory)
+			.leftJoin(bugHistory.payment, payment)
+			.where(bugHistory.memberId.eq(memberId))
+			.orderBy(bugHistory.createdAt.desc())
 			.fetch();
-	}
-
-	private BooleanExpression equalDate(LocalDateTime dateTime) {
-		return bugHistory.createdAt.year().eq(dateTime.getYear())
-			.and(bugHistory.createdAt.month().eq(dateTime.getMonthValue()))
-			.and(bugHistory.createdAt.dayOfMonth().eq(dateTime.getDayOfMonth()));
 	}
 }
