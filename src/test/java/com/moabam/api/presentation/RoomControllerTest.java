@@ -971,6 +971,58 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andDo(print());
 	}
 
+	@DisplayName("참여중이지 않은 방에 대한 리다이렉션 반환 성공")
+	@WithMember
+	@Test
+	void check_if_participant_false_success() throws Exception {
+		// given
+		Room room = RoomFixture.room();
+		Room savedRoom = roomRepository.save(room);
+
+		// expected
+		mockMvc.perform(get("/rooms/" + savedRoom.getId() + "/check"))
+			.andExpect(status().isFound())
+			.andExpect(redirectedUrl(String.format("https://dev-api.moabam.com/%d/un-joined", savedRoom.getId())))
+			.andDo(print());
+	}
+
+	@DisplayName("참여중이지 않은 방의 정보 불러오기 성공")
+	@Test
+	void get_un_joined_room_details() throws Exception {
+		// given
+		Room room = RoomFixture.room("테스트 방", NIGHT, 21);
+		Room savedRoom = roomRepository.save(room);
+
+		Routine routine1 = RoomFixture.routine(savedRoom, "물 마시기");
+		Routine routine2 = RoomFixture.routine(savedRoom, "커피 마시기");
+
+		routineRepository.saveAll(List.of(routine1, routine2));
+
+		// expected
+		mockMvc.perform(get("/rooms/" + savedRoom.getId() + "/un-joined"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("참여중인 방에 대한 리다이렉션 반환 성공")
+	@WithMember
+	@Test
+	void check_if_participant_true_success() throws Exception {
+		// given
+		Room room = RoomFixture.room();
+		Room savedRoom = roomRepository.save(room);
+
+		Participant participant = RoomFixture.participant(room, 1L);
+		participantRepository.save(participant);
+
+		// expected
+		mockMvc.perform(get("/rooms/" + savedRoom.getId() + "/check"))
+			.andExpect(status().isFound())
+			.andExpect(
+				redirectedUrl(String.format("https://dev-api.moabam.com/%d/%s", savedRoom.getId(), LocalDate.now())))
+			.andDo(print());
+	}
+
 	@DisplayName("아침, 저녁 방 전체 조회 성공 - 첫 번째 조회, 다음 페이지 있음")
 	@WithMember(id = 1L)
 	@Test
