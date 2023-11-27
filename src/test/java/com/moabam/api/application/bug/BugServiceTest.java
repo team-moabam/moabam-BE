@@ -1,6 +1,7 @@
 package com.moabam.api.application.bug;
 
 import static com.moabam.api.domain.product.ProductType.*;
+import static com.moabam.support.fixture.BugFixture.*;
 import static com.moabam.support.fixture.CouponFixture.*;
 import static com.moabam.support.fixture.MemberFixture.*;
 import static com.moabam.support.fixture.ProductFixture.*;
@@ -22,6 +23,8 @@ import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.payment.PaymentMapper;
 import com.moabam.api.domain.bug.Bug;
+import com.moabam.api.domain.bug.BugType;
+import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
@@ -46,6 +49,9 @@ class BugServiceTest {
 
 	@Mock
 	CouponService couponService;
+
+	@Mock
+	BugHistoryRepository bugHistoryRepository;
 
 	@Mock
 	ProductRepository productRepository;
@@ -127,5 +133,48 @@ class BugServiceTest {
 				.isInstanceOf(NotFoundException.class)
 				.hasMessage("존재하지 않는 상품입니다.");
 		}
+	}
+
+	@DisplayName("벌레를 사용한다.")
+	@Test
+	void use_success() {
+		// given
+		Member member = spy(member());
+		given(member.getId()).willReturn(1L);
+
+		// when
+		bugService.use(member, BugType.MORNING, 5);
+
+		// then
+		assertThat(member.getBug().getMorningBug()).isEqualTo(MORNING_BUG - 5);
+	}
+
+	@DisplayName("벌레 보상을 준다.")
+	@Test
+	void reward_success() {
+		// given
+		Member member = spy(member());
+		given(member.getId()).willReturn(1L);
+
+		// when
+		bugService.reward(member, BugType.NIGHT, 5);
+
+		// then
+		assertThat(member.getBug().getNightBug()).isEqualTo(NIGHT_BUG + 5);
+	}
+
+	@DisplayName("벌레를 충전한다.")
+	@Test
+	void charge_success() {
+		// given
+		Long memberId = 1L;
+		Member member = member();
+		given(memberService.getById(memberId)).willReturn(member);
+
+		// when
+		bugService.charge(memberId, bugProduct());
+
+		// then
+		assertThat(member.getBug().getGoldenBug()).isEqualTo(GOLDEN_BUG + BUG_PRODUCT_QUANTITY);
 	}
 }

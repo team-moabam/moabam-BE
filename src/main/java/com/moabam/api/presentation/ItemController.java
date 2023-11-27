@@ -35,8 +35,7 @@ public class ItemController {
 
 	@PostMapping("/{itemId}/purchase")
 	@ResponseStatus(HttpStatus.OK)
-	public void purchaseItem(@Auth AuthMember member,
-		@PathVariable Long itemId,
+	public void purchaseItem(@Auth AuthMember member, @PathVariable Long itemId,
 		@Valid @RequestBody PurchaseItemRequest request) {
 		itemService.purchaseItem(member.id(), itemId, request);
 	}
