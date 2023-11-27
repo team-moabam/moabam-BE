@@ -32,6 +32,7 @@ import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.api.domain.member.Role;
+import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.global.common.util.ClockHolder;
@@ -39,6 +40,7 @@ import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.CouponFixture;
+import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.snippet.CouponSnippet;
 import com.moabam.support.snippet.CouponWalletSnippet;
 import com.moabam.support.snippet.ErrorSnippet;
@@ -54,6 +56,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	ObjectMapper objectMapper;
+
+	@Autowired
+	MemberRepository memberRepository;
 
 	@Autowired
 	CouponRepository couponRepository;
@@ -114,7 +119,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@Test
 	void create_Coupon_OpenAt_BadRequestException() throws Exception {
 		// Given
-		String couponType = CouponType.GOLDEN_COUPON.getName();
+		String couponType = CouponType.GOLDEN.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 1);
 
 		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
@@ -441,5 +446,60 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$", hasSize(0)));
+	}
+
+	@WithMember
+	@DisplayName("POST - 특정 회원이 보유한 쿠폰을 성공적으로 사용한다. - Void")
+	@Test
+	void use_success() throws Exception {
+		// Given
+		Coupon coupon = couponRepository.save(CouponFixture.coupon());
+		CouponWallet couponWallet = couponWalletRepository.save(CouponWallet.create(1L, coupon));
+		memberRepository.save(MemberFixture.member(1L));
+
+		// When & Then
+		mockMvc.perform(post("/my-coupons/" + couponWallet.getId()))
+			.andDo(print())
+			.andDo(document("my-coupons/couponWalletId",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint())))
+			.andExpect(status().isOk());
+	}
+
+	@WithMember
+	@DisplayName("POST - 특정 회원이 보유하지 않은 쿠폰을 사용한다. - NotFoundException")
+	@Test
+	void use_NotFoundException() throws Exception {
+		// When & Then
+		mockMvc.perform(post("/my-coupons/" + 777L))
+			.andDo(print())
+			.andDo(document("my-coupons/couponWalletId",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isNotFound())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND_COUPON_WALLET.getMessage()));
+		;
+	}
+
+	@WithMember
+	@DisplayName("POST - 특정 회원이 보유한 할인 쿠폰을 사용한다. - BadRequestException")
+	@Test
+	void use_BadRequestException() throws Exception {
+		// Given
+		Coupon coupon = couponRepository.save(CouponFixture.coupon(CouponType.DISCOUNT, 1000));
+		CouponWallet couponWallet = couponWalletRepository.save(CouponWallet.create(1L, coupon));
+
+		// When & Then
+		mockMvc.perform(post("/my-coupons/" + couponWallet.getId()))
+			.andDo(print())
+			.andDo(document("my-coupons/couponWalletId",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_DISCOUNT_COUPON.getMessage()));
 	}
 }

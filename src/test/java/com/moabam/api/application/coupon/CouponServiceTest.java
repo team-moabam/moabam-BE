@@ -17,12 +17,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
 import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
+import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
+import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
@@ -37,7 +40,9 @@ import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.FilterProcessExtension;
+import com.moabam.support.fixture.BugFixture;
 import com.moabam.support.fixture.CouponFixture;
+import com.moabam.support.fixture.MemberFixture;
 
 @ExtendWith({MockitoExtension.class, FilterProcessExtension.class})
 class CouponServiceTest {
@@ -49,7 +54,13 @@ class CouponServiceTest {
 	CouponManageService couponManageService;
 
 	@Mock
+	MemberService memberService;
+
+	@Mock
 	CouponRepository couponRepository;
+
+	@Mock
+	CouponWalletRepository couponWalletRepository;
 
 	@Mock
 	CouponSearchRepository couponSearchRepository;
@@ -166,7 +177,7 @@ class CouponServiceTest {
 	void create_OpenAt_BadRequestException() {
 		// Given
 		AuthMember admin = AuthorizationThreadLocal.getAuthMember();
-		String couponType = CouponType.GOLDEN_COUPON.getName();
+		String couponType = CouponType.GOLDEN.getName();
 		CreateCouponRequest request = CouponFixture.createCouponRequest(couponType, 1, 1);
 
 		given(couponRepository.existsByName(any(String.class))).willReturn(false);
@@ -300,9 +311,90 @@ class CouponServiceTest {
 			.willReturn(Optional.of(couponWallet));
 
 		// When
-		Coupon actual = couponService.getByWalletIdAndMemberId(1L, 1L);
+		CouponWallet actual = couponService.getWalletByIdAndMemberId(1L, 1L);
 
 		// Then
-		assertThat(actual.getName()).isEqualTo(couponWallet.getCoupon().getName());
+		assertThat(actual.getCoupon().getName()).isEqualTo(couponWallet.getCoupon().getName());
+	}
+
+	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있는 특정 쿠폰을 성공적으로 사용한다. - Void")
+	@Test
+	void use_success() {
+		// Given
+		Member member = MemberFixture.member(BugFixture.zeroBug());
+		Coupon coupon = CouponFixture.coupon(CouponType.GOLDEN, 1000);
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
+
+		given(memberService.findMember(any(Long.class))).willReturn(member);
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.of(couponWallet));
+
+		// When
+		couponService.use(1L, 1L);
+
+		// Then
+		verify(couponWalletRepository).delete(any(CouponWallet.class));
+	}
+
+	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있는 할인 쿠폰을 사용한다. - BadRequestException")
+	@Test
+	void use_BadRequestException() {
+		// Given
+		Coupon coupon = CouponFixture.coupon(CouponType.DISCOUNT, 1000);
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
+
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.of(couponWallet));
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.use(1L, 1L))
+			.isInstanceOf(BadRequestException.class)
+			.hasMessage(ErrorMessage.INVALID_DISCOUNT_COUPON.getMessage());
+	}
+
+	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있지 않은 쿠폰을 사용한다. - NotFoundException")
+	@Test
+	void use_NotFoundException() {
+		// Given
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.use(1L, 1L))
+			.isInstanceOf(NotFoundException.class)
+			.hasMessage(ErrorMessage.NOT_FOUND_COUPON_WALLET.getMessage());
+	}
+
+	@DisplayName("결제할 때, 할인 쿠폰을 사용한다. - Void")
+	@Test
+	void discount_success() {
+		// Given
+		Coupon coupon = CouponFixture.coupon(CouponType.DISCOUNT, 1000);
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
+
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.of(couponWallet));
+
+		// When
+		couponService.discount(1L, 1L);
+
+		// Then
+		verify(couponWalletRepository).delete(couponWallet);
+	}
+
+	@DisplayName("결제할 때, 벌레 쿠폰을 사용한다. - BadRequestException")
+	@Test
+	void discount_BadRequestException() {
+		// Given
+		Coupon coupon = CouponFixture.coupon(CouponType.GOLDEN, 1000);
+		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
+
+		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
+			.willReturn(Optional.of(couponWallet));
+
+		// When & Then
+		assertThatThrownBy(() -> couponService.discount(1L, 1L))
+			.isInstanceOf(BadRequestException.class)
+			.hasMessage(ErrorMessage.INVALID_BUG_COUPON.getMessage());
 	}
 }

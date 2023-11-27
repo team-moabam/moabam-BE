@@ -498,7 +498,7 @@ Access-Control-Max-Age: 3600</code></pre>
 <h4 id="_요청_2" class="discrete">요청</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admins/coupons/33 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admins/coupons/35 HTTP/1.1
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -526,7 +526,7 @@ Access-Control-Max-Age: 3600</code></pre>
 <h4 id="_요청_3">요청</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /coupons/22 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /coupons/23 HTTP/1.1
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -540,16 +540,16 @@ Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Acc
 Access-Control-Allow-Credentials: true
 Access-Control-Max-Age: 3600
 Content-Type: application/json
-Content-Length: 205
+Content-Length: 198
 
 {
-  "id" : 22,
+  "id" : 23,
   "adminName" : "1admin",
   "name" : "couponName",
   "description" : "",
   "point" : 10,
   "stock" : 100,
-  "type" : "MORNING_COUPON",
+  "type" : "MORNING",
   "startAt" : "2023-02-01",
   "openAt" : "2023-01-01"
 }</code></pre>
@@ -590,16 +590,16 @@ Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Acc
 Access-Control-Allow-Credentials: true
 Access-Control-Max-Age: 3600
 Content-Type: application/json
-Content-Length: 206
+Content-Length: 199
 
 [ {
-  "id" : 23,
+  "id" : 24,
   "adminName" : "1admin",
   "name" : "coupon1",
   "description" : "",
   "point" : 10,
   "stock" : 100,
-  "type" : "MORNING_COUPON",
+  "type" : "MORNING",
   "startAt" : "2023-03-01",
   "openAt" : "2023-01-01"
 } ]</code></pre>
@@ -672,38 +672,38 @@ Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Acc
 Access-Control-Allow-Credentials: true
 Access-Control-Max-Age: 3600
 Content-Type: application/json
-Content-Length: 507
+Content-Length: 472
 
 [ {
-  "id" : 17,
+  "id" : 18,
   "name" : "c1",
   "description" : "",
   "point" : 10,
-  "type" : "MORNING_COUPON"
+  "type" : "MORNING"
 }, {
-  "id" : 18,
+  "id" : 19,
   "name" : "c2",
   "description" : "",
   "point" : 10,
-  "type" : "MORNING_COUPON"
+  "type" : "MORNING"
 }, {
-  "id" : 19,
+  "id" : 20,
   "name" : "c3",
   "description" : "",
   "point" : 10,
-  "type" : "MORNING_COUPON"
+  "type" : "MORNING"
 }, {
-  "id" : 20,
+  "id" : 21,
   "name" : "c4",
   "description" : "",
   "point" : 10,
-  "type" : "MORNING_COUPON"
+  "type" : "MORNING"
 }, {
-  "id" : 21,
+  "id" : 22,
   "name" : "c5",
   "description" : "",
   "point" : 10,
-  "type" : "MORNING_COUPON"
+  "type" : "MORNING"
 } ]</code></pre>
 </div>
 </div>
@@ -711,11 +711,33 @@ Content-Length: 507
 </div>
 </div>
 <div class="sect2">
-<h3 id="_쿠폰_사용_진행_중">쿠폰 사용 (진행 중)</h3>
+<h3 id="_쿠폰을_사용">쿠폰을 사용</h3>
 <div class="literalblock">
 <div class="content">
 <pre>사용자가 자신의 보관함에 있는 쿠폰들을 사용합니다.</pre>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_요청_7">요청</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /my-coupons/8 HTTP/1.1
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<h4 id="_응답_7" class="discrete">응답</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Access-Control-Allow-Origin:
+Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 3600</code></pre>
+</div>
+</div>
+<hr>
 </div>
 </div>
 </div>
@@ -724,7 +746,7 @@ Content-Length: 507
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-26 14:13:28 +0900
+Last updated 2023-11-27 17:06:34 +0900
 </div>
 </div>
 </body>

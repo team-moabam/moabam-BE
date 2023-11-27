@@ -101,7 +101,7 @@ class ItemServiceTest {
 			PurchaseItemRequest request = new PurchaseItemRequest(BugType.GOLDEN);
 			Member member = member();
 			Item item = nightMageSkin();
-			given(memberService.getById(memberId)).willReturn(member);
+			given(memberService.findMember(memberId)).willReturn(member);
 			given(itemRepository.findById(itemId)).willReturn(Optional.of(item));
 			given(inventorySearchRepository.findOne(memberId, itemId)).willReturn(Optional.empty());
 

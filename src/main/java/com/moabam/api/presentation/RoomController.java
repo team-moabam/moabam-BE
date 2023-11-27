@@ -23,6 +23,7 @@ import com.moabam.api.application.room.RoomService;
 import com.moabam.api.application.room.SearchService;
 import com.moabam.api.domain.image.ImageType;
 import com.moabam.api.domain.room.RoomType;
+import com.moabam.api.dto.room.CertifiedMemberInfo;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.GetAllRoomsResponse;
@@ -31,6 +32,7 @@ import com.moabam.api.dto.room.ModifyRoomRequest;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
+import com.moabam.api.dto.room.UnJoinedRoomDetailsResponse;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
 
@@ -86,6 +88,18 @@ public class RoomController {
 		roomService.exitRoom(authMember.id(), roomId);
 	}
 
+	@GetMapping("/{roomId}/check")
+	@ResponseStatus(HttpStatus.OK)
+	public boolean checkIfParticipant(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId) {
+		return roomService.checkIfParticipant(authMember.id(), roomId);
+	}
+
+	@GetMapping("/{roomId}/un-joined")
+	@ResponseStatus(HttpStatus.OK)
+	public UnJoinedRoomDetailsResponse getUnJoinedRoomDetails(@PathVariable("roomId") Long roomId) {
+		return searchService.getUnJoinedRoomDetails(roomId);
+	}
+
 	@GetMapping("/{roomId}/{date}")
 	@ResponseStatus(HttpStatus.OK)
 	public RoomDetailsResponse getRoomDetails(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId,
@@ -98,7 +112,8 @@ public class RoomController {
 	public void certifyRoom(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId,
 		@RequestPart List<MultipartFile> multipartFiles) {
 		List<String> imageUrls = imageService.uploadImages(multipartFiles, ImageType.CERTIFICATION);
-		certificationService.certifyRoom(authMember.id(), roomId, imageUrls);
+		CertifiedMemberInfo info = certificationService.getCertifiedMemberInfo(authMember.id(), roomId, imageUrls);
+		certificationService.certifyRoom(info);
 	}
 
 	@PutMapping("/{roomId}/members/{memberId}/mandate")

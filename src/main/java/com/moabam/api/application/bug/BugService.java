@@ -17,7 +17,7 @@ import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
-import com.moabam.api.domain.coupon.Coupon;
+import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
@@ -69,8 +69,8 @@ public class BugService {
 		Payment payment = PaymentMapper.toPayment(memberId, product);
 
 		if (!isNull(request.couponWalletId())) {
-			Coupon coupon = couponService.getByWalletIdAndMemberId(request.couponWalletId(), memberId);
-			payment.applyCoupon(coupon, request.couponWalletId());
+			CouponWallet couponWallet = couponService.getWalletByIdAndMemberId(request.couponWalletId(), memberId);
+			payment.applyCoupon(couponWallet);
 		}
 		paymentRepository.save(payment);
 
@@ -102,7 +102,7 @@ public class BugService {
 	}
 
 	private Bug getByMemberId(Long memberId) {
-		return memberService.getById(memberId)
+		return memberService.findMember(memberId)
 			.getBug();
 	}
 

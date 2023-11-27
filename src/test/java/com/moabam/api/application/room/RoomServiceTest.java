@@ -67,7 +67,7 @@ class RoomServiceTest {
 
 		Room expectedRoom = RoomMapper.toRoomEntity(createRoomRequest);
 		given(roomRepository.save(any(Room.class))).willReturn(expectedRoom);
-		given(memberService.getById(1L)).willReturn(member);
+		given(memberService.findMember(1L)).willReturn(member);
 
 		// when
 		Long result = roomService.createRoom(1L, "닉네임", createRoomRequest);
@@ -95,7 +95,7 @@ class RoomServiceTest {
 
 		Room expectedRoom = RoomMapper.toRoomEntity(createRoomRequest);
 		given(roomRepository.save(any(Room.class))).willReturn(expectedRoom);
-		given(memberService.getById(1L)).willReturn(member);
+		given(memberService.findMember(1L)).willReturn(member);
 
 		// when
 		Long result = roomService.createRoom(1L, "닉네임", createRoomRequest);
@@ -128,7 +128,7 @@ class RoomServiceTest {
 			Optional.of(memberParticipant));
 		given(participantSearchRepository.findOne(managerId, room.getId())).willReturn(
 			Optional.of(managerParticipant));
-		given(memberService.getById(2L)).willReturn(member);
+		given(memberService.findMember(2L)).willReturn(member);
 
 		// when
 		roomService.mandateManager(managerId, room.getId(), memberId);

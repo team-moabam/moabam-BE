@@ -1,16 +1,12 @@
 package com.moabam.api.presentation;
 
-import static org.mockito.BDDMockito.any;
-import static org.mockito.BDDMockito.doReturn;
-import static org.mockito.BDDMockito.willReturn;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +36,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.auth.AuthorizationService;
 import com.moabam.api.application.auth.OAuth2AuthorizationServerRequestService;
+import com.moabam.api.domain.item.Item;
+import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
@@ -48,6 +46,7 @@ import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
 import com.moabam.support.fixture.AuthorizationResponseFixture;
+import com.moabam.support.fixture.ItemFixture;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -61,6 +60,9 @@ class MemberAuthorizeControllerTest {
 
 	@Autowired
 	OAuth2AuthorizationServerRequestService oAuth2AuthorizationServerRequestService;
+
+	@Autowired
+	ItemRepository itemRepository;
 
 	@SpyBean
 	AuthorizationService authorizationService;
@@ -121,6 +123,10 @@ class MemberAuthorizeControllerTest {
 		contentParams.add("redirect_uri", oAuthConfig.provider().redirectUri());
 		contentParams.add("code", "test");
 		contentParams.add("client_secret", oAuthConfig.client().clientSecret());
+
+		Item morningEgg = ItemFixture.morningSantaSkin().build();
+		Item nightEgg = ItemFixture.nightMageSkin();
+		itemRepository.saveAll(List.of(morningEgg, nightEgg));
 
 		AuthorizationCodeResponse authorizationCodeResponse = AuthorizationResponseFixture.successCodeResponse();
 		String requestBody = objectMapper.writeValueAsString(authorizationCodeResponse);

@@ -3,14 +3,17 @@ package com.moabam.api.application.room.mapper;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.room.Certification;
 import com.moabam.api.domain.room.DailyMemberCertification;
 import com.moabam.api.domain.room.DailyRoomCertification;
 import com.moabam.api.domain.room.Participant;
+import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.Routine;
 import com.moabam.api.dto.room.CertificationImageResponse;
 import com.moabam.api.dto.room.CertificationImagesResponse;
+import com.moabam.api.dto.room.CertifiedMemberInfo;
 import com.moabam.api.dto.room.TodayCertificateRankResponse;
 
 import lombok.AccessLevel;
@@ -70,6 +73,15 @@ public final class CertificationsMapper {
 			.routine(routine)
 			.memberId(memberId)
 			.image(image)
+			.build();
+	}
+
+	public static CertifiedMemberInfo toCertifiedMemberInfo(LocalDate date, BugType bugType, Room room, Member member) {
+		return CertifiedMemberInfo.builder()
+			.date(date)
+			.bugType(bugType)
+			.room(room)
+			.member(member)
 			.build();
 	}
 }

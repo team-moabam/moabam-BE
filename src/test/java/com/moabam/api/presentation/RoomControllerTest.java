@@ -1,16 +1,11 @@
 package com.moabam.api.presentation;
 
-import static com.moabam.api.domain.room.RoomType.MORNING;
-import static com.moabam.api.domain.room.RoomType.NIGHT;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static com.moabam.api.domain.room.RoomType.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -892,6 +887,37 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		assertThat(participantSearchRepository.findOne(member.getId(), room.getId())).isEmpty();
 	}
 
+	@DisplayName("방장 위임 성공")
+	@WithMember(id = 1L)
+	@Test
+	void mandate_manager_success() throws Exception {
+		// given
+		Member member2 = MemberFixture.member("1234", "방장될 멤버");
+		memberRepository.save(member2);
+
+		Room room = RoomFixture.room();
+		Participant participant1 = RoomFixture.participant(room, member.getId());
+		participant1.enableManager();
+		Participant participant2 = RoomFixture.participant(room, member2.getId());
+
+		roomRepository.save(room);
+		participantRepository.save(participant1);
+		participantRepository.save(participant2);
+
+		// expected
+		mockMvc.perform(put("/rooms/" + room.getId() + "/members/" + member2.getId() + "/mandate"))
+			.andExpect(status().isOk())
+			.andDo(print());
+
+		Room savedRoom = roomRepository.findById(room.getId()).orElseThrow();
+		Participant savedParticipant1 = participantRepository.findById(participant1.getId()).orElseThrow();
+		Participant savedParticipant2 = participantRepository.findById(participant2.getId()).orElseThrow();
+
+		assertThat(savedRoom.getManagerNickname()).isEqualTo(member2.getNickname());
+		assertThat(savedParticipant1.isManager()).isFalse();
+		assertThat(savedParticipant2.isManager()).isTrue();
+	}
+
 	@DisplayName("현재 참여중인 모든 방 조회 성공 - 첫번째 방은 개인과 방 모두 인증 성공")
 	@WithMember(id = 1L)
 	@Test
@@ -941,6 +967,72 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		// expected
 		mockMvc.perform(get("/rooms/join-history"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("참여중이지 않은 방에 대한 확인 성공")
+	@WithMember
+	@Test
+	void check_if_participant_false_success() throws Exception {
+		// given
+		Room room = RoomFixture.room();
+		Room savedRoom = roomRepository.save(room);
+
+		// expected
+		mockMvc.perform(get("/rooms/" + savedRoom.getId() + "/check"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("참여중이지 않은 방의 정보 불러오기 성공")
+	@Test
+	void get_un_joined_room_details() throws Exception {
+		// given
+		Room room = RoomFixture.room("테스트 방", NIGHT, 21);
+		Room savedRoom = roomRepository.save(room);
+
+		Member member1 = MemberFixture.member("901010", "testtest");
+		member1 = memberRepository.save(member1);
+
+		Item item = ItemFixture.nightMageSkin();
+
+		Inventory inventory = InventoryFixture.inventory(member1.getId(), item);
+		inventory.select();
+
+		itemRepository.save(item);
+		inventoryRepository.save(inventory);
+
+		Participant participant = RoomFixture.participant(savedRoom, member1.getId());
+		participantRepository.save(participant);
+
+		Routine routine1 = RoomFixture.routine(savedRoom, "물 마시기");
+		Routine routine2 = RoomFixture.routine(savedRoom, "커피 마시기");
+		routineRepository.saveAll(List.of(routine1, routine2));
+
+		DailyMemberCertification dailyMemberCertification = RoomFixture.dailyMemberCertification(member1.getId(),
+			savedRoom.getId(), participant);
+		dailyMemberCertificationRepository.save(dailyMemberCertification);
+
+		// expected
+		mockMvc.perform(get("/rooms/" + savedRoom.getId() + "/un-joined"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@DisplayName("참여중인 방에 대한 확인 성공")
+	@WithMember
+	@Test
+	void check_if_participant_true_success() throws Exception {
+		// given
+		Room room = RoomFixture.room();
+		Room savedRoom = roomRepository.save(room);
+
+		Participant participant = RoomFixture.participant(room, 1L);
+		participantRepository.save(participant);
+
+		// expected
+		mockMvc.perform(get("/rooms/" + savedRoom.getId() + "/check"))
 			.andExpect(status().isOk())
 			.andDo(print());
 	}

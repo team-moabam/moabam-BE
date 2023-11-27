@@ -30,6 +30,7 @@ import com.moabam.api.domain.room.repository.DailyMemberCertificationRepository;
 import com.moabam.api.domain.room.repository.DailyRoomCertificationRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoutineRepository;
+import com.moabam.api.dto.room.CertifiedMemberInfo;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.common.util.UrlSubstringParser;
 import com.moabam.global.error.exception.BadRequestException;
@@ -55,32 +56,41 @@ public class CertificationService {
 	private final ClockHolder clockHolder;
 
 	@Transactional
-	public void certifyRoom(Long memberId, Long roomId, List<String> imageUrls) {
+	public CertifiedMemberInfo getCertifiedMemberInfo(Long memberId, Long roomId, List<String> imageUrls) {
 		LocalDate today = clockHolder.date();
 		Participant participant = participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
 		Room room = participant.getRoom();
-		Member member = memberService.getById(memberId);
+		Member member = memberService.findMember(memberId);
 		BugType bugType = switch (room.getRoomType()) {
 			case MORNING -> BugType.MORNING;
 			case NIGHT -> BugType.NIGHT;
 		};
-		int roomLevel = room.getLevel();
 
 		validateCertifyTime(clockHolder.times(), room.getCertifyTime());
 		validateAlreadyCertified(memberId, roomId, today);
 
 		certifyMember(memberId, roomId, participant, member, imageUrls);
 
+		return CertificationsMapper.toCertifiedMemberInfo(today, bugType, room, member);
+	}
+
+	@Transactional
+	public void certifyRoom(CertifiedMemberInfo certifyInfo) {
+		LocalDate date = certifyInfo.date();
+		BugType bugType = certifyInfo.bugType();
+		Room room = certifyInfo.room();
+		Member member = certifyInfo.member();
+
 		Optional<DailyRoomCertification> dailyRoomCertification =
-			certificationsSearchRepository.findDailyRoomCertification(roomId, today);
+			certificationsSearchRepository.findDailyRoomCertification(room.getId(), date);
 
 		if (dailyRoomCertification.isEmpty()) {
-			certifyRoomIfAvailable(roomId, today, room, bugType, roomLevel);
+			certifyRoomIfAvailable(room.getId(), date, room, bugType, room.getLevel());
 			return;
 		}
 
-		bugService.reward(member, bugType, roomLevel);
+		bugService.reward(member, bugType, room.getLevel());
 	}
 
 	public boolean existsMemberCertification(Long memberId, Long roomId, LocalDate date) {
@@ -90,6 +100,11 @@ public class CertificationService {
 
 	public boolean existsRoomCertification(Long roomId, LocalDate date) {
 		return dailyRoomCertificationRepository.existsByRoomIdAndCertifiedAt(roomId, date);
+	}
+
+	public Certification findCertification(Long certificationId) {
+		return certificationRepository.findById(certificationId)
+			.orElseThrow(() -> new NotFoundException(CERTIFICATION_NOT_FOUND));
 	}
 
 	private void validateCertifyTime(LocalDateTime now, int certifyTime) {

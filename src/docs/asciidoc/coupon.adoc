@@ -96,6 +96,17 @@ include::{snippets}/my-coupons/couponId/http-response.adoc[]
 
 ---
 
-=== 쿠폰 사용 (진행 중)
+=== 쿠폰을 사용
 
  사용자가 자신의 보관함에 있는 쿠폰들을 사용합니다.
+
+==== 요청
+
+include::{snippets}/my-coupons/couponWalletId/http-request.adoc[]
+
+[discrete]
+==== 응답
+
+include::{snippets}/my-coupons/couponWalletId/http-response.adoc[]
+
+---

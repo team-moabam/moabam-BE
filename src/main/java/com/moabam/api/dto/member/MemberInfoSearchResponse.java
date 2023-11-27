@@ -10,6 +10,8 @@ import lombok.Builder;
 public record MemberInfoSearchResponse(
 	String nickname,
 	String profileImage,
+	String morningImage,
+	String nightImage,
 	String intro,
 	long totalCertifyCount,
 	Set<BadgeType> badges,

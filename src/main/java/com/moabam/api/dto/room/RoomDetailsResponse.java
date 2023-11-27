@@ -15,6 +15,7 @@ public record RoomDetailsResponse(
 	String managerNickName,
 	String roomImage,
 	int level,
+	int exp,
 	RoomType roomType,
 	int certifyTime,
 	int currentUserCount,

@@ -1,7 +1,9 @@
 package com.moabam.api.domain.member;
 
+import static com.moabam.global.common.util.BaseImageUrl.*;
 import static com.moabam.global.common.util.GlobalConstant.*;
 import static com.moabam.global.common.util.RandomUtils.*;
+import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
 import java.time.LocalDateTime;
@@ -10,9 +12,11 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 
 import com.moabam.api.domain.bug.Bug;
+import com.moabam.api.domain.item.Item;
+import com.moabam.api.domain.item.ItemType;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.global.common.entity.BaseTimeEntity;
-import com.moabam.global.common.util.BaseImageUrl;
+import com.moabam.global.error.exception.NotFoundException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -52,6 +56,12 @@ public class Member extends BaseTimeEntity {
 	@Column(name = "profile_image", nullable = false)
 	private String profileImage;
 
+	@Column(name = "morning_image", nullable = false)
+	private String morningImage;
+
+	@Column(name = "night_image", nullable = false)
+	private String nightImage;
+
 	@Column(name = "total_certify_count", nullable = false)
 	@ColumnDefault("0")
 	private long totalCertifyCount;
@@ -85,7 +95,9 @@ public class Member extends BaseTimeEntity {
 		this.socialId = requireNonNull(socialId);
 		this.nickname = createNickName();
 		this.intro = "";
-		this.profileImage = BaseImageUrl.MEMBER_PROFILE_URL;
+		this.profileImage = IMAGE_DOMAIN + MEMBER_PROFILE_URL;
+		this.morningImage = IMAGE_DOMAIN + DEFAULT_MORNING_EGG_URL;
+		this.nightImage = IMAGE_DOMAIN + DEFAULT_NIGHT_EGG_URL;
 		this.bug = requireNonNull(bug);
 		this.role = Role.USER;
 	}
@@ -134,6 +146,21 @@ public class Member extends BaseTimeEntity {
 
 	public void changeProfileUri(String newProfileUri) {
 		this.profileImage = requireNonNullElse(newProfileUri, profileImage);
+		this.profileImage = requireNonNullElse(newProfileUri, profileImage);
+	}
+
+	public void changeDefaultSkintUrl(Item item) throws NotFoundException {
+		if (ItemType.MORNING.equals(item.getType())) {
+			this.morningImage = item.getImage();
+			return;
+		}
+
+		if (ItemType.NIGHT.equals(item.getType())) {
+			this.nightImage = item.getImage();
+			return;
+		}
+
+		throw new NotFoundException(SKIN_TYPE_NOT_FOUND);
 	}
 
 	private String createNickName() {

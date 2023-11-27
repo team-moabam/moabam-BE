@@ -2,15 +2,17 @@ package com.moabam.api.application.member;
 
 import static com.moabam.global.common.util.GlobalConstant.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.item.Inventory;
+import com.moabam.api.domain.item.Item;
+import com.moabam.api.domain.item.ItemType;
 import com.moabam.api.domain.member.BadgeType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.member.BadgeResponse;
@@ -41,6 +43,8 @@ public final class MemberMapper {
 		return MemberInfoSearchResponse.builder()
 			.nickname(infos.nickname())
 			.profileImage(infos.profileImage())
+			.morningImage(infos.morningImage())
+			.nightImage(infos.nightImage())
 			.intro(infos.intro())
 			.totalCertifyCount(infos.totalCertifyCount())
 			.badges(new HashSet<>(badgeTypes))
@@ -50,8 +54,7 @@ public final class MemberMapper {
 			.build();
 	}
 
-	public static MemberInfoResponse toMemberInfoResponse(MemberInfoSearchResponse memberInfoSearchResponse,
-		List<Inventory> inventories) {
+	public static MemberInfoResponse toMemberInfoResponse(MemberInfoSearchResponse memberInfoSearchResponse) {
 		long certifyCount = memberInfoSearchResponse.totalCertifyCount();
 
 		return MemberInfoResponse.builder()
@@ -60,7 +63,7 @@ public final class MemberMapper {
 			.intro(memberInfoSearchResponse.intro())
 			.level(certifyCount / LEVEL_DIVISOR)
 			.exp(certifyCount % LEVEL_DIVISOR)
-			.birds(defaultSkins(inventories))
+			.birds(defaultSkins(memberInfoSearchResponse.morningImage(), memberInfoSearchResponse.nightImage()))
 			.badges(badgedNames(memberInfoSearchResponse.badges()))
 			.goldenBug(memberInfoSearchResponse.goldenBug())
 			.morningBug(memberInfoSearchResponse.morningBug())
@@ -68,15 +71,23 @@ public final class MemberMapper {
 			.build();
 	}
 
+	public static Inventory toInventory(Long memberId, Item item) {
+		return Inventory.builder()
+			.memberId(memberId)
+			.item(item)
+			.isDefault(true)
+			.build();
+	}
+
 	private static List<BadgeResponse> badgedNames(Set<BadgeType> badgeTypes) {
 		return BadgeType.memberBadgeMap(badgeTypes);
 	}
 
-	private static Map<String, String> defaultSkins(List<Inventory> inventories) {
-		return inventories.stream()
-			.collect(Collectors.toMap(
-				inventory -> inventory.getItem().getType().name(),
-				inventory -> inventory.getItem().getImage()
-			));
+	private static Map<String, String> defaultSkins(String morningImage, String nightImage) {
+		Map<String, String> birdsSkin = new HashMap<>();
+		birdsSkin.put(ItemType.MORNING.name(), morningImage);
+		birdsSkin.put(ItemType.NIGHT.name(), nightImage);
+
+		return birdsSkin;
 	}
 }

@@ -13,6 +13,8 @@ public enum ErrorMessage {
 	NOT_FOUND_AVAILABLE_PORT("사용 가능한 포트를 찾을 수 없습니다. (10000 ~ 65535)"),
 	ERROR_EXECUTING_EMBEDDED_REDIS("Embedded Redis 실행 중 오류가 발생했습니다."),
 
+	REPORT_REQUEST_ERROR("신고 요청하고자 하는 방이나 대상이 존재하지 않습니다."),
+
 	ROOM_NOT_FOUND("존재하지 않는 방 입니다."),
 	ROOM_MAX_USER_COUNT_MODIFY_FAIL("잘못된 최대 인원수 설정입니다."),
 	ROOM_MODIFY_UNAUTHORIZED_REQUEST("방장이 아닌 사용자는 방을 수정할 수 없습니다."),
@@ -26,6 +28,7 @@ public enum ErrorMessage {
 	ROUTINE_NOT_FOUND("루틴을 찾을 수 없습니다"),
 	INVALID_REQUEST_URL("잘못된 URL 요청입니다."),
 	INVALID_CERTIFY_TIME("현재 인증 시간이 아닙니다."),
+	CERTIFICATION_NOT_FOUND("인증 정보가 없습니다."),
 
 	LOGIN_FAILED("로그인에 실패했습니다."),
 	REQUEST_FAILED("네트워크 접근 실패입니다."),
@@ -37,7 +40,9 @@ public enum ErrorMessage {
 	UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS("카카오 연결 요청 실패로 Rollback하였습니다."),
 	NICKNAME_CONFLICT("이미 존재하는 닉네임입니다."),
 
+	BASIC_SKIN_NOT_FOUND("기본 스킨 오류 발생, 관리자에게 문의하세요"),
 	INVALID_DEFAULT_SKIN_SIZE("기본 스킨은 2개여야 합니다. 관리자에게 문의하세요"),
+	SKIN_TYPE_NOT_FOUND("스킨 타입이 없습니다. 관리자에게 문의하세요"),
 
 	BUG_NOT_ENOUGH("보유한 벌레가 부족합니다."),
 
@@ -70,6 +75,8 @@ public enum ErrorMessage {
 	INVALID_COUPON_START_AT_PERIOD("쿠폰 발급 시작 날짜는 현재 날짜보다 이전이거나 같을 수 없습니다."),
 	INVALID_COUPON_OPEN_AT_PERIOD("쿠폰 정보 오픈 날짜는 시작 날짜보다 이전이여야 합니다."),
 	INVALID_COUPON_PERIOD("쿠폰 발급 가능 기간이 아닙니다."),
+	INVALID_DISCOUNT_COUPON("할인 쿠폰은 결제 시, 사용할 수 있습니다."),
+	INVALID_BUG_COUPON("벌레 쿠폰은 보관함에서 사용할 수 있습니다."),
 	CONFLICT_COUPON_NAME("쿠폰의 이름이 중복되었습니다."),
 	CONFLICT_COUPON_START_AT("쿠폰 발급 가능 날짜가 중복되었습니다."),
 	NOT_FOUND_COUPON_TYPE("존재하지 않는 쿠폰 종류입니다."),

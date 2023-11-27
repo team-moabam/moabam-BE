@@ -50,7 +50,7 @@ public class PaymentService {
 			payment.confirm(response.paymentKey(), response.approvedAt());
 
 			if (payment.isCouponApplied()) {
-				couponService.use(memberId, payment.getCouponWalletId());
+				couponService.discount(memberId, payment.getCouponWalletId());
 			}
 			bugService.charge(memberId, payment.getProduct());
 		} catch (MoabamException exception) {

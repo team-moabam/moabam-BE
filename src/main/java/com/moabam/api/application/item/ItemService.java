@@ -47,7 +47,7 @@ public class ItemService {
 	@Transactional
 	public void purchaseItem(Long memberId, Long itemId, PurchaseItemRequest request) {
 		Item item = getItem(itemId);
-		Member member = memberService.getById(memberId);
+		Member member = memberService.findMember(memberId);
 
 		validateAlreadyPurchased(memberId, itemId);
 		item.validatePurchasable(request.bugType(), member.getLevel());
