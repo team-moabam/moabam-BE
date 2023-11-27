@@ -993,10 +993,24 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Room room = RoomFixture.room("테스트 방", NIGHT, 21);
 		Room savedRoom = roomRepository.save(room);
 
+		Item item = ItemFixture.nightMageSkin();
+
+		Inventory inventory = InventoryFixture.inventory(1L, item);
+		inventory.select();
+
+		itemRepository.save(item);
+		inventoryRepository.save(inventory);
+
+		Participant participant = RoomFixture.participant(savedRoom, member.getId());
+		participantRepository.save(participant);
+
 		Routine routine1 = RoomFixture.routine(savedRoom, "물 마시기");
 		Routine routine2 = RoomFixture.routine(savedRoom, "커피 마시기");
-
 		routineRepository.saveAll(List.of(routine1, routine2));
+
+		DailyMemberCertification dailyMemberCertification = RoomFixture.dailyMemberCertification(member.getId(),
+			savedRoom.getId(), participant);
+		dailyMemberCertificationRepository.save(dailyMemberCertification);
 
 		// expected
 		mockMvc.perform(get("/rooms/" + savedRoom.getId() + "/un-joined"))
