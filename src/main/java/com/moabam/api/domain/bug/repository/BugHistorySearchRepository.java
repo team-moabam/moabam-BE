@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.moabam.api.domain.item.repository.BugHistoryDto;
+import com.moabam.api.dto.bug.BugHistoryWithPayment;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -19,9 +19,9 @@ public class BugHistorySearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public List<BugHistoryDto> findByMemberIdWithPayment(Long memberId) {
+	public List<BugHistoryWithPayment> findByMemberIdWithPayment(Long memberId) {
 		return jpaQueryFactory.select(Projections.constructor(
-				BugHistoryDto.class,
+				BugHistoryWithPayment.class,
 				bugHistory.id,
 				bugHistory.bugType,
 				bugHistory.actionType,

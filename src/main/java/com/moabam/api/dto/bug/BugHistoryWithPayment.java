@@ -1,4 +1,4 @@
-package com.moabam.api.domain.item.repository;
+package com.moabam.api.dto.bug;
 
 import java.time.LocalDateTime;
 
@@ -9,14 +9,13 @@ import com.moabam.api.domain.payment.Payment;
 import lombok.Builder;
 
 @Builder
-public record BugHistoryDto(
+public record BugHistoryWithPayment(
 	Long id,
 	BugType bugType,
 	BugActionType actionType,
 	int quantity,
 	LocalDateTime createdAt,
 	Payment payment
-
 ) {
 
 }

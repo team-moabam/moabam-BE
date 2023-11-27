@@ -17,12 +17,12 @@ import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
 import com.moabam.api.domain.coupon.Coupon;
-import com.moabam.api.domain.item.repository.BugHistoryDto;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.domain.product.repository.ProductRepository;
 import com.moabam.api.dto.bug.BugHistoryResponse;
+import com.moabam.api.dto.bug.BugHistoryWithPayment;
 import com.moabam.api.dto.bug.BugResponse;
 import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.api.dto.product.PurchaseProductRequest;
@@ -50,7 +50,7 @@ public class BugService {
 	}
 
 	public BugHistoryResponse getBugHistory(Long memberId) {
-		List<BugHistoryDto> history = bugHistorySearchRepository.findByMemberIdWithPayment(memberId);
+		List<BugHistoryWithPayment> history = bugHistorySearchRepository.findByMemberIdWithPayment(memberId);
 
 		return BugMapper.toBugHistoryResponse(history);
 	}

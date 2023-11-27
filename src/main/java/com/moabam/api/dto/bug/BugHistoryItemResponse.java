@@ -5,6 +5,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.moabam.api.domain.bug.BugActionType;
 import com.moabam.api.domain.bug.BugType;
+import com.moabam.api.dto.payment.PaymentResponse;
 
 import lombok.Builder;
 
@@ -16,16 +17,6 @@ public record BugHistoryItemResponse(
 	int quantity,
 	String date,
 	@JsonInclude(NON_NULL) PaymentResponse payment
-
 ) {
 
-	@Builder
-	public record PaymentResponse(
-		Long id,
-		String orderName,
-		int discountAmount,
-		int totalAmount
-	) {
-
-	}
 }
