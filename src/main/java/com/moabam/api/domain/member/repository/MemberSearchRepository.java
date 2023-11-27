@@ -54,6 +54,8 @@ public class MemberSearchRepository {
 		List<Expression<?>> selectExpression = new ArrayList<>(List.of(
 			member.nickname,
 			member.profileImage,
+			member.morningImage,
+			member.nightImage,
 			member.intro,
 			member.totalCertifyCount,
 			badge.type));
