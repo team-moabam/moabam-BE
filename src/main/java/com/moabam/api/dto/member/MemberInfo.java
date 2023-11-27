@@ -5,6 +5,8 @@ import com.moabam.api.domain.member.BadgeType;
 public record MemberInfo(
 	String nickname,
 	String profileImage,
+	String morningImage,
+	String nightImage,
 	String intro,
 	long totalCertifyCount,
 	BadgeType badges,
@@ -13,8 +15,9 @@ public record MemberInfo(
 	Integer nightBug
 ) {
 
-	public MemberInfo(String nickname, String profileImage, String intro,
-		long totalCertifyCount, BadgeType badges) {
-		this(nickname, profileImage, intro, totalCertifyCount, badges, null, null, null);
+	public MemberInfo(String nickname, String profileImage, String morningImage, String nightImage,
+		String intro, long totalCertifyCount, BadgeType badges) {
+		this(nickname, profileImage, morningImage, nightImage, intro,
+			totalCertifyCount, badges, null, null, null);
 	}
 }

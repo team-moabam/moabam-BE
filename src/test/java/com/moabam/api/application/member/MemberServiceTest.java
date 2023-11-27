@@ -1,6 +1,5 @@
 package com.moabam.api.application.member;
 
-import static com.moabam.global.error.model.ErrorMessage.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -27,6 +26,7 @@ import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.ModifyMemberRequest;
 import com.moabam.global.auth.model.AuthMember;
@@ -97,9 +97,6 @@ class MemberServiceTest {
 		given(member.getId()).willReturn(1L);
 		willReturn(member)
 			.given(memberRepository).save(any(Member.class));
-		willReturn(List.of(ItemFixture.morningSantaSkin().build(),
-			ItemFixture.nightMageSkin()))
-			.given(itemRepository).findAllById(any());
 
 		// when
 		LoginResponse result = memberService.login(authorizationTokenInfoResponse);
@@ -160,10 +157,6 @@ class MemberServiceTest {
 
 		given(memberSearchRepository.findMemberAndBadges(authMember.id(), true))
 			.willReturn(MemberInfoSearchFixture.friendMemberInfo(total));
-		given(inventorySearchRepository.findDefaultSkin(authMember.id()))
-			.willReturn(List.of(
-				InventoryFixture.inventory(authMember.id(), morning),
-				InventoryFixture.inventory(authMember.id(), night)));
 
 		// When + Then
 		MemberInfoResponse memberInfoResponse = memberService.searchInfo(authMember, null);
@@ -187,10 +180,11 @@ class MemberServiceTest {
 			Item night = ItemFixture.nightMageSkin();
 			Inventory morningSkin = InventoryFixture.inventory(searchId, morning);
 			Inventory nightSkin = InventoryFixture.inventory(searchId, night);
+			List<MemberInfo> memberInfos = MemberInfoSearchFixture
+				.myInfo(morningSkin.getItem().getImage(), nightSkin.getItem().getImage());
 
 			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
-				.willReturn(MemberInfoSearchFixture.myInfo());
-			given(inventorySearchRepository.findDefaultSkin(searchId)).willReturn(List.of(morningSkin, nightSkin));
+				.willReturn(memberInfos);
 
 			// when
 			MemberInfoResponse memberInfoResponse = memberService.searchInfo(authMember, null);
@@ -198,43 +192,6 @@ class MemberServiceTest {
 			// then
 			assertThat(memberInfoResponse.birds()).containsEntry("MORNING", morningSkin.getItem().getImage());
 			assertThat(memberInfoResponse.birds()).containsEntry("NIGHT", nightSkin.getItem().getImage());
-		}
-
-		@DisplayName("기본 스킨이 없어서 예외 발생")
-		@Test
-		void failBy_underSize(@WithMember AuthMember authMember) {
-			// given
-			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
-				.willReturn(MemberInfoSearchFixture.friendMemberInfo());
-			given(inventorySearchRepository.findDefaultSkin(anyLong())).willReturn(List.of());
-
-			// when
-			assertThatThrownBy(() -> memberService.searchInfo(authMember, 123L))
-				.isInstanceOf(BadRequestException.class)
-				.hasMessage(INVALID_DEFAULT_SKIN_SIZE.getMessage());
-		}
-
-		@DisplayName("기본 스킨이 3개 이상이어서 예외 발생")
-		@Test
-		void failBy_overSize(@WithMember AuthMember authMember) {
-			// given
-			long searchId = 1L;
-			Item morning = ItemFixture.morningSantaSkin().build();
-			Item night = ItemFixture.nightMageSkin();
-			Item kill = ItemFixture.morningKillerSkin().build();
-			Inventory morningSkin = InventoryFixture.inventory(searchId, morning);
-			Inventory nightSkin = InventoryFixture.inventory(searchId, night);
-			Inventory killSkin = InventoryFixture.inventory(searchId, kill);
-
-			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
-				.willReturn(MemberInfoSearchFixture.myInfo());
-			given(inventorySearchRepository.findDefaultSkin(searchId))
-				.willReturn(List.of(morningSkin, nightSkin, killSkin));
-
-			// when
-			assertThatThrownBy(() -> memberService.searchInfo(authMember, null))
-				.isInstanceOf(BadRequestException.class)
-				.hasMessage(INVALID_DEFAULT_SKIN_SIZE.getMessage());
 		}
 	}
 

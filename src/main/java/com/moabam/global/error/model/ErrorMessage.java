@@ -42,6 +42,7 @@ public enum ErrorMessage {
 
 	BASIC_SKIN_NOT_FOUND("기본 스킨 오류 발생, 관리자에게 문의하세요"),
 	INVALID_DEFAULT_SKIN_SIZE("기본 스킨은 2개여야 합니다. 관리자에게 문의하세요"),
+	SKIN_TYPE_NOT_FOUND("스킨 타입이 없습니다. 관리자에게 문의하세요"),
 
 	BUG_NOT_ENOUGH("보유한 벌레가 부족합니다."),
 

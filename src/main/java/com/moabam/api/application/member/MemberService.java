@@ -13,7 +13,6 @@ import com.moabam.api.application.auth.mapper.AuthMapper;
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.repository.InventoryRepository;
-import com.moabam.api.domain.item.repository.InventorySearchRepository;
 import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
@@ -27,7 +26,6 @@ import com.moabam.api.dto.member.ModifyMemberRequest;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.BaseDataCode;
 import com.moabam.global.common.util.ClockHolder;
-import com.moabam.global.common.util.GlobalConstant;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -41,7 +39,6 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
-	private final InventorySearchRepository inventorySearchRepository;
 	private final InventoryRepository inventoryRepository;
 	private final ItemRepository itemRepository;
 	private final MemberSearchRepository memberSearchRepository;
@@ -84,11 +81,8 @@ public class MemberService {
 		if (!isMe) {
 			searchId = memberId;
 		}
-
 		MemberInfoSearchResponse memberInfoSearchResponse = findMemberInfo(searchId, isMe);
-		List<Inventory> inventories = getDefaultSkin(searchId);
-
-		return MemberMapper.toMemberInfoResponse(memberInfoSearchResponse, inventories);
+		return MemberMapper.toMemberInfoResponse(memberInfoSearchResponse);
 	}
 
 	@Transactional
@@ -111,25 +105,17 @@ public class MemberService {
 		}
 	}
 
-	private List<Inventory> getDefaultSkin(Long searchId) {
-		List<Inventory> inventories = inventorySearchRepository.findDefaultSkin(searchId);
-		if (inventories.size() != GlobalConstant.DEFAULT_SKIN_SIZE) {
-			throw new BadRequestException(INVALID_DEFAULT_SKIN_SIZE);
-		}
-
-		return inventories;
-	}
-
 	private Member signUp(Long socialId) {
 		Member member = MemberMapper.toMember(socialId);
-		Member savedMember = memberRepository.save(member);
+		return memberRepository.save(member);
+	}
+
+	private void saveMyEgg(Member member) {
 		List<Item> items = getBasicEggs();
 		List<Inventory> inventories = items.stream()
-			.map(item -> MemberMapper.toInventory(savedMember.getId(), item))
+			.map(item -> MemberMapper.toInventory(member.getId(), item))
 			.toList();
 		inventoryRepository.saveAll(inventories);
-
-		return savedMember;
 	}
 
 	private List<Item> getBasicEggs() {
