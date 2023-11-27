@@ -32,6 +32,7 @@ import com.moabam.api.dto.room.ModifyRoomRequest;
 import com.moabam.api.dto.room.MyRoomsResponse;
 import com.moabam.api.dto.room.RoomDetailsResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
+import com.moabam.api.dto.room.UnJoinedRoomDetailsResponse;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
 
@@ -85,6 +86,18 @@ public class RoomController {
 	@ResponseStatus(HttpStatus.OK)
 	public void exitRoom(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId) {
 		roomService.exitRoom(authMember.id(), roomId);
+	}
+
+	@GetMapping("/{roomId}/check")
+	@ResponseStatus(HttpStatus.OK)
+	public boolean checkIfParticipant(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId) {
+		return roomService.checkIfParticipant(authMember.id(), roomId);
+	}
+
+	@GetMapping("/{roomId}/un-joined")
+	@ResponseStatus(HttpStatus.OK)
+	public UnJoinedRoomDetailsResponse getUnJoinedRoomDetails(@PathVariable("roomId") Long roomId) {
+		return searchService.getUnJoinedRoomDetails(roomId);
 	}
 
 	@GetMapping("/{roomId}/{date}")
