@@ -126,7 +126,7 @@ class CertificationServiceTest {
 		given(clockHolder.times()).willReturn(LocalDateTime.now().withHour(9).withMinute(58));
 		given(clockHolder.date()).willReturn(today);
 		given(participantSearchRepository.findOne(memberId, roomId)).willReturn(Optional.of(participant));
-		given(memberService.getById(memberId)).willReturn(member1);
+		given(memberService.findMember(memberId)).willReturn(member1);
 		given(routineRepository.findById(1L)).willReturn(Optional.of(routines.get(0)));
 		given(routineRepository.findById(2L)).willReturn(Optional.of(routines.get(1)));
 		given(dailyMemberCertificationRepository.save(any(DailyMemberCertification.class))).willReturn(

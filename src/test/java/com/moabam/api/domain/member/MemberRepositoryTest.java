@@ -2,13 +2,16 @@ package com.moabam.api.domain.member;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.application.member.MemberMapper;
 import com.moabam.api.domain.member.repository.BadgeRepository;
@@ -27,6 +30,9 @@ import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.ParticipantFixture;
 import com.moabam.support.fixture.RoomFixture;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 @QuerydslRepositoryTest
 class MemberRepositoryTest {
 
@@ -44,6 +50,9 @@ class MemberRepositoryTest {
 
 	@Autowired
 	ParticipantRepository participantRepository;
+
+	@PersistenceContext
+	EntityManager entityManager;
 
 	@DisplayName("회원 생성 테스트")
 	@Test
@@ -162,5 +171,34 @@ class MemberRepositoryTest {
 			MemberInfoSearchResponse memberInfoSearchResponse = MemberMapper.toMemberInfoSearchResponse(memberInfos);
 			assertThat(memberInfoSearchResponse.badges()).isEmpty();
 		}
+	}
+
+	@DisplayName("삭제된 회원 찾기 테스트")
+	@Transactional
+	@Test
+	void findMemberTest() {
+		// Given
+		Member member = MemberFixture.member();
+
+		// When
+		memberRepository.save(member);
+
+		member.delete(LocalDateTime.now());
+		memberRepository.flush();
+		memberRepository.delete(member);
+
+		memberRepository.flush();
+
+		// then
+		Optional<Member> deletedMember = memberSearchRepository.findMember(member.getId(), false);
+
+		Assertions.assertAll(
+			() -> assertThat(deletedMember).isPresent(),
+			() -> {
+				Member delete = deletedMember.get();
+				assertThat(delete.getSocialId()).contains("delete");
+				assertThat(delete.getDeletedAt()).isNotNull();
+			}
+		);
 	}
 }

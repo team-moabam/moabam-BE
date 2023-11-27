@@ -52,7 +52,7 @@ public class RoomService {
 
 		validateEnteredRoomCount(memberId, room.getRoomType());
 
-		Member member = memberService.getById(memberId);
+		Member member = memberService.findMember(memberId);
 		member.enterRoom(room.getRoomType());
 		participant.enableManager();
 		room.changeManagerNickname(nickname);
@@ -89,7 +89,7 @@ public class RoomService {
 			() -> new NotFoundException(ROOM_NOT_FOUND));
 		validateRoomEnter(memberId, enterRoomRequest.password(), room);
 
-		Member member = memberService.getById(memberId);
+		Member member = memberService.findMember(memberId);
 		member.enterRoom(room.getRoomType());
 		room.increaseCurrentUserCount();
 
@@ -104,7 +104,7 @@ public class RoomService {
 
 		validateRoomExit(participant, room);
 
-		Member member = memberService.getById(memberId);
+		Member member = memberService.findMember(memberId);
 		member.exitRoom(room.getRoomType());
 
 		participant.removeRoom();
@@ -126,7 +126,7 @@ public class RoomService {
 		validateManagerAuthorization(managerParticipant);
 
 		Room room = managerParticipant.getRoom();
-		Member member = memberService.getById(memberParticipant.getMemberId());
+		Member member = memberService.findMember(memberParticipant.getMemberId());
 		room.changeManagerNickname(member.getNickname());
 
 		managerParticipant.disableManager();
@@ -143,7 +143,7 @@ public class RoomService {
 		participantRepository.delete(memberParticipant);
 		room.decreaseCurrentUserCount();
 
-		Member member = memberService.getById(memberId);
+		Member member = memberService.findMember(memberId);
 		member.exitRoom(room.getRoomType());
 	}
 
@@ -151,6 +151,11 @@ public class RoomService {
 		if (!roomRepository.existsById(roomId)) {
 			throw new NotFoundException(ROOM_NOT_FOUND);
 		}
+	}
+
+	public Room findRoom(Long roomId) {
+		return roomRepository.findById(roomId)
+			.orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
 	}
 
 	private Participant getParticipant(Long memberId, Long roomId) {
@@ -176,7 +181,7 @@ public class RoomService {
 	}
 
 	private void validateEnteredRoomCount(Long memberId, RoomType roomType) {
-		Member member = memberService.getById(memberId);
+		Member member = memberService.findMember(memberId);
 
 		if (roomType.equals(MORNING) && member.getCurrentMorningCount() >= 3) {
 			throw new BadRequestException(MEMBER_ROOM_EXCEED);

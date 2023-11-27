@@ -59,7 +59,7 @@ public class CertificationService {
 		Participant participant = participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
 		Room room = participant.getRoom();
-		Member member = memberService.getById(memberId);
+		Member member = memberService.findMember(memberId);
 		BugType bugType = switch (room.getRoomType()) {
 			case MORNING -> BugType.MORNING;
 			case NIGHT -> BugType.NIGHT;
@@ -98,6 +98,11 @@ public class CertificationService {
 
 	public boolean existsRoomCertification(Long roomId, LocalDate date) {
 		return dailyRoomCertificationRepository.existsByRoomIdAndCertifiedAt(roomId, date);
+	}
+
+	public Certification findCertification(Long certificationId) {
+		return certificationRepository.findById(certificationId)
+			.orElseThrow(() -> new NotFoundException(CERTIFICATION_NOT_FOUND));
 	}
 
 	private void validateCertifyTime(LocalDateTime now, int certifyTime) {

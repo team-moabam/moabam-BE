@@ -41,8 +41,8 @@ public class MemberService {
 	private final MemberSearchRepository memberSearchRepository;
 	private final ClockHolder clockHolder;
 
-	public Member getById(Long memberId) {
-		return memberRepository.findById(memberId)
+	public Member findMember(Long memberId) {
+		return memberSearchRepository.findMember(memberId)
 			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
 	}
 

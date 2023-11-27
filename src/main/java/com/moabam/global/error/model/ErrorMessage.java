@@ -13,6 +13,8 @@ public enum ErrorMessage {
 	NOT_FOUND_AVAILABLE_PORT("사용 가능한 포트를 찾을 수 없습니다. (10000 ~ 65535)"),
 	ERROR_EXECUTING_EMBEDDED_REDIS("Embedded Redis 실행 중 오류가 발생했습니다."),
 
+	REPORT_REQUEST_ERROR("신고 요청하고자 하는 방이나 대상이 존재하지 않습니다."),
+
 	ROOM_NOT_FOUND("존재하지 않는 방 입니다."),
 	ROOM_MAX_USER_COUNT_MODIFY_FAIL("잘못된 최대 인원수 설정입니다."),
 	ROOM_MODIFY_UNAUTHORIZED_REQUEST("방장이 아닌 사용자는 방을 수정할 수 없습니다."),
@@ -26,6 +28,7 @@ public enum ErrorMessage {
 	ROUTINE_NOT_FOUND("루틴을 찾을 수 없습니다"),
 	INVALID_REQUEST_URL("잘못된 URL 요청입니다."),
 	INVALID_CERTIFY_TIME("현재 인증 시간이 아닙니다."),
+	CERTIFICATION_NOT_FOUND("인증 정보가 없습니다."),
 
 	LOGIN_FAILED("로그인에 실패했습니다."),
 	REQUEST_FAILED("네트워크 접근 실패입니다."),

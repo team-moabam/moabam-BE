@@ -44,7 +44,7 @@ public class BugService {
 	private final PaymentRepository paymentRepository;
 
 	public BugResponse getBug(Long memberId) {
-		Bug bug = memberService.getById(memberId).getBug();
+		Bug bug = memberService.findMember(memberId).getBug();
 
 		return BugMapper.toBugResponse(bug);
 	}
@@ -77,7 +77,7 @@ public class BugService {
 
 	@Transactional
 	public void charge(Long memberId, Product bugProduct) {
-		Bug bug = memberService.getById(memberId).getBug();
+		Bug bug = memberService.findMember(memberId).getBug();
 
 		bug.charge(bugProduct.getQuantity());
 		bugHistoryRepository.save(BugMapper.toChargeBugHistory(memberId, bugProduct.getQuantity()));
