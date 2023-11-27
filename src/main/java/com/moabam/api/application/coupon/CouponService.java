@@ -60,7 +60,7 @@ public class CouponService {
 
 	@Transactional
 	public void use(Long memberId, Long couponWalletId) {
-		Coupon coupon = getByWallet(memberId, couponWalletId);
+		Coupon coupon = getByWalletIdAndMemberId(couponWalletId, memberId);
 		couponRepository.delete(coupon);
 	}
 

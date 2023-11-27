@@ -62,4 +62,13 @@ public final class BugMapper {
 			.history(StreamUtils.map(dtoList, BugMapper::toBugHistoryItemResponse))
 			.build();
 	}
+
+	public static BugHistory toChargeBugHistory(Long memberId, int quantity) {
+		return BugHistory.builder()
+			.memberId(memberId)
+			.bugType(BugType.GOLDEN)
+			.actionType(BugActionType.CHARGE)
+			.quantity(quantity)
+			.build();
+	}
 }
