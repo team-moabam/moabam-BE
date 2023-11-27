@@ -88,7 +88,7 @@ public class CertificationService {
 			return;
 		}
 
-		member.getBug().increaseBug(bugType, room.getLevel());
+		member.getBug().increase(bugType, room.getLevel());
 	}
 
 	public boolean existsMemberCertification(Long memberId, Long roomId, LocalDate date) {
@@ -182,6 +182,6 @@ public class CertificationService {
 			.toList();
 
 		memberService.getRoomMembers(memberIds)
-			.forEach(completedMember -> completedMember.getBug().increaseBug(bugType, expAppliedRoomLevel));
+			.forEach(completedMember -> completedMember.getBug().increase(bugType, expAppliedRoomLevel));
 	}
 }
