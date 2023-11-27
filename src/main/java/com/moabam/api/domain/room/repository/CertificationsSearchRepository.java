@@ -17,6 +17,7 @@ import com.moabam.api.domain.room.DailyMemberCertification;
 import com.moabam.api.domain.room.DailyRoomCertification;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -67,6 +68,7 @@ public class CertificationsSearchRepository {
 				dailyRoomCertification.roomId.eq(roomId),
 				dailyRoomCertification.certifiedAt.eq(date)
 			)
+			.setLockMode(LockModeType.PESSIMISTIC_WRITE)
 			.fetchOne());
 	}
 

@@ -2,13 +2,16 @@ package com.moabam.api.domain.member;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.application.member.MemberMapper;
 import com.moabam.api.domain.member.repository.BadgeRepository;
@@ -26,6 +29,9 @@ import com.moabam.support.fixture.BadgeFixture;
 import com.moabam.support.fixture.MemberFixture;
 import com.moabam.support.fixture.ParticipantFixture;
 import com.moabam.support.fixture.RoomFixture;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @QuerydslRepositoryTest
 class MemberRepositoryTest {
@@ -45,11 +51,14 @@ class MemberRepositoryTest {
 	@Autowired
 	ParticipantRepository participantRepository;
 
+	@PersistenceContext
+	EntityManager entityManager;
+
 	@DisplayName("회원 생성 테스트")
 	@Test
 	void test() {
 		// given
-		Member member = MemberFixture.member();
+		Member member = MemberFixture.member("313", "test");
 		memberRepository.save(member);
 
 		// when
@@ -67,7 +76,7 @@ class MemberRepositoryTest {
 		@Test
 		void room_exist_and_manager_error() {
 			// given
-			Member member = MemberFixture.member();
+			Member member = MemberFixture.member("1111", "test");
 			memberRepository.save(member);
 
 			Room room = RoomFixture.room();
@@ -93,7 +102,7 @@ class MemberRepositoryTest {
 			room.changeManagerNickname("test");
 			roomRepository.save(room);
 
-			Member member = MemberFixture.member();
+			Member member = MemberFixture.member("44", "test");
 			member.changeNickName("not");
 			memberRepository.save(member);
 
@@ -114,7 +123,7 @@ class MemberRepositoryTest {
 		@Test
 		void member_not_found() {
 			// Given
-			List<MemberInfo> memberInfos = memberSearchRepository.findMemberAndBadges(1L, false);
+			List<MemberInfo> memberInfos = memberSearchRepository.findMemberAndBadges(999L, false);
 
 			// When + Then
 			assertThat(memberInfos).isEmpty();
@@ -124,7 +133,7 @@ class MemberRepositoryTest {
 		@Test
 		void search_info_success() {
 			// given
-			Member member = MemberFixture.member();
+			Member member = MemberFixture.member("hhhh", "test");
 			member.enterRoom(RoomType.MORNING);
 			memberRepository.save(member);
 
@@ -149,7 +158,7 @@ class MemberRepositoryTest {
 		@Test
 		void no_badges_search_success() {
 			// given
-			Member member = MemberFixture.member();
+			Member member = MemberFixture.member("ttttt", "test");
 			member.enterRoom(RoomType.MORNING);
 			memberRepository.save(member);
 
@@ -162,5 +171,34 @@ class MemberRepositoryTest {
 			MemberInfoSearchResponse memberInfoSearchResponse = MemberMapper.toMemberInfoSearchResponse(memberInfos);
 			assertThat(memberInfoSearchResponse.badges()).isEmpty();
 		}
+	}
+
+	@DisplayName("삭제된 회원 찾기 테스트")
+	@Transactional
+	@Test
+	void findMemberTest() {
+		// Given
+		Member member = MemberFixture.member();
+
+		// When
+		memberRepository.save(member);
+
+		member.delete(LocalDateTime.now());
+		memberRepository.flush();
+		memberRepository.delete(member);
+
+		memberRepository.flush();
+
+		// then
+		Optional<Member> deletedMember = memberSearchRepository.findMember(member.getId(), false);
+
+		Assertions.assertAll(
+			() -> assertThat(deletedMember).isPresent(),
+			() -> {
+				Member delete = deletedMember.get();
+				assertThat(delete.getSocialId()).contains("delete");
+				assertThat(delete.getDeletedAt()).isNotNull();
+			}
+		);
 	}
 }

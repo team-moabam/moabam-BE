@@ -59,7 +59,7 @@ class BugServiceTest {
 		// given
 		Long memberId = 1L;
 		Member member = member();
-		given(memberService.getById(memberId)).willReturn(member);
+		given(memberService.findMember(memberId)).willReturn(member);
 
 		// when
 		BugResponse response = bugService.getBug(memberId);
