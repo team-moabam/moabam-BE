@@ -16,20 +16,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CouponManageRepository {
 
+	private static final int EXPIRE_DAYS = 2;
 	private static final String STOCK_KEY = "%s_INCR";
 
 	private final ZSetRedisRepository zSetRedisRepository;
 	private final ValueRedisRepository valueRedisRepository;
 
 	public void addIfAbsentQueue(String couponName, Long memberId, double registerTime) {
-		zSetRedisRepository.addIfAbsent(requireNonNull(couponName), requireNonNull(memberId), registerTime);
+		zSetRedisRepository.addIfAbsent(
+			requireNonNull(couponName),
+			requireNonNull(memberId),
+			registerTime,
+			EXPIRE_DAYS
+		);
 	}
 
-	public Set<Long> popMinQueue(String couponName, long count) {
+	public Set<Long> range(String key, long start, long end) {
 		return zSetRedisRepository
-			.popMin(requireNonNull(couponName), count)
+			.range(requireNonNull(key), start, end)
 			.stream()
-			.map(tuple -> (Long)tuple.getValue())
+			.map(Long.class::cast)
 			.collect(Collectors.toSet());
 	}
 

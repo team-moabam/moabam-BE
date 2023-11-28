@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 
 import com.moabam.api.infrastructure.redis.ValueRedisRepository;
 import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
@@ -38,7 +37,7 @@ class CouponManageRepositoryTest {
 		couponManageRepository.addIfAbsentQueue("couponName", 1L, 1);
 
 		// Then
-		verify(zSetRedisRepository).addIfAbsent(any(String.class), any(Long.class), any(double.class));
+		verify(zSetRedisRepository).addIfAbsent(any(String.class), any(Long.class), any(double.class), any(int.class));
 	}
 
 	@DisplayName("쿠폰명이 Null인 대기열에 사용자를 등록한다.- NullPointerException")
@@ -57,25 +56,25 @@ class CouponManageRepositoryTest {
 			.isInstanceOf(NullPointerException.class);
 	}
 
-	@DisplayName("쿠폰 대기열에서 성공적으로 10명을 꺼내고 삭제한다.")
-	@MethodSource("com.moabam.support.fixture.CouponFixture#provideTypedTuples")
+	@DisplayName("쿠폰 대기열에서 성공적으로 10명을 조회한다. - Set<Long>")
+	@MethodSource("com.moabam.support.fixture.CouponFixture#provideValues_Object")
 	@ParameterizedTest
-	void popMinQueue_success(Set<TypedTuple<Object>> tuples) {
+	void range_success(Set<Object> values) {
 		// Given
-		given(zSetRedisRepository.popMin(any(String.class), any(long.class))).willReturn(tuples);
+		given(zSetRedisRepository.range(any(String.class), any(long.class), any(long.class))).willReturn(values);
 
 		// When
-		Set<Long> actual = couponManageRepository.popMinQueue("couponName", 10);
+		Set<Long> actual = couponManageRepository.range("couponName", 0, 10);
 
 		// Then
 		assertThat(actual).hasSize(10);
 	}
 
-	@DisplayName("쿠폰명이 Null인 대기열에서 사용자를 꺼낸다.  - NullPointerException")
+	@DisplayName("쿠폰명이 Null인 대기열에서 사용자를 조회한다.  - NullPointerException")
 	@Test
-	void popMinQueue_NullPointerException() {
+	void range_NullPointerException() {
 		// When & Then
-		assertThatThrownBy(() -> couponManageRepository.popMinQueue(null, 10))
+		assertThatThrownBy(() -> couponManageRepository.range(null, 0, 10))
 			.isInstanceOf(NullPointerException.class);
 	}
 
