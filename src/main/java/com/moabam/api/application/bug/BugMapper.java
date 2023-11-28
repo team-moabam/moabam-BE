@@ -20,15 +20,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BugMapper {
 
-	public static BugHistory toUseBugHistory(Long memberId, BugType bugType, int quantity) {
-		return BugHistory.builder()
-			.memberId(memberId)
-			.bugType(bugType)
-			.actionType(BugActionType.USE)
-			.quantity(quantity)
-			.build();
-	}
-
 	public static BugResponse toBugResponse(Bug bug) {
 		return BugResponse.builder()
 			.morningBug(bug.getMorningBug())
@@ -54,11 +45,38 @@ public final class BugMapper {
 			.build();
 	}
 
+	public static BugHistory toUseBugHistory(Long memberId, BugType bugType, int quantity) {
+		return BugHistory.builder()
+			.memberId(memberId)
+			.bugType(bugType)
+			.actionType(BugActionType.USE)
+			.quantity(quantity)
+			.build();
+	}
+
 	public static BugHistory toChargeBugHistory(Long memberId, int quantity) {
 		return BugHistory.builder()
 			.memberId(memberId)
 			.bugType(BugType.GOLDEN)
 			.actionType(BugActionType.CHARGE)
+			.quantity(quantity)
+			.build();
+	}
+
+	public static BugHistory toRewardBugHistory(Long memberId, BugType bugType, int quantity) {
+		return BugHistory.builder()
+			.memberId(memberId)
+			.bugType(bugType)
+			.actionType(BugActionType.REWARD)
+			.quantity(quantity)
+			.build();
+	}
+
+	public static BugHistory toCouponBugHistory(Long memberId, BugType bugType, int quantity) {
+		return BugHistory.builder()
+			.memberId(memberId)
+			.bugType(bugType)
+			.actionType(BugActionType.COUPON)
 			.quantity(quantity)
 			.build();
 	}

@@ -17,7 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.application.member.MemberService;
+import com.moabam.api.application.bug.BugService;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
 import com.moabam.api.domain.coupon.CouponWallet;
@@ -25,7 +25,6 @@ import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
-import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
@@ -40,9 +39,7 @@ import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.FilterProcessExtension;
-import com.moabam.support.fixture.BugFixture;
 import com.moabam.support.fixture.CouponFixture;
-import com.moabam.support.fixture.MemberFixture;
 
 @ExtendWith({MockitoExtension.class, FilterProcessExtension.class})
 class CouponServiceTest {
@@ -54,7 +51,7 @@ class CouponServiceTest {
 	CouponManageService couponManageService;
 
 	@Mock
-	MemberService memberService;
+	BugService bugService;
 
 	@Mock
 	CouponRepository couponRepository;
@@ -321,11 +318,9 @@ class CouponServiceTest {
 	@Test
 	void use_success() {
 		// Given
-		Member member = MemberFixture.member(BugFixture.zeroBug());
 		Coupon coupon = CouponFixture.coupon(CouponType.GOLDEN, 1000);
 		CouponWallet couponWallet = CouponWallet.create(1L, coupon);
 
-		given(memberService.findMember(any(Long.class))).willReturn(member);
 		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
 			.willReturn(Optional.of(couponWallet));
 

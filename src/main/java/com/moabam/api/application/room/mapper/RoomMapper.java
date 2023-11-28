@@ -164,8 +164,8 @@ public final class RoomMapper {
 			.rank(rank)
 			.memberId(member.getId())
 			.nickname(member.getNickname())
-			.awakeImage(inventory.getItem().getImage())
-			.sleepImage(inventory.getItem().getImage())
+			.awakeImage(inventory.getItem().getAwakeImage())
+			.sleepImage(inventory.getItem().getSleepImage())
 			.build();
 	}
 }
