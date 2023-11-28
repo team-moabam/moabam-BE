@@ -28,9 +28,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends BaseTimeEntity {
 
-	private static final String ROOM_LEVEL_0_IMAGE = "'temptemp'";
-	private static final String ROOM_LEVEL_10_IMAGE = "'temp'";
-	private static final String ROOM_LEVEL_20_IMAGE = "'tempp'";
+	private static final int LEVEL_5 = 5;
+	private static final int LEVEL_10 = 10;
+	private static final int LEVEL_20 = 20;
+	private static final int LEVEL_30 = 30;
+	private static final String ROOM_LEVEL_0_IMAGE = "'https://image.moabam.com/moabam/default/room-level-00.png'";
+	private static final String ROOM_LEVEL_5_IMAGE = "'https://image.moabam.com/moabam/default/room-level-05.png'";
+	private static final String ROOM_LEVEL_10_IMAGE = "'https://image.moabam.com/moabam/default/room-level-10.png'";
+	private static final String ROOM_LEVEL_20_IMAGE = "'https://image.moabam.com/moabam/default/room-level-20.png'";
+	private static final String ROOM_LEVEL_30_IMAGE = "'https://image.moabam.com/moabam/default/room-level-30.png'";
 	private static final int MORNING_START_TIME = 4;
 	private static final int MORNING_END_TIME = 10;
 	private static final int NIGHT_START_TIME = 20;
@@ -96,6 +102,28 @@ public class Room extends BaseTimeEntity {
 	public void levelUp() {
 		this.level += 1;
 		this.exp = 0;
+		upgradeRoomImage(this.level);
+	}
+
+	public void upgradeRoomImage(int level) {
+		if (level == LEVEL_5) {
+			this.roomImage = ROOM_LEVEL_5_IMAGE;
+			return;
+		}
+
+		if (level == LEVEL_10) {
+			this.roomImage = ROOM_LEVEL_10_IMAGE;
+			return;
+		}
+
+		if (level == LEVEL_20) {
+			this.roomImage = ROOM_LEVEL_20_IMAGE;
+			return;
+		}
+
+		if (level == LEVEL_30) {
+			this.roomImage = ROOM_LEVEL_30_IMAGE;
+		}
 	}
 
 	public void gainExp() {
@@ -132,10 +160,6 @@ public class Room extends BaseTimeEntity {
 
 	public void decreaseCurrentUserCount() {
 		this.currentUserCount -= 1;
-	}
-
-	public void upgradeRoomImage(String roomImage) {
-		this.roomImage = roomImage;
 	}
 
 	public void changeCertifyTime(int certifyTime) {
