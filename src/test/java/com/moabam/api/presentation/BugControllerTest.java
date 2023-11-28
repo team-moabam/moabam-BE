@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.bug.BugMapper;
+import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.product.ProductMapper;
 import com.moabam.api.domain.bug.BugActionType;
@@ -58,6 +59,9 @@ class BugControllerTest extends WithoutFilterSupporter {
 
 	@MockBean
 	MemberService memberService;
+	
+	@MockBean
+	CouponService couponService;
 
 	@Autowired
 	BugHistoryRepository bugHistoryRepository;

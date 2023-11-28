@@ -45,10 +45,11 @@ public class Bug {
 		return bug;
 	}
 
-	public void use(BugType bugType, int price) {
+	public void use(BugType bugType, int count) {
 		int currentBug = getBug(bugType);
-		validateEnoughBug(currentBug, price);
-		decrease(bugType, price);
+
+		validateEnoughBug(currentBug, count);
+		decrease(bugType, count);
 	}
 
 	private int getBug(BugType bugType) {
@@ -59,8 +60,8 @@ public class Bug {
 		};
 	}
 
-	private void validateEnoughBug(int currentBug, int price) {
-		if (price > currentBug) {
+	private void validateEnoughBug(int currentBug, int count) {
+		if (currentBug < count) {
 			throw new BadRequestException(BUG_NOT_ENOUGH);
 		}
 	}
@@ -81,7 +82,7 @@ public class Bug {
 		}
 	}
 
-	public void charge(int quantity) {
-		this.goldenBug += quantity;
+	public void charge(int count) {
+		this.goldenBug += count;
 	}
 }

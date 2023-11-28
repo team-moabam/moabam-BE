@@ -9,7 +9,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.payment.PaymentMapper;
 import com.moabam.api.application.product.ProductMapper;
@@ -18,6 +17,7 @@ import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
 import com.moabam.api.domain.coupon.CouponWallet;
+import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
@@ -30,6 +30,7 @@ import com.moabam.api.dto.product.ProductsResponse;
 import com.moabam.api.dto.product.PurchaseProductRequest;
 import com.moabam.api.dto.product.PurchaseProductResponse;
 import com.moabam.global.error.exception.NotFoundException;
+import com.moabam.global.error.model.ErrorMessage;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,11 +40,11 @@ import lombok.RequiredArgsConstructor;
 public class BugService {
 
 	private final MemberService memberService;
-	private final CouponService couponService;
 	private final BugHistoryRepository bugHistoryRepository;
 	private final BugHistorySearchRepository bugHistorySearchRepository;
 	private final ProductRepository productRepository;
 	private final PaymentRepository paymentRepository;
+	private final CouponWalletSearchRepository couponWalletSearchRepository;
 
 	public BugResponse getBug(Long memberId) {
 		Bug bug = getByMemberId(memberId);
@@ -69,7 +70,7 @@ public class BugService {
 		Payment payment = PaymentMapper.toPayment(memberId, product);
 
 		if (!isNull(request.couponWalletId())) {
-			CouponWallet couponWallet = couponService.getWalletByIdAndMemberId(request.couponWalletId(), memberId);
+			CouponWallet couponWallet = getCouponWallet(request.couponWalletId(), memberId);
 			payment.applyCoupon(couponWallet);
 		}
 		paymentRepository.save(payment);
@@ -78,11 +79,11 @@ public class BugService {
 	}
 
 	@Transactional
-	public void use(Member member, BugType bugType, int price) {
+	public void use(Member member, BugType bugType, int count) {
 		Bug bug = member.getBug();
 
-		bug.use(bugType, price);
-		bugHistoryRepository.save(BugMapper.toUseBugHistory(member.getId(), bugType, price));
+		bug.use(bugType, count);
+		bugHistoryRepository.save(BugMapper.toUseBugHistory(member.getId(), bugType, count));
 	}
 
 	@Transactional
@@ -101,6 +102,14 @@ public class BugService {
 		bugHistoryRepository.save(BugMapper.toChargeBugHistory(memberId, bugProduct.getQuantity()));
 	}
 
+	@Transactional
+	public void applyCoupon(Long memberId, BugType bugType, int count) {
+		Bug bug = getByMemberId(memberId);
+
+		bug.increase(bugType, count);
+		bugHistoryRepository.save(BugMapper.toCouponBugHistory(memberId, bugType, count));
+	}
+
 	private Bug getByMemberId(Long memberId) {
 		return memberService.findMember(memberId)
 			.getBug();
@@ -109,5 +118,10 @@ public class BugService {
 	private Product getProductById(Long productId) {
 		return productRepository.findById(productId)
 			.orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+	}
+
+	private CouponWallet getCouponWallet(Long couponWalletId, Long memberId) {
+		return couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 	}
 }
