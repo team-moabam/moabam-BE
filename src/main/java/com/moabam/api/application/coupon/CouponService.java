@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.moabam.api.application.member.MemberService;
+import com.moabam.api.application.bug.BugService;
 import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponWallet;
@@ -14,7 +14,6 @@ import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponSearchRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
-import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
@@ -35,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class CouponService {
 
 	private final ClockHolder clockHolder;
-	private final MemberService memberService;
+	private final BugService bugService;
 	private final CouponManageService couponManageService;
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
@@ -59,9 +58,7 @@ public class CouponService {
 		Coupon coupon = couponWallet.getCoupon();
 		BugType bugType = coupon.getType().getBugType();
 
-		Member member = memberService.findMember(memberId);
-		member.getBug().increase(bugType, coupon.getPoint());
-
+		bugService.applyCoupon(memberId, bugType, coupon.getPoint());
 		couponWalletRepository.delete(couponWallet);
 	}
 

@@ -1,6 +1,7 @@
 package com.moabam.api.application.bug;
 
 import static com.moabam.api.domain.product.ProductType.*;
+import static com.moabam.support.fixture.BugFixture.*;
 import static com.moabam.support.fixture.CouponFixture.*;
 import static com.moabam.support.fixture.MemberFixture.*;
 import static com.moabam.support.fixture.ProductFixture.*;
@@ -18,11 +19,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.application.coupon.CouponService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.payment.PaymentMapper;
 import com.moabam.api.domain.bug.Bug;
+import com.moabam.api.domain.bug.BugType;
+import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.coupon.CouponWallet;
+import com.moabam.api.domain.coupon.repository.CouponWalletSearchRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
@@ -46,13 +49,16 @@ class BugServiceTest {
 	MemberService memberService;
 
 	@Mock
-	CouponService couponService;
+	BugHistoryRepository bugHistoryRepository;
 
 	@Mock
 	ProductRepository productRepository;
 
 	@Mock
 	PaymentRepository paymentRepository;
+
+	@Mock
+	CouponWalletSearchRepository couponWalletSearchRepository;
 
 	@DisplayName("벌레를 조회한다.")
 	@Test
@@ -100,12 +106,13 @@ class BugServiceTest {
 			Long memberId = 1L;
 			Long productId = 1L;
 			Long couponWalletId = 1L;
+			CouponWallet couponWallet = CouponWallet.create(memberId, discount1000Coupon());
 			Payment payment = PaymentMapper.toPayment(memberId, bugProduct());
 			PurchaseProductRequest request = new PurchaseProductRequest(couponWalletId);
 			given(productRepository.findById(productId)).willReturn(Optional.of(bugProduct()));
 			given(paymentRepository.save(any(Payment.class))).willReturn(payment);
-			given(couponService.getWalletByIdAndMemberId(couponWalletId, memberId)).willReturn(
-				CouponWallet.create(memberId, discount1000Coupon()));
+			given(couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)).willReturn(
+				Optional.of(couponWallet));
 
 			// when
 			PurchaseProductResponse response = bugService.purchaseBugProduct(memberId, productId, request);
@@ -129,5 +136,48 @@ class BugServiceTest {
 				.isInstanceOf(NotFoundException.class)
 				.hasMessage("존재하지 않는 상품입니다.");
 		}
+	}
+
+	@DisplayName("벌레를 사용한다.")
+	@Test
+	void use_success() {
+		// given
+		Member member = spy(member());
+		given(member.getId()).willReturn(1L);
+
+		// when
+		bugService.use(member, BugType.MORNING, 5);
+
+		// then
+		assertThat(member.getBug().getMorningBug()).isEqualTo(MORNING_BUG - 5);
+	}
+
+	@DisplayName("벌레 보상을 준다.")
+	@Test
+	void reward_success() {
+		// given
+		Member member = spy(member());
+		given(member.getId()).willReturn(1L);
+
+		// when
+		bugService.reward(member, BugType.NIGHT, 5);
+
+		// then
+		assertThat(member.getBug().getNightBug()).isEqualTo(NIGHT_BUG + 5);
+	}
+
+	@DisplayName("벌레를 충전한다.")
+	@Test
+	void charge_success() {
+		// given
+		Long memberId = 1L;
+		Member member = member();
+		given(memberService.findMember(memberId)).willReturn(member);
+
+		// when
+		bugService.charge(memberId, bugProduct());
+
+		// then
+		assertThat(member.getBug().getGoldenBug()).isEqualTo(GOLDEN_BUG + BUG_PRODUCT_QUANTITY);
 	}
 }
