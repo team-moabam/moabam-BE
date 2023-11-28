@@ -299,8 +299,8 @@ public class SearchService {
 				.findAny()
 				.orElseThrow(() -> new NotFoundException(INVENTORY_NOT_FOUND));
 
-			String awakeImage = inventory.getItem().getImage();
-			String sleepImage = inventory.getItem().getImage();
+			String awakeImage = inventory.getItem().getAwakeImage();
+			String sleepImage = inventory.getItem().getSleepImage();
 
 			int contributionPoint = calculateContributionPoint(member.getId(), participants, date);
 			CertificationImagesResponse certificationImages = getCertificationImages(member.getId(), certifications);
@@ -343,8 +343,8 @@ public class SearchService {
 				.findAny()
 				.orElseThrow(() -> new NotFoundException(INVENTORY_NOT_FOUND));
 
-			String awakeImage = inventory.getItem().getImage();
-			String sleepImage = inventory.getItem().getImage();
+			String awakeImage = inventory.getItem().getAwakeImage();
+			String sleepImage = inventory.getItem().getSleepImage();
 
 			int contributionPoint = calculateContributionPoint(memberId, participants, date);
 			boolean isNotificationSent = knocks.contains(member.getId());
