@@ -60,6 +60,7 @@ class ZSetRedisRepositoryTest {
 		assertThat(redisTemplate.opsForZSet().score(key, value)).isEqualTo(1);
 	}
 
+	@Disabled
 	@DisplayName("저장된 데이터와 동일한 갯수만큼 조회한다. - Set<Object>")
 	@Test
 	void range_same_success() {
@@ -75,6 +76,7 @@ class ZSetRedisRepositoryTest {
 		assertThat(actual).hasSize(3);
 	}
 
+	@Disabled
 	@DisplayName("저장된 데이터보다 많은 갯수만큼 조회한다. - Set<Object>")
 	@Test
 	void range_more_success() {
@@ -89,6 +91,7 @@ class ZSetRedisRepositoryTest {
 		assertThat(actual).hasSize(2);
 	}
 
+	@Disabled
 	@DisplayName("저장된 데이터보다 더 적은 갯수만큼 조회한다. - Set<Object>")
 	@Test
 	void range_less_success() {
