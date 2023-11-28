@@ -107,8 +107,10 @@ public class MemberService {
 
 	private Member signUp(Long socialId) {
 		Member member = MemberMapper.toMember(socialId);
+		Member savedMember = memberRepository.save(member);
+		saveMyEgg(savedMember);
 
-		return memberRepository.save(member);
+		return savedMember;
 	}
 
 	private void saveMyEgg(Member member) {

@@ -97,6 +97,8 @@ class MemberServiceTest {
 		given(member.getId()).willReturn(1L);
 		willReturn(member)
 			.given(memberRepository).save(any(Member.class));
+		willReturn(List.of(ItemFixture.morningSantaSkin().build(), ItemFixture.nightMageSkin()))
+			.given(itemRepository).findAllById(any());
 
 		// when
 		LoginResponse result = memberService.login(authorizationTokenInfoResponse);
@@ -213,5 +215,4 @@ class MemberServiceTest {
 			() -> assertThat(member.getProfileImage()).isEqualTo("/main")
 		);
 	}
-
 }

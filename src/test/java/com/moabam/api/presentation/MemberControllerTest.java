@@ -76,6 +76,8 @@ import com.moabam.support.fixture.ParticipantFixture;
 import com.moabam.support.fixture.RoomFixture;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
+import jakarta.persistence.EntityManager;
+
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -128,6 +130,9 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 	Member member;
 
+	@Autowired
+	EntityManager entityManager;
+
 	@BeforeAll
 	void allSetUp() {
 		restTemplateBuilder = new RestTemplateBuilder()
@@ -143,6 +148,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		RestTemplate restTemplate = restTemplateBuilder.build();
 		ReflectionTestUtils.setField(oAuth2AuthorizationServerRequestService, "restTemplate", restTemplate);
 		mockRestServiceServer = MockRestServiceServer.createServer(restTemplate);
+		member = entityManager.merge(member);
 	}
 
 	@DisplayName("로그아웃 성공 테스트")
@@ -270,6 +276,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 		member.changeDefaultSkintUrl(night);
 		member.changeDefaultSkintUrl(morning);
+		memberRepository.flush();
 
 		// expected
 		mockMvc.perform(get("/members"))
@@ -316,6 +323,11 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 		Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
 		inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
+
+		member.changeDefaultSkintUrl(night);
+		member.changeDefaultSkintUrl(morning);
+
+		memberRepository.flush();
 
 		// expected
 		mockMvc.perform(get("/members"))
@@ -375,6 +387,10 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		friend.changeDefaultSkintUrl(night);
 		memberRepository.flush();
 		inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
+
+		friend.changeDefaultSkintUrl(morning);
+		friend.changeDefaultSkintUrl(night);
+		memberRepository.flush();
 
 		// expected
 		mockMvc.perform(get("/members/{memberId}", friend.getId()))
