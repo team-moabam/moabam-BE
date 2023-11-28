@@ -45,10 +45,11 @@ public class Bug {
 		return bug;
 	}
 
-	public void use(BugType bugType, int price) {
+	public void use(BugType bugType, int count) {
 		int currentBug = getBug(bugType);
-		validateEnoughBug(currentBug, price);
-		decrease(bugType, price);
+
+		validateEnoughBug(currentBug, count);
+		decrease(bugType, count);
 	}
 
 	private int getBug(BugType bugType) {
@@ -59,29 +60,29 @@ public class Bug {
 		};
 	}
 
-	private void validateEnoughBug(int currentBug, int price) {
-		if (price > currentBug) {
+	private void validateEnoughBug(int currentBug, int count) {
+		if (currentBug < count) {
 			throw new BadRequestException(BUG_NOT_ENOUGH);
 		}
 	}
 
-	private void decrease(BugType bugType, int bug) {
+	private void decrease(BugType bugType, int count) {
 		switch (bugType) {
-			case MORNING -> this.morningBug -= bug;
-			case NIGHT -> this.nightBug -= bug;
-			case GOLDEN -> this.goldenBug -= bug;
+			case MORNING -> this.morningBug -= count;
+			case NIGHT -> this.nightBug -= count;
+			case GOLDEN -> this.goldenBug -= count;
 		}
 	}
 
-	public void increase(BugType bugType, int bug) {
+	public void increase(BugType bugType, int count) {
 		switch (bugType) {
-			case MORNING -> this.morningBug += bug;
-			case NIGHT -> this.nightBug += bug;
-			case GOLDEN -> this.goldenBug += bug;
+			case MORNING -> this.morningBug += count;
+			case NIGHT -> this.nightBug += count;
+			case GOLDEN -> this.goldenBug += count;
 		}
 	}
 
-	public void charge(int quantity) {
-		this.goldenBug += quantity;
+	public void charge(int count) {
+		this.goldenBug += count;
 	}
 }

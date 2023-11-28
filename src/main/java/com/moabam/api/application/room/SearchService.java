@@ -1,12 +1,8 @@
 package com.moabam.api.application.room;
 
-import static com.moabam.global.common.util.GlobalConstant.NOT_COMPLETED_RANK;
-import static com.moabam.global.common.util.GlobalConstant.ROOM_FIXED_SEARCH_SIZE;
-import static com.moabam.global.error.model.ErrorMessage.INVENTORY_NOT_FOUND;
-import static com.moabam.global.error.model.ErrorMessage.PARTICIPANT_NOT_FOUND;
-import static com.moabam.global.error.model.ErrorMessage.ROOM_DETAILS_ERROR;
-import static com.moabam.global.error.model.ErrorMessage.ROOM_MODIFY_UNAUTHORIZED_REQUEST;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static com.moabam.global.common.util.GlobalConstant.*;
+import static com.moabam.global.error.model.ErrorMessage.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -51,6 +47,8 @@ import com.moabam.api.dto.room.RoomHistoryResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
 import com.moabam.api.dto.room.RoutineResponse;
 import com.moabam.api.dto.room.TodayCertificateRankResponse;
+import com.moabam.api.dto.room.UnJoinedRoomCertificateRankResponse;
+import com.moabam.api.dto.room.UnJoinedRoomDetailsResponse;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -187,6 +185,44 @@ public class SearchService {
 		return RoomMapper.toSearchAllRoomsResponse(hasNext, getAllRoomResponse);
 	}
 
+	public UnJoinedRoomDetailsResponse getUnJoinedRoomDetails(Long roomId) {
+		Room room = roomRepository.findById(roomId)
+			.orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
+
+		List<Routine> routines = routineRepository.findAllByRoomId(roomId);
+		List<RoutineResponse> routineResponses = RoutineMapper.toRoutineResponses(routines);
+		List<DailyMemberCertification> sortedDailyMemberCertifications =
+			certificationsSearchRepository.findSortedDailyMemberCertifications(roomId, clockHolder.date());
+		List<Long> memberIds = sortedDailyMemberCertifications.stream()
+			.map(DailyMemberCertification::getMemberId)
+			.toList();
+		List<Member> members = memberService.getRoomMembers(memberIds);
+		List<Inventory> inventories = inventorySearchRepository.findDefaultInventories(memberIds,
+			room.getRoomType().name());
+		List<UnJoinedRoomCertificateRankResponse> unJoinedRoomCertificateRankResponses = new ArrayList<>();
+
+		int rank = 1;
+		for (DailyMemberCertification certification : sortedDailyMemberCertifications) {
+			Member member = members.stream()
+				.filter(m -> m.getId().equals(certification.getMemberId()))
+				.findAny()
+				.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
+
+			Inventory inventory = inventories.stream()
+				.filter(i -> i.getMemberId().equals(member.getId()))
+				.findAny()
+				.orElseThrow(() -> new NotFoundException(INVENTORY_NOT_FOUND));
+
+			UnJoinedRoomCertificateRankResponse response = RoomMapper.toUnJoinedRoomCertificateRankResponse(member,
+				rank, inventory);
+
+			unJoinedRoomCertificateRankResponses.add(response);
+			rank += 1;
+		}
+
+		return RoomMapper.toUnJoinedRoomDetails(room, routineResponses, unJoinedRoomCertificateRankResponses);
+	}
+
 	private boolean isHasNext(List<GetAllRoomResponse> getAllRoomResponse, List<Room> rooms) {
 		boolean hasNext = false;
 
@@ -263,8 +299,8 @@ public class SearchService {
 				.findAny()
 				.orElseThrow(() -> new NotFoundException(INVENTORY_NOT_FOUND));
 
-			String awakeImage = inventory.getItem().getImage();
-			String sleepImage = inventory.getItem().getImage();
+			String awakeImage = inventory.getItem().getAwakeImage();
+			String sleepImage = inventory.getItem().getSleepImage();
 
 			int contributionPoint = calculateContributionPoint(member.getId(), participants, date);
 			CertificationImagesResponse certificationImages = getCertificationImages(member.getId(), certifications);
@@ -307,8 +343,8 @@ public class SearchService {
 				.findAny()
 				.orElseThrow(() -> new NotFoundException(INVENTORY_NOT_FOUND));
 
-			String awakeImage = inventory.getItem().getImage();
-			String sleepImage = inventory.getItem().getImage();
+			String awakeImage = inventory.getItem().getAwakeImage();
+			String sleepImage = inventory.getItem().getSleepImage();
 
 			int contributionPoint = calculateContributionPoint(memberId, participants, date);
 			boolean isNotificationSent = knocks.contains(member.getId());

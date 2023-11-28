@@ -183,7 +183,7 @@ class MemberServiceTest {
 			Inventory morningSkin = InventoryFixture.inventory(searchId, morning);
 			Inventory nightSkin = InventoryFixture.inventory(searchId, night);
 			List<MemberInfo> memberInfos = MemberInfoSearchFixture
-				.myInfo(morningSkin.getItem().getImage(), nightSkin.getItem().getImage());
+				.myInfo(morningSkin.getItem().getAwakeImage(), nightSkin.getItem().getAwakeImage());
 
 			given(memberSearchRepository.findMemberAndBadges(anyLong(), anyBoolean()))
 				.willReturn(memberInfos);
@@ -192,8 +192,8 @@ class MemberServiceTest {
 			MemberInfoResponse memberInfoResponse = memberService.searchInfo(authMember, null);
 
 			// then
-			assertThat(memberInfoResponse.birds()).containsEntry("MORNING", morningSkin.getItem().getImage());
-			assertThat(memberInfoResponse.birds()).containsEntry("NIGHT", nightSkin.getItem().getImage());
+			assertThat(memberInfoResponse.birds()).containsEntry("MORNING", morningSkin.getItem().getAwakeImage());
+			assertThat(memberInfoResponse.birds()).containsEntry("NIGHT", nightSkin.getItem().getAwakeImage());
 		}
 	}
 

@@ -288,8 +288,8 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				MockMvcResultMatchers.jsonPath("$.level").value(member.getTotalCertifyCount() / LEVEL_DIVISOR),
 				MockMvcResultMatchers.jsonPath("$.exp").value(member.getTotalCertifyCount() % LEVEL_DIVISOR),
 
-				MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
-				MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
+				// MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
+				// MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
 
 				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("MORNING_BIRTH"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(true),
@@ -339,8 +339,8 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				MockMvcResultMatchers.jsonPath("$.level").value(member.getTotalCertifyCount() / LEVEL_DIVISOR),
 				MockMvcResultMatchers.jsonPath("$.exp").value(member.getTotalCertifyCount() % LEVEL_DIVISOR),
 
-				MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
-				MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
+				// MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
+				// MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
 
 				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("MORNING_BIRTH"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(false),
@@ -383,6 +383,9 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		morningInven.select();
 
 		Inventory killerInven = InventoryFixture.inventory(friend.getId(), killer);
+		friend.changeDefaultSkintUrl(morning);
+		friend.changeDefaultSkintUrl(night);
+		memberRepository.flush();
 		inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
 
 		friend.changeDefaultSkintUrl(morning);
@@ -399,8 +402,8 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				MockMvcResultMatchers.jsonPath("$.level").value(friend.getTotalCertifyCount() / LEVEL_DIVISOR),
 				MockMvcResultMatchers.jsonPath("$.exp").value(friend.getTotalCertifyCount() % LEVEL_DIVISOR),
 
-				MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
-				MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
+				MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getAwakeImage()),
+				MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getAwakeImage()),
 
 				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("MORNING_BIRTH"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(true),

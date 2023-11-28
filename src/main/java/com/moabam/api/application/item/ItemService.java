@@ -7,10 +7,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.moabam.api.application.bug.BugMapper;
+import com.moabam.api.application.bug.BugService;
 import com.moabam.api.application.member.MemberService;
-import com.moabam.api.domain.bug.Bug;
-import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.ItemType;
@@ -32,11 +30,11 @@ import lombok.RequiredArgsConstructor;
 public class ItemService {
 
 	private final MemberService memberService;
+	private final BugService bugService;
 	private final ItemRepository itemRepository;
 	private final ItemSearchRepository itemSearchRepository;
 	private final InventoryRepository inventoryRepository;
 	private final InventorySearchRepository inventorySearchRepository;
-	private final BugHistoryRepository bugHistoryRepository;
 
 	public ItemsResponse getItems(Long memberId, ItemType type) {
 		Item defaultItem = getDefaultInventory(memberId, type).getItem();
@@ -54,12 +52,10 @@ public class ItemService {
 		validateAlreadyPurchased(memberId, itemId);
 		item.validatePurchasable(request.bugType(), member.getLevel());
 
-		Bug bug = member.getBug();
 		int price = item.getPrice(request.bugType());
 
-		bug.use(request.bugType(), price);
+		bugService.use(member, request.bugType(), price);
 		inventoryRepository.save(ItemMapper.toInventory(memberId, item));
-		bugHistoryRepository.save(BugMapper.toUseBugHistory(memberId, request.bugType(), price));
 	}
 
 	@Transactional

@@ -1,8 +1,12 @@
 package com.moabam.api.application.room.mapper;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.time.LocalDate;
 import java.util.List;
 
+import com.moabam.api.domain.item.Inventory;
+import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.dto.room.CreateRoomRequest;
@@ -17,6 +21,8 @@ import com.moabam.api.dto.room.RoomHistoryResponse;
 import com.moabam.api.dto.room.RoomsHistoryResponse;
 import com.moabam.api.dto.room.RoutineResponse;
 import com.moabam.api.dto.room.TodayCertificateRankResponse;
+import com.moabam.api.dto.room.UnJoinedRoomCertificateRankResponse;
+import com.moabam.api.dto.room.UnJoinedRoomDetailsResponse;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -44,6 +50,7 @@ public final class RoomMapper {
 			.managerNickName(managerNickname)
 			.roomImage(room.getRoomImage())
 			.level(room.getLevel())
+			.exp(room.getExp())
 			.roomType(room.getRoomType())
 			.certifyTime(room.getCertifyTime())
 			.currentUserCount(room.getCurrentUserCount())
@@ -129,6 +136,36 @@ public final class RoomMapper {
 		return GetAllRoomsResponse.builder()
 			.hasNext(hasNext)
 			.rooms(getAllRoomResponse)
+			.build();
+	}
+
+	public static UnJoinedRoomDetailsResponse toUnJoinedRoomDetails(Room room, List<RoutineResponse> routines,
+		List<UnJoinedRoomCertificateRankResponse> responses) {
+		return UnJoinedRoomDetailsResponse.builder()
+			.roomId(room.getId())
+			.isPassword(!isEmpty(room.getPassword()))
+			.title(room.getTitle())
+			.roomImage(room.getRoomImage())
+			.level(room.getLevel())
+			.exp(room.getExp())
+			.roomType(room.getRoomType())
+			.certifyTime(room.getCertifyTime())
+			.currentUserCount(room.getCurrentUserCount())
+			.maxUserCount(room.getMaxUserCount())
+			.announcement(room.getAnnouncement())
+			.routines(routines)
+			.certifiedRanks(responses)
+			.build();
+	}
+
+	public static UnJoinedRoomCertificateRankResponse toUnJoinedRoomCertificateRankResponse(Member member, int rank,
+		Inventory inventory) {
+		return UnJoinedRoomCertificateRankResponse.builder()
+			.rank(rank)
+			.memberId(member.getId())
+			.nickname(member.getNickname())
+			.awakeImage(inventory.getItem().getAwakeImage())
+			.sleepImage(inventory.getItem().getSleepImage())
 			.build();
 	}
 }

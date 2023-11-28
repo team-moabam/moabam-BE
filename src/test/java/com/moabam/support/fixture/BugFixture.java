@@ -23,6 +23,14 @@ public final class BugFixture {
 			.build();
 	}
 
+	public static Bug zeroBug() {
+		return Bug.builder()
+			.morningBug(0)
+			.nightBug(0)
+			.goldenBug(0)
+			.build();
+	}
+
 	public static BugHistory rewardMorningBugHistory(Long memberId) {
 		return BugHistory.builder()
 			.memberId(memberId)

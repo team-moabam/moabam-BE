@@ -147,6 +147,15 @@ public class RoomService {
 		member.exitRoom(room.getRoomType());
 	}
 
+	public boolean checkIfParticipant(Long memberId, Long roomId) {
+		try {
+			getParticipant(memberId, roomId);
+			return true;
+		} catch (NotFoundException e) {
+			return false;
+		}
+	}
+
 	public void validateRoomById(Long roomId) {
 		if (!roomRepository.existsById(roomId)) {
 			throw new NotFoundException(ROOM_NOT_FOUND);

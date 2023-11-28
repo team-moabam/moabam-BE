@@ -10,6 +10,7 @@ import com.moabam.global.common.entity.BaseTimeEntity;
 import com.moabam.global.error.exception.BadRequestException;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -44,8 +45,8 @@ public class Item extends BaseTimeEntity {
 	@Column(name = "name", nullable = false)
 	private String name;
 
-	@Column(name = "image", nullable = false)
-	private String image;
+	@Embedded
+	private ItemImage image;
 
 	@Column(name = "bug_price", nullable = false)
 	@ColumnDefault("0")
@@ -60,7 +61,7 @@ public class Item extends BaseTimeEntity {
 	private int unlockLevel;
 
 	@Builder
-	private Item(ItemType type, ItemCategory category, String name, String image, int bugPrice, int goldenBugPrice,
+	private Item(ItemType type, ItemCategory category, String name, ItemImage image, int bugPrice, int goldenBugPrice,
 		Integer unlockLevel) {
 		this.type = requireNonNull(type);
 		this.category = requireNonNull(category);
@@ -106,5 +107,13 @@ public class Item extends BaseTimeEntity {
 
 	public int getPrice(BugType bugType) {
 		return bugType.isGoldenBug() ? this.goldenBugPrice : this.bugPrice;
+	}
+
+	public String getAwakeImage() {
+		return this.getImage().getAwake();
+	}
+
+	public String getSleepImage() {
+		return this.getImage().getSleep();
 	}
 }
