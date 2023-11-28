@@ -106,18 +106,4 @@ class ZSetRedisRepositoryTest {
 		// Then
 		assertThat(actual).hasSize(3);
 	}
-
-	@DisplayName("저장된 데이터 갯수를 조회한다. - Long")
-	@Test
-	void size_success() {
-		// Given
-		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expireDays);
-		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expireDays);
-
-		// When
-		Long actual = zSetRedisRepository.size(key);
-
-		// Then
-		assertThat(actual).isEqualTo(2);
-	}
 }

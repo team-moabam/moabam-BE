@@ -30,8 +30,4 @@ public class ZSetRedisRepository {
 			.opsForZSet()
 			.range(key, start, end);
 	}
-
-	public Long size(String key) {
-		return redisTemplate.opsForZSet().size(key);
-	}
 }

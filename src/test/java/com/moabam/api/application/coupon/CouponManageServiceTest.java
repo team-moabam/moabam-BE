@@ -60,7 +60,7 @@ class CouponManageServiceTest {
 		assertThatNoException().isThrownBy(() -> couponManageService.init());
 	}
 
-	@DisplayName("10명ㅗ두 쿠폰 발행이 성공적으로 된다.")
+	@DisplayName("10명의 사용자가 쿠폰 발행을 성공적으로 한.")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideValues_Long")
 	@ParameterizedTest
 	void issue_all_success(Set<Long> values) {
@@ -76,7 +76,6 @@ class CouponManageServiceTest {
 		couponManageService.issue();
 
 		// Then
-		verify(couponManageRepository).queueSize(any(String.class));
 		verify(couponWalletRepository, times(10)).save(any(CouponWallet.class));
 		verify(notificationService, times(10))
 			.sendCouponIssueResult(any(Long.class), any(String.class), any(String.class));
@@ -95,7 +94,6 @@ class CouponManageServiceTest {
 		// Then
 		verify(couponManageRepository, times(0)).increaseIssuedStock(any(String.class));
 		verify(couponWalletRepository, times(0)).save(any(CouponWallet.class));
-		verify(couponManageRepository, times(0)).queueSize(any(String.class));
 		verify(couponManageRepository, times(0))
 			.range(any(String.class), any(long.class), any(long.class));
 		verify(notificationService, times(0))
@@ -118,7 +116,6 @@ class CouponManageServiceTest {
 		couponManageService.issue();
 
 		// Then
-		verify(couponManageRepository).queueSize(any(String.class));
 		verify(couponManageRepository, times(10)).increaseIssuedStock(any(String.class));
 		verify(couponWalletRepository, times(0)).save(any(CouponWallet.class));
 		verify(notificationService, times(10))

@@ -39,10 +39,6 @@ public class CouponManageRepository {
 			.collect(Collectors.toSet());
 	}
 
-	public Long queueSize(String couponName) {
-		return zSetRedisRepository.size(requireNonNull(couponName));
-	}
-
 	public void deleteQueue(String couponName) {
 		valueRedisRepository.delete(requireNonNull(couponName));
 	}
