@@ -17,12 +17,8 @@ public class ZSetRedisRepository {
 	private final RedisTemplate<String, Object> redisTemplate;
 
 	public void addIfAbsent(String key, Object value, double score, int expire) {
-		if (redisTemplate.opsForZSet().score(key, value) == null) {
-			redisTemplate
-				.opsForZSet()
-				.add(requireNonNull(key), requireNonNull(value), score);
-			redisTemplate.expire(key, Duration.ofDays(expire));
-		}
+		redisTemplate.opsForZSet().addIfAbsent(requireNonNull(key), requireNonNull(value), score);
+		redisTemplate.expire(key, Duration.ofDays(expire));
 	}
 
 	public Set<Object> range(String key, long start, long end) {

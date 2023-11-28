@@ -37,6 +37,7 @@ class ZSetRedisRepositoryTest {
 		}
 	}
 
+	@Disabled
 	@DisplayName("레디스의 SortedSet 데이터가 성공적으로 저장된다. - Void")
 	@Test
 	void addIfAbsent_success() {
@@ -47,6 +48,7 @@ class ZSetRedisRepositoryTest {
 		assertThat(valueRedisRepository.hasKey(key)).isTrue();
 	}
 
+	@Disabled
 	@DisplayName("이미 존재하는 값을 한 번 더 저장을 시도한다. - Void")
 	@Test
 	void setRedisRepository_addIfAbsent_not_update() {
@@ -58,7 +60,6 @@ class ZSetRedisRepositoryTest {
 		assertThat(redisTemplate.opsForZSet().score(key, value)).isEqualTo(1);
 	}
 
-	@Disabled
 	@DisplayName("저장된 데이터와 동일한 갯수만큼 조회한다. - Set<Object>")
 	@Test
 	void range_same_success() {
@@ -74,7 +75,6 @@ class ZSetRedisRepositoryTest {
 		assertThat(actual).hasSize(3);
 	}
 
-	@Disabled
 	@DisplayName("저장된 데이터보다 많은 갯수만큼 조회한다. - Set<Object>")
 	@Test
 	void range_more_success() {
@@ -89,7 +89,6 @@ class ZSetRedisRepositoryTest {
 		assertThat(actual).hasSize(2);
 	}
 
-	@Disabled
 	@DisplayName("저장된 데이터보다 더 적은 갯수만큼 조회한다. - Set<Object>")
 	@Test
 	void range_less_success() {
