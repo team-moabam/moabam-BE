@@ -25,7 +25,7 @@ class RoomTest {
 
 		// then
 		assertThat(room.getPassword()).isNull();
-		assertThat(room.getRoomImage()).isEqualTo("'temptemp'");
+		assertThat(room.getRoomImage()).isEqualTo("'https://image.moabam.com/moabam/default/room-level-00.png'");
 		assertThat(room.getRoomType()).isEqualTo(RoomType.MORNING);
 		assertThat(room.getCertifyTime()).isEqualTo(10);
 		assertThat(room.getMaxUserCount()).isEqualTo(9);
