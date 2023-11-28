@@ -115,6 +115,7 @@ public class MemberService {
 	private Member signUp(Long socialId) {
 		Member member = MemberMapper.toMember(socialId);
 		Member savedMember = memberRepository.save(member);
+		saveMyEgg(savedMember);
 		rankingService.addRanking(MemberMapper.toRankingInfo(member), member.getTotalCertifyCount());
 
 		return savedMember;

@@ -150,12 +150,12 @@ public class Member extends BaseTimeEntity {
 
 	public void changeDefaultSkintUrl(Item item) throws NotFoundException {
 		if (ItemType.MORNING.equals(item.getType())) {
-			this.morningImage = item.getImage();
+			this.morningImage = item.getAwakeImage();
 			return;
 		}
 
 		if (ItemType.NIGHT.equals(item.getType())) {
-			this.nightImage = item.getImage();
+			this.nightImage = item.getAwakeImage();
 			return;
 		}
 
