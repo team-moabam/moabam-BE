@@ -19,6 +19,7 @@ import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.ConflictException;
+import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 
 import lombok.RequiredArgsConstructor;
@@ -42,10 +43,16 @@ public class NotificationService {
 	public void sendKnock(AuthMember member, Long targetId, Long roomId) {
 		roomService.validateRoomById(roomId);
 		validateConflictKnock(member.id(), targetId, roomId);
+		String fcmToken = fcmService.findTokenByMemberId(targetId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_FCM_TOKEN));
 
-		String fcmToken = fcmService.findTokenByMemberId(targetId);
 		fcmService.sendAsync(fcmToken, String.format(KNOCK_BODY, member.nickname()));
 		notificationRepository.saveKnock(member.id(), targetId, roomId);
+	}
+
+	public void sendCouponIssueResult(Long memberId, String couponName, String body) {
+		String fcmToken = fcmService.findTokenByMemberId(memberId).orElse(null);
+		fcmService.sendAsync(fcmToken, String.format(body, couponName));
 	}
 
 	@Scheduled(cron = "0 50 * * * *")
@@ -56,7 +63,7 @@ public class NotificationService {
 		participants.parallelStream().forEach(participant -> {
 			String roomTitle = participant.getRoom().getTitle();
 			String notificationBody = String.format(CERTIFY_TIME_BODY, roomTitle);
-			String fcmToken = fcmService.findTokenByMemberId(participant.getMemberId());
+			String fcmToken = fcmService.findTokenByMemberId(participant.getMemberId()).orElse(null);
 			fcmService.sendAsync(fcmToken, notificationBody);
 		});
 	}

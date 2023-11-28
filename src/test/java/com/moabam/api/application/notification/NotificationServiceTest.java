@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,9 @@ class NotificationServiceTest {
 	@Mock
 	ClockHolder clockHolder;
 
+	String SUCCESS_ISSUE_BODY = "%s 쿠폰 발행을 성공했습니다. 축하드립니다!";
+	String FAIL_ISSUE_BODY = "%s 쿠폰 발행을 실패했습니다. 다음 기회에!";
+
 	@WithMember
 	@DisplayName("상대에게 콕 알림을 성공적으로 보낸다. - Void")
 	@Test
@@ -58,7 +62,7 @@ class NotificationServiceTest {
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
-		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn("FCM-TOKEN");
+		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.of("FCM-TOKEN"));
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(false);
 
@@ -92,10 +96,9 @@ class NotificationServiceTest {
 		AuthMember member = AuthorizationThreadLocal.getAuthMember();
 
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
+		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.empty());
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(false);
-		given(fcmService.findTokenByMemberId(any(Long.class)))
-			.willThrow(new NotFoundException(ErrorMessage.NOT_FOUND_FCM_TOKEN));
 
 		// When & Then
 		assertThatThrownBy(() -> notificationService.sendKnock(member, 1L, 1L))
@@ -120,13 +123,39 @@ class NotificationServiceTest {
 			.hasMessage(ErrorMessage.CONFLICT_KNOCK.getMessage());
 	}
 
+	@DisplayName("특정 사용자에게 쿠폰 이슈 결과를 성공적으로 전송한다. - Void")
+	@Test
+	void sendCouponIssueResult_success() {
+		// Given
+		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.of("FCM-TOKEN"));
+
+		// When
+		notificationService.sendCouponIssueResult(1L, "couponName", SUCCESS_ISSUE_BODY);
+
+		// Then
+		verify(fcmService).sendAsync(any(String.class), any(String.class));
+	}
+
+	@DisplayName("로그아웃된 사용자에게 쿠폰 이슈 결과를 성공적으로 전송한다. - Void")
+	@Test
+	void sendCouponIssueResult_fcmToken_null() {
+		// Given
+		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.empty());
+
+		// When
+		notificationService.sendCouponIssueResult(1L, "couponName", SUCCESS_ISSUE_BODY);
+
+		// Then
+		verify(fcmService).sendAsync(any(String.class), any(String.class));
+	}
+
 	@DisplayName("특정 인증 시간에 해당하는 방 사용자들에게 알림을 성공적으로 보낸다. - Void")
 	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideParticipants")
 	@ParameterizedTest
 	void sendCertificationTime_success(List<Participant> participants) {
 		// Given
 		given(participantSearchRepository.findAllByRoomCertifyTime(any(Integer.class))).willReturn(participants);
-		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn("FCM-TOKEN");
+		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.of("FCM-TOKEN"));
 		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
 		// When
@@ -136,14 +165,13 @@ class NotificationServiceTest {
 		verify(fcmService, times(3)).sendAsync(any(String.class), any(String.class));
 	}
 
-	@WithMember
 	@DisplayName("특정 인증 시간에 해당하는 방 사용자들의 토큰값이 없다. - Void")
 	@MethodSource("com.moabam.support.fixture.ParticipantFixture#provideParticipants")
 	@ParameterizedTest
 	void sendCertificationTime_NoFirebaseMessaging(List<Participant> participants) {
 		// Given
 		given(participantSearchRepository.findAllByRoomCertifyTime(any(Integer.class))).willReturn(participants);
-		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(null);
+		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.empty());
 		given(clockHolder.times()).willReturn(LocalDateTime.now());
 
 		// When
