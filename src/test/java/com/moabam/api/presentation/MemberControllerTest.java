@@ -386,8 +386,8 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				MockMvcResultMatchers.jsonPath("$.level").value(friend.getTotalCertifyCount() / LEVEL_DIVISOR),
 				MockMvcResultMatchers.jsonPath("$.exp").value(friend.getTotalCertifyCount() % LEVEL_DIVISOR),
 
-				MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
-				MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
+				MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getAwakeImage()),
+				MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getAwakeImage()),
 
 				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("MORNING_BIRTH"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(true),
