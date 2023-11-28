@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.application.ranking.RankingService;
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.repository.InventoryRepository;
@@ -59,6 +60,9 @@ class MemberServiceTest {
 
 	@Mock
 	InventoryRepository inventoryRepository;
+
+	@Mock
+	RankingService rankingService;
 
 	@Mock
 	ItemRepository itemRepository;
