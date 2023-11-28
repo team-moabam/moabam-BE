@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 
 import com.moabam.global.config.EmbeddedRedisConfig;
 
@@ -29,6 +28,7 @@ class ZSetRedisRepositoryTest {
 
 	String key = "key";
 	Long value = 1L;
+	int expire_days = 2;
 
 	@AfterEach
 	void afterEach() {
@@ -41,7 +41,7 @@ class ZSetRedisRepositoryTest {
 	@Test
 	void addIfAbsent_success() {
 		// When
-		zSetRedisRepository.addIfAbsent(key, value, 1);
+		zSetRedisRepository.addIfAbsent(key, value, 1, expire_days);
 
 		// Then
 		assertThat(valueRedisRepository.hasKey(key)).isTrue();
@@ -51,61 +51,59 @@ class ZSetRedisRepositoryTest {
 	@Test
 	void setRedisRepository_addIfAbsent_not_update() {
 		// When
-		zSetRedisRepository.addIfAbsent(key, value, 1);
-		zSetRedisRepository.addIfAbsent(key, value, 5);
+		zSetRedisRepository.addIfAbsent(key, value, 1, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value, 5, expire_days);
 
 		// Then
 		assertThat(redisTemplate.opsForZSet().score(key, value)).isEqualTo(1);
 	}
 
 	@Disabled
-	@DisplayName("저장된 데이터와 동일한 갯수만큼의 반환과 삭제를 성공적으로 시도한다. - Set<TypedTuple<Object>>")
+	@DisplayName("저장된 데이터와 동일한 갯수만큼 조회한다. - Set<Object>")
 	@Test
-	void popMin_same_success() {
+	void range_same_success() {
 		// Given
-		zSetRedisRepository.addIfAbsent(key, value + 1, 1);
-		zSetRedisRepository.addIfAbsent(key, value + 2, 2);
-		zSetRedisRepository.addIfAbsent(key, value + 3, 3);
+		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 3, 3, expire_days);
 
 		// When
-		Set<TypedTuple<Object>> actual = zSetRedisRepository.popMin(key, 3);
+		Set<Object> actual = zSetRedisRepository.range(key, 0, 3);
 
 		// Then
 		assertThat(actual).hasSize(3);
-		assertThat(valueRedisRepository.hasKey(key)).isFalse();
 	}
 
 	@Disabled
-	@DisplayName("저장된 데이터보다 많은 갯수만큼의 반환과 삭제를 성공적으로 시도한다. - Set<TypedTuple<Object>>")
+	@DisplayName("저장된 데이터보다 많은 갯수만큼 조회한다. - Set<Object>")
 	@Test
-	void popMin_more_success() {
+	void range_more_success() {
 		// Given
-		zSetRedisRepository.addIfAbsent(key, value + 1, 1);
-		zSetRedisRepository.addIfAbsent(key, value + 2, 2);
+		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expire_days);
 
 		// When
-		Set<TypedTuple<Object>> actual = zSetRedisRepository.popMin(key, 3);
+		Set<Object> actual = zSetRedisRepository.range(key, 0, 3);
 
 		// Then
 		assertThat(actual).hasSize(2);
 	}
 
 	@Disabled
-	@DisplayName("저장된 데이터보다 더 적은 갯수만큼의 반환과 삭제를 성공적으로 시도한다. - Set<TypedTuple<Object>>")
+	@DisplayName("저장된 데이터보다 더 적은 갯수만큼 조회한다. - Set<Object>")
 	@Test
-	void popMin_less_success() {
+	void range_less_success() {
 		// Given
-		zSetRedisRepository.addIfAbsent(key, value + 1, 1);
-		zSetRedisRepository.addIfAbsent(key, value + 2, 2);
-		zSetRedisRepository.addIfAbsent(key, value + 3, 3);
-		zSetRedisRepository.addIfAbsent(key, value + 4, 4);
-		zSetRedisRepository.addIfAbsent(key, value + 5, 5);
+		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 3, 3, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 4, 4, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 5, 5, expire_days);
 
 		// When
-		Set<TypedTuple<Object>> actual = zSetRedisRepository.popMin(key, 3);
+		Set<Object> actual = zSetRedisRepository.range(key, 0, 3);
 
 		// Then
 		assertThat(actual).hasSize(3);
-		assertThat(valueRedisRepository.hasKey(key)).isTrue();
 	}
 }
