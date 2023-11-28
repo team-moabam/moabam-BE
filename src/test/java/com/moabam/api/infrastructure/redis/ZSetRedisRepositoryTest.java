@@ -28,7 +28,7 @@ class ZSetRedisRepositoryTest {
 
 	String key = "key";
 	Long value = 1L;
-	int expire_days = 2;
+	int expireDays = 2;
 
 	@AfterEach
 	void afterEach() {
@@ -41,7 +41,7 @@ class ZSetRedisRepositoryTest {
 	@Test
 	void addIfAbsent_success() {
 		// When
-		zSetRedisRepository.addIfAbsent(key, value, 1, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value, 1, expireDays);
 
 		// Then
 		assertThat(valueRedisRepository.hasKey(key)).isTrue();
@@ -51,8 +51,8 @@ class ZSetRedisRepositoryTest {
 	@Test
 	void setRedisRepository_addIfAbsent_not_update() {
 		// When
-		zSetRedisRepository.addIfAbsent(key, value, 1, expire_days);
-		zSetRedisRepository.addIfAbsent(key, value, 5, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value, 1, expireDays);
+		zSetRedisRepository.addIfAbsent(key, value, 5, expireDays);
 
 		// Then
 		assertThat(redisTemplate.opsForZSet().score(key, value)).isEqualTo(1);
@@ -63,9 +63,9 @@ class ZSetRedisRepositoryTest {
 	@Test
 	void range_same_success() {
 		// Given
-		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expire_days);
-		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expire_days);
-		zSetRedisRepository.addIfAbsent(key, value + 3, 3, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expireDays);
+		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expireDays);
+		zSetRedisRepository.addIfAbsent(key, value + 3, 3, expireDays);
 
 		// When
 		Set<Object> actual = zSetRedisRepository.range(key, 0, 3);
@@ -79,8 +79,8 @@ class ZSetRedisRepositoryTest {
 	@Test
 	void range_more_success() {
 		// Given
-		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expire_days);
-		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expireDays);
+		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expireDays);
 
 		// When
 		Set<Object> actual = zSetRedisRepository.range(key, 0, 3);
@@ -94,11 +94,11 @@ class ZSetRedisRepositoryTest {
 	@Test
 	void range_less_success() {
 		// Given
-		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expire_days);
-		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expire_days);
-		zSetRedisRepository.addIfAbsent(key, value + 3, 3, expire_days);
-		zSetRedisRepository.addIfAbsent(key, value + 4, 4, expire_days);
-		zSetRedisRepository.addIfAbsent(key, value + 5, 5, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expireDays);
+		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expireDays);
+		zSetRedisRepository.addIfAbsent(key, value + 3, 3, expireDays);
+		zSetRedisRepository.addIfAbsent(key, value + 4, 4, expireDays);
+		zSetRedisRepository.addIfAbsent(key, value + 5, 5, expireDays);
 
 		// When
 		Set<Object> actual = zSetRedisRepository.range(key, 0, 3);
@@ -111,8 +111,8 @@ class ZSetRedisRepositoryTest {
 	@Test
 	void size_success() {
 		// Given
-		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expire_days);
-		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expire_days);
+		zSetRedisRepository.addIfAbsent(key, value + 1, 1, expireDays);
+		zSetRedisRepository.addIfAbsent(key, value + 2, 2, expireDays);
 
 		// When
 		Long actual = zSetRedisRepository.size(key);

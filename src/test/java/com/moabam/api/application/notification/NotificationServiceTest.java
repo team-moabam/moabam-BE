@@ -51,8 +51,7 @@ class NotificationServiceTest {
 	@Mock
 	ClockHolder clockHolder;
 
-	String SUCCESS_ISSUE_BODY = "%s 쿠폰 발행을 성공했습니다. 축하드립니다!";
-	String FAIL_ISSUE_BODY = "%s 쿠폰 발행을 실패했습니다. 다음 기회에!";
+	String successIssueResult = "%s 쿠폰 발행을 성공했습니다. 축하드립니다!";
 
 	@WithMember
 	@DisplayName("상대에게 콕 알림을 성공적으로 보낸다. - Void")
@@ -130,7 +129,7 @@ class NotificationServiceTest {
 		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.of("FCM-TOKEN"));
 
 		// When
-		notificationService.sendCouponIssueResult(1L, "couponName", SUCCESS_ISSUE_BODY);
+		notificationService.sendCouponIssueResult(1L, "couponName", successIssueResult);
 
 		// Then
 		verify(fcmService).sendAsync(any(String.class), any(String.class));
@@ -143,7 +142,7 @@ class NotificationServiceTest {
 		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.empty());
 
 		// When
-		notificationService.sendCouponIssueResult(1L, "couponName", SUCCESS_ISSUE_BODY);
+		notificationService.sendCouponIssueResult(1L, "couponName", successIssueResult);
 
 		// Then
 		verify(fcmService).sendAsync(isNull(), any(String.class));
