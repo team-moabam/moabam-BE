@@ -146,7 +146,6 @@ public class Member extends BaseTimeEntity {
 
 	public void changeProfileUri(String newProfileUri) {
 		this.profileImage = requireNonNullElse(newProfileUri, profileImage);
-		this.profileImage = requireNonNullElse(newProfileUri, profileImage);
 	}
 
 	public void changeDefaultSkintUrl(Item item) throws NotFoundException {
