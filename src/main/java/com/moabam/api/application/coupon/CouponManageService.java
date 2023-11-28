@@ -26,10 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CouponManageService {
 
-	private static final long ISSUE_SIZE = 10;
-	private static final long FIRST_INDEX = 0;
 	private static final String SUCCESS_ISSUE_BODY = "%s 쿠폰 발행을 성공했습니다. 축하드립니다!";
 	private static final String FAIL_ISSUE_BODY = "%s 쿠폰 발행을 실패했습니다. 다음 기회에!";
+	private static final long ISSUE_SIZE = 10;
+	private static final long ISSUE_FIRST = 0;
 
 	private final ClockHolder clockHolder;
 	private final NotificationService notificationService;
@@ -38,13 +38,11 @@ public class CouponManageService {
 	private final CouponManageRepository couponManageRepository;
 	private final CouponWalletRepository couponWalletRepository;
 
-	private long start = FIRST_INDEX;
-	private long end = ISSUE_SIZE;
+	private long current = ISSUE_FIRST;
 
 	@Scheduled(cron = "0 0 0 * * *")
 	public void init() {
-		start = FIRST_INDEX;
-		end = ISSUE_SIZE;
+		current = ISSUE_FIRST;
 	}
 
 	@Scheduled(fixedDelay = 1000)
@@ -58,23 +56,22 @@ public class CouponManageService {
 
 		Coupon coupon = optionalCoupon.get();
 		String couponName = coupon.getName();
-		Set<Long> membersId = couponManageRepository.range(couponName, start, end);
+		int maxStock = coupon.getStock();
+
+		Set<Long> membersId = couponManageRepository.range(couponName, current, current + ISSUE_SIZE);
 
 		for (Long memberId : membersId) {
-			int nextStock = couponManageRepository.increaseIssuedStock(coupon.getName());
+			int nextStock = couponManageRepository.increaseIssuedStock(couponName);
 
-			if (coupon.getStock() < nextStock) {
-				notificationService.sendCouponIssueResult(memberId, coupon.getName(), FAIL_ISSUE_BODY);
+			if (maxStock < nextStock) {
+				notificationService.sendCouponIssueResult(memberId, couponName, FAIL_ISSUE_BODY);
 				continue;
 			}
 
-			CouponWallet couponWallet = CouponWallet.create(memberId, coupon);
-			couponWalletRepository.save(couponWallet);
-			notificationService.sendCouponIssueResult(memberId, coupon.getName(), SUCCESS_ISSUE_BODY);
+			couponWalletRepository.save(CouponWallet.create(memberId, coupon));
+			notificationService.sendCouponIssueResult(memberId, couponName, SUCCESS_ISSUE_BODY);
+			current++;
 		}
-
-		start = end;
-		end = Math.min(couponManageRepository.queueSize(couponName), end + ISSUE_SIZE);
 	}
 
 	public void register(AuthMember authMember, String couponName) {
