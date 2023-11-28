@@ -32,11 +32,11 @@ public class Room extends BaseTimeEntity {
 	private static final int LEVEL_10 = 10;
 	private static final int LEVEL_20 = 20;
 	private static final int LEVEL_30 = 30;
-	private static final String ROOM_LEVEL_0_IMAGE = "'https://image.moabam.com/moabam/default/room-level-00.png'";
-	private static final String ROOM_LEVEL_5_IMAGE = "'https://image.moabam.com/moabam/default/room-level-05.png'";
-	private static final String ROOM_LEVEL_10_IMAGE = "'https://image.moabam.com/moabam/default/room-level-10.png'";
-	private static final String ROOM_LEVEL_20_IMAGE = "'https://image.moabam.com/moabam/default/room-level-20.png'";
-	private static final String ROOM_LEVEL_30_IMAGE = "'https://image.moabam.com/moabam/default/room-level-30.png'";
+	private static final String ROOM_LEVEL_0_IMAGE = "https://image.moabam.com/moabam/default/room-level-00.png";
+	private static final String ROOM_LEVEL_5_IMAGE = "https://image.moabam.com/moabam/default/room-level-05.png";
+	private static final String ROOM_LEVEL_10_IMAGE = "https://image.moabam.com/moabam/default/room-level-10.png";
+	private static final String ROOM_LEVEL_20_IMAGE = "https://image.moabam.com/moabam/default/room-level-20.png";
+	private static final String ROOM_LEVEL_30_IMAGE = "https://image.moabam.com/moabam/default/room-level-30.png";
 	private static final int MORNING_START_TIME = 4;
 	private static final int MORNING_END_TIME = 10;
 	private static final int NIGHT_START_TIME = 20;
@@ -78,7 +78,7 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "announcement", length = 100)
 	private String announcement;
 
-	@ColumnDefault(ROOM_LEVEL_0_IMAGE)
+	@ColumnDefault("'" + ROOM_LEVEL_0_IMAGE + "'")
 	@Column(name = "room_image", length = 500)
 	private String roomImage;
 

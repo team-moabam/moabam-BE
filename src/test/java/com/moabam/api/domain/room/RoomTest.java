@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
+import com.moabam.support.fixture.RoomFixture;
 
 class RoomTest {
 
@@ -25,7 +26,7 @@ class RoomTest {
 
 		// then
 		assertThat(room.getPassword()).isNull();
-		assertThat(room.getRoomImage()).isEqualTo("'https://image.moabam.com/moabam/default/room-level-00.png'");
+		assertThat(room.getRoomImage()).isEqualTo("https://image.moabam.com/moabam/default/room-level-00.png");
 		assertThat(room.getRoomType()).isEqualTo(RoomType.MORNING);
 		assertThat(room.getCertifyTime()).isEqualTo(10);
 		assertThat(room.getMaxUserCount()).isEqualTo(9);
@@ -87,5 +88,24 @@ class RoomTest {
 		assertThatThrownBy(() -> room.changeCertifyTime(certifyTime))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.INVALID_REQUEST_FIELD.getMessage());
+	}
+
+	@DisplayName("레벨에 따른 이미지 업데이트")
+	@ParameterizedTest
+	@CsvSource({
+		"5, https://image.moabam.com/moabam/default/room-level-05.png",
+		"10, https://image.moabam.com/moabam/default/room-level-10.png",
+		"20, https://image.moabam.com/moabam/default/room-level-20.png",
+		"30, https://image.moabam.com/moabam/default/room-level-30.png",
+	})
+	void update_room_image_success(int level, String image) {
+		// given
+		Room room = RoomFixture.room();
+
+		// when
+		room.upgradeRoomImage(level);
+
+		// then
+		assertThat(room.getRoomImage()).isEqualTo(image);
 	}
 }
