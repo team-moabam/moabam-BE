@@ -78,6 +78,27 @@ class CouponManageRepositoryTest {
 			.isInstanceOf(NullPointerException.class);
 	}
 
+	@DisplayName("대기열의 사이즈를 성공적으로 반환한다. - Long")
+	@Test
+	void queueSize_success() {
+		// Given
+		given(zSetRedisRepository.size(any(String.class))).willReturn(2L);
+
+		// When
+		Long actual = couponManageRepository.queueSize("CouponName");
+
+		// Then
+		assertThat(actual).isEqualTo(2L);
+	}
+
+	@DisplayName("쿠폰명이 Null인 대기열의 사이즈를 반환한다. - NullPointerException")
+	@Test
+	void queueSize_NullPointerException() {
+		// When & Then
+		assertThatThrownBy(() -> couponManageRepository.queueSize(null))
+			.isInstanceOf(NullPointerException.class);
+	}
+
 	@DisplayName("쿠폰 대기열을 성공적으로 삭제한다. - Void")
 	@Test
 	void deleteQueue_success() {
@@ -114,40 +135,6 @@ class CouponManageRepositoryTest {
 	void increaseIssuedStock_NullPointerException() {
 		// When & Then
 		assertThatThrownBy(() -> couponManageRepository.increaseIssuedStock(null))
-			.isInstanceOf(NullPointerException.class);
-	}
-
-	@DisplayName("쿠폰의 현재 할당된 재고를 성공적으로 조회한다. - int")
-	@Test
-	void getIssuedStock_success() {
-		// Given
-		given(valueRedisRepository.get(any(String.class))).willReturn("1");
-
-		// When
-		int actual = couponManageRepository.getIssuedStock("couponName");
-
-		// Then
-		assertThat(actual).isEqualTo(1);
-	}
-
-	@DisplayName("쿠폰의 현재 할당된 재고가 없어서 0이 조회된다. - int")
-	@Test
-	void getIssuedStock_zero() {
-		// Given
-		given(valueRedisRepository.get(any(String.class))).willReturn(null);
-
-		// When
-		int actual = couponManageRepository.getIssuedStock("couponName");
-
-		// Then
-		assertThat(actual).isZero();
-	}
-
-	@DisplayName("쿠폰명이 Null인 쿠폰의 할당된 재고를 조회한다. - NullPointerException")
-	@Test
-	void getIssuedStock_NullPointerException() {
-		// When & Then
-		assertThatThrownBy(() -> couponManageRepository.getIssuedStock(null))
 			.isInstanceOf(NullPointerException.class);
 	}
 

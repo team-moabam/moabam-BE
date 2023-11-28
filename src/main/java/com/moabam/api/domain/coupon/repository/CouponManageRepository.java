@@ -31,12 +31,16 @@ public class CouponManageRepository {
 		);
 	}
 
-	public Set<Long> range(String key, long start, long end) {
+	public Set<Long> range(String couponName, long start, long end) {
 		return zSetRedisRepository
-			.range(requireNonNull(key), start, end)
+			.range(requireNonNull(couponName), start, end)
 			.stream()
 			.map(Long.class::cast)
 			.collect(Collectors.toSet());
+	}
+
+	public Long queueSize(String couponName) {
+		return zSetRedisRepository.size(requireNonNull(couponName));
 	}
 
 	public void deleteQueue(String couponName) {
@@ -49,17 +53,6 @@ public class CouponManageRepository {
 		return valueRedisRepository
 			.increment(requireNonNull(stockKey))
 			.intValue();
-	}
-
-	public int getIssuedStock(String couponName) {
-		String stockKey = String.format(STOCK_KEY, requireNonNull(couponName));
-		String stockValue = valueRedisRepository.get(requireNonNull(stockKey));
-
-		if (stockValue == null) {
-			return 0;
-		}
-
-		return Integer.parseInt(stockValue);
 	}
 
 	public void deleteIssuedStock(String couponName) {

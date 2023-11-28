@@ -146,7 +146,7 @@ class NotificationServiceTest {
 		notificationService.sendCouponIssueResult(1L, "couponName", SUCCESS_ISSUE_BODY);
 
 		// Then
-		verify(fcmService).sendAsync(any(String.class), any(String.class));
+		verify(fcmService).sendAsync(isNull(), any(String.class));
 	}
 
 	@DisplayName("특정 인증 시간에 해당하는 방 사용자들에게 알림을 성공적으로 보낸다. - Void")
