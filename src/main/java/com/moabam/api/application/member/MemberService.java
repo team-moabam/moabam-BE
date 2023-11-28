@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.application.auth.mapper.AuthMapper;
+import com.moabam.api.application.ranking.RankingService;
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.repository.InventoryRepository;
@@ -23,6 +24,7 @@ import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.api.dto.member.ModifyMemberRequest;
+import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.BaseDataCode;
 import com.moabam.global.common.util.ClockHolder;
@@ -38,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberService {
 
+	private final RankingService rankingService;
 	private final MemberRepository memberRepository;
 	private final InventoryRepository inventoryRepository;
 	private final ItemRepository itemRepository;
@@ -72,6 +75,7 @@ public class MemberService {
 		member.delete(clockHolder.times());
 		memberRepository.flush();
 		memberRepository.delete(member);
+		rankingService.removeRanking(MemberMapper.toRankingInfo(member));
 	}
 
 	public MemberInfoResponse searchInfo(AuthMember authMember, Long memberId) {
@@ -82,21 +86,24 @@ public class MemberService {
 			searchId = memberId;
 		}
 		MemberInfoSearchResponse memberInfoSearchResponse = findMemberInfo(searchId, isMe);
+
 		return MemberMapper.toMemberInfoResponse(memberInfoSearchResponse);
 	}
 
 	@Transactional
 	public void modifyInfo(AuthMember authMember, ModifyMemberRequest modifyMemberRequest, String newProfileUri) {
 		validateNickname(modifyMemberRequest.nickname());
-
 		Member member = memberSearchRepository.findMember(authMember.id())
 			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
 
+		RankingInfo beforeInfo = MemberMapper.toRankingInfo(member);
 		member.changeNickName(modifyMemberRequest.nickname());
 		member.changeIntro(modifyMemberRequest.intro());
 		member.changeProfileUri(newProfileUri);
-
 		memberRepository.save(member);
+		RankingInfo afterInfo = MemberMapper.toRankingInfo(member);
+
+		rankingService.changeInfos(beforeInfo, afterInfo);
 	}
 
 	private void validateNickname(String nickname) {
@@ -107,7 +114,10 @@ public class MemberService {
 
 	private Member signUp(Long socialId) {
 		Member member = MemberMapper.toMember(socialId);
-		return memberRepository.save(member);
+		Member savedMember = memberRepository.save(member);
+		rankingService.addRanking(MemberMapper.toRankingInfo(member), member.getTotalCertifyCount());
+
+		return savedMember;
 	}
 
 	private void saveMyEgg(Member member) {

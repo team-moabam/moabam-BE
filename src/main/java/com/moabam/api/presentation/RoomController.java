@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.moabam.api.application.image.ImageService;
+import com.moabam.api.application.ranking.RankingService;
 import com.moabam.api.application.room.CertificationService;
 import com.moabam.api.application.room.RoomService;
 import com.moabam.api.application.room.SearchService;
@@ -48,6 +49,7 @@ public class RoomController {
 	private final SearchService searchService;
 	private final CertificationService certificationService;
 	private final ImageService imageService;
+	private final RankingService rankingService;
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
@@ -114,6 +116,7 @@ public class RoomController {
 		List<String> imageUrls = imageService.uploadImages(multipartFiles, ImageType.CERTIFICATION);
 		CertifiedMemberInfo info = certificationService.getCertifiedMemberInfo(authMember.id(), roomId, imageUrls);
 		certificationService.certifyRoom(info);
+		rankingService.updateCacheScore(info);
 	}
 
 	@PutMapping("/{roomId}/members/{memberId}/mandate")
