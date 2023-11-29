@@ -10,6 +10,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Configuration
 @Profile("!test")
 public class RedisConfig {
@@ -34,5 +36,10 @@ public class RedisConfig {
 		redisTemplate.setConnectionFactory(redisConnectionFactory);
 
 		return redisTemplate;
+	}
+
+	@Bean
+	public ObjectMapper objectMapper() {
+		return new ObjectMapper();
 	}
 }

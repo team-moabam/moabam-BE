@@ -19,6 +19,7 @@ import com.moabam.api.dto.member.BadgeResponse;
 import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
+import com.moabam.api.dto.ranking.PersonalRankingInfo;
 import com.moabam.api.dto.ranking.RankingInfo;
 
 import lombok.AccessLevel;
@@ -94,6 +95,15 @@ public final class MemberMapper {
 
 	public static RankingInfo toRankingInfo(Member member) {
 		return RankingInfo.builder()
+			.memberId(member.getId())
+			.nickname(member.getNickname())
+			.image(member.getProfileImage())
+			.build();
+	}
+
+	public static PersonalRankingInfo toRankingInfoWithScore(Member member) {
+		return PersonalRankingInfo.builder()
+			.score(member.getTotalCertifyCount())
 			.memberId(member.getId())
 			.nickname(member.getNickname())
 			.image(member.getProfileImage())

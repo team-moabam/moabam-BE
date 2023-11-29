@@ -17,6 +17,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.global.error.exception.MoabamException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -58,6 +59,11 @@ public class EmbeddedRedisConfig {
 		redisTemplate.setConnectionFactory(redisConnectionFactory);
 
 		return redisTemplate;
+	}
+
+	@Bean
+	public ObjectMapper objectMapper() {
+		return new ObjectMapper();
 	}
 
 	public void startRedis() {

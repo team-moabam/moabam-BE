@@ -3,15 +3,20 @@ package com.moabam.api.application.ranking;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Set;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 import com.moabam.api.application.member.MemberMapper;
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.dto.ranking.PersonalRankingInfo;
 import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.api.dto.room.CertifiedMemberInfo;
 import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
@@ -158,6 +163,92 @@ public class RankingServiceTest {
 
 			// then
 			assertThat(resultDouble).isNull();
+		}
+	}
+
+	@DisplayName("조회")
+	@Nested
+	class Select {
+
+		@DisplayName("성공")
+		@Test
+		void test() {
+			// given
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(1L, "Hello1", "123"),
+				1);
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(2L, "Hello2", "123"),
+				2);
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(3L, "Hello3", "123"),
+				3);
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(4L, "Hello4", "123"),
+				4);
+
+			// when
+			setSerialize(Object.class);
+			Set<ZSetOperations.TypedTuple<Object>> rankings = redisTemplate.opsForZSet()
+				.reverseRangeWithScores("Ranking", 0, 2);
+			setSerialize(String.class);
+
+			// then
+			assertThat(rankings).hasSize(3);
+		}
+
+		@DisplayName("일부만 조회 성공")
+		@Test
+		void search_part() {
+			// given
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(1L, "Hello1", "123"),
+				1);
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(2L, "Hello2", "123"),
+				2);
+
+			// when
+			setSerialize(Object.class);
+			Set<ZSetOperations.TypedTuple<Object>> rankings = redisTemplate.opsForZSet()
+				.reverseRangeWithScores("Ranking", 0, 10);
+			setSerialize(String.class);
+
+			// then
+			assertThat(rankings).hasSize(2);
+		}
+
+		private void setSerialize(Class classes) {
+			redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(classes));
+		}
+
+		@DisplayName("랭킹 조회 성공")
+		@Test
+		void getTopRankings() {
+			// given
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(1L, "Hello1", "123"),
+				1);
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(2L, "Hello2", "123"),
+				2);
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(4L, "Hello3", "123"),
+				2);
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(3L, "Hello2", "123"),
+				3);
+			redisTemplate.opsForZSet().add("Ranking",
+				new RankingInfo(5L, "Hello4", "123"),
+				3);
+
+			// When + Then
+			assertThatNoException().isThrownBy(() -> rankingService.getMemberRanking(PersonalRankingInfo.builder()
+				.score(1L)
+				.image("123")
+				.nickname("Hello1")
+				.memberId(1L)
+				.build()));
 		}
 	}
 }

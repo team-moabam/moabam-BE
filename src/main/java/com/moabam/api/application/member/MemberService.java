@@ -24,6 +24,7 @@ import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.api.dto.member.ModifyMemberRequest;
+import com.moabam.api.dto.ranking.PersonalRankingInfo;
 import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.BaseDataCode;
@@ -104,6 +105,12 @@ public class MemberService {
 		RankingInfo afterInfo = MemberMapper.toRankingInfo(member);
 
 		rankingService.changeInfos(beforeInfo, afterInfo);
+	}
+
+	public PersonalRankingInfo getRankingInfo(AuthMember authMember) {
+		Member member = findMember(authMember.id());
+
+		return MemberMapper.toRankingInfoWithScore(member);
 	}
 
 	private void validateNickname(String nickname) {

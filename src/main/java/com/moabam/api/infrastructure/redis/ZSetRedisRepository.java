@@ -5,7 +5,9 @@ import static java.util.Objects.*;
 import java.util.Set;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -47,5 +49,21 @@ public class ZSetRedisRepository {
 
 	public void delete(String key, Object value) {
 		redisTemplate.opsForZSet().remove(key, value);
+	}
+
+	public Set<TypedTuple<Object>> range(String key, int startIndex, int limitIndex) {
+		setSerialize(Object.class);
+		Set<ZSetOperations.TypedTuple<Object>> rankings = redisTemplate.opsForZSet()
+			.reverseRangeWithScores(key, startIndex, limitIndex);
+		setSerialize(String.class);
+		return rankings;
+	}
+
+	private void setSerialize(Class classes) {
+		redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(classes));
+	}
+
+	public Long rank(String key, Object myRankingInfo) {
+		return redisTemplate.opsForZSet().reverseRank(key, myRankingInfo);
 	}
 }
