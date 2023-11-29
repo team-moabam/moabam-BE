@@ -30,7 +30,7 @@ public final class MemberFixture {
 			.build();
 	}
 
-	public static Member member(String socialId, String nickname) {
+	public static Member member(String socialId) {
 		return Member.builder()
 			.socialId(socialId)
 			.bug(BugFixture.bug())

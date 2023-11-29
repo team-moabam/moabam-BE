@@ -73,8 +73,8 @@ public class NotificationService {
 			.filter(participant -> !participant.getMemberId().equals(memberId))
 			.toList();
 
-		Predicate<Long> knockPredicate = targetId ->
-			notificationRepository.existsKnockByKey(memberId, targetId, roomId);
+		Predicate<Long> knockPredicate = targetId -> notificationRepository.existsKnockByKey(memberId, targetId,
+			roomId);
 
 		Map<Boolean, List<Long>> knockStatus = filteredParticipants.stream()
 			.map(Participant::getMemberId)

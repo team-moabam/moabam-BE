@@ -2,10 +2,10 @@ package com.moabam.api.application.ranking;
 
 import java.util.List;
 
-import com.moabam.api.dto.ranking.PersonalRankingInfo;
 import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.api.dto.ranking.TopRankingInfoResponse;
 import com.moabam.api.dto.ranking.TopRankingResponses;
+import com.moabam.api.dto.ranking.UpdateRanking;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -23,13 +23,13 @@ public class RankingMapper {
 			.build();
 	}
 
-	public static TopRankingInfoResponse topRankingResponse(int rank, PersonalRankingInfo rankInfo) {
+	public static TopRankingInfoResponse topRankingResponse(int rank, UpdateRanking updateRanking) {
 		return TopRankingInfoResponse.builder()
 			.rank(rank)
-			.score(rankInfo.score())
-			.nickname(rankInfo.nickname())
-			.image(rankInfo.image())
-			.memberId(rankInfo.memberId())
+			.score(updateRanking.score())
+			.nickname(updateRanking.rankingInfo().nickname())
+			.image(updateRanking.rankingInfo().image())
+			.memberId(updateRanking.rankingInfo().memberId())
 			.build();
 	}
 

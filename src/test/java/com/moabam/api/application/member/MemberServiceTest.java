@@ -229,4 +229,17 @@ class MemberServiceTest {
 			() -> assertThat(member.getProfileImage()).isEqualTo("/main")
 		);
 	}
+
+	@DisplayName("모든 랭킹 업데이트")
+	@Test
+	void update_all_ranking() {
+		// given
+		Member member1 = MemberFixture.member("1");
+		Member member2 = MemberFixture.member("2");
+		given(memberSearchRepository.findAllMembers())
+			.willReturn(List.of(member1, member2));
+
+		// when + Then
+		assertThatNoException().isThrownBy(() -> memberService.updateAllRanking());
+	}
 }

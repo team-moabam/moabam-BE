@@ -148,7 +148,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		restTemplateBuilder = new RestTemplateBuilder()
 			.errorHandler(new RestTemplateResponseHandler());
 
-		member = MemberFixture.member("1234567890987654", "nickname");
+		member = MemberFixture.member("1234567890987654");
 		member.increaseTotalCertifyCount();
 		memberRepository.save(member);
 	}
@@ -371,7 +371,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@Test
 	void search_friend_info_success() throws Exception {
 		// given
-		Member friend = MemberFixture.member("123456789", "nick");
+		Member friend = MemberFixture.member("123456789");
 		memberRepository.save(friend);
 
 		Badge morningBirth = BadgeFixture.badge(friend.getId(), BadgeType.MORNING_BIRTH);
@@ -527,7 +527,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		if (Objects.nonNull(nickname)) {
 			updateNick = nickname;
 		}
-		
+
 		Double result = redisTemplate.opsForZSet()
 			.score("Ranking", new RankingInfo(member.getId(), updateNick, member.getProfileImage()));
 		assertThat(result).isEqualTo(member.getTotalCertifyCount());

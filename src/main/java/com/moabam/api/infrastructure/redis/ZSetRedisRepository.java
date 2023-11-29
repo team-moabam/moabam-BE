@@ -68,11 +68,11 @@ public class ZSetRedisRepository {
 		return rankings;
 	}
 
-	private void setSerialize(Class classes) {
-		redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(classes));
-	}
-
 	public Long reverseRank(String key, Object myRankingInfo) {
 		return redisTemplate.opsForZSet().reverseRank(key, myRankingInfo);
+	}
+
+	private void setSerialize(Class classes) {
+		redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(classes));
 	}
 }

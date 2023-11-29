@@ -11,13 +11,10 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.application.member.MemberMapper;
-import com.moabam.api.domain.member.Member;
-import com.moabam.api.dto.ranking.PersonalRankingInfo;
 import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.api.dto.ranking.TopRankingInfoResponse;
 import com.moabam.api.dto.ranking.TopRankingResponses;
-import com.moabam.api.dto.room.CertifiedMemberInfo;
+import com.moabam.api.dto.ranking.UpdateRanking;
 import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +25,7 @@ public class RankingService {
 
 	private static final String RANKING = "Ranking";
 	private static final int START_INDEX = 0;
-	private static final int LIMIT_INDEX = 10;
+	private static final int LIMIT_INDEX = 9;
 
 	private final ObjectMapper objectMapper;
 	private final ZSetRedisRepository zSetRedisRepository;
@@ -37,10 +34,9 @@ public class RankingService {
 		zSetRedisRepository.add(RANKING, rankingInfo, totalCertifyCount);
 	}
 
-	public void updateCacheScore(CertifiedMemberInfo info) {
-		Member member = info.member();
-		RankingInfo rankingInfo = MemberMapper.toRankingInfo(member);
-		zSetRedisRepository.add(RANKING, rankingInfo, member.getTotalCertifyCount());
+	public void updateScores(List<UpdateRanking> updateRankings) {
+		updateRankings.forEach(updateRanking ->
+			zSetRedisRepository.add(RANKING, updateRanking.rankingInfo(), updateRanking.score()));
 	}
 
 	public void changeInfos(RankingInfo before, RankingInfo after) {
@@ -51,11 +47,11 @@ public class RankingService {
 		zSetRedisRepository.delete(RANKING, rankingInfo);
 	}
 
-	public TopRankingResponses getMemberRanking(PersonalRankingInfo myRankingInfo) {
+	public TopRankingResponses getMemberRanking(UpdateRanking myRankingInfo) {
 		List<TopRankingInfoResponse> topRankings = getTopRankings();
-		Long myRanking = zSetRedisRepository.reverseRank("Ranking", myRankingInfo);
-		TopRankingInfoResponse myRankingInfoResponse = RankingMapper.topRankingResponse(myRanking.intValue(),
-			myRankingInfo);
+		Long myRanking = zSetRedisRepository.reverseRank(RANKING, myRankingInfo.rankingInfo());
+		TopRankingInfoResponse myRankingInfoResponse =
+			RankingMapper.topRankingResponse(myRanking.intValue(), myRankingInfo);
 
 		return RankingMapper.topRankingResponses(myRankingInfoResponse, topRankings);
 	}
@@ -74,6 +70,7 @@ public class RankingService {
 			RankingInfo rankingInfo = objectMapper.convertValue(topRanking.getValue(), RankingInfo.class);
 			topRankingInfoRespons.add(RankingMapper.topRankingResponse(scoreSet.size(), score, rankingInfo));
 		}
+		
 		return topRankingInfoRespons;
 	}
 }

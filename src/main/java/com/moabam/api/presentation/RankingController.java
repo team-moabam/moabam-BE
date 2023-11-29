@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.ranking.RankingService;
-import com.moabam.api.dto.ranking.PersonalRankingInfo;
 import com.moabam.api.dto.ranking.TopRankingResponses;
+import com.moabam.api.dto.ranking.UpdateRanking;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
 
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/ranking")
+@RequestMapping("/rankings")
 @RestController
 @RequiredArgsConstructor
 public class RankingController {
@@ -26,7 +26,8 @@ public class RankingController {
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public TopRankingResponses getRanking(@Auth AuthMember authMember) {
-		PersonalRankingInfo rankingInfo = memberService.getRankingInfo(authMember);
+		UpdateRanking rankingInfo = memberService.getRankingInfo(authMember);
+
 		return rankingService.getMemberRanking(rankingInfo);
 	}
 }

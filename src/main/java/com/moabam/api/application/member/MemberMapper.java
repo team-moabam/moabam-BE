@@ -19,8 +19,8 @@ import com.moabam.api.dto.member.BadgeResponse;
 import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
-import com.moabam.api.dto.ranking.PersonalRankingInfo;
 import com.moabam.api.dto.ranking.RankingInfo;
+import com.moabam.api.dto.ranking.UpdateRanking;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -32,6 +32,13 @@ public final class MemberMapper {
 		return Member.builder()
 			.socialId(String.valueOf(socialId))
 			.bug(Bug.builder().build())
+			.build();
+	}
+
+	public static UpdateRanking toUpdateRanking(Member member) {
+		return UpdateRanking.builder()
+			.rankingInfo(toRankingInfo(member))
+			.score(member.getTotalCertifyCount())
 			.build();
 	}
 
@@ -81,6 +88,14 @@ public final class MemberMapper {
 			.build();
 	}
 
+	public static RankingInfo toRankingInfo(Member member) {
+		return RankingInfo.builder()
+			.memberId(member.getId())
+			.nickname(member.getNickname())
+			.image(member.getProfileImage())
+			.build();
+	}
+
 	private static List<BadgeResponse> badgedNames(Set<BadgeType> badgeTypes) {
 		return BadgeType.memberBadgeMap(badgeTypes);
 	}
@@ -91,22 +106,5 @@ public final class MemberMapper {
 		birdsSkin.put(ItemType.NIGHT.name(), nightImage);
 
 		return birdsSkin;
-	}
-
-	public static RankingInfo toRankingInfo(Member member) {
-		return RankingInfo.builder()
-			.memberId(member.getId())
-			.nickname(member.getNickname())
-			.image(member.getProfileImage())
-			.build();
-	}
-
-	public static PersonalRankingInfo toRankingInfoWithScore(Member member) {
-		return PersonalRankingInfo.builder()
-			.score(member.getTotalCertifyCount())
-			.memberId(member.getId())
-			.nickname(member.getNickname())
-			.image(member.getProfileImage())
-			.build();
 	}
 }

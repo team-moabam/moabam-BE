@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +28,8 @@ import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.api.dto.member.ModifyMemberRequest;
-import com.moabam.api.dto.ranking.PersonalRankingInfo;
 import com.moabam.api.dto.ranking.RankingInfo;
+import com.moabam.api.dto.ranking.UpdateRanking;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.BaseDataCode;
 import com.moabam.global.common.util.ClockHolder;
@@ -124,10 +125,20 @@ public class MemberService {
 		}
 	}
 
-	public PersonalRankingInfo getRankingInfo(AuthMember authMember) {
+	public UpdateRanking getRankingInfo(AuthMember authMember) {
 		Member member = findMember(authMember.id());
 
-		return MemberMapper.toRankingInfoWithScore(member);
+		return MemberMapper.toUpdateRanking(member);
+	}
+
+	@Scheduled(cron = "* 15 * * * *")
+	public void updateAllRanking() {
+		List<Member> members = memberSearchRepository.findAllMembers();
+		List<UpdateRanking> updateRankings = members.stream()
+			.map(MemberMapper::toUpdateRanking)
+			.toList();
+
+		rankingService.updateScores(updateRankings);
 	}
 
 	private void changeNickname(Long memberId, String changedName) {
@@ -137,7 +148,6 @@ public class MemberService {
 			participant.getRoom().changeManagerNickname(changedName);
 		}
 	}
-
 
 	private void validateNickname(String nickname) {
 		if (Objects.isNull(nickname)) {
