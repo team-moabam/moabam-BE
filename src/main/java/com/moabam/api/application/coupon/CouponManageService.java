@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.moabam.api.domain.coupon.Coupon;
@@ -32,7 +33,7 @@ public class CouponManageService {
 	private final CouponManageRepository couponManageRepository;
 	private final CouponWalletRepository couponWalletRepository;
 
-	// @Scheduled(fixedDelay = 1000)
+	@Scheduled(fixedDelay = 1000)
 	public void issue() {
 		LocalDate now = clockHolder.date();
 		Optional<Coupon> isCoupon = couponRepository.findByStartAt(now);
