@@ -33,6 +33,7 @@ import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
+import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.cookie.CookieDevUtils;
@@ -67,6 +68,9 @@ class AuthorizationServiceTest {
 	JwtProviderService jwtProviderService;
 
 	@Mock
+	FcmService fcmService;
+
+	@Mock
 	TokenRepository tokenRepository;
 
 	CookieUtils cookieUtils;
@@ -93,7 +97,7 @@ class AuthorizationServiceTest {
 		noOAuthConfig = new OAuthConfig(
 			new OAuthConfig.Provider(null, null, null, null, null),
 			new OAuthConfig.Client(null, null, null, null, null, null));
-		noPropertyService = new AuthorizationService(noOAuthConfig, tokenConfig,
+		noPropertyService = new AuthorizationService(fcmService, noOAuthConfig, tokenConfig,
 			oAuth2AuthorizationServerRequestService, memberService, jwtProviderService, tokenRepository, cookieUtils);
 	}
 

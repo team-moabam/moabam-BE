@@ -144,6 +144,7 @@ public class RoomService {
 
 		Room room = managerParticipant.getRoom();
 		memberParticipant.removeRoom();
+		participantRepository.flush();
 		participantRepository.delete(memberParticipant);
 		room.decreaseCurrentUserCount();
 
