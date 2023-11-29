@@ -60,11 +60,12 @@ public class ItemService {
 
 	@Transactional
 	public void selectItem(Long memberId, Long itemId) {
+		Member member = memberService.findMember(memberId);
 		Inventory inventory = getInventory(memberId, itemId);
 
 		inventorySearchRepository.findDefault(memberId, inventory.getItemType())
 			.ifPresent(Inventory::deselect);
-		inventory.select();
+		inventory.select(member);
 	}
 
 	private Item getItem(Long itemId) {
