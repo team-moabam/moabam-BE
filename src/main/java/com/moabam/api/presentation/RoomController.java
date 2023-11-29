@@ -110,7 +110,7 @@ public class RoomController {
 	@PostMapping("/{roomId}/certification")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void certifyRoom(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId,
-		@RequestPart("file") Map<String, MultipartFile> multipartFiles) {
+		@RequestPart(name = "file") Map<String, MultipartFile> multipartFiles) {
 
 		log.info("multipartFiles Size = {}", multipartFiles.size());
 		log.info(multipartFiles.toString());
