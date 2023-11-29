@@ -35,10 +35,4 @@ public class ZSetRedisRepository {
 			.opsForZSet()
 			.rank(key, value);
 	}
-
-	public void remove(String key, Object value) {
-		redisTemplate
-			.opsForZSet()
-			.remove(key, value);
-	}
 }

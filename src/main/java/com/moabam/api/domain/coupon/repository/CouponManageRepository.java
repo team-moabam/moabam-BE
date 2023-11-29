@@ -44,10 +44,6 @@ public class CouponManageRepository {
 			.intValue();
 	}
 
-	public void removeQueue(String couponName, Long memberId) {
-		zSetRedisRepository.remove(requireNonNull(couponName), requireNonNull(memberId));
-	}
-
 	public void deleteQueue(String couponName) {
 		valueRedisRepository.delete(requireNonNull(couponName));
 	}

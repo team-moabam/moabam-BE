@@ -78,6 +78,27 @@ class CouponManageRepositoryTest {
 			.isInstanceOf(NullPointerException.class);
 	}
 
+	@DisplayName("특정 사용자의 쿠폰 순위를 정상적으로 조회한다. - int")
+	@Test
+	void rankQueue_success() {
+		// Given
+		given(zSetRedisRepository.rank(any(String.class), any(Long.class))).willReturn(1L);
+
+		// When
+		int actual = couponManageRepository.rankQueue("couponName", 1L);
+
+		// Then
+		assertThat(actual).isEqualTo(1);
+	}
+
+	@DisplayName("쿠폰명이 Null인 특정 사용자 쿠폰 순위를 조회한다. - int")
+	@Test
+	void rankQueue_NullPointerException() {
+		// When & Then
+		assertThatThrownBy(() -> couponManageRepository.rankQueue(null, 1L))
+			.isInstanceOf(NullPointerException.class);
+	}
+
 	@DisplayName("쿠폰 대기열을 성공적으로 삭제한다. - Void")
 	@Test
 	void deleteQueue_success() {
