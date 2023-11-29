@@ -62,7 +62,10 @@ class JwtProviderServiceTest {
 	@Test
 	void decoding_token_failBy_url() {
 		// given
-		String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtb2Ftb2Ftb2FiYW0iLCJpYXQiOjE3MDEyMzQyNjksImV4cCI6MTcwMTIzNDU2OSwiaWQiOjIsIm5pY2tuYW1lIjoiXHVEODNEXHVEQzNC6rOw64-M7J20Iiwicm9sZSI6IlVTRVIifQ.yVcvshWQ6fsQ0OQ-A5kolDo-8QsLVFCD6dIENKWZH-A";
+		String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+			+ ".eyJpc3MiOiJtb2Ftb2Ftb2FiYW0iLCJpYXQiOjE3MDEyMzQyNjksImV4c"
+			+ "CI6MTcwMTIzNDU2OSwiaWQiOjIsIm5pY2tuYW1lIjoiXHVEODNEXHVEQzNC6rOw64-M7J20Iiwicm9sZSI6IlVTRVIifQ"
+			+ ".yVcvshWQ6fsQ0OQ-A5kolDo-8QsLVFCD6dIENKWZH-A";
 		String[] parts = token.split("\\.");
 
 		// when + then
@@ -72,8 +75,13 @@ class JwtProviderServiceTest {
 	@DisplayName("토큰 디코딩 성공")
 	@ParameterizedTest
 	@ValueSource(strings = {
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtb2Ftb2Ftb2FiYW0iLCJpYXQiOjE3MDEyMzQyNjksImV4cCI6MTcwMjQ0Mzg2OX0.IrcH_LvBKK1HezgY3PVY-0HQlhP6neEuydH6Mhz4Jgo",
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtb2Ftb2Ftb2FiYW0iLCJpYXQiOjE3MDEyMzQyNjksImV4cCI6MTcwMTIzNDU2OSwiaWQiOjIsIm5pY2tuYW1lIjoiXHVEODNEXHVEQzNC6rOw64-M7J20Iiwicm9sZSI6IlVTRVIifQ.yVcvshWQ6fsQ0OQ-A5kolDo-8QsLVFCD6dIENKWZH-A"
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+			+ ".eyJpc3MiOiJtb2Ftb2Ftb2FiYW0iLCJpYXQiOjE3MDEyMzQyNjksImV4cCI6MTcwMjQ0Mzg2OX0"
+			+ ".IrcH_LvBKK1HezgY3PVY-0HQlhP6neEuydH6Mhz4Jgo",
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+			+ ".eyJpc3MiOiJtb2Ftb2Ftb2FiYW0iLCJpYXQiOjE3MDEyMzQyNjksImV4cCI6MTcwMTIzNDU2OSwiaWQiOjIsIm"
+			+ "5pY2tuYW1lIjoiXHVEODNEXHVEQzNC6rOw64-M7J20Iiwicm9sZSI6IlVTRVIifQ"
+			+ ".yVcvshWQ6fsQ0OQ-A5kolDo-8QsLVFCD6dIENKWZH-A"
 	})
 	void decoding_token_success(String token) {
 		// given
