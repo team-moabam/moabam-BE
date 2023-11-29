@@ -46,7 +46,6 @@ public class PaymentController {
 			paymentService.confirm(member.id(), payment, response);
 		} catch (TossPaymentException exception) {
 			paymentService.fail(payment, request.paymentKey());
-			throw exception;
 		}
 	}
 }

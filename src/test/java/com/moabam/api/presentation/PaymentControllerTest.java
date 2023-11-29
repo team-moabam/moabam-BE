@@ -29,6 +29,7 @@ import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.PaymentStatus;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
+import com.moabam.api.domain.payment.repository.PaymentSearchRepository;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.domain.product.repository.ProductRepository;
 import com.moabam.api.dto.payment.ConfirmPaymentRequest;
@@ -57,6 +58,9 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	PaymentRepository paymentRepository;
+
+	@Autowired
+	PaymentSearchRepository paymentSearchRepository;
 
 	@Autowired
 	ProductRepository productRepository;
@@ -168,9 +172,8 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 			mockMvc.perform(post("/payments/confirm")
 					.contentType(APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isInternalServerError())
+				.andExpect(status().isOk())
 				.andDo(print());
-			System.out.println(payment.getStatus());
 			assertThat(payment.getPaymentKey()).isEqualTo(PAYMENT_KEY);
 			assertThat(payment.getStatus()).isEqualTo(PaymentStatus.ABORTED);
 		}

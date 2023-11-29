@@ -34,7 +34,7 @@ public class TossPaymentService {
 			.baseUrl(config.baseUrl())
 			.defaultHeaders(headers -> {
 				headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-				headers.setBearerAuth(Base64.getEncoder().encodeToString(config.secretKey().getBytes()));
+				headers.setBasicAuth(Base64.getEncoder().encodeToString(config.secretKey().getBytes()));
 			})
 			.build();
 	}
