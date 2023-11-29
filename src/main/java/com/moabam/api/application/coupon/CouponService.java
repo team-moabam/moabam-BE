@@ -42,14 +42,26 @@ public class CouponService {
 	private final CouponWalletSearchRepository couponWalletSearchRepository;
 
 	@Transactional
-	public void create(AuthMember admin, CreateCouponRequest request) {
-		validateAdminRole(admin);
+	public void create(CreateCouponRequest request, Long adminId, Role role) {
+		validateAdminRole(role);
 		validateConflictName(request.name());
 		validateConflictStartAt(request.startAt());
 		validatePeriod(request.startAt(), request.openAt());
 
-		Coupon coupon = CouponMapper.toEntity(admin.id(), request);
+		Coupon coupon = CouponMapper.toEntity(adminId, request);
+
 		couponRepository.save(coupon);
+	}
+
+	@Transactional
+	public void delete(Long couponId, Role role) {
+		validateAdminRole(role);
+
+		Coupon coupon = couponRepository.findById(couponId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
+
+		couponRepository.delete(coupon);
+		couponManageService.deleteQueue(coupon.getName());
 	}
 
 	@Transactional
@@ -72,15 +84,6 @@ public class CouponService {
 		}
 
 		couponWalletRepository.delete(couponWallet);
-	}
-
-	@Transactional
-	public void delete(AuthMember admin, Long couponId) {
-		validateAdminRole(admin);
-		Coupon coupon = couponRepository.findById(couponId)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
-		couponRepository.delete(coupon);
-		couponManageService.deleteQueue(coupon.getName());
 	}
 
 	public CouponResponse getById(Long couponId) {
@@ -121,8 +124,8 @@ public class CouponService {
 		}
 	}
 
-	private void validateAdminRole(AuthMember admin) {
-		if (!admin.role().equals(Role.ADMIN)) {
+	private void validateAdminRole(Role role) {
+		if (!role.equals(Role.ADMIN)) {
 			throw new NotFoundException(ErrorMessage.MEMBER_NOT_FOUND);
 		}
 	}

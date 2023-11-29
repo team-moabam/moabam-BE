@@ -33,14 +33,14 @@ public class CouponController {
 
 	@PostMapping("/admins/coupons")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void create(@Auth AuthMember admin, @Valid @RequestBody CreateCouponRequest request) {
-		couponService.create(admin, request);
+	public void create(@Valid @RequestBody CreateCouponRequest request, @Auth AuthMember admin) {
+		couponService.create(request, admin.id(), admin.role());
 	}
 
 	@DeleteMapping("/admins/coupons/{couponId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void delete(@Auth AuthMember admin, @PathVariable("couponId") Long couponId) {
-		couponService.delete(admin, couponId);
+	public void delete(@PathVariable("couponId") Long couponId, @Auth AuthMember admin) {
+		couponService.delete(couponId, admin.role());
 	}
 
 	@GetMapping("/coupons/{couponId}")
