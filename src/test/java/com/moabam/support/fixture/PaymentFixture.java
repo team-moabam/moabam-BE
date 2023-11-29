@@ -10,7 +10,6 @@ import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.PaymentStatus;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.dto.payment.ConfirmPaymentRequest;
-import com.moabam.api.dto.payment.ConfirmTossPaymentRequest;
 import com.moabam.api.dto.payment.ConfirmTossPaymentResponse;
 
 public final class PaymentFixture {
@@ -47,14 +46,6 @@ public final class PaymentFixture {
 
 	public static ConfirmPaymentRequest confirmPaymentRequest() {
 		return ConfirmPaymentRequest.builder()
-			.paymentKey(PAYMENT_KEY)
-			.orderId(ORDER_ID)
-			.amount(AMOUNT)
-			.build();
-	}
-
-	public static ConfirmTossPaymentRequest confirmTossPaymentRequest() {
-		return ConfirmTossPaymentRequest.builder()
 			.paymentKey(PAYMENT_KEY)
 			.orderId(ORDER_ID)
 			.amount(AMOUNT)

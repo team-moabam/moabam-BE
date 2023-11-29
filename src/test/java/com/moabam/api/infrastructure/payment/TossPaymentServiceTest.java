@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moabam.api.dto.payment.ConfirmTossPaymentRequest;
+import com.moabam.api.dto.payment.ConfirmPaymentRequest;
 import com.moabam.api.dto.payment.ConfirmTossPaymentResponse;
 import com.moabam.global.config.TossPaymentConfig;
 import com.moabam.global.error.exception.MoabamException;
@@ -58,7 +58,7 @@ class TossPaymentServiceTest {
 		@Test
 		void success() throws Exception {
 			// given
-			ConfirmTossPaymentRequest request = confirmTossPaymentRequest();
+			ConfirmPaymentRequest request = confirmPaymentRequest();
 			ConfirmTossPaymentResponse expected = confirmTossPaymentResponse();
 			mockWebServer.enqueue(new MockResponse()
 				.setResponseCode(200)
@@ -76,7 +76,7 @@ class TossPaymentServiceTest {
 		@Test
 		void exception() {
 			// given
-			ConfirmTossPaymentRequest request = confirmTossPaymentRequest();
+			ConfirmPaymentRequest request = confirmPaymentRequest();
 			String jsonString = "{\"code\":\"NOT_FOUND_PAYMENT\",\"message\":\"존재하지 않는 결제 입니다.\"}";
 			mockWebServer.enqueue(new MockResponse()
 				.setResponseCode(404)
