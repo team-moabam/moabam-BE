@@ -53,71 +53,59 @@ class NotificationServiceTest {
 
 	String successIssueResult = "%s 쿠폰 발행을 성공했습니다. 축하드립니다!";
 
-	@WithMember
 	@DisplayName("상대에게 콕 알림을 성공적으로 보낸다. - Void")
 	@Test
 	void sendKnock_success() {
 		// Given
-		AuthMember member = AuthorizationThreadLocal.getAuthMember();
-
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.of("FCM-TOKEN"));
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(false);
 
 		// When
-		notificationService.sendKnock(member, 2L, 1L);
+		notificationService.sendKnock(1L, 1L, 2L, "nickName");
 
 		// Then
 		verify(fcmService).sendAsync(any(String.class), any(String.class));
 		verify(notificationRepository).saveKnock(any(Long.class), any(Long.class), any(Long.class));
 	}
 
-	@WithMember
 	@DisplayName("콕 찌를 상대의 방이 존재하지 않는다. - NotFoundException")
 	@Test
 	void sendKnock_Room_NotFoundException() {
 		// Given
-		AuthMember member = AuthorizationThreadLocal.getAuthMember();
-
 		willThrow(NotFoundException.class).given(roomService).validateRoomById(any(Long.class));
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnock(member, 1L, 1L))
+		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L, "nickName"))
 			.isInstanceOf(NotFoundException.class);
 	}
 
-	@WithMember
 	@DisplayName("콕 찌를 상대의 FCM 토큰이 존재하지 않는다. - NotFoundException")
 	@Test
 	void sendKnock_FcmToken_NotFoundException() {
 		// Given
-		AuthMember member = AuthorizationThreadLocal.getAuthMember();
-
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.empty());
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(false);
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnock(member, 1L, 1L))
+		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L, "nickName"))
 			.isInstanceOf(NotFoundException.class)
 			.hasMessage(ErrorMessage.NOT_FOUND_FCM_TOKEN.getMessage());
 	}
 
-	@WithMember
 	@DisplayName("콕 찌를 상대가 이미 찌른 상대이다. - ConflictException")
 	@Test
 	void sendKnock_ConflictException() {
 		// Given
-		AuthMember member = AuthorizationThreadLocal.getAuthMember();
-
 		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(true);
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnock(member, 1L, 1L))
+		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L, "nickName"))
 			.isInstanceOf(ConflictException.class)
 			.hasMessage(ErrorMessage.CONFLICT_KNOCK.getMessage());
 	}

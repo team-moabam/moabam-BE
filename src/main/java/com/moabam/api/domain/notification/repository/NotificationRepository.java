@@ -15,21 +15,27 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationRepository {
 
-	private static final String KNOCK_KEY = "room_%s_member_%s_knocks_%s";
+	private static final String KNOCK_KEY = "roomId=%s_targetId=%s_memberId=%s";
 	private static final long EXPIRE_KNOCK = 12;
 
 	private final ValueRedisRepository valueRedisRepository;
 
-	public void saveKnock(Long memberId, Long targetId, Long roomId) {
-		String knockKey =
-			String.format(KNOCK_KEY, requireNonNull(roomId), requireNonNull(memberId), requireNonNull(targetId));
+	public void saveKnock(Long roomId, Long targetId, Long memberId) {
+		String knockKey = String.format(
+			KNOCK_KEY,
+			requireNonNull(roomId),
+			requireNonNull(targetId),
+			requireNonNull(memberId));
 
 		valueRedisRepository.save(knockKey, BLANK, Duration.ofHours(EXPIRE_KNOCK));
 	}
 
-	public boolean existsKnockByKey(Long memberId, Long targetId, Long roomId) {
-		String knockKey =
-			String.format(KNOCK_KEY, requireNonNull(roomId), requireNonNull(memberId), requireNonNull(targetId));
+	public boolean existsKnockByKey(Long roomId, Long targetId, Long memberId) {
+		String knockKey = String.format(
+			KNOCK_KEY,
+			requireNonNull(roomId),
+			requireNonNull(targetId),
+			requireNonNull(memberId));
 
 		return valueRedisRepository.hasKey(requireNonNull(knockKey));
 	}
