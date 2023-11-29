@@ -53,7 +53,7 @@ jobs:
           port: 22
           username: ${{ secrets.EC2_INSTANCE_USERNAME }}
           key: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
-          source: "./.env, ./docker-compose-dev.yml, ./scripts/*, ./nginx/*"
+          source: "./.env, ./docker-compose-dev.yml, ./scripts/*, ./nginx/*, ./mysql/*"
           target: "/home/ubuntu/moabam"
 
       - name: 파일 세팅

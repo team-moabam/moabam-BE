@@ -72,3 +72,4 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - /home/ubuntu/moabam/data/mysql:/var/lib/mysql
+      - /home/ubuntu/moabam/sql/initdb.d:/docker-entrypoint-initdb.d
