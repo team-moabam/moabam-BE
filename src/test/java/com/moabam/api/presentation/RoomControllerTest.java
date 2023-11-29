@@ -663,10 +663,13 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.maxUserCount(8)
 			.build();
 
+		List<Routine> routines = RoomFixture.routines(room);
+
 		Participant participant = RoomFixture.participant(room, 1L);
 		participant.enableManager();
 
 		roomRepository.save(room);
+		routineRepository.saveAll(routines);
 		participantRepository.save(participant);
 
 		// expected
@@ -675,9 +678,11 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andDo(print());
 
 		List<Room> deletedRoom = roomRepository.findAll();
+		List<Routine> deletedRoutine = routineRepository.findAll();
 		List<Participant> deletedParticipant = participantRepository.findAll();
 
 		assertThat(deletedRoom).isEmpty();
+		assertThat(deletedRoutine).hasSize(0);
 		assertThat(deletedParticipant).hasSize(1);
 		assertThat(deletedParticipant.get(0).getDeletedAt()).isNotNull();
 		assertThat(deletedParticipant.get(0).getDeletedRoomTitle()).isNotNull();
