@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 public class CouponManageRepository {
 
 	private static final int EXPIRE_DAYS = 2;
-	private static final String STOCK_KEY = "%s_INCR";
 
 	private final ZSetRedisRepository zSetRedisRepository;
 	private final ValueRedisRepository valueRedisRepository;
@@ -31,7 +30,7 @@ public class CouponManageRepository {
 		);
 	}
 
-	public Set<Long> range(String couponName, long start, long end) {
+	public Set<Long> rangeQueue(String couponName, long start, long end) {
 		return zSetRedisRepository
 			.range(requireNonNull(couponName), start, end)
 			.stream()
@@ -39,20 +38,17 @@ public class CouponManageRepository {
 			.collect(Collectors.toSet());
 	}
 
-	public void deleteQueue(String couponName) {
-		valueRedisRepository.delete(requireNonNull(couponName));
-	}
-
-	public int increaseIssuedStock(String couponName) {
-		String stockKey = String.format(STOCK_KEY, requireNonNull(couponName));
-
-		return valueRedisRepository
-			.increment(requireNonNull(stockKey))
+	public int rankQueue(String couponName, Long memberId) {
+		return zSetRedisRepository
+			.rank(requireNonNull(couponName), requireNonNull(memberId))
 			.intValue();
 	}
 
-	public void deleteIssuedStock(String couponName) {
-		String stockKey = String.format(STOCK_KEY, requireNonNull(couponName));
-		valueRedisRepository.delete(requireNonNull(stockKey));
+	public void removeQueue(String couponName, Long memberId) {
+		zSetRedisRepository.remove(requireNonNull(couponName), requireNonNull(memberId));
+	}
+
+	public void deleteQueue(String couponName) {
+		valueRedisRepository.delete(requireNonNull(couponName));
 	}
 }

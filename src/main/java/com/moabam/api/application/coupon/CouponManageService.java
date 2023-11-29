@@ -13,7 +13,6 @@ import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponManageRepository;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
-import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -56,14 +55,14 @@ public class CouponManageService {
 
 		Coupon coupon = optionalCoupon.get();
 		String couponName = coupon.getName();
-		int maxStock = coupon.getStock();
+		int max = coupon.getStock();
 
-		Set<Long> membersId = couponManageRepository.range(couponName, current, current + ISSUE_SIZE);
+		Set<Long> membersId = couponManageRepository.rangeQueue(couponName, current, current + ISSUE_SIZE);
 
 		for (Long memberId : membersId) {
-			int nextStock = couponManageRepository.increaseIssuedStock(couponName);
+			int rank = couponManageRepository.rankQueue(couponName, memberId);
 
-			if (maxStock < nextStock) {
+			if (max < rank) {
 				notificationService.sendCouponIssueResult(memberId, couponName, FAIL_ISSUE_BODY);
 				continue;
 			}
@@ -74,22 +73,20 @@ public class CouponManageService {
 		}
 	}
 
-	public void register(AuthMember authMember, String couponName) {
+	public void registerQueue(Long memberId, String couponName) {
 		double registerTime = System.currentTimeMillis();
-		validateRegister(couponName);
-		couponManageRepository.addIfAbsentQueue(couponName, authMember.id(), registerTime);
+		validateRegisterQueue(couponName);
+		couponManageRepository.addIfAbsentQueue(couponName, memberId, registerTime);
 	}
 
-	public void deleteCouponManage(String couponName) {
+	public void deleteQueue(String couponName) {
 		couponManageRepository.deleteQueue(couponName);
-		couponManageRepository.deleteIssuedStock(couponName);
 	}
 
-	private void validateRegister(String couponName) {
+	private void validateRegisterQueue(String couponName) {
 		LocalDate now = clockHolder.date();
-		Optional<Coupon> coupon = couponRepository.findByStartAt(now);
 
-		if (coupon.isEmpty() || !coupon.get().getName().equals(couponName)) {
+		if (!couponRepository.existsByNameAndStartAt(couponName, now)) {
 			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
 		}
 	}

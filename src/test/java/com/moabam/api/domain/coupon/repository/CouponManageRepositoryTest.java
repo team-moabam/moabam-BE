@@ -64,7 +64,7 @@ class CouponManageRepositoryTest {
 		given(zSetRedisRepository.range(any(String.class), any(long.class), any(long.class))).willReturn(values);
 
 		// When
-		Set<Long> actual = couponManageRepository.range("couponName", 0, 10);
+		Set<Long> actual = couponManageRepository.rangeQueue("couponName", 0, 10);
 
 		// Then
 		assertThat(actual).hasSize(10);
@@ -74,7 +74,7 @@ class CouponManageRepositoryTest {
 	@Test
 	void range_NullPointerException() {
 		// When & Then
-		assertThatThrownBy(() -> couponManageRepository.range(null, 0, 10))
+		assertThatThrownBy(() -> couponManageRepository.rangeQueue(null, 0, 10))
 			.isInstanceOf(NullPointerException.class);
 	}
 
@@ -93,45 +93,6 @@ class CouponManageRepositoryTest {
 	void deleteQueue_NullPointerException() {
 		// When & Then
 		assertThatThrownBy(() -> couponManageRepository.deleteQueue(null))
-			.isInstanceOf(NullPointerException.class);
-	}
-
-	@DisplayName("쿠폰의 할당된 재고를 성공적으로 증가시킨다. - int")
-	@Test
-	void increaseIssuedStock_success() {
-		// Given
-		given(valueRedisRepository.increment(any(String.class))).willReturn(77L);
-
-		// When
-		int actual = couponManageRepository.increaseIssuedStock("couponName");
-
-		// Then
-		assertThat(actual).isEqualTo(77);
-	}
-
-	@DisplayName("쿠폰명이 Null인 쿠폰의 할당된 재고를 증가시킨다. - NullPointerException")
-	@Test
-	void increaseIssuedStock_NullPointerException() {
-		// When & Then
-		assertThatThrownBy(() -> couponManageRepository.increaseIssuedStock(null))
-			.isInstanceOf(NullPointerException.class);
-	}
-
-	@DisplayName("할당된 쿠폰 재고를 성공적으로 삭제한다. - Void")
-	@Test
-	void deleteIssuedStock_success() {
-		// When
-		couponManageRepository.deleteIssuedStock("couponName");
-
-		// Then
-		verify(valueRedisRepository).delete(any(String.class));
-	}
-
-	@DisplayName("쿠폰명이 Null인 할당된 쿠폰 재고를 삭제한다. - NullPointerException")
-	@Test
-	void deleteIssuedStock_NullPointerException() {
-		// When & Then
-		assertThatThrownBy(() -> couponManageRepository.deleteIssuedStock(null))
 			.isInstanceOf(NullPointerException.class);
 	}
 }
