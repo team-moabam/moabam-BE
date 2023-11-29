@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record BadgeResponse(
-	BadgeType badge,
+	String badge,
 	boolean unlock
 ) {
 

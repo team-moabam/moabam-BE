@@ -45,7 +45,7 @@ public class RoomService {
 	private final MemberService memberService;
 
 	@Transactional
-	public Long createRoom(Long memberId, String nickname, CreateRoomRequest createRoomRequest) {
+	public Long createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
 		Room room = RoomMapper.toRoomEntity(createRoomRequest);
 		List<Routine> routines = RoutineMapper.toRoutineEntities(room, createRoomRequest.routines());
 		Participant participant = ParticipantMapper.toParticipant(room, memberId);
@@ -55,7 +55,7 @@ public class RoomService {
 		Member member = memberService.findMember(memberId);
 		member.enterRoom(room.getRoomType());
 		participant.enableManager();
-		room.changeManagerNickname(nickname);
+		room.changeManagerNickname(member.getNickname());
 
 		Room savedRoom = roomRepository.save(room);
 		routineRepository.saveAll(routines);

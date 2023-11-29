@@ -7,6 +7,7 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
@@ -47,7 +48,7 @@ public class Member extends BaseTimeEntity {
 	@Column(name = "social_id", nullable = false, unique = true)
 	private String socialId;
 
-	@Column(name = "nickname", nullable = false, unique = true)
+	@Column(name = "nickname", unique = true)
 	private String nickname;
 
 	@Column(name = "intro", length = 30)
@@ -134,10 +135,15 @@ public class Member extends BaseTimeEntity {
 
 	public void delete(LocalDateTime now) {
 		socialId = deleteSocialId(now);
+		nickname = null;
 	}
 
-	public void changeNickName(String nickname) {
-		this.nickname = requireNonNullElse(nickname, this.nickname);
+	public boolean changeNickName(String nickname) {
+		if (Objects.isNull(nickname)) {
+			return false;
+		}
+		this.nickname = nickname;
+		return true;
 	}
 
 	public void changeIntro(String intro) {

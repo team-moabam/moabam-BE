@@ -29,6 +29,7 @@ public enum ErrorMessage {
 	INVALID_REQUEST_URL("잘못된 URL 요청입니다."),
 	INVALID_CERTIFY_TIME("현재 인증 시간이 아닙니다."),
 	CERTIFICATION_NOT_FOUND("인증 정보가 없습니다."),
+	NEED_TO_EXIT_ALL_ROOMS("모든 방에서 나가야 회원 탈퇴가 가능합니다."),
 	PARTICIPANT_DEPORT_ERROR("방장은 자신을 추방할 수 없습니다."),
 
 	LOGIN_FAILED("로그인에 실패했습니다."),

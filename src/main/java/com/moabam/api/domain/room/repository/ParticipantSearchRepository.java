@@ -76,4 +76,15 @@ public class ParticipantSearchRepository {
 			)
 			.fetch();
 	}
+
+	public List<Participant> findAllRoomMangerByMemberId(Long memberId) {
+		return jpaQueryFactory
+			.selectFrom(participant)
+			.join(participant.room, room).fetchJoin()
+			.where(
+				participant.memberId.eq(memberId),
+				participant.isManager.isTrue()
+			)
+			.fetch();
+	}
 }
