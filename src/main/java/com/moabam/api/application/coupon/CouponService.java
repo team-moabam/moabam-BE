@@ -19,7 +19,6 @@ import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.api.dto.coupon.MyCouponResponse;
-import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
@@ -66,7 +65,8 @@ public class CouponService {
 
 	@Transactional
 	public void use(Long memberId, Long couponWalletId) {
-		CouponWallet couponWallet = getWalletByIdAndMemberId(couponWalletId, memberId);
+		CouponWallet couponWallet = couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 		Coupon coupon = couponWallet.getCoupon();
 		BugType bugType = coupon.getType().getBugType();
 
@@ -76,7 +76,8 @@ public class CouponService {
 
 	@Transactional
 	public void discount(Long memberId, Long couponWalletId) {
-		CouponWallet couponWallet = getWalletByIdAndMemberId(couponWalletId, memberId);
+		CouponWallet couponWallet = couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 		Coupon coupon = couponWallet.getCoupon();
 
 		if (!coupon.getType().isDiscount()) {
@@ -100,16 +101,11 @@ public class CouponService {
 		return CouponMapper.toResponses(coupons);
 	}
 
-	public List<MyCouponResponse> getWallet(Long couponId, AuthMember authMember) {
+	public List<MyCouponResponse> getAllByWalletIdAndMemberId(Long couponWalletId, Long memberId) {
 		List<CouponWallet> couponWallets =
-			couponWalletSearchRepository.findAllByCouponIdAndMemberId(couponId, authMember.id());
+			couponWalletSearchRepository.findAllByIdAndMemberId(couponWalletId, memberId);
 
 		return CouponMapper.toMyResponses(couponWallets);
-	}
-
-	public CouponWallet getWalletByIdAndMemberId(Long couponWalletId, Long memberId) {
-		return couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 	}
 
 	private void validatePeriod(LocalDate startAt, LocalDate openAt) {

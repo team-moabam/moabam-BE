@@ -1,6 +1,5 @@
 package com.moabam.api.application.coupon;
 
-import static com.moabam.support.fixture.CouponFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -31,14 +30,11 @@ import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.api.dto.coupon.MyCouponResponse;
-import com.moabam.global.auth.model.AuthMember;
-import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
-import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.CouponFixture;
 
@@ -257,39 +253,36 @@ class CouponServiceTest {
 		assertThat(actual).hasSize(coupons.size());
 	}
 
-	@WithMember
-	@DisplayName("나의 쿠폰함을 성공적으로 조회한다.")
+	@DisplayName("나의 모든 쿠폰을 성공적으로 조회한다.")
 	@MethodSource("com.moabam.support.fixture.CouponWalletFixture#provideCouponWalletByCouponId1_total5")
 	@ParameterizedTest
-	void getWallet_success(List<CouponWallet> couponWallets) {
+	void getAllByWalletIdAndMemberId_all_success(List<CouponWallet> couponWallets) {
 		// Given
-		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
-
-		given(couponWalletSearchRepository.findAllByCouponIdAndMemberId(isNull(), any(Long.class)))
+		given(couponWalletSearchRepository.findAllByIdAndMemberId(isNull(), any(Long.class)))
 			.willReturn(couponWallets);
 
 		// When
-		List<MyCouponResponse> actual = couponService.getWallet(null, authMember);
+		List<MyCouponResponse> actual = couponService.getAllByWalletIdAndMemberId(null, 1L);
 
 		// Then
 		assertThat(actual).hasSize(couponWallets.size());
 	}
 
-	@WithMember
-	@DisplayName("지갑에서 특정 쿠폰을 성공적으로 조회한다.")
+	@DisplayName("나의 특정 쿠폰을 성공적으로 조회한다.")
 	@Test
-	void getByWalletIdAndMemberId_success() {
+	void getAllByWalletIdAndMemberId_success() {
 		// Given
-		CouponWallet couponWallet = CouponWallet.create(1L, coupon());
+		Coupon coupon = CouponFixture.coupon();
+		List<CouponWallet> couponWallets = List.of(CouponWallet.create(1L, coupon));
 
-		given(couponWalletSearchRepository.findByIdAndMemberId(any(Long.class), any(Long.class)))
-			.willReturn(Optional.of(couponWallet));
+		given(couponWalletSearchRepository.findAllByIdAndMemberId(any(Long.class), any(Long.class)))
+			.willReturn(couponWallets);
 
 		// When
-		CouponWallet actual = couponService.getWalletByIdAndMemberId(1L, 1L);
+		List<MyCouponResponse> actual = couponService.getAllByWalletIdAndMemberId(1L, 1L);
 
 		// Then
-		assertThat(actual.getCoupon().getName()).isEqualTo(couponWallet.getCoupon().getName());
+		assertThat(actual).hasSize(1);
 	}
 
 	@DisplayName("특정 회원이 쿠폰 지갑에 가지고 있는 특정 쿠폰을 성공적으로 사용한다. - Void")

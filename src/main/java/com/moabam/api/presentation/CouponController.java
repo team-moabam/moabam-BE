@@ -55,22 +55,24 @@ public class CouponController {
 		return couponService.getAllByStatus(request);
 	}
 
-	@PostMapping("/coupons")
+	@GetMapping({"/my-coupons", "/my-coupons/{couponWalletId}"})
 	@ResponseStatus(HttpStatus.OK)
-	public void registerQueue(@Auth AuthMember authMember, @RequestParam("couponName") String couponName) {
-		couponManageService.registerQueue(authMember.id(), couponName);
-	}
-
-	@GetMapping({"/my-coupons", "/my-coupons/{couponId}"})
-	@ResponseStatus(HttpStatus.OK)
-	public List<MyCouponResponse> getWallet(@Auth AuthMember authMember,
-		@PathVariable(value = "couponId", required = false) Long couponId) {
-		return couponService.getWallet(couponId, authMember);
+	public List<MyCouponResponse> getAllByWalletIdAndMemberId(
+		@PathVariable(value = "couponWalletId", required = false) Long couponWalletId,
+		@Auth AuthMember authMember
+	) {
+		return couponService.getAllByWalletIdAndMemberId(couponWalletId, authMember.id());
 	}
 
 	@PostMapping("/my-coupons/{couponWalletId}")
 	@ResponseStatus(HttpStatus.OK)
 	public void use(@Auth AuthMember authMember, @PathVariable("couponWalletId") Long couponWalletId) {
 		couponService.use(authMember.id(), couponWalletId);
+	}
+
+	@PostMapping("/coupons")
+	@ResponseStatus(HttpStatus.OK)
+	public void registerQueue(@Auth AuthMember authMember, @RequestParam("couponName") String couponName) {
+		couponManageService.registerQueue(authMember.id(), couponName);
 	}
 }
