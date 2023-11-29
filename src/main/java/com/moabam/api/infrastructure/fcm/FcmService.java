@@ -9,7 +9,9 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FcmService {
@@ -22,7 +24,9 @@ public class FcmService {
 			return;
 		}
 
+		log.info("FCM TOKEN before: " + fcmToken);
 		fcmRepository.saveToken(fcmToken, memberId);
+		log.info("FCM TOKEN after: " + findTokenByMemberId(memberId));
 	}
 
 	public void deleteTokenByMemberId(Long memberId) {
