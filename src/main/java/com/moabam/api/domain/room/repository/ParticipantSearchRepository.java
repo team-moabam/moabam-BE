@@ -62,6 +62,7 @@ public class ParticipantSearchRepository {
 			.where(
 				participant.memberId.eq(memberId)
 			)
+			.orderBy(participant.createdAt.desc())
 			.fetch();
 	}
 

@@ -10,6 +10,7 @@ import lombok.Builder;
 public record ManageRoomResponse(
 	Long roomId,
 	String title,
+	Long managerId,
 	String announcement,
 	RoomType roomType,
 	int certifyTime,

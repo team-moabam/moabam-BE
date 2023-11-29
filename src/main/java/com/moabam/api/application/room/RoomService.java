@@ -135,6 +135,7 @@ public class RoomService {
 
 	@Transactional
 	public void deportParticipant(Long managerId, Long roomId, Long memberId) {
+		validateDeportParticipant(managerId, memberId);
 		Participant managerParticipant = getParticipant(managerId, roomId);
 		Participant memberParticipant = getParticipant(memberId, roomId);
 		validateManagerAuthorization(managerParticipant);
@@ -170,6 +171,12 @@ public class RoomService {
 	private Participant getParticipant(Long memberId, Long roomId) {
 		return participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
+	}
+
+	private void validateDeportParticipant(Long managerId, Long memberId) {
+		if (managerId.equals(memberId)) {
+			throw new BadRequestException(PARTICIPANT_DEPORT_ERROR);
+		}
 	}
 
 	private void validateManagerAuthorization(Participant participant) {
