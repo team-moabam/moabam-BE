@@ -7,8 +7,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.provider.Arguments;
-import org.springframework.data.redis.core.DefaultTypedTuple;
-import org.springframework.data.redis.core.ZSetOperations;
 
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponType;
@@ -152,19 +150,35 @@ public final class CouponFixture {
 		);
 	}
 
-	public static Stream<Arguments> provideTypedTuples() {
-		Set<ZSetOperations.TypedTuple<Object>> tuples = new HashSet<>();
-		tuples.add(new DefaultTypedTuple<>(1L, 1.0));
-		tuples.add(new DefaultTypedTuple<>(2L, 2.0));
-		tuples.add(new DefaultTypedTuple<>(3L, 3.0));
-		tuples.add(new DefaultTypedTuple<>(4L, 4.0));
-		tuples.add(new DefaultTypedTuple<>(5L, 5.0));
-		tuples.add(new DefaultTypedTuple<>(6L, 6.0));
-		tuples.add(new DefaultTypedTuple<>(7L, 7.0));
-		tuples.add(new DefaultTypedTuple<>(8L, 8.0));
-		tuples.add(new DefaultTypedTuple<>(9L, 9.0));
-		tuples.add(new DefaultTypedTuple<>(10L, 10.0));
+	public static Stream<Arguments> provideValues_Object() {
+		Set<Object> values = new HashSet<>();
+		values.add(2L);
+		values.add(3L);
+		values.add(4L);
+		values.add(1L);
+		values.add(5L);
+		values.add(6L);
+		values.add(7L);
+		values.add(8L);
+		values.add(9L);
+		values.add(10L);
 
-		return Stream.of(Arguments.of(tuples));
+		return Stream.of(Arguments.of(values));
+	}
+
+	public static Stream<Arguments> provideValues_Long() {
+		Set<Object> values = new HashSet<>();
+		values.add(2L);
+		values.add(3L);
+		values.add(4L);
+		values.add(1L);
+		values.add(5L);
+		values.add(6L);
+		values.add(7L);
+		values.add(8L);
+		values.add(9L);
+		values.add(10L);
+
+		return Stream.of(Arguments.of(values));
 	}
 }

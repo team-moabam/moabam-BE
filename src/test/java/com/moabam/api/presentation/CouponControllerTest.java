@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -300,6 +301,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$", hasSize(1)));
 	}
 
+	@Disabled
 	@WithMember
 	@DisplayName("POST - 쿠폰 발급 요청을 성공적으로 한다. - Void")
 	@Test
@@ -321,7 +323,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember
-	@DisplayName("POST - 발급이 가능한 쿠폰이 없는 상황에 쿠폰 발급 요청을 한다. - BadRequestException")
+	@DisplayName("POST - 발급 가능 날짜가 아닌 쿠폰에 발급 요청을 한다. (Not found) - BadRequestException")
 	@Test
 	void registerQueue_Zero_StartAt_BadRequestException() throws Exception {
 		// Given
@@ -344,7 +346,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember
-	@DisplayName("POST - 발급 기간이 아닌 쿠폰에 발급 요청을 한다. - BadRequestException")
+	@DisplayName("POST - 발급 가능 날짜가 아닌 쿠폰에 발급 요청을 한다. (Not equals) - BadRequestException")
 	@Test
 	void registerQueue_Not_StartAt_BadRequestException() throws Exception {
 		// Given

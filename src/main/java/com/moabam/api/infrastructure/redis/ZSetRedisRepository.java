@@ -2,10 +2,10 @@ package com.moabam.api.infrastructure.redis;
 
 import static java.util.Objects.*;
 
+import java.time.Duration;
 import java.util.Set;
 
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -16,17 +16,23 @@ public class ZSetRedisRepository {
 
 	private final RedisTemplate<String, Object> redisTemplate;
 
-	public void addIfAbsent(String key, Object value, double score) {
-		if (redisTemplate.opsForZSet().score(key, value) == null) {
-			redisTemplate
-				.opsForZSet()
-				.add(requireNonNull(key), requireNonNull(value), score);
-		}
+	public void addIfAbsent(String key, Object value, double score, int expire) {
+		redisTemplate
+			.opsForZSet()
+			.addIfAbsent(requireNonNull(key), requireNonNull(value), score);
+		redisTemplate
+			.expire(key, Duration.ofDays(expire));
 	}
 
-	public Set<TypedTuple<Object>> popMin(String key, long count) {
+	public Set<Object> range(String key, long start, long end) {
 		return redisTemplate
 			.opsForZSet()
-			.popMin(key, count);
+			.range(key, start, end);
+	}
+
+	public Long rank(String key, Object value) {
+		return redisTemplate
+			.opsForZSet()
+			.rank(key, value);
 	}
 }

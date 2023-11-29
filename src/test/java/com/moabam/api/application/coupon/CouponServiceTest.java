@@ -202,7 +202,7 @@ class CouponServiceTest {
 
 		// Then
 		verify(couponRepository).delete(coupon);
-		verify(couponManageService).deleteCouponManage(any(String.class));
+		verify(couponManageService).deleteQueue(any(String.class));
 	}
 
 	@WithMember(role = Role.USER)
