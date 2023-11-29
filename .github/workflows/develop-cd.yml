@@ -69,8 +69,8 @@ jobs:
             chmod +x ./scripts/deploy-dev.sh
             chmod +x ./scripts/init-letsencrypt.sh
             chmod +x ./scripts/init-nginx-converter.sh
-            chmod +x ./mysql/init.sql
-            chmod +x ./mysql/item-data.sql
+            chmod +x ./mysql/initdb.d/init.sql
+            chmod +x ./mysql/initdb.d/item-data.sql
 
       - name: Github Actions IP 보안그룹에서 삭제
         if: always()
