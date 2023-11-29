@@ -99,11 +99,12 @@ public final class RoomMapper {
 			.build();
 	}
 
-	public static ManageRoomResponse toManageRoomResponse(Room room, List<RoutineResponse> routines,
+	public static ManageRoomResponse toManageRoomResponse(Room room, Long managerId, List<RoutineResponse> routines,
 		List<ParticipantResponse> participantResponses) {
 		return ManageRoomResponse.builder()
 			.roomId(room.getId())
 			.title(room.getTitle())
+			.managerId(managerId)
 			.announcement(room.getAnnouncement())
 			.roomType(room.getRoomType())
 			.certifyTime(room.getCertifyTime())

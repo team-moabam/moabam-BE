@@ -4,6 +4,7 @@ import static java.util.Objects.*;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.moabam.api.domain.member.Member;
 import com.moabam.global.common.entity.BaseTimeEntity;
 
 import jakarta.persistence.Column;
@@ -54,8 +55,9 @@ public class Inventory extends BaseTimeEntity {
 		return this.item.getType();
 	}
 
-	public void select() {
+	public void select(Member member) {
 		this.isDefault = true;
+		member.changeDefaultSkintUrl(this.item);
 	}
 
 	public void deselect() {

@@ -807,9 +807,9 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Inventory inventory1 = InventoryFixture.inventory(1L, item);
 		Inventory inventory2 = InventoryFixture.inventory(member2.getId(), item);
 		Inventory inventory3 = InventoryFixture.inventory(member3.getId(), item);
-		inventory1.select();
-		inventory2.select();
-		inventory3.select();
+		inventory1.select(member);
+		inventory2.select(member2);
+		inventory3.select(member3);
 
 		itemRepository.save(item);
 		inventoryRepository.saveAll(List.of(inventory1, inventory2, inventory3));
@@ -885,6 +885,25 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		assertThat(getRoom.getCurrentUserCount()).isEqualTo(1);
 		assertThat(getMemberParticipant.getDeletedAt()).isNotNull();
 		assertThat(participantSearchRepository.findOne(member.getId(), room.getId())).isEmpty();
+	}
+
+	@DisplayName("방장 본인 추방 시도 - 예외 처리")
+	@WithMember(id = 1L)
+	@Test
+	void deport_self_fail() throws Exception {
+		// given
+		Room room = RoomFixture.room();
+
+		Participant managerParticipant = RoomFixture.participant(room, member.getId());
+		managerParticipant.enableManager();
+
+		roomRepository.save(room);
+		participantRepository.save(managerParticipant);
+
+		// expected
+		mockMvc.perform(delete("/rooms/" + room.getId() + "/members/" + member.getId()))
+			.andExpect(status().isBadRequest())
+			.andDo(print());
 	}
 
 	@DisplayName("방장 위임 성공")
@@ -998,7 +1017,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Item item = ItemFixture.nightMageSkin();
 
 		Inventory inventory = InventoryFixture.inventory(member1.getId(), item);
-		inventory.select();
+		inventory.select(member1);
 
 		itemRepository.save(item);
 		inventoryRepository.save(inventory);

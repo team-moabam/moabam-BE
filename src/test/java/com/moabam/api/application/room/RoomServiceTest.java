@@ -70,7 +70,7 @@ class RoomServiceTest {
 		given(memberService.findMember(1L)).willReturn(member);
 
 		// when
-		Long result = roomService.createRoom(1L, "닉네임", createRoomRequest);
+		Long result = roomService.createRoom(1L, createRoomRequest);
 
 		// then
 		verify(roomRepository).save(any(Room.class));
@@ -98,7 +98,7 @@ class RoomServiceTest {
 		given(memberService.findMember(1L)).willReturn(member);
 
 		// when
-		Long result = roomService.createRoom(1L, "닉네임", createRoomRequest);
+		Long result = roomService.createRoom(1L, createRoomRequest);
 
 		// then
 		verify(roomRepository).save(any(Room.class));
