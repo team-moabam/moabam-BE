@@ -102,7 +102,7 @@ class PaymentServiceTest {
 			paymentService.confirm(memberId, request);
 
 			// then
-			verify(couponService, times(1)).discount(memberId, couponWalletId);
+			verify(couponService, times(1)).discount(couponWalletId, memberId);
 			verify(bugService, times(1)).charge(memberId, payment.getProduct());
 		}
 
