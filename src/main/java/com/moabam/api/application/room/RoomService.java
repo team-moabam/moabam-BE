@@ -116,6 +116,8 @@ public class RoomService {
 			return;
 		}
 
+		List<Routine> routines = routineRepository.findAllByRoomId(roomId);
+		routineRepository.deleteAll(routines);
 		roomRepository.delete(room);
 	}
 
