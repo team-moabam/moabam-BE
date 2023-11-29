@@ -18,12 +18,13 @@ public class FcmRepository {
 
 	private final ValueRedisRepository valueRedisRepository;
 
-	public void saveToken(Long memberId, String fcmToken) {
+	public void saveToken(String fcmToken, Long memberId) {
+		String tokenKey = String.valueOf(requireNonNull(memberId));
+
 		valueRedisRepository.save(
-			String.valueOf(requireNonNull(memberId)),
+			tokenKey,
 			requireNonNull(fcmToken),
-			Duration.ofDays(EXPIRE_FCM_TOKEN)
-		);
+			Duration.ofDays(EXPIRE_FCM_TOKEN));
 	}
 
 	public void deleteTokenByMemberId(Long memberId) {
@@ -32,9 +33,5 @@ public class FcmRepository {
 
 	public String findTokenByMemberId(Long memberId) {
 		return valueRedisRepository.get(String.valueOf(requireNonNull(memberId)));
-	}
-
-	public boolean existsTokenByMemberId(Long memberId) {
-		return valueRedisRepository.hasKey(String.valueOf(requireNonNull(memberId)));
 	}
 }

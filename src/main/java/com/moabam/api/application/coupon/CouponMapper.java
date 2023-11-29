@@ -52,6 +52,7 @@ public final class CouponMapper {
 		Coupon coupon = couponWallet.getCoupon();
 
 		return MyCouponResponse.builder()
+			.walletId(couponWallet.getId())
 			.id(coupon.getId())
 			.name(coupon.getName())
 			.description(coupon.getDescription())

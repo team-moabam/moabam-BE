@@ -76,7 +76,7 @@ class ItemControllerTest extends WithoutFilterSupporter {
 			Long memberId = getAuthMember().id();
 			Item item1 = itemRepository.save(morningSantaSkin().build());
 			Inventory inventory = inventoryRepository.save(inventory(memberId, item1));
-			inventory.select();
+			inventory.select(member());
 			Item item2 = itemRepository.save(morningKillerSkin().build());
 			ItemsResponse expected = ItemMapper.toItemsResponse(item1.getId(), List.of(item1), List.of(item2));
 
@@ -153,6 +153,7 @@ class ItemControllerTest extends WithoutFilterSupporter {
 		// given
 		Long memberId = getAuthMember().id();
 		Item item = itemRepository.save(nightMageSkin());
+		given(memberService.findMember(memberId)).willReturn(member());
 		inventoryRepository.save(inventory(memberId, item));
 
 		// when, then

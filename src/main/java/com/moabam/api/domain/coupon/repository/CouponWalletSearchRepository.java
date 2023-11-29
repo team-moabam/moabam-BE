@@ -20,23 +20,23 @@ public class CouponWalletSearchRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public List<CouponWallet> findAllByCouponIdAndMemberId(Long couponId, Long memberId) {
+	public List<CouponWallet> findAllByIdAndMemberId(Long couponWalletId, Long memberId) {
 		return jpaQueryFactory
 			.selectFrom(couponWallet)
 			.join(couponWallet.coupon, coupon).fetchJoin()
 			.where(
-				DynamicQuery.generateEq(couponId, couponWallet.coupon.id::eq),
+				DynamicQuery.generateEq(couponWalletId, couponWallet.id::eq),
 				DynamicQuery.generateEq(memberId, couponWallet.memberId::eq)
 			)
 			.fetch();
 	}
 
-	public Optional<CouponWallet> findByIdAndMemberId(Long id, Long memberId) {
+	public Optional<CouponWallet> findByIdAndMemberId(Long couponWalletId, Long memberId) {
 		return Optional.ofNullable(jpaQueryFactory
 			.selectFrom(couponWallet)
 			.join(couponWallet.coupon, coupon).fetchJoin()
 			.where(
-				couponWallet.id.eq(id),
+				couponWallet.id.eq(couponWalletId),
 				couponWallet.memberId.eq(memberId))
 			.fetchOne()
 		);

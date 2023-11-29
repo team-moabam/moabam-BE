@@ -28,7 +28,7 @@ class FcmRepositoryTest {
 	@Test
 	void saveToken_success() {
 		// When
-		fcmRepository.saveToken(1L, "value1");
+		fcmRepository.saveToken("FCM-TOKEN", 1L);
 
 		// Then
 		verify(valueRedisRepository).save(any(String.class), any(String.class), any(Duration.class));
@@ -38,7 +38,7 @@ class FcmRepositoryTest {
 	@Test
 	void saveToken_MemberId_NullPointerException() {
 		// When & Then
-		assertThatThrownBy(() -> fcmRepository.saveToken(null, "value"))
+		assertThatThrownBy(() -> fcmRepository.saveToken("FCM-TOKEN", null))
 			.isInstanceOf(NullPointerException.class);
 	}
 
@@ -46,7 +46,7 @@ class FcmRepositoryTest {
 	@Test
 	void saveToken_FcmToken_NullPointerException() {
 		// When & Then
-		assertThatThrownBy(() -> fcmRepository.saveToken(1L, null))
+		assertThatThrownBy(() -> fcmRepository.saveToken(null, 1L))
 			.isInstanceOf(NullPointerException.class);
 	}
 
@@ -60,7 +60,7 @@ class FcmRepositoryTest {
 		verify(valueRedisRepository).delete(any(String.class));
 	}
 
-	@DisplayName("ID가 Null인 사용자가 FCM 토큰을 삭제한다.. - NullPointerException")
+	@DisplayName("ID가 Null인 사용자가 FCM 토큰을 삭제한다. - NullPointerException")
 	@Test
 	void deleteTokenByMemberId_NullPointerException() {
 		// When & Then
@@ -83,24 +83,6 @@ class FcmRepositoryTest {
 	void findTokenByMemberId_NullPointerException() {
 		// When & Then
 		assertThatThrownBy(() -> fcmRepository.findTokenByMemberId(null))
-			.isInstanceOf(NullPointerException.class);
-	}
-
-	@DisplayName("FCM 토큰 존재 여부를 성공적으로 확인한다. - Boolean")
-	@Test
-	void existsTokenByMemberId_success() {
-		// When
-		fcmRepository.existsTokenByMemberId(1L);
-
-		// Then
-		verify(valueRedisRepository).hasKey(any(String.class));
-	}
-
-	@DisplayName("ID가 Null인 사용자가 FCM 토큰 존재 여부를 확인한다. - NullPointerException")
-	@Test
-	void existsTokenByMemberId_NullPointerException() {
-		// When & Then
-		assertThatThrownBy(() -> fcmRepository.existsTokenByMemberId(null))
 			.isInstanceOf(NullPointerException.class);
 	}
 }

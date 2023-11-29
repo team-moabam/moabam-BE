@@ -266,10 +266,10 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		itemRepository.saveAll(List.of(night, morning, killer));
 
 		Inventory nightInven = InventoryFixture.inventory(member.getId(), night);
-		nightInven.select();
+		nightInven.select(member);
 
 		Inventory morningInven = InventoryFixture.inventory(member.getId(), morning);
-		morningInven.select();
+		morningInven.select(member);
 
 		Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
 		inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
@@ -316,10 +316,10 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		itemRepository.saveAll(List.of(night, morning, killer));
 
 		Inventory nightInven = InventoryFixture.inventory(member.getId(), night);
-		nightInven.select();
+		nightInven.select(member);
 
 		Inventory morningInven = InventoryFixture.inventory(member.getId(), morning);
-		morningInven.select();
+		morningInven.select(member);
 
 		Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
 		inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
@@ -377,10 +377,10 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		itemRepository.saveAll(List.of(night, morning, killer));
 
 		Inventory nightInven = InventoryFixture.inventory(friend.getId(), night);
-		nightInven.select();
+		nightInven.select(member);
 
 		Inventory morningInven = InventoryFixture.inventory(friend.getId(), morning);
-		morningInven.select();
+		morningInven.select(member);
 
 		Inventory killerInven = InventoryFixture.inventory(friend.getId(), killer);
 		friend.changeDefaultSkintUrl(morning);
@@ -435,13 +435,13 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		itemRepository.saveAll(List.of(night, morning, killer));
 
 		Inventory nightInven = InventoryFixture.inventory(member.getId(), night);
-		nightInven.select();
+		nightInven.select(member);
 
 		Inventory morningInven = InventoryFixture.inventory(member.getId(), morning);
-		morningInven.select();
+		morningInven.select(member);
 
 		Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
-		killerInven.select();
+		killerInven.select(member);
 		inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
 
 		// expected
