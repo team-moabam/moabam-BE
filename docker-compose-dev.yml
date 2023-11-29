@@ -70,6 +70,7 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
     volumes:
       - /home/ubuntu/moabam/data/mysql:/var/lib/mysql
-      - /home/ubuntu/moabam/sql/initdb.d:/docker-entrypoint-initdb.d
+      - /home/ubuntu/moabam/mysql/initdb.d:/docker-entrypoint-initdb.d
