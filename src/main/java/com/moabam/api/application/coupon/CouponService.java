@@ -64,18 +64,22 @@ public class CouponService {
 	}
 
 	@Transactional
-	public void use(Long memberId, Long couponWalletId) {
+	public void use(Long couponWalletId, Long memberId) {
 		CouponWallet couponWallet = couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 		Coupon coupon = couponWallet.getCoupon();
 		BugType bugType = coupon.getType().getBugType();
+
+		if (coupon.getType().isDiscount()) {
+			throw new BadRequestException(ErrorMessage.INVALID_DISCOUNT_COUPON);
+		}
 
 		bugService.applyCoupon(memberId, bugType, coupon.getPoint());
 		couponWalletRepository.delete(couponWallet);
 	}
 
 	@Transactional
-	public void discount(Long memberId, Long couponWalletId) {
+	public void discount(Long couponWalletId, Long memberId) {
 		CouponWallet couponWallet = couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 		Coupon coupon = couponWallet.getCoupon();

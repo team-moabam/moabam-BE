@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,6 +35,7 @@ import com.moabam.api.domain.member.Role;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
+import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
@@ -69,6 +69,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 
 	@MockBean
 	ClockHolder clockHolder;
+
+	@MockBean
+	ZSetRedisRepository zSetRedisRepository;
 
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("POST - 쿠폰을 성공적으로 발행한다. - Void")
@@ -416,7 +419,6 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_DISCOUNT_COUPON.getMessage()));
 	}
 
-	@Disabled
 	@WithMember
 	@DisplayName("POST - 쿠폰 발급 요청을 성공적으로 한다. - Void")
 	@Test
@@ -426,6 +428,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 		Coupon coupon = couponRepository.save(couponFixture);
 
 		given(clockHolder.date()).willReturn(LocalDate.of(2023, 2, 1));
+		willDoNothing().given(zSetRedisRepository).addIfAbsent(anyString(), anyLong(), anyDouble(), anyInt());
 
 		// When & Then
 		mockMvc.perform(post("/coupons")

@@ -129,7 +129,7 @@ class CouponManageServiceTest {
 		given(couponRepository.existsByNameAndStartAt(any(String.class), any(LocalDate.class))).willReturn(true);
 
 		// When
-		couponManageService.registerQueue(1L, coupon.getName());
+		couponManageService.registerQueue(coupon.getName(), 1L);
 
 		// Then
 		verify(couponManageRepository).addIfAbsentQueue(any(String.class), any(Long.class), any(double.class));
@@ -143,7 +143,7 @@ class CouponManageServiceTest {
 		given(couponRepository.existsByNameAndStartAt(any(String.class), any(LocalDate.class))).willReturn(false);
 
 		// When & Then
-		assertThatThrownBy(() -> couponManageService.registerQueue(1L, "couponName"))
+		assertThatThrownBy(() -> couponManageService.registerQueue("couponName", 1L))
 			.isInstanceOf(BadRequestException.class)
 			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD.getMessage());
 	}

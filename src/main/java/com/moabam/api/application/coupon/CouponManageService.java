@@ -73,7 +73,7 @@ public class CouponManageService {
 		}
 	}
 
-	public void registerQueue(Long memberId, String couponName) {
+	public void registerQueue(String couponName, Long memberId) {
 		double registerTime = System.currentTimeMillis();
 		validateRegisterQueue(couponName);
 		couponManageRepository.addIfAbsentQueue(couponName, memberId, registerTime);

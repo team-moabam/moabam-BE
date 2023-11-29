@@ -66,13 +66,13 @@ public class CouponController {
 
 	@PostMapping("/my-coupons/{couponWalletId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void use(@Auth AuthMember authMember, @PathVariable("couponWalletId") Long couponWalletId) {
-		couponService.use(authMember.id(), couponWalletId);
+	public void use(@PathVariable("couponWalletId") Long couponWalletId, @Auth AuthMember authMember) {
+		couponService.use(couponWalletId, authMember.id());
 	}
 
 	@PostMapping("/coupons")
 	@ResponseStatus(HttpStatus.OK)
-	public void registerQueue(@Auth AuthMember authMember, @RequestParam("couponName") String couponName) {
-		couponManageService.registerQueue(authMember.id(), couponName);
+	public void registerQueue(@RequestParam("couponName") String couponName, @Auth AuthMember authMember) {
+		couponManageService.registerQueue(couponName, authMember.id());
 	}
 }
