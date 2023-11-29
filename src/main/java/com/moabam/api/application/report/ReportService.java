@@ -31,7 +31,7 @@ public class ReportService {
 
 	@Transactional
 	public void report(AuthMember authMember, ReportRequest reportRequest) {
-		validateNoReportSubject(reportRequest.roomId(), reportRequest.certificationId());
+		validateNoReportSubject(reportRequest.reportedId());
 		Report report = createReport(authMember.id(), reportRequest);
 		reportRepository.save(report);
 	}
@@ -39,21 +39,22 @@ public class ReportService {
 	private Report createReport(Long reporterId, ReportRequest reportRequest) {
 		Member reportedMember = memberService.findMember(reportRequest.reportedId());
 
+		Certification certification = null;
 		if (nonNull(reportRequest.certificationId())) {
-			Certification certification = certificationService.findCertification(reportRequest.certificationId());
-
-			return ReportMapper.toReport(reporterId, reportedMember.getId(),
-				null, certification, reportRequest.description());
+			certification = certificationService.findCertification(reportRequest.certificationId());
 		}
 
-		Room room = roomService.findRoom(reportRequest.roomId());
+		Room room = null;
+		if (nonNull(reportRequest.roomId())) {
+			room = roomService.findRoom(reportRequest.roomId());
+		}
 
 		return ReportMapper.toReport(reporterId, reportedMember.getId(),
-			room, null, reportRequest.description());
+			room, certification, reportRequest.description());
 	}
 
-	private void validateNoReportSubject(Long roomId, Long certificationId) {
-		if (isNull(roomId) && isNull(certificationId)) {
+	private void validateNoReportSubject(Long reportedId) {
+		if (isNull(reportedId)) {
 			throw new BadRequestException(ErrorMessage.REPORT_REQUEST_ERROR);
 		}
 	}

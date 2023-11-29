@@ -1,6 +1,6 @@
 package com.moabam.api.application.auth;
 
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -13,6 +13,7 @@ import com.moabam.global.error.model.ErrorMessage;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -37,8 +38,9 @@ public class JwtAuthenticationService {
 
 	public PublicClaim parseClaim(String token) {
 		String claims = token.split("\\.")[1];
-		String decodeClaims = new String(Base64.getDecoder().decode(claims));
-		JSONObject jsonObject = new JSONObject(decodeClaims);
+		byte[] claimsBytes = Decoders.BASE64URL.decode(claims);
+		String decodedClaims = new String(claimsBytes, StandardCharsets.UTF_8);
+		JSONObject jsonObject = new JSONObject(decodedClaims);
 
 		return AuthorizationMapper.toPublicClaim(jsonObject);
 	}

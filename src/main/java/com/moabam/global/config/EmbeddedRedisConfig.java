@@ -37,8 +37,10 @@ public class EmbeddedRedisConfig {
 	private int availablePort;
 	private RedisServer redisServer;
 
-	public EmbeddedRedisConfig(@Value("${spring.data.redis.port}") int redisPort,
-		@Value("${spring.data.redis.host}") String redisHost) {
+	public EmbeddedRedisConfig(
+		@Value("${spring.data.redis.port}") int redisPort,
+		@Value("${spring.data.redis.host}") String redisHost
+	) {
 		this.redisPort = redisPort;
 		this.redisHost = redisHost;
 

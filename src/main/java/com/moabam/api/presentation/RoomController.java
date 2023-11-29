@@ -54,7 +54,7 @@ public class RoomController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Long createRoom(@Auth AuthMember authMember, @Valid @RequestBody CreateRoomRequest createRoomRequest) {
-		return roomService.createRoom(authMember.id(), authMember.nickname(), createRoomRequest);
+		return roomService.createRoom(authMember.id(), createRoomRequest);
 	}
 
 	@GetMapping

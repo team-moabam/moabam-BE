@@ -18,6 +18,9 @@ import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
+import com.moabam.api.domain.room.Participant;
+import com.moabam.api.domain.room.repository.ParticipantRepository;
+import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.MemberInfo;
@@ -46,6 +49,8 @@ public class MemberService {
 	private final InventoryRepository inventoryRepository;
 	private final ItemRepository itemRepository;
 	private final MemberSearchRepository memberSearchRepository;
+	private final ParticipantSearchRepository participantSearchRepository;
+	private final ParticipantRepository participantRepository;
 	private final ClockHolder clockHolder;
 
 	public Member findMember(Long memberId) {
@@ -73,6 +78,12 @@ public class MemberService {
 
 	@Transactional
 	public void delete(Member member) {
+		List<Participant> participants = participantRepository.findAllByMemberId(member.getId());
+
+		if (!participants.isEmpty()) {
+			throw new BadRequestException(NEED_TO_EXIT_ALL_ROOMS);
+		}
+
 		member.delete(clockHolder.times());
 		memberRepository.flush();
 		memberRepository.delete(member);
@@ -99,12 +110,18 @@ public class MemberService {
 
 		RankingInfo beforeInfo = MemberMapper.toRankingInfo(member);
 		member.changeNickName(modifyMemberRequest.nickname());
+
+		boolean nickNameChanged = member.changeNickName(modifyMemberRequest.nickname());
 		member.changeIntro(modifyMemberRequest.intro());
 		member.changeProfileUri(newProfileUri);
 		memberRepository.save(member);
-		RankingInfo afterInfo = MemberMapper.toRankingInfo(member);
 
+		RankingInfo afterInfo = MemberMapper.toRankingInfo(member);
 		rankingService.changeInfos(beforeInfo, afterInfo);
+
+		if (nickNameChanged) {
+			changeNickname(authMember.id(), modifyMemberRequest.nickname());
+		}
 	}
 
 	public PersonalRankingInfo getRankingInfo(AuthMember authMember) {
@@ -113,7 +130,19 @@ public class MemberService {
 		return MemberMapper.toRankingInfoWithScore(member);
 	}
 
+	private void changeNickname(Long memberId, String changedName) {
+		List<Participant> participants = participantSearchRepository.findAllRoomMangerByMemberId(memberId);
+
+		for (Participant participant : participants) {
+			participant.getRoom().changeManagerNickname(changedName);
+		}
+	}
+
+
 	private void validateNickname(String nickname) {
+		if (Objects.isNull(nickname)) {
+			return;
+		}
 		if (StringUtils.isEmpty(nickname) && memberRepository.existsByNickname(nickname)) {
 			throw new ConflictException(NICKNAME_CONFLICT);
 		}

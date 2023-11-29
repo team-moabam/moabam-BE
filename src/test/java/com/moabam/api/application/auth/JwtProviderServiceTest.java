@@ -9,14 +9,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import com.moabam.api.application.auth.JwtProviderService;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.support.fixture.PublicClaimFixture;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 
 class JwtProviderServiceTest {
 
@@ -54,6 +56,39 @@ class JwtProviderServiceTest {
 		Long iat = Long.valueOf(claimsJson.get("iat").toString());
 		Long exp = Long.valueOf(claimsJson.get("exp").toString());
 		assertThat(iat).isLessThan(exp);
+	}
+
+	@DisplayName("토큰 디코딩 실패")
+	@Test
+	void decoding_token_failBy_url() {
+		// given
+		String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+			+ ".eyJpc3MiOiJtb2Ftb2Ftb2FiYW0iLCJpYXQiOjE3MDEyMzQyNjksImV4c"
+			+ "CI6MTcwMTIzNDU2OSwiaWQiOjIsIm5pY2tuYW1lIjoiXHVEODNEXHVEQzNC6rOw64-M7J20Iiwicm9sZSI6IlVTRVIifQ"
+			+ ".yVcvshWQ6fsQ0OQ-A5kolDo-8QsLVFCD6dIENKWZH-A";
+		String[] parts = token.split("\\.");
+
+		// when + then
+		assertThatThrownBy(() -> Base64.getDecoder().decode(parts[1])).isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@DisplayName("토큰 디코딩 성공")
+	@ParameterizedTest
+	@ValueSource(strings = {
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+			+ ".eyJpc3MiOiJtb2Ftb2Ftb2FiYW0iLCJpYXQiOjE3MDEyMzQyNjksImV4cCI6MTcwMjQ0Mzg2OX0"
+			+ ".IrcH_LvBKK1HezgY3PVY-0HQlhP6neEuydH6Mhz4Jgo",
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+			+ ".eyJpc3MiOiJtb2Ftb2Ftb2FiYW0iLCJpYXQiOjE3MDEyMzQyNjksImV4cCI6MTcwMTIzNDU2OSwiaWQiOjIsIm"
+			+ "5pY2tuYW1lIjoiXHVEODNEXHVEQzNC6rOw64-M7J20Iiwicm9sZSI6IlVTRVIifQ"
+			+ ".yVcvshWQ6fsQ0OQ-A5kolDo-8QsLVFCD6dIENKWZH-A"
+	})
+	void decoding_token_success(String token) {
+		// given
+		String[] parts = token.split("\\.");
+
+		// When + Then
+		assertThatNoException().isThrownBy(() -> Decoders.BASE64URL.decode(parts[1]));
 	}
 
 	@DisplayName("refresh 토큰 생성 성공")

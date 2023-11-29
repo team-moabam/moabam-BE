@@ -7,12 +7,12 @@ import java.util.Set;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.moabam.api.application.notification.NotificationService;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponManageRepository;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
-import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.model.ErrorMessage;
@@ -25,67 +25,69 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CouponManageService {
 
+	private static final String SUCCESS_ISSUE_BODY = "%s 쿠폰 발행을 성공했습니다. 축하드립니다!";
+	private static final String FAIL_ISSUE_BODY = "%s 쿠폰 발행을 실패했습니다. 다음 기회에!";
 	private static final long ISSUE_SIZE = 10;
+	private static final long ISSUE_FIRST = 0;
 
 	private final ClockHolder clockHolder;
+	private final NotificationService notificationService;
 
 	private final CouponRepository couponRepository;
 	private final CouponManageRepository couponManageRepository;
 	private final CouponWalletRepository couponWalletRepository;
 
+	private long current = ISSUE_FIRST;
+
+	@Scheduled(cron = "0 0 0 * * *")
+	public void init() {
+		current = ISSUE_FIRST;
+	}
+
 	@Scheduled(fixedDelay = 1000)
 	public void issue() {
 		LocalDate now = clockHolder.date();
-		Optional<Coupon> isCoupon = couponRepository.findByStartAt(now);
+		Optional<Coupon> optionalCoupon = couponRepository.findByStartAt(now);
 
-		if (!canIssue(isCoupon)) {
+		if (optionalCoupon.isEmpty()) {
 			return;
 		}
 
-		Coupon coupon = isCoupon.get();
-		Set<Long> membersId = couponManageRepository.popMinQueue(coupon.getName(), ISSUE_SIZE);
+		Coupon coupon = optionalCoupon.get();
+		String couponName = coupon.getName();
+		int max = coupon.getStock();
 
-		membersId.forEach(memberId -> {
-			int nextStock = couponManageRepository.increaseIssuedStock(coupon.getName());
+		Set<Long> membersId = couponManageRepository.rangeQueue(couponName, current, current + ISSUE_SIZE);
 
-			if (coupon.getStock() < nextStock) {
-				return;
+		for (Long memberId : membersId) {
+			int rank = couponManageRepository.rankQueue(couponName, memberId);
+
+			if (max < rank) {
+				notificationService.sendCouponIssueResult(memberId, couponName, FAIL_ISSUE_BODY);
+				continue;
 			}
 
-			CouponWallet couponWallet = CouponWallet.create(memberId, coupon);
-			couponWalletRepository.save(couponWallet);
-		});
+			couponWalletRepository.save(CouponWallet.create(memberId, coupon));
+			notificationService.sendCouponIssueResult(memberId, couponName, SUCCESS_ISSUE_BODY);
+			current++;
+		}
 	}
 
-	public void register(AuthMember authMember, String couponName) {
+	public void registerQueue(Long memberId, String couponName) {
 		double registerTime = System.currentTimeMillis();
-		validateRegister(couponName);
-		couponManageRepository.addIfAbsentQueue(couponName, authMember.id(), registerTime);
+		validateRegisterQueue(couponName);
+		couponManageRepository.addIfAbsentQueue(couponName, memberId, registerTime);
 	}
 
-	public void deleteCouponManage(String couponName) {
+	public void deleteQueue(String couponName) {
 		couponManageRepository.deleteQueue(couponName);
-		couponManageRepository.deleteIssuedStock(couponName);
 	}
 
-	private void validateRegister(String couponName) {
+	private void validateRegisterQueue(String couponName) {
 		LocalDate now = clockHolder.date();
-		Optional<Coupon> coupon = couponRepository.findByStartAt(now);
 
-		if (coupon.isEmpty() || !coupon.get().getName().equals(couponName)) {
+		if (!couponRepository.existsByNameAndStartAt(couponName, now)) {
 			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
 		}
-	}
-
-	private boolean canIssue(Optional<Coupon> coupon) {
-		if (coupon.isEmpty()) {
-			return false;
-		}
-
-		Coupon currentCoupon = coupon.get();
-		int currentStock = couponManageRepository.getIssuedStock(currentCoupon.getName());
-		int maxStock = currentCoupon.getStock();
-
-		return currentStock < maxStock;
 	}
 }

@@ -2,6 +2,7 @@ package com.moabam.api.infrastructure.redis;
 
 import static java.util.Objects.*;
 
+import java.time.Duration;
 import java.util.Set;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,16 +19,24 @@ public class ZSetRedisRepository {
 
 	private final RedisTemplate<String, Object> redisTemplate;
 
-	public void addIfAbsent(String key, Object value, double score) {
-		if (redisTemplate.opsForZSet().score(key, value) == null) {
-			add(key, value, score);
-		}
+	public void addIfAbsent(String key, Object value, double score, int expire) {
+		redisTemplate
+			.opsForZSet()
+			.addIfAbsent(requireNonNull(key), requireNonNull(value), score);
+		redisTemplate
+			.expire(key, Duration.ofDays(expire));
 	}
 
-	public Set<TypedTuple<Object>> popMin(String key, long count) {
+	public Set<Object> range(String key, long start, long end) {
 		return redisTemplate
 			.opsForZSet()
-			.popMin(key, count);
+			.range(key, start, end);
+	}
+
+	public Long rank(String key, Object value) {
+		return redisTemplate
+			.opsForZSet()
+			.rank(key, value);
 	}
 
 	public void add(String key, Object value, double score) {
@@ -51,7 +60,7 @@ public class ZSetRedisRepository {
 		redisTemplate.opsForZSet().remove(key, value);
 	}
 
-	public Set<TypedTuple<Object>> range(String key, int startIndex, int limitIndex) {
+	public Set<TypedTuple<Object>> rangeJson(String key, int startIndex, int limitIndex) {
 		setSerialize(Object.class);
 		Set<ZSetOperations.TypedTuple<Object>> rankings = redisTemplate.opsForZSet()
 			.reverseRangeWithScores(key, startIndex, limitIndex);
@@ -63,7 +72,7 @@ public class ZSetRedisRepository {
 		redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(classes));
 	}
 
-	public Long rank(String key, Object myRankingInfo) {
+	public Long reverseRank(String key, Object myRankingInfo) {
 		return redisTemplate.opsForZSet().reverseRank(key, myRankingInfo);
 	}
 }

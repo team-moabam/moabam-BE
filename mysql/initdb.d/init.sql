@@ -1,4 +1,4 @@
-use moabam;
+use moabam_dev;
 
 create table badge
 (

@@ -25,6 +25,8 @@ import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
+import com.moabam.api.domain.room.repository.ParticipantRepository;
+import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.MemberInfo;
@@ -54,6 +56,12 @@ class MemberServiceTest {
 
 	@Mock
 	MemberSearchRepository memberSearchRepository;
+
+	@Mock
+	ParticipantRepository participantRepository;
+
+	@Mock
+	ParticipantSearchRepository participantSearchRepository;
 
 	@Mock
 	InventorySearchRepository inventorySearchRepository;
@@ -208,6 +216,8 @@ class MemberServiceTest {
 		Member member = MemberFixture.member();
 		ModifyMemberRequest modifyMemberRequest = ModifyImageFixture.modifyMemberRequest();
 		given(memberSearchRepository.findMember(authMember.id())).willReturn(Optional.ofNullable(member));
+		given(participantSearchRepository.findAllRoomMangerByMemberId(any()))
+			.willReturn(List.of());
 
 		// when
 		memberService.modifyInfo(authMember, modifyMemberRequest, "/main");

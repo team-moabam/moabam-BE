@@ -80,7 +80,7 @@ public class CouponService {
 		Coupon coupon = couponRepository.findById(couponId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 		couponRepository.delete(coupon);
-		couponManageService.deleteCouponManage(coupon.getName());
+		couponManageService.deleteQueue(coupon.getName());
 	}
 
 	public CouponResponse getById(Long couponId) {

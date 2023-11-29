@@ -53,7 +53,7 @@ public class RankingService {
 
 	public TopRankingResponses getMemberRanking(PersonalRankingInfo myRankingInfo) {
 		List<TopRankingInfoResponse> topRankings = getTopRankings();
-		Long myRanking = zSetRedisRepository.rank("Ranking", myRankingInfo);
+		Long myRanking = zSetRedisRepository.reverseRank("Ranking", myRankingInfo);
 		TopRankingInfoResponse myRankingInfoResponse = RankingMapper.topRankingResponse(myRanking.intValue(),
 			myRankingInfo);
 
@@ -62,7 +62,7 @@ public class RankingService {
 
 	private List<TopRankingInfoResponse> getTopRankings() {
 		Set<ZSetOperations.TypedTuple<Object>> topRankings =
-			zSetRedisRepository.range(RANKING, START_INDEX, LIMIT_INDEX);
+			zSetRedisRepository.rangeJson(RANKING, START_INDEX, LIMIT_INDEX);
 
 		Set<Long> scoreSet = new HashSet<>();
 		List<TopRankingInfoResponse> topRankingInfoRespons = new ArrayList<>();

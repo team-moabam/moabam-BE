@@ -202,7 +202,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 		Member deletedMEmber = deletedMemberOptional.get();
 		assertThat(deletedMEmber.getDeletedAt()).isNotNull();
-		assertThat(deletedMEmber.getNickname()).isEqualTo(nickname);
+		assertThat(deletedMEmber.getNickname()).isNull();
 	}
 
 	@DisplayName("회원이 없어서 회원 삭제 실패")
@@ -301,13 +301,13 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				// MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
 				// MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
 
-				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("MORNING_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("오목눈이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("MORNING_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("어른 오목눈이"),
 				MockMvcResultMatchers.jsonPath("$.badges[1].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("NIGHT_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("부엉이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[2].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("NIGHT_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("어른 부엉이"),
 				MockMvcResultMatchers.jsonPath("$.badges[3].unlock").value(false),
 				MockMvcResultMatchers.jsonPath("$.goldenBug").value(member.getBug().getGoldenBug()),
 				MockMvcResultMatchers.jsonPath("$.morningBug").value(member.getBug().getMorningBug()),
@@ -352,13 +352,13 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				// MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
 				// MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
 
-				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("MORNING_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("오목눈이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(false),
-				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("MORNING_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("어른 오목눈이"),
 				MockMvcResultMatchers.jsonPath("$.badges[1].unlock").value(false),
-				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("NIGHT_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("부엉이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[2].unlock").value(false),
-				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("NIGHT_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("어른 부엉이"),
 				MockMvcResultMatchers.jsonPath("$.badges[3].unlock").value(false),
 				MockMvcResultMatchers.jsonPath("$.goldenBug").value(member.getBug().getGoldenBug()),
 				MockMvcResultMatchers.jsonPath("$.morningBug").value(member.getBug().getMorningBug()),
@@ -415,13 +415,13 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getAwakeImage()),
 				MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getAwakeImage()),
 
-				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("MORNING_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("오목눈이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("MORNING_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("어른 오목눈이"),
 				MockMvcResultMatchers.jsonPath("$.badges[1].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("NIGHT_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("부엉이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[2].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("NIGHT_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("어른 부엉이"),
 				MockMvcResultMatchers.jsonPath("$.badges[3].unlock").value(true)
 			).andDo(print());
 	}
