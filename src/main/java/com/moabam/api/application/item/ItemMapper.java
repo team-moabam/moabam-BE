@@ -20,7 +20,7 @@ public final class ItemMapper {
 			.type(item.getType().name())
 			.category(item.getCategory().name())
 			.name(item.getName())
-			.image(item.getImage())
+			.image(item.getAwakeImage())
 			.level(item.getUnlockLevel())
 			.bugPrice(item.getBugPrice())
 			.goldenBugPrice(item.getGoldenBugPrice())

@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.application.bug.BugService;
 import com.moabam.api.application.image.ImageService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.room.mapper.CertificationsMapper;
@@ -50,6 +51,9 @@ class CertificationServiceTest {
 
 	@Mock
 	private MemberService memberService;
+
+	@Mock
+	private BugService bugService;
 
 	@Mock
 	private RoomRepository roomRepository;
@@ -161,7 +165,7 @@ class CertificationServiceTest {
 		certificationService.certifyRoom(certifyInfo);
 
 		// then
-		assertThat(member1.getBug().getMorningBug()).isEqualTo(12);
+		verify(bugService).reward(any(Member.class), any(BugType.class), anyInt());
 	}
 
 	@DisplayName("인증되지 않은 방에서 루틴 인증 후 방의 인증 성공")
@@ -184,11 +188,7 @@ class CertificationServiceTest {
 		certificationService.certifyRoom(certifyInfo);
 
 		// then
-		assertThat(member1.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member2.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member3.getBug().getMorningBug()).isEqualTo(12);
-		assertThat(member3.getBug().getNightBug()).isEqualTo(20);
-		assertThat(member3.getBug().getGoldenBug()).isEqualTo(30);
+		verify(bugService, times(3)).reward(any(Member.class), any(BugType.class), anyInt());
 		assertThat(room.getExp()).isEqualTo(1);
 		assertThat(room.getLevel()).isEqualTo(2);
 	}

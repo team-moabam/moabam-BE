@@ -19,8 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.application.bug.BugService;
 import com.moabam.api.application.member.MemberService;
-import com.moabam.api.domain.bug.BugHistory;
 import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.item.Inventory;
@@ -46,6 +46,9 @@ class ItemServiceTest {
 
 	@Mock
 	MemberService memberService;
+
+	@Mock
+	BugService bugService;
 
 	@Mock
 	ItemRepository itemRepository;
@@ -106,11 +109,8 @@ class ItemServiceTest {
 			itemService.purchaseItem(memberId, itemId, request);
 
 			// Then
-			verify(memberService).findMember(memberId);
-			verify(itemRepository).findById(itemId);
-			verify(inventorySearchRepository).findOne(memberId, itemId);
+			verify(bugService).use(any(Member.class), any(BugType.class), anyInt());
 			verify(inventoryRepository).save(any(Inventory.class));
-			verify(bugHistoryRepository).save(any(BugHistory.class));
 		}
 
 		@DisplayName("해당 아이템이 존재하지 않으면 예외가 발생한다.")
@@ -167,8 +167,6 @@ class ItemServiceTest {
 			itemService.selectItem(memberId, itemId);
 
 			// then
-			verify(inventorySearchRepository).findOne(memberId, itemId);
-			verify(inventorySearchRepository).findDefault(memberId, itemType);
 			assertFalse(defaultInventory.isDefault());
 			assertTrue(inventory.isDefault());
 		}
