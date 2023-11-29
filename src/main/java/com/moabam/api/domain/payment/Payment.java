@@ -133,9 +133,9 @@ public class Payment {
 		this.requestedAt = LocalDateTime.now();
 	}
 
-	public void confirm(String paymentKey, LocalDateTime approvedAt) {
+	public void confirm(String paymentKey) {
 		this.paymentKey = paymentKey;
-		this.approvedAt = approvedAt;
+		this.approvedAt = LocalDateTime.now();
 		this.status = PaymentStatus.DONE;
 	}
 

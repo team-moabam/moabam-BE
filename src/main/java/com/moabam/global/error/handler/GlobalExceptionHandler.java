@@ -21,6 +21,7 @@ import com.moabam.global.error.exception.FcmException;
 import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.global.error.exception.MoabamException;
 import com.moabam.global.error.exception.NotFoundException;
+import com.moabam.global.error.exception.TossPaymentException;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorResponse;
 
@@ -58,7 +59,7 @@ public class GlobalExceptionHandler {
 	}
 
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	@ExceptionHandler(FcmException.class)
+	@ExceptionHandler({FcmException.class, TossPaymentException.class})
 	protected ErrorResponse handleFcmException(MoabamException moabamException) {
 		return new ErrorResponse(moabamException.getMessage(), null);
 	}
