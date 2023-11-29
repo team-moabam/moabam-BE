@@ -9,9 +9,11 @@ import com.moabam.api.domain.coupon.Coupon;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
-	boolean existsByName(String name);
+	boolean existsByName(String couponName);
 
 	boolean existsByStartAt(LocalDate startAt);
 
 	Optional<Coupon> findByStartAt(LocalDate startAt);
+
+	boolean existsByNameAndStartAt(String couponName, LocalDate startAt);
 }

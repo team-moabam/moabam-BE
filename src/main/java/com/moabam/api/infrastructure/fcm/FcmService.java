@@ -1,13 +1,13 @@
 package com.moabam.api.infrastructure.fcm;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.moabam.global.auth.model.AuthMember;
-import com.moabam.global.error.exception.NotFoundException;
-import com.moabam.global.error.model.ErrorMessage;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,10 +32,8 @@ public class FcmService {
 		fcmRepository.deleteTokenByMemberId(memberId);
 	}
 
-	public String findTokenByMemberId(Long targetId) {
-		validateToken(targetId);
-
-		return fcmRepository.findTokenByMemberId(targetId);
+	public Optional<String> findTokenByMemberId(Long targetId) {
+		return Optional.ofNullable(fcmRepository.findTokenByMemberId(targetId));
 	}
 
 	public void sendAsync(String fcmToken, String notificationBody) {
@@ -44,12 +42,6 @@ public class FcmService {
 		if (fcmToken != null) {
 			Message message = FcmMapper.toMessage(notification, fcmToken);
 			firebaseMessaging.sendAsync(message);
-		}
-	}
-
-	private void validateToken(Long memberId) {
-		if (!fcmRepository.existsTokenByMemberId(memberId)) {
-			throw new NotFoundException(ErrorMessage.NOT_FOUND_FCM_TOKEN);
 		}
 	}
 }

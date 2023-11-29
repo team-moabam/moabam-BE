@@ -58,7 +58,7 @@ public class CouponController {
 	@PostMapping("/coupons")
 	@ResponseStatus(HttpStatus.OK)
 	public void registerQueue(@Auth AuthMember authMember, @RequestParam("couponName") String couponName) {
-		couponManageService.register(authMember, couponName);
+		couponManageService.registerQueue(authMember.id(), couponName);
 	}
 
 	@GetMapping({"/my-coupons", "/my-coupons/{couponId}"})
