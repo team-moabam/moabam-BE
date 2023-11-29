@@ -160,6 +160,7 @@ class ItemServiceTest {
 			Inventory inventory = inventory(memberId, nightMageSkin());
 			Inventory defaultInventory = inventory(memberId, nightMageSkin());
 			ItemType itemType = inventory.getItemType();
+			given(memberService.findMember(memberId)).willReturn(member());
 			given(inventorySearchRepository.findOne(memberId, itemId)).willReturn(Optional.of(inventory));
 			given(inventorySearchRepository.findDefault(memberId, itemType)).willReturn(Optional.of(defaultInventory));
 

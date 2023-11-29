@@ -807,9 +807,9 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Inventory inventory1 = InventoryFixture.inventory(1L, item);
 		Inventory inventory2 = InventoryFixture.inventory(member2.getId(), item);
 		Inventory inventory3 = InventoryFixture.inventory(member3.getId(), item);
-		inventory1.select();
-		inventory2.select();
-		inventory3.select();
+		inventory1.select(member);
+		inventory2.select(member2);
+		inventory3.select(member3);
 
 		itemRepository.save(item);
 		inventoryRepository.saveAll(List.of(inventory1, inventory2, inventory3));
@@ -1017,7 +1017,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Item item = ItemFixture.nightMageSkin();
 
 		Inventory inventory = InventoryFixture.inventory(member1.getId(), item);
-		inventory.select();
+		inventory.select(member1);
 
 		itemRepository.save(item);
 		inventoryRepository.save(inventory);
