@@ -143,6 +143,7 @@ public class RoomService {
 		validateManagerAuthorization(managerParticipant);
 
 		Room room = managerParticipant.getRoom();
+		memberParticipant.removeRoom();
 		participantRepository.delete(memberParticipant);
 		room.decreaseCurrentUserCount();
 
