@@ -26,6 +26,7 @@ import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.api.dto.member.ModifyMemberRequest;
+import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.BaseDataCode;
 import com.moabam.global.common.util.ClockHolder;
@@ -41,6 +42,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberService {
 
+	private final FcmService fcmService;
 	private final MemberRepository memberRepository;
 	private final InventoryRepository inventoryRepository;
 	private final ItemRepository itemRepository;
@@ -83,6 +85,7 @@ public class MemberService {
 		member.delete(clockHolder.times());
 		memberRepository.flush();
 		memberRepository.delete(member);
+		fcmService.deleteTokenByMemberId(member.getId());
 	}
 
 	public MemberInfoResponse searchInfo(AuthMember authMember, Long memberId) {
