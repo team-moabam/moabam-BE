@@ -5,7 +5,9 @@ import java.util.Optional;
 import com.moabam.api.domain.payment.Order;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.product.Product;
+import com.moabam.api.dto.payment.ConfirmTossPaymentResponse;
 import com.moabam.api.dto.payment.PaymentResponse;
+import com.moabam.api.dto.payment.RequestConfirmPaymentResponse;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -35,5 +37,13 @@ public final class PaymentMapper {
 				.totalAmount(p.getTotalAmount())
 				.build())
 			.orElse(null);
+	}
+
+	public static RequestConfirmPaymentResponse toRequestConfirmPaymentResponse(Payment payment,
+		ConfirmTossPaymentResponse response) {
+		return RequestConfirmPaymentResponse.builder()
+			.payment(payment)
+			.paymentKey(response.paymentKey())
+			.build();
 	}
 }

@@ -6,7 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -21,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TossPaymentService {
 
@@ -39,7 +37,6 @@ public class TossPaymentService {
 			.build();
 	}
 
-	@Transactional
 	public ConfirmTossPaymentResponse confirm(ConfirmPaymentRequest request) {
 		return webClient.post()
 			.uri("/v1/payments/confirm")

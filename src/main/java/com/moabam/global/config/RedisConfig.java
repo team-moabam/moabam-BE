@@ -38,4 +38,12 @@ public class RedisConfig {
 
 		return redisTemplate;
 	}
+
+	@Bean
+	public ObjectMapper objectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModules(new JavaTimeModule());
+
+		return objectMapper;
+	}
 }

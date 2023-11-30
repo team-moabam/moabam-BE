@@ -2,12 +2,9 @@ package com.moabam.support.fixture;
 
 import static com.moabam.support.fixture.ProductFixture.*;
 
-import java.time.LocalDateTime;
-
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.payment.Order;
 import com.moabam.api.domain.payment.Payment;
-import com.moabam.api.domain.payment.PaymentStatus;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.dto.payment.ConfirmPaymentRequest;
 import com.moabam.api.dto.payment.ConfirmTossPaymentResponse;
@@ -57,9 +54,7 @@ public final class PaymentFixture {
 			.paymentKey(PAYMENT_KEY)
 			.orderId(ORDER_ID)
 			.orderName(BUG_PRODUCT_NAME)
-			.status(PaymentStatus.DONE)
 			.totalAmount(AMOUNT)
-			.approvedAt(LocalDateTime.of(2023, 1, 1, 1, 1))
 			.build();
 	}
 }

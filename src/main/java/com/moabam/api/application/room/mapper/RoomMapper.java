@@ -45,6 +45,7 @@ public final class RoomMapper {
 		List<TodayCertificateRankResponse> todayCertificateRankResponses, double completePercentage) {
 		return RoomDetailsResponse.builder()
 			.roomId(room.getId())
+			.roomCreatedAt(room.getCreatedAt())
 			.myMemberId(memberId)
 			.title(room.getTitle())
 			.managerNickName(managerNickname)
