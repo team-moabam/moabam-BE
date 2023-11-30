@@ -210,7 +210,6 @@ public class RankingServiceTest {
 				.score(1L)
 				.rankingInfo(RankingInfo.builder().nickname("Hello1").memberId(1L).image("123").build())
 				.build();
-			
 			// When
 			TopRankingResponses topRankingResponses = rankingService.getMemberRanking(myRanking);
 

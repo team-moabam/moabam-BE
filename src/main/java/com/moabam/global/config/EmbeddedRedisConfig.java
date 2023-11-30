@@ -68,7 +68,7 @@ public class EmbeddedRedisConfig {
 	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.registerModules(new JavaTimeModule());
-		
+
 		return objectMapper;
 	}
 
