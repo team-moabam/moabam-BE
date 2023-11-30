@@ -79,7 +79,7 @@ class FcmServiceTest extends WithoutFilterSupporter {
 	@Test
 	void sendAsync_success() {
 		// When
-		fcmService.sendAsync("FCM-TOKEN", "알림");
+		fcmService.sendAsync("FCM-TOKEN", "title", "body");
 
 		// Then
 		verify(firebaseMessaging).sendAsync(any(Message.class));
@@ -89,7 +89,7 @@ class FcmServiceTest extends WithoutFilterSupporter {
 	@Test
 	void sendAsync_null() {
 		// When
-		fcmService.sendAsync(null, "알림");
+		fcmService.sendAsync(null, "titile", "body");
 
 		// Then
 		verify(firebaseMessaging, times(0)).sendAsync(any(Message.class));

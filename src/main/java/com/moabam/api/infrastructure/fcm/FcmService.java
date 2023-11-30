@@ -33,8 +33,8 @@ public class FcmService {
 		return Optional.ofNullable(fcmRepository.findTokenByMemberId(targetId));
 	}
 
-	public void sendAsync(String fcmToken, String notificationBody) {
-		Notification notification = FcmMapper.toNotification(notificationBody);
+	public void sendAsync(String fcmToken, String notificationTitle, String notificationBody) {
+		Notification notification = FcmMapper.toNotification(notificationTitle, notificationBody);
 
 		if (fcmToken != null) {
 			Message message = FcmMapper.toMessage(notification, fcmToken);

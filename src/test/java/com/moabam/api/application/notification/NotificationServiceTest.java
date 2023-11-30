@@ -70,7 +70,7 @@ class NotificationServiceTest {
 		notificationService.sendKnock(1L, 1L, 2L, "nickName");
 
 		// Then
-		verify(fcmService).sendAsync(any(String.class), any(String.class));
+		verify(fcmService).sendAsync(any(String.class), any(String.class), any(String.class));
 		verify(notificationRepository).saveKnock(any(Long.class), any(Long.class), any(Long.class));
 	}
 
@@ -128,7 +128,7 @@ class NotificationServiceTest {
 		notificationService.sendCouponIssueResult(1L, "couponName", successIssueResult);
 
 		// Then
-		verify(fcmService).sendAsync(any(String.class), any(String.class));
+		verify(fcmService).sendAsync(any(String.class), any(String.class), any(String.class));
 	}
 
 	@DisplayName("로그아웃된 사용자에게 쿠폰 이슈 결과를 성공적으로 전송한다. - Void")
@@ -141,7 +141,7 @@ class NotificationServiceTest {
 		notificationService.sendCouponIssueResult(1L, "couponName", successIssueResult);
 
 		// Then
-		verify(fcmService).sendAsync(isNull(), any(String.class));
+		verify(fcmService).sendAsync(isNull(), any(String.class), any(String.class));
 	}
 
 	@DisplayName("특정 인증 시간에 해당하는 방 사용자들에게 알림을 성공적으로 보낸다. - Void")
@@ -157,7 +157,8 @@ class NotificationServiceTest {
 		notificationService.sendCertificationTime();
 
 		// Then
-		verify(fcmService, times(3)).sendAsync(any(String.class), any(String.class));
+		verify(fcmService, times(3))
+			.sendAsync(any(String.class), any(String.class), any(String.class));
 	}
 
 	@DisplayName("특정 인증 시간에 해당하는 방 사용자들의 토큰값이 없다. - Void")
@@ -173,7 +174,8 @@ class NotificationServiceTest {
 		notificationService.sendCertificationTime();
 
 		// Then
-		verify(fcmService, times(0)).sendAsync(any(String.class), any(String.class));
+		verify(fcmService, times(0))
+			.sendAsync(any(String.class), any(String.class), any(String.class));
 	}
 
 	@WithMember

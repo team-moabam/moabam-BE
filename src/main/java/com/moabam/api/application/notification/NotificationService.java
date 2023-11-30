@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class NotificationService {
 
+	private static final String COMMON_TITLE = "모아밤";
 	private static final String KNOCK_BODY = "%s방에서 %s님이 콕 찔렀어요~";
 	private static final String CERTIFY_TIME_BODY = "%s방 인증 시간~";
 
@@ -45,13 +46,16 @@ public class NotificationService {
 		String fcmToken = fcmService.findTokenByMemberId(targetId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_FCM_TOKEN));
 
-		fcmService.sendAsync(fcmToken, String.format(KNOCK_BODY, roomTitle, memberNickname));
+		String notificationTitle = roomId.toString();
+		String notificationBody = String.format(KNOCK_BODY, roomTitle, memberNickname);
+		fcmService.sendAsync(fcmToken, notificationTitle, notificationBody);
 		notificationRepository.saveKnock(roomId, targetId, memberId);
 	}
 
 	public void sendCouponIssueResult(Long memberId, String couponName, String body) {
 		String fcmToken = fcmService.findTokenByMemberId(memberId).orElse(null);
-		fcmService.sendAsync(fcmToken, String.format(body, couponName));
+		String notificationBody = String.format(body, couponName);
+		fcmService.sendAsync(fcmToken, COMMON_TITLE, notificationBody);
 	}
 
 	@Scheduled(cron = "0 50 * * * *")
@@ -61,9 +65,10 @@ public class NotificationService {
 
 		participants.parallelStream().forEach(participant -> {
 			String roomTitle = participant.getRoom().getTitle();
+			String notificationTitle = participant.getRoom().getId().toString();
 			String notificationBody = String.format(CERTIFY_TIME_BODY, roomTitle);
 			String fcmToken = fcmService.findTokenByMemberId(participant.getMemberId()).orElse(null);
-			fcmService.sendAsync(fcmToken, notificationBody);
+			fcmService.sendAsync(fcmToken, notificationTitle, notificationBody);
 		});
 	}
 
