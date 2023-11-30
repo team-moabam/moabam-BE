@@ -6,8 +6,8 @@ import lombok.Builder;
 
 @Builder
 public record TopRankingResponses(
-	List<TopRankingInfoResponse> topRankings,
-	TopRankingInfoResponse myRanking
+	List<TopRankingInfo> topRankings,
+	TopRankingInfo myRanking
 ) {
 
 }

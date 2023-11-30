@@ -3,7 +3,7 @@ package com.moabam.api.application.ranking;
 import java.util.List;
 
 import com.moabam.api.dto.ranking.RankingInfo;
-import com.moabam.api.dto.ranking.TopRankingInfoResponse;
+import com.moabam.api.dto.ranking.TopRankingInfo;
 import com.moabam.api.dto.ranking.TopRankingResponses;
 import com.moabam.api.dto.ranking.UpdateRanking;
 
@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RankingMapper {
 
-	public static TopRankingInfoResponse topRankingResponse(int rank, long score, RankingInfo rankInfo) {
-		return TopRankingInfoResponse.builder()
+	public static TopRankingInfo topRankingResponse(int rank, long score, RankingInfo rankInfo) {
+		return TopRankingInfo.builder()
 			.rank(rank)
 			.score(score)
 			.nickname(rankInfo.nickname())
@@ -23,8 +23,8 @@ public class RankingMapper {
 			.build();
 	}
 
-	public static TopRankingInfoResponse topRankingResponse(int rank, UpdateRanking updateRanking) {
-		return TopRankingInfoResponse.builder()
+	public static TopRankingInfo topRankingResponse(int rank, UpdateRanking updateRanking) {
+		return TopRankingInfo.builder()
 			.rank(rank)
 			.score(updateRanking.score())
 			.nickname(updateRanking.rankingInfo().nickname())
@@ -33,8 +33,8 @@ public class RankingMapper {
 			.build();
 	}
 
-	public static TopRankingResponses topRankingResponses(TopRankingInfoResponse myRanking,
-		List<TopRankingInfoResponse> topRankings) {
+	public static TopRankingResponses topRankingResponses(TopRankingInfo myRanking,
+		List<TopRankingInfo> topRankings) {
 		return TopRankingResponses.builder()
 			.topRankings(topRankings)
 			.myRanking(myRanking)

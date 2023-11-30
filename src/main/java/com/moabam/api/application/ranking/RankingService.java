@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.dto.ranking.RankingInfo;
-import com.moabam.api.dto.ranking.TopRankingInfoResponse;
+import com.moabam.api.dto.ranking.TopRankingInfo;
 import com.moabam.api.dto.ranking.TopRankingResponses;
 import com.moabam.api.dto.ranking.UpdateRanking;
 import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
@@ -48,29 +48,29 @@ public class RankingService {
 	}
 
 	public TopRankingResponses getMemberRanking(UpdateRanking myRankingInfo) {
-		List<TopRankingInfoResponse> topRankings = getTopRankings();
+		List<TopRankingInfo> topRankings = getTopRankings();
 		Long myRanking = zSetRedisRepository.reverseRank(RANKING, myRankingInfo.rankingInfo());
-		TopRankingInfoResponse myRankingInfoResponse =
+		TopRankingInfo myRankingInfoResponse =
 			RankingMapper.topRankingResponse(myRanking.intValue(), myRankingInfo);
 
 		return RankingMapper.topRankingResponses(myRankingInfoResponse, topRankings);
 	}
 
-	private List<TopRankingInfoResponse> getTopRankings() {
+	private List<TopRankingInfo> getTopRankings() {
 		Set<ZSetOperations.TypedTuple<Object>> topRankings =
 			zSetRedisRepository.rangeJson(RANKING, START_INDEX, LIMIT_INDEX);
 
 		Set<Long> scoreSet = new HashSet<>();
-		List<TopRankingInfoResponse> topRankingInfoRespons = new ArrayList<>();
+		List<TopRankingInfo> topRankingInfo = new ArrayList<>();
 
 		for (ZSetOperations.TypedTuple<Object> topRanking : topRankings) {
 			long score = requireNonNull(topRanking.getScore()).longValue();
 			scoreSet.add(score);
 
 			RankingInfo rankingInfo = objectMapper.convertValue(topRanking.getValue(), RankingInfo.class);
-			topRankingInfoRespons.add(RankingMapper.topRankingResponse(scoreSet.size(), score, rankingInfo));
+			topRankingInfo.add(RankingMapper.topRankingResponse(scoreSet.size(), score, rankingInfo));
 		}
 
-		return topRankingInfoRespons;
+		return topRankingInfo;
 	}
 }

@@ -18,7 +18,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import com.moabam.api.application.member.MemberMapper;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.ranking.RankingInfo;
-import com.moabam.api.dto.ranking.TopRankingInfoResponse;
+import com.moabam.api.dto.ranking.TopRankingInfo;
 import com.moabam.api.dto.ranking.TopRankingResponses;
 import com.moabam.api.dto.ranking.UpdateRanking;
 import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
@@ -214,8 +214,8 @@ public class RankingServiceTest {
 			TopRankingResponses topRankingResponses = rankingService.getMemberRanking(myRanking);
 
 			// Then
-			List<TopRankingInfoResponse> topRankings = topRankingResponses.topRankings();
-			TopRankingInfoResponse myRank = topRankingResponses.myRanking();
+			List<TopRankingInfo> topRankings = topRankingResponses.topRankings();
+			TopRankingInfo myRank = topRankingResponses.myRanking();
 			assertAll(() -> assertThat(topRankings).hasSize(10), () -> assertThat(myRank.score()).isEqualTo(1),
 				() -> assertThat(topRankings.get(0).rank()).isEqualTo(1),
 				() -> assertThat(topRankings.get(1).rank()).isEqualTo(1),
