@@ -4,6 +4,10 @@ server {
     access_log      /home/ubuntu/moabam/logs/access_ssl_moabam.log main;
     error_log       /home/ubuntu/moabam/logs/error.log error;
 
+    location ^~ /actuator {
+        return 404;
+    }
+    
     ssl_certificate /etc/letsencrypt/live/${SERVER_DOMAIN}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/${SERVER_DOMAIN}/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
