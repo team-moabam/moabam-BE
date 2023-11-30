@@ -21,10 +21,6 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: environment 세팅
-        run: |
-          cp src/main/resources/config/dev.env ./.env
-
       - name: Gradle 캐싱
         uses: actions/cache@v3
         with:
