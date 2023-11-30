@@ -1,8 +1,8 @@
 server {
     listen          443 ssl;
     server_name     ${SERVER_DOMAIN};
-    access_log      /home/ubuntu/moabam/logs/access_ssl_moabam.log main;
-    error_log       /home/ubuntu/moabam/logs/error.log error;
+    access_log      /var/log/nginx/access.log main;
+    error_log       /var/log/nginx/error.log error;
 
     location ^~ /actuator {
         return 404;

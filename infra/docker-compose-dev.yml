@@ -14,6 +14,7 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/certbot/conf:/etc/letsencrypt
       - ./nginx/certbot/www:/var/www/certbot
+      - ../logs/nginx:/var/log/nginx
   certbot:
     image: certbot/certbot:latest
     container_name: certbot
