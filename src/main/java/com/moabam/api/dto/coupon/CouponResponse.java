@@ -14,7 +14,7 @@ public record CouponResponse(
 	String name,
 	String description,
 	int point,
-	int stock,
+	int maxCount,
 	CouponType type,
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	LocalDate startAt,

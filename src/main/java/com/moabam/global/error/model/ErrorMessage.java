@@ -82,6 +82,7 @@ public enum ErrorMessage {
 	INVALID_BUG_COUPON("벌레 쿠폰은 보관함에서 사용할 수 있습니다."),
 	CONFLICT_COUPON_NAME("쿠폰의 이름이 중복되었습니다."),
 	CONFLICT_COUPON_START_AT("쿠폰 발급 가능 날짜가 중복되었습니다."),
+	CONFLICT_COUPON_ISSUE("이미 쿠폰 발급에 성공했습니다!"),
 	NOT_FOUND_COUPON_TYPE("존재하지 않는 쿠폰 종류입니다."),
 	NOT_FOUND_COUPON("존재하지 않는 쿠폰입니다."),
 	NOT_FOUND_COUPON_WALLET("보유하지 않은 쿠폰입니다."),

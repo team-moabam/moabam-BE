@@ -15,6 +15,7 @@ import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
+import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.model.ErrorMessage;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,6 @@ public class CouponManageService {
 	private static final String SUCCESS_ISSUE_BODY = "%s 쿠폰 발행을 성공했습니다. 축하드립니다!";
 	private static final String FAIL_ISSUE_BODY = "%s 쿠폰 발행을 실패했습니다. 다음 기회에!";
 	private static final long ISSUE_SIZE = 10;
-	private static final long ISSUE_FIRST = 0;
 
 	private final ClockHolder clockHolder;
 	private final NotificationService notificationService;
@@ -36,13 +36,6 @@ public class CouponManageService {
 	private final CouponRepository couponRepository;
 	private final CouponManageRepository couponManageRepository;
 	private final CouponWalletRepository couponWalletRepository;
-
-	private long current = ISSUE_FIRST;
-
-	@Scheduled(cron = "0 0 0 * * *")
-	public void init() {
-		current = ISSUE_FIRST;
-	}
 
 	@Scheduled(fixedDelay = 1000)
 	public void issue() {
@@ -55,27 +48,26 @@ public class CouponManageService {
 
 		Coupon coupon = optionalCoupon.get();
 		String couponName = coupon.getName();
-		int max = coupon.getStock();
+		int maxCount = coupon.getMaxCount();
+		int currentCount = couponManageRepository.getCouponCount(couponName);
 
-		Set<Long> membersId = couponManageRepository.rangeQueue(couponName, current, current + ISSUE_SIZE);
+		if (maxCount <= currentCount) {
+			return;
+		}
+
+		Set<Long> membersId = couponManageRepository.rangeQueue(couponName, currentCount, currentCount + ISSUE_SIZE);
 
 		for (Long memberId : membersId) {
-			int rank = couponManageRepository.rankQueue(couponName, memberId);
-
-			if (max < rank) {
-				notificationService.sendCouponIssueResult(memberId, couponName, FAIL_ISSUE_BODY);
-				continue;
-			}
-
 			couponWalletRepository.save(CouponWallet.create(memberId, coupon));
 			notificationService.sendCouponIssueResult(memberId, couponName, SUCCESS_ISSUE_BODY);
-			current++;
 		}
+
+		couponManageRepository.increase(couponName, membersId.size());
 	}
 
 	public void registerQueue(String couponName, Long memberId) {
 		double registerTime = System.currentTimeMillis();
-		validateRegisterQueue(couponName);
+		validateRegisterQueue(couponName, memberId);
 		couponManageRepository.addIfAbsentQueue(couponName, memberId, registerTime);
 	}
 
@@ -83,11 +75,21 @@ public class CouponManageService {
 		couponManageRepository.deleteQueue(couponName);
 	}
 
-	private void validateRegisterQueue(String couponName) {
+	private void validateRegisterQueue(String couponName, Long memberId) {
 		LocalDate now = clockHolder.date();
+		Coupon coupon = couponRepository.findByNameAndStartAt(couponName, now)
+			.orElseThrow(() -> new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD));
 
-		if (!couponRepository.existsByNameAndStartAt(couponName, now)) {
-			throw new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD);
+		if (couponManageRepository.hasValue(couponName, memberId)) {
+			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_ISSUE);
+		}
+
+		int maxCount = coupon.getMaxCount();
+		int sizeQueue = couponManageRepository.sizeQueue(couponName);
+
+		if (maxCount <= sizeQueue) {
+			notificationService.sendCouponIssueResult(memberId, couponName, FAIL_ISSUE_BODY);
+			throw new BadRequestException(ErrorMessage.INVALID_COUPON_STOCK_END);
 		}
 	}
 }

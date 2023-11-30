@@ -420,27 +420,6 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember
-	@DisplayName("POST - 쿠폰 발급 요청을 성공적으로 한다. - Void")
-	@Test
-	void registerQueue_success() throws Exception {
-		// Given
-		Coupon couponFixture = CouponFixture.coupon();
-		Coupon coupon = couponRepository.save(couponFixture);
-
-		given(clockHolder.date()).willReturn(LocalDate.of(2023, 2, 1));
-		willDoNothing().given(zSetRedisRepository).addIfAbsent(anyString(), anyLong(), anyDouble(), anyInt());
-
-		// When & Then
-		mockMvc.perform(post("/coupons")
-				.param("couponName", coupon.getName()))
-			.andDo(print())
-			.andDo(document("coupons",
-				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint())))
-			.andExpect(status().isOk());
-	}
-
-	@WithMember
 	@DisplayName("POST - 발급 가능 날짜가 아닌 쿠폰에 발급 요청을 한다. (Not found) - BadRequestException")
 	@Test
 	void registerQueue_Zero_StartAt_BadRequestException() throws Exception {

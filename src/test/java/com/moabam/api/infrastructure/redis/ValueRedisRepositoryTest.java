@@ -78,7 +78,7 @@ class ValueRedisRepositoryTest {
 	@Test
 	void increment_success() {
 		// When
-		Long actual = valueRedisRepository.increment(stockKey);
+		Long actual = valueRedisRepository.increment(stockKey, 1);
 
 		// Then
 		assertThat(actual).isEqualTo(1L);

@@ -220,7 +220,7 @@ class CouponServiceTest {
 
 		// Then
 		assertThat(actual.point()).isEqualTo(coupon.getPoint());
-		assertThat(actual.stock()).isEqualTo(coupon.getStock());
+		assertThat(actual.maxCount()).isEqualTo(coupon.getMaxCount());
 	}
 
 	@DisplayName("존재하지 않는 쿠폰을 조회한다. - NotFoundException")
