@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record TopRankingResponses(
+public record TopRankingResponse(
 	List<TopRankingInfo> topRankings,
 	TopRankingInfo myRanking
 ) {
