@@ -13,6 +13,7 @@ import com.moabam.api.domain.payment.repository.PaymentSearchRepository;
 import com.moabam.api.dto.payment.ConfirmPaymentRequest;
 import com.moabam.api.dto.payment.ConfirmTossPaymentResponse;
 import com.moabam.api.dto.payment.PaymentRequest;
+import com.moabam.api.dto.payment.RequestConfirmPaymentResponse;
 import com.moabam.api.infrastructure.payment.TossPaymentService;
 import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.exception.TossPaymentException;
@@ -37,13 +38,13 @@ public class PaymentService {
 		payment.request(request.orderId());
 	}
 
-	public void processConfirm(Long memberId, ConfirmPaymentRequest request) {
+	public RequestConfirmPaymentResponse requestConfirm(Long memberId, ConfirmPaymentRequest request) {
 		Payment payment = getByOrderId(request.orderId());
 		payment.validateInfo(memberId, request.amount());
 
 		try {
 			ConfirmTossPaymentResponse response = tossPaymentService.confirm(request);
-			confirm(memberId, payment, response);
+			return PaymentMapper.toRequestConfirmPaymentResponse(payment, response);
 		} catch (TossPaymentException exception) {
 			payment.fail(request.paymentKey());
 			throw exception;
@@ -51,8 +52,8 @@ public class PaymentService {
 	}
 
 	@Transactional
-	public void confirm(Long memberId, Payment payment, ConfirmTossPaymentResponse response) {
-		payment.confirm(response.paymentKey());
+	public void confirm(Long memberId, Payment payment, String paymentKey) {
+		payment.confirm(paymentKey);
 
 		if (payment.isCouponApplied()) {
 			couponService.discount(payment.getCouponWalletId(), memberId);
