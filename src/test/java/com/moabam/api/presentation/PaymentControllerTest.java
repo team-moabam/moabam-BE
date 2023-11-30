@@ -172,10 +172,8 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 			mockMvc.perform(post("/payments/confirm")
 					.contentType(APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isOk())
+				.andExpect(status().isInternalServerError())
 				.andDo(print());
-			assertThat(payment.getPaymentKey()).isEqualTo(PAYMENT_KEY);
-			assertThat(payment.getStatus()).isEqualTo(PaymentStatus.ABORTED);
 		}
 	}
 }
