@@ -23,7 +23,6 @@ import com.moabam.api.domain.payment.PaymentStatus;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
 import com.moabam.api.domain.payment.repository.PaymentSearchRepository;
 import com.moabam.api.dto.payment.ConfirmPaymentRequest;
-import com.moabam.api.dto.payment.ConfirmTossPaymentResponse;
 import com.moabam.api.dto.payment.PaymentRequest;
 import com.moabam.api.infrastructure.payment.TossPaymentService;
 import com.moabam.global.error.exception.NotFoundException;
@@ -65,9 +64,9 @@ class PaymentServiceTest {
 			.hasMessage("존재하지 않는 결제 정보입니다.");
 	}
 
-	@DisplayName("결제 승인을 처리한다.")
+	@DisplayName("결제 승인을 요청한다.")
 	@Nested
-	class ProcessConfirm {
+	class RequestConfirm {
 
 		@DisplayName("해당 결제 정보가 존재하지 않으면 예외가 발생한다.")
 		@Test
@@ -78,7 +77,7 @@ class PaymentServiceTest {
 			given(paymentSearchRepository.findByOrderId(request.orderId())).willReturn(Optional.empty());
 
 			// when, then
-			assertThatThrownBy(() -> paymentService.processConfirm(memberId, request))
+			assertThatThrownBy(() -> paymentService.requestConfirm(memberId, request))
 				.isInstanceOf(NotFoundException.class)
 				.hasMessage("존재하지 않는 결제 정보입니다.");
 		}
@@ -94,30 +93,26 @@ class PaymentServiceTest {
 			given(tossPaymentService.confirm(request)).willThrow(TossPaymentException.class);
 
 			// when, then
-			assertThatThrownBy(() -> paymentService.processConfirm(memberId, request))
+			assertThatThrownBy(() -> paymentService.requestConfirm(memberId, request))
 				.isInstanceOf(TossPaymentException.class);
 			assertThat(payment.getPaymentKey()).isEqualTo(PAYMENT_KEY);
 			assertThat(payment.getStatus()).isEqualTo(PaymentStatus.ABORTED);
 		}
+	}
 
-		@DisplayName("쿠폰을 적용한 경우 쿠폰을 차감한 후 벌레를 충전한다.")
-		@Test
-		void success_with_coupon() {
-			// given
-			Long memberId = 1L;
-			Long couponWalletId = 1L;
-			Payment payment = paymentWithCoupon(bugProduct(), discount1000Coupon(), couponWalletId);
-			ConfirmPaymentRequest request = confirmPaymentRequest();
-			ConfirmTossPaymentResponse response = confirmTossPaymentResponse();
-			given(paymentSearchRepository.findByOrderId(request.orderId())).willReturn(Optional.of(payment));
-			given(tossPaymentService.confirm(request)).willReturn(response);
+	@DisplayName("결제 승인에 성공한다.")
+	@Test
+	void confirm_success() {
+		// given
+		Long memberId = 1L;
+		Long couponWalletId = 1L;
+		Payment payment = paymentWithCoupon(bugProduct(), discount1000Coupon(), couponWalletId);
 
-			// when
-			paymentService.processConfirm(memberId, request);
+		// when
+		paymentService.confirm(memberId, payment, PAYMENT_KEY);
 
-			// then
-			verify(couponService, times(1)).discount(couponWalletId, memberId);
-			verify(bugService, times(1)).charge(memberId, payment.getProduct());
-		}
+		// then
+		verify(couponService, times(1)).discount(couponWalletId, memberId);
+		verify(bugService, times(1)).charge(memberId, payment.getProduct());
 	}
 }
