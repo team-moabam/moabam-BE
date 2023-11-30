@@ -19,7 +19,7 @@ import com.moabam.api.application.member.MemberMapper;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.api.dto.ranking.TopRankingInfo;
-import com.moabam.api.dto.ranking.TopRankingResponses;
+import com.moabam.api.dto.ranking.TopRankingResponse;
 import com.moabam.api.dto.ranking.UpdateRanking;
 import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
 import com.moabam.global.config.EmbeddedRedisConfig;
@@ -211,11 +211,11 @@ public class RankingServiceTest {
 				.rankingInfo(RankingInfo.builder().nickname("Hello1").memberId(1L).image("123").build())
 				.build();
 			// When
-			TopRankingResponses topRankingResponses = rankingService.getMemberRanking(myRanking);
+			TopRankingResponse topRankingResponse = rankingService.getMemberRanking(myRanking);
 
 			// Then
-			List<TopRankingInfo> topRankings = topRankingResponses.topRankings();
-			TopRankingInfo myRank = topRankingResponses.myRanking();
+			List<TopRankingInfo> topRankings = topRankingResponse.topRankings();
+			TopRankingInfo myRank = topRankingResponse.myRanking();
 			assertAll(() -> assertThat(topRankings).hasSize(10), () -> assertThat(myRank.score()).isEqualTo(1),
 				() -> assertThat(topRankings.get(0).rank()).isEqualTo(1),
 				() -> assertThat(topRankings.get(1).rank()).isEqualTo(1),

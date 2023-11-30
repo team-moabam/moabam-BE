@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.api.dto.ranking.TopRankingInfo;
-import com.moabam.api.dto.ranking.TopRankingResponses;
+import com.moabam.api.dto.ranking.TopRankingResponse;
 import com.moabam.api.dto.ranking.UpdateRanking;
 import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
 
@@ -47,7 +47,7 @@ public class RankingService {
 		zSetRedisRepository.delete(RANKING, rankingInfo);
 	}
 
-	public TopRankingResponses getMemberRanking(UpdateRanking myRankingInfo) {
+	public TopRankingResponse getMemberRanking(UpdateRanking myRankingInfo) {
 		List<TopRankingInfo> topRankings = getTopRankings();
 		Long myRanking = zSetRedisRepository.reverseRank(RANKING, myRankingInfo.rankingInfo());
 		TopRankingInfo myRankingInfoResponse =

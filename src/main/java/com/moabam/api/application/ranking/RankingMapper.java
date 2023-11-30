@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.api.dto.ranking.TopRankingInfo;
-import com.moabam.api.dto.ranking.TopRankingResponses;
+import com.moabam.api.dto.ranking.TopRankingResponse;
 import com.moabam.api.dto.ranking.UpdateRanking;
 
 import lombok.AccessLevel;
@@ -33,9 +33,9 @@ public class RankingMapper {
 			.build();
 	}
 
-	public static TopRankingResponses topRankingResponses(TopRankingInfo myRanking,
+	public static TopRankingResponse topRankingResponses(TopRankingInfo myRanking,
 		List<TopRankingInfo> topRankings) {
-		return TopRankingResponses.builder()
+		return TopRankingResponse.builder()
 			.topRankings(topRankings)
 			.myRanking(myRanking)
 			.build();

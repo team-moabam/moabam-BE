@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.ranking.RankingService;
-import com.moabam.api.dto.ranking.TopRankingResponses;
+import com.moabam.api.dto.ranking.TopRankingResponse;
 import com.moabam.api.dto.ranking.UpdateRanking;
 import com.moabam.global.auth.annotation.Auth;
 import com.moabam.global.auth.model.AuthMember;
@@ -25,7 +25,7 @@ public class RankingController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public TopRankingResponses getRanking(@Auth AuthMember authMember) {
+	public TopRankingResponse getRanking(@Auth AuthMember authMember) {
 		UpdateRanking rankingInfo = memberService.getRankingInfo(authMember);
 
 		return rankingService.getMemberRanking(rankingInfo);
