@@ -1,6 +1,8 @@
 package com.moabam.global.error.handler;
 
-import static com.moabam.global.error.model.ErrorMessage.*;
+import static com.moabam.global.error.model.ErrorMessage.INVALID_REQUEST_FIELD;
+import static com.moabam.global.error.model.ErrorMessage.INVALID_REQUEST_VALUE_TYPE_FORMAT;
+import static com.moabam.global.error.model.ErrorMessage.S3_INVALID_IMAGE_SIZE;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
@@ -96,6 +99,14 @@ public class GlobalExceptionHandler {
 			.map(Class::getSimpleName)
 			.orElse("");
 		String message = String.format(INVALID_REQUEST_VALUE_TYPE_FORMAT.getMessage(), exception.getValue(), typeName);
+
+		return new ErrorResponse(message, null);
+	}
+
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleMaxSizeException(MaxUploadSizeExceededException exception) {
+		String message = String.format(S3_INVALID_IMAGE_SIZE.getMessage());
 
 		return new ErrorResponse(message, null);
 	}
