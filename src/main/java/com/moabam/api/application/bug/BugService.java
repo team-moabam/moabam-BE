@@ -80,6 +80,10 @@ public class BugService {
 
 	@Transactional
 	public void use(Member member, BugType bugType, int count) {
+		if (count == 0) {
+			return;
+		}
+
 		Bug bug = member.getBug();
 
 		bug.use(bugType, count);
@@ -88,6 +92,10 @@ public class BugService {
 
 	@Transactional
 	public void reward(Member member, BugType bugType, int count) {
+		if (count == 0) {
+			return;
+		}
+
 		Bug bug = member.getBug();
 
 		bug.increase(bugType, count);
@@ -104,6 +112,10 @@ public class BugService {
 
 	@Transactional
 	public void applyCoupon(Long memberId, BugType bugType, int count) {
+		if (count == 0) {
+			return;
+		}
+
 		Bug bug = getByMemberId(memberId);
 
 		bug.increase(bugType, count);

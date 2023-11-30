@@ -12,15 +12,15 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class ResizedImage implements MultipartFile {
+public class NewImage implements MultipartFile {
 
 	private final String name;
 	private final String contentType;
 	private final long size;
 	private final byte[] bytes;
 
-	public static ResizedImage of(String name, String contentType, byte[] bytes) {
-		return new ResizedImage(name, contentType, bytes.length, bytes);
+	public static NewImage of(String name, String contentType, byte[] bytes) {
+		return new NewImage(name, contentType, bytes.length, bytes);
 	}
 
 	@Override

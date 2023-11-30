@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -29,6 +30,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -45,6 +48,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.auth.OAuth2AuthorizationServerRequestService;
 import com.moabam.api.application.image.ImageService;
+import com.moabam.api.application.member.MemberMapper;
 import com.moabam.api.domain.auth.repository.TokenRepository;
 import com.moabam.api.domain.image.ImageType;
 import com.moabam.api.domain.item.Inventory;
@@ -63,6 +67,8 @@ import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.api.dto.member.ModifyMemberRequest;
+import com.moabam.api.dto.ranking.RankingInfo;
+import com.moabam.global.config.EmbeddedRedisConfig;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
@@ -83,6 +89,7 @@ import jakarta.persistence.EntityManager;
 @AutoConfigureMockMvc
 @AutoConfigureMockRestServiceServer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import(EmbeddedRedisConfig.class)
 class MemberControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
@@ -133,12 +140,15 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@Autowired
 	EntityManager entityManager;
 
+	@Autowired
+	RedisTemplate<String, Object> redisTemplate;
+
 	@BeforeAll
 	void allSetUp() {
 		restTemplateBuilder = new RestTemplateBuilder()
 			.errorHandler(new RestTemplateResponseHandler());
 
-		member = MemberFixture.member("1234567890987654", "nickname");
+		member = MemberFixture.member("1234567890987654");
 		member.increaseTotalCertifyCount();
 		memberRepository.save(member);
 	}
@@ -361,7 +371,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@Test
 	void search_friend_info_success() throws Exception {
 		// given
-		Member friend = MemberFixture.member("123456789", "nick");
+		Member friend = MemberFixture.member("123456789");
 		memberRepository.save(friend);
 
 		Badge morningBirth = BadgeFixture.badge(friend.getId(), BadgeType.MORNING_BIRTH);
@@ -481,6 +491,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				.characterEncoding("UTF-8"))
 			.andExpect(status().is2xxSuccessful())
 			.andDo(print());
+
 	}
 
 	@DisplayName("회원 프로필없이 성공 ")
@@ -499,6 +510,8 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 		willThrow(NullPointerException.class)
 			.given(imageService).uploadImages(any(), any());
+		RankingInfo rankingInfo = MemberMapper.toRankingInfo(member);
+		redisTemplate.opsForZSet().add("Ranking", rankingInfo, member.getTotalCertifyCount());
 
 		// expected
 		mockMvc.perform(multipart(HttpMethod.POST, "/members/modify")
@@ -508,5 +521,15 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				.characterEncoding("UTF-8"))
 			.andExpect(status().is2xxSuccessful())
 			.andDo(print());
+
+		String updateNick = member.getNickname();
+
+		if (Objects.nonNull(nickname)) {
+			updateNick = nickname;
+		}
+
+		Double result = redisTemplate.opsForZSet()
+			.score("Ranking", new RankingInfo(member.getId(), updateNick, member.getProfileImage()));
+		assertThat(result).isEqualTo(member.getTotalCertifyCount());
 	}
 }

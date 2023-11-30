@@ -60,9 +60,9 @@ class RoomServiceConcurrencyTest {
 
 		Room savedRoom = roomRepository.save(room);
 
-		Member member1 = MemberFixture.member("qwe", "닉네임1");
-		Member member2 = MemberFixture.member("qwfe", "닉네임2");
-		Member member3 = MemberFixture.member("qff", "닉네임3");
+		Member member1 = MemberFixture.member("qwe");
+		Member member2 = MemberFixture.member("qwfe");
+		Member member3 = MemberFixture.member("qff");
 		memberRepository.saveAll(List.of(member1, member2, member3));
 
 		Participant participant1 = RoomFixture.participant(savedRoom, member1.getId());
@@ -79,7 +79,7 @@ class RoomServiceConcurrencyTest {
 
 		// when
 		for (int i = 0; i < threadCount; i++) {
-			Member member = MemberFixture.member(String.valueOf(i + 100), "test");
+			Member member = MemberFixture.member(String.valueOf(i + 100));
 			newMembers.add(member);
 			memberRepository.save(member);
 			final Long memberId = member.getId();

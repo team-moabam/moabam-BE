@@ -73,7 +73,7 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 
 	@BeforeEach
 	void setUp() {
-		target = memberRepository.save(MemberFixture.member("123", "targetName"));
+		target = memberRepository.save(MemberFixture.member("123"));
 		room = roomRepository.save(RoomFixture.room());
 		knockKey = String.format("room_%s_member_%s_knocks_%s", room.getId(), 1, target.getId());
 
