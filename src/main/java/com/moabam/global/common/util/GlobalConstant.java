@@ -12,6 +12,7 @@ public class GlobalConstant {
 	public static final String DELIMITER = "/";
 	public static final String CHARSET_UTF_8 = ";charset=UTF-8";
 	public static final String SPACE = " ";
+	public static final int MIDNIGHT_HOUR = 0;
 	public static final int ONE_HOUR = 1;
 	public static final int HOURS_IN_A_DAY = 24;
 	public static final int NOT_COMPLETED_RANK = 500;
