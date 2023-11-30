@@ -2,12 +2,13 @@ package com.moabam.api.dto.room;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Builder
-public record CertifyRoomRequest(
-	Long routineId,
-	MultipartFile image
-) {
+@Getter
+@Setter
+public class CertifyRoomRequest {
 
+	private Long routineId;
+	private MultipartFile image;
 }

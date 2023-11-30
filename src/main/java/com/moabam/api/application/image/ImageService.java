@@ -1,5 +1,7 @@
 package com.moabam.api.application.image;
 
+import static com.moabam.global.error.model.ErrorMessage.IMAGE_CONVERT_FAIL;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import com.moabam.api.domain.image.ImageType;
 import com.moabam.api.domain.image.NewImage;
 import com.moabam.api.dto.room.CertifyRoomsRequest;
 import com.moabam.api.infrastructure.s3.S3Manager;
+import com.moabam.global.error.exception.BadRequestException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,12 +45,13 @@ public class ImageService {
 	}
 
 	public List<NewImage> getNewImages(CertifyRoomsRequest request) {
-		return request.certifyRoomsRequest().stream()
-			.map(c -> {
+		return request.getCertifyRoomsRequest().stream()
+			.map(certifyRoomRequest -> {
 				try {
-					return NewImage.of(c.routineId().toString(), c.image().getContentType(), c.image().getBytes());
+					return NewImage.of(String.valueOf(certifyRoomRequest.getRoutineId()),
+						certifyRoomRequest.getImage().getContentType(), certifyRoomRequest.getImage().getBytes());
 				} catch (IOException e) {
-					throw new RuntimeException(e);
+					throw new BadRequestException(IMAGE_CONVERT_FAIL);
 				}
 			})
 			.toList();
