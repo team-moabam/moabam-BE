@@ -116,7 +116,7 @@ public class ImageResizer {
 		}
 	}
 
-	private ResizedImage toMultipartFile(byte[] bytes) {
-		return ResizedImage.of(fileName, image.getContentType(), bytes);
+	private NewImage toMultipartFile(byte[] bytes) {
+		return NewImage.of(fileName, image.getContentType(), bytes);
 	}
 }

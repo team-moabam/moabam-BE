@@ -1,7 +1,7 @@
 package com.moabam.api.presentation;
 
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,16 +12,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.moabam.api.application.image.ImageService;
 import com.moabam.api.application.room.CertificationService;
 import com.moabam.api.application.room.RoomService;
 import com.moabam.api.application.room.SearchService;
+import com.moabam.api.domain.image.ImageType;
+import com.moabam.api.domain.image.NewImage;
 import com.moabam.api.domain.room.RoomType;
+import com.moabam.api.dto.room.CertifiedMemberInfo;
+import com.moabam.api.dto.room.CertifyRoomsRequest;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.GetAllRoomsResponse;
@@ -110,14 +112,11 @@ public class RoomController {
 	@PostMapping("/{roomId}/certification")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void certifyRoom(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId,
-		@RequestPart(name = "file") Map<String, MultipartFile> multipartFiles) {
-
-		log.info("multipartFiles Size = {}", multipartFiles.size());
-		log.info(multipartFiles.toString());
-
-		// List<String> imageUrls = imageService.uploadImages(multipartFiles, ImageType.CERTIFICATION);
-		// CertifiedMemberInfo info = certificationService.getCertifiedMemberInfo(authMember.id(), roomId, imageUrls);
-		// certificationService.certifyRoom(info);
+		CertifyRoomsRequest request) {
+		List<NewImage> images = imageService.getNewImages(request);
+		List<String> imageUrls = imageService.uploadImages(images, ImageType.CERTIFICATION);
+		CertifiedMemberInfo info = certificationService.getCertifiedMemberInfo(authMember.id(), roomId, imageUrls);
+		certificationService.certifyRoom(info);
 	}
 
 	@PutMapping("/{roomId}/members/{memberId}/mandate")

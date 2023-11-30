@@ -16,7 +16,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.moabam.api.domain.image.ImageType;
-import com.moabam.api.domain.image.ResizedImage;
+import com.moabam.api.domain.image.NewImage;
 import com.moabam.api.infrastructure.s3.S3Manager;
 import com.moabam.support.fixture.RoomFixture;
 
@@ -38,7 +38,7 @@ class ImageServiceTest {
 		MockMultipartFile image1 = RoomFixture.makeMultipartFile1();
 		List<MultipartFile> images = List.of(image1);
 
-		given(s3Manager.uploadImage(anyString(), any(ResizedImage.class))).willReturn(image1.getName());
+		given(s3Manager.uploadImage(anyString(), any(NewImage.class))).willReturn(image1.getName());
 
 		// when
 		List<String> result = imageService.uploadImages(images, imageType);
