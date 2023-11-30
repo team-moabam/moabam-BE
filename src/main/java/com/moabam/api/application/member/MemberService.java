@@ -134,7 +134,7 @@ public class MemberService {
 		return MemberMapper.toUpdateRanking(member);
 	}
 
-	@Scheduled(cron = "* 15 * * * *")
+	@Scheduled(cron = "0 15 * * * *")
 	public void updateAllRanking() {
 		List<Member> members = memberSearchRepository.findAllMembers();
 		List<UpdateRanking> updateRankings = members.stream()
