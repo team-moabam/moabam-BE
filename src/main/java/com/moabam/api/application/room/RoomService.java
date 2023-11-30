@@ -161,12 +161,6 @@ public class RoomService {
 		}
 	}
 
-	public void validateRoomById(Long roomId) {
-		if (!roomRepository.existsById(roomId)) {
-			throw new NotFoundException(ROOM_NOT_FOUND);
-		}
-	}
-
 	public Room findRoom(Long roomId) {
 		return roomRepository.findById(roomId)
 			.orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));

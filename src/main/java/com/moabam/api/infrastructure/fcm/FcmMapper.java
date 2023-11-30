@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FcmMapper {
 
-	private static final String NOTIFICATION_TITLE = "모아밤";
-
-	public static Notification toNotification(String body) {
+	public static Notification toNotification(String title, String body) {
 		return Notification.builder()
-			.setTitle(NOTIFICATION_TITLE)
+			.setTitle(title)
 			.setBody(body)
 			.build();
 	}
