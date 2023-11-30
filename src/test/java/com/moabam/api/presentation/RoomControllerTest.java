@@ -850,7 +850,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		dailyRoomCertificationRepository.save(dailyRoomCertification);
 
 		DailyRoomCertification dailyRoomCertification1 = RoomFixture.dailyRoomCertification(room.getId(),
-			LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), LocalDate.now().getDayOfMonth() - 3));
+			LocalDate.now().minusDays(3));
 		dailyRoomCertificationRepository.save(dailyRoomCertification1);
 
 		// expected
