@@ -2,11 +2,12 @@ package com.moabam.api.dto.room;
 
 import java.util.List;
 
-import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Builder
-public record CertifyRoomsRequest(
-	List<CertifyRoomRequest> certifyRoomsRequest
-) {
+@Getter
+@Setter
+public class CertifyRoomsRequest {
 
+	private List<CertifyRoomRequest> certifyRoomsRequest;
 }
