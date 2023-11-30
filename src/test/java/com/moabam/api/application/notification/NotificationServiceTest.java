@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
+import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
@@ -29,6 +30,7 @@ import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.FilterProcessExtension;
+import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith({MockitoExtension.class, FilterProcessExtension.class})
 class NotificationServiceTest {
@@ -57,7 +59,9 @@ class NotificationServiceTest {
 	@Test
 	void sendKnock_success() {
 		// Given
-		willDoNothing().given(roomService).validateRoomById(any(Long.class));
+		Room room = RoomFixture.room();
+
+		given(roomService.findRoom(any(Long.class))).willReturn(room);
 		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.of("FCM-TOKEN"));
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(false);
@@ -74,7 +78,7 @@ class NotificationServiceTest {
 	@Test
 	void sendKnock_Room_NotFoundException() {
 		// Given
-		willThrow(NotFoundException.class).given(roomService).validateRoomById(any(Long.class));
+		given(roomService.findRoom(any(Long.class))).willThrow(NotFoundException.class);
 
 		// When & Then
 		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L, "nickName"))
@@ -85,7 +89,9 @@ class NotificationServiceTest {
 	@Test
 	void sendKnock_FcmToken_NotFoundException() {
 		// Given
-		willDoNothing().given(roomService).validateRoomById(any(Long.class));
+		Room room = RoomFixture.room();
+
+		given(roomService.findRoom(any(Long.class))).willReturn(room);
 		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.empty());
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(false);
@@ -100,7 +106,9 @@ class NotificationServiceTest {
 	@Test
 	void sendKnock_ConflictException() {
 		// Given
-		willDoNothing().given(roomService).validateRoomById(any(Long.class));
+		Room room = RoomFixture.room();
+
+		given(roomService.findRoom(any(Long.class))).willReturn(room);
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(true);
 

@@ -28,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class NotificationService {
 
-	private static final String KNOCK_BODY = "%s님이 콕 찔렀습니다.";
-	private static final String CERTIFY_TIME_BODY = "%s방 인증 시간입니다.";
+	private static final String KNOCK_BODY = "%s방에서 %s님이 콕 찔렀어요~";
+	private static final String CERTIFY_TIME_BODY = "%s방 인증 시간~";
 
 	private final ClockHolder clockHolder;
 	private final FcmService fcmService;
@@ -40,12 +40,12 @@ public class NotificationService {
 
 	@Transactional
 	public void sendKnock(Long roomId, Long targetId, Long memberId, String memberNickname) {
-		roomService.validateRoomById(roomId);
+		String roomTitle = roomService.findRoom(roomId).getTitle();
 		validateConflictKnock(roomId, targetId, memberId);
 		String fcmToken = fcmService.findTokenByMemberId(targetId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_FCM_TOKEN));
 
-		fcmService.sendAsync(fcmToken, String.format(KNOCK_BODY, memberNickname));
+		fcmService.sendAsync(fcmToken, String.format(KNOCK_BODY, roomTitle, memberNickname));
 		notificationRepository.saveKnock(roomId, targetId, memberId);
 	}
 
