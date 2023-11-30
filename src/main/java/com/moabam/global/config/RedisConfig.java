@@ -10,9 +10,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 @Configuration
 @Profile("!test")
 public class RedisConfig {
@@ -37,13 +34,5 @@ public class RedisConfig {
 		redisTemplate.setConnectionFactory(redisConnectionFactory);
 
 		return redisTemplate;
-	}
-
-	@Bean
-	public ObjectMapper objectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.registerModules(new JavaTimeModule());
-
-		return objectMapper;
 	}
 }
