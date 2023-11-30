@@ -1,6 +1,8 @@
 server {
     listen          443 ssl;
     server_name     ${SERVER_DOMAIN};
+    access_log      /home/ubuntu/moabam/logs/access_ssl_moabam.log main;
+    error_log       /home/ubuntu/moabam/logs/error.log error;
 
     ssl_certificate /etc/letsencrypt/live/${SERVER_DOMAIN}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/${SERVER_DOMAIN}/privkey.pem;
