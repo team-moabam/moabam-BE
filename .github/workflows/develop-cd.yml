@@ -162,7 +162,7 @@ jobs:
           key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
           source: "./infra/docker-compose-dev.yml"
           script: |
-            cd /home/ubuntu/moabam
+            cd /home/ubuntu/moabam/infra
             echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
             ./scripts/deploy-dev.sh
             docker rm `docker ps -a -q`
