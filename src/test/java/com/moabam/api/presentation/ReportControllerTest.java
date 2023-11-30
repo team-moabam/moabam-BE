@@ -110,7 +110,7 @@ class ReportControllerTest extends WithoutFilterSupporter {
 	@Test
 	void reports_failBy_subject_null() throws Exception {
 		// given
-		Member member = MemberFixture.member("2", "ji");
+		Member member = MemberFixture.member("2");
 		memberRepository.save(member);
 
 		ReportRequest reportRequest = ReportFixture.reportRequest(member.getId(), null, null);
@@ -128,7 +128,7 @@ class ReportControllerTest extends WithoutFilterSupporter {
 	@Test
 	void reports_failBy_member() throws Exception {
 		// given
-		Member newMember = MemberFixture.member("9999", "n");
+		Member newMember = MemberFixture.member("9999");
 		memberRepository.save(newMember);
 
 		newMember.delete(LocalDateTime.now());

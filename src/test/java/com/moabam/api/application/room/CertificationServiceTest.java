@@ -102,9 +102,9 @@ class CertificationServiceTest {
 	void init() {
 		room = spy(RoomFixture.room());
 		participant = spy(RoomFixture.participant(room, 1L));
-		member1 = MemberFixture.member("1", "회원1");
-		member2 = MemberFixture.member("2", "회원2");
-		member3 = MemberFixture.member("3", "회원3");
+		member1 = MemberFixture.member("1");
+		member2 = MemberFixture.member("2");
+		member3 = MemberFixture.member("3");
 
 		lenient().when(room.getId()).thenReturn(1L);
 		lenient().when(participant.getRoom()).thenReturn(room);

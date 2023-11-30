@@ -61,11 +61,11 @@ class CertificationServiceConcurrencyTest {
 		}
 		Room savedRoom = roomRepository.save(room);
 
-		Member member1 = MemberFixture.member("0000", "닉네임1");
-		Member member2 = MemberFixture.member("1234", "닉네임2");
-		Member member3 = MemberFixture.member("5678", "닉네임3");
-		Member member4 = MemberFixture.member("3333", "닉네임4");
-		Member member5 = MemberFixture.member("5555", "닉네임5");
+		Member member1 = MemberFixture.member("0000");
+		Member member2 = MemberFixture.member("1234");
+		Member member3 = MemberFixture.member("5678");
+		Member member4 = MemberFixture.member("3333");
+		Member member5 = MemberFixture.member("5555");
 
 		List<Member> members = memberRepository.saveAll(List.of(member1, member2, member3, member4, member5));
 
