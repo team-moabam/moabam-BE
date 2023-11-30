@@ -31,10 +31,11 @@ public class CouponManageRepository {
 	}
 
 	public Set<Long> rangeQueue(String couponName, long start, long end) {
+
 		return zSetRedisRepository
 			.range(requireNonNull(couponName), start, end)
 			.stream()
-			.map(Long.class::cast)
+			.map(memberId -> Long.parseLong(String.valueOf(memberId)))
 			.collect(Collectors.toSet());
 	}
 
