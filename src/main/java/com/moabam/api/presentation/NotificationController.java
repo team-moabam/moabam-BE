@@ -31,7 +31,7 @@ public class NotificationController {
 		@PathVariable("memberId") Long memberId,
 		@Auth AuthMember authMember
 	) {
-		notificationService.sendKnock(roomId, memberId, authMember.id(), authMember.nickname());
+		notificationService.sendKnock(roomId, memberId, authMember.id());
 	}
 
 	@PostMapping

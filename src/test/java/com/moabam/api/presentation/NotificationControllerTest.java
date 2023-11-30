@@ -8,9 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -41,6 +42,7 @@ import com.moabam.support.snippet.ErrorSnippet;
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NotificationControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
@@ -67,15 +69,17 @@ class NotificationControllerTest extends WithoutFilterSupporter {
 	@MockBean
 	FirebaseMessaging firebaseMessaging;
 
+	Member member;
 	Member target;
 	Room room;
 	String knockKey;
 
-	@BeforeEach
+	@BeforeAll
 	void setUp() {
-		target = memberRepository.save(MemberFixture.member("123"));
+		member = memberRepository.save(MemberFixture.member(1L));
+		target = memberRepository.save(MemberFixture.member("socialId"));
 		room = roomRepository.save(RoomFixture.room());
-		knockKey = String.format("room_%s_member_%s_knocks_%s", room.getId(), 1, target.getId());
+		knockKey = String.format("roomId=%s_targetId=%s_memberId=%s", room.getId(), target.getId(), member.getId());
 
 		willReturn(null)
 			.given(firebaseMessaging)

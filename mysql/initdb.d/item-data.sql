@@ -37,3 +37,12 @@ values ('MORNING', 'SKIN', '산타 오목눈이', 'https://image.moabam.com/moab
 insert into item (type, category, name, awake_image, sleep_image, bug_price, golden_bug_price, unlock_level, created_at)
 values ('NIGHT', 'SKIN', '산타 부엉이', 'https://image.moabam.com/moabam/skins/owl/santa/eyes-opened.png',
         'https://image.moabam.com/moabam/skins/owl/santa/eyes-closed', 30, 15, 15, current_time());
+
+insert into product (id, type, name, price, quantity, created_at, updated_at)
+values (null, 'BUG', '황금벌레x5', 3300, 5, current_time(), null);
+
+insert into product (id, type, name, price, quantity, created_at, updated_at)
+values (null, 'BUG', '황금벌레x10', 6600, 10, current_time(), null);
+
+insert into product (id, type, name, price, quantity, created_at, updated_at)
+values (null, 'BUG', '황금벌레x15', 9900, 15, current_time(), null);

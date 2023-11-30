@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.room.RoomService;
 import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
@@ -29,24 +30,27 @@ import lombok.RequiredArgsConstructor;
 public class NotificationService {
 
 	private static final String COMMON_TITLE = "모아밤";
-	private static final String KNOCK_BODY = "%s방에서 %s님이 콕 찔렀어요~";
-	private static final String CERTIFY_TIME_BODY = "%s방 인증 시간~";
+	private static final String KNOCK_BODY = "[%s] - [%s]님이 콕콕콕!";
+	private static final String CERTIFY_TIME_BODY = "[%s] - 인증 시간!";
 
 	private final ClockHolder clockHolder;
 	private final FcmService fcmService;
 	private final RoomService roomService;
+	private final MemberService memberService;
 
 	private final NotificationRepository notificationRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
 
 	@Transactional
-	public void sendKnock(Long roomId, Long targetId, Long memberId, String memberNickname) {
-		String roomTitle = roomService.findRoom(roomId).getTitle();
+	public void sendKnock(Long roomId, Long targetId, Long memberId) {
 		validateConflictKnock(roomId, targetId, memberId);
 		String fcmToken = fcmService.findTokenByMemberId(targetId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_FCM_TOKEN));
 
+		String roomTitle = roomService.findRoom(roomId).getTitle();
+		String memberNickname = memberService.findMember(memberId).getNickname();
 		String notificationTitle = roomId.toString();
+
 		String notificationBody = String.format(KNOCK_BODY, roomTitle, memberNickname);
 		fcmService.sendAsync(fcmToken, notificationTitle, notificationBody);
 		notificationRepository.saveKnock(roomId, targetId, memberId);
