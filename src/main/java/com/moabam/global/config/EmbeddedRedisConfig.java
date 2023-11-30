@@ -18,6 +18,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.moabam.global.error.exception.MoabamException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -65,7 +66,10 @@ public class EmbeddedRedisConfig {
 
 	@Bean
 	public ObjectMapper objectMapper() {
-		return new ObjectMapper();
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModules(new JavaTimeModule());
+		
+		return objectMapper;
 	}
 
 	public void startRedis() {

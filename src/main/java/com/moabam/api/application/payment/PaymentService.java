@@ -13,9 +13,7 @@ import com.moabam.api.domain.payment.repository.PaymentSearchRepository;
 import com.moabam.api.dto.payment.ConfirmPaymentRequest;
 import com.moabam.api.dto.payment.ConfirmTossPaymentResponse;
 import com.moabam.api.dto.payment.PaymentRequest;
-import com.moabam.api.infrastructure.payment.TossPaymentMapper;
 import com.moabam.api.infrastructure.payment.TossPaymentService;
-import com.moabam.global.error.exception.MoabamException;
 import com.moabam.global.error.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -38,24 +36,26 @@ public class PaymentService {
 		payment.request(request.orderId());
 	}
 
-	@Transactional
-	public void confirm(Long memberId, ConfirmPaymentRequest request) {
+	public Payment validateInfo(Long memberId, ConfirmPaymentRequest request) {
 		Payment payment = getByOrderId(request.orderId());
 		payment.validateInfo(memberId, request.amount());
 
-		try {
-			ConfirmTossPaymentResponse response = tossPaymentService.confirm(
-				TossPaymentMapper.toConfirmRequest(request.paymentKey(), request.orderId(), request.amount())
-			);
-			payment.confirm(response.paymentKey(), response.approvedAt());
+		return payment;
+	}
 
-			if (payment.isCouponApplied()) {
-				couponService.discount(memberId, payment.getCouponWalletId());
-			}
-			bugService.charge(memberId, payment.getProduct());
-		} catch (MoabamException exception) {
-			payment.fail(request.paymentKey());
+	@Transactional
+	public void confirm(Long memberId, Payment payment, ConfirmTossPaymentResponse response) {
+		payment.confirm(response.paymentKey());
+
+		if (payment.isCouponApplied()) {
+			couponService.discount(payment.getCouponWalletId(), memberId);
 		}
+		bugService.charge(memberId, payment.getProduct());
+	}
+
+	@Transactional
+	public void fail(Payment payment, String paymentKey) {
+		payment.fail(paymentKey);
 	}
 
 	private Payment getById(Long paymentId) {

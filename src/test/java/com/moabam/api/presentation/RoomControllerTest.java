@@ -663,10 +663,13 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.maxUserCount(8)
 			.build();
 
+		List<Routine> routines = RoomFixture.routines(room);
+
 		Participant participant = RoomFixture.participant(room, 1L);
 		participant.enableManager();
 
 		roomRepository.save(room);
+		routineRepository.saveAll(routines);
 		participantRepository.save(participant);
 
 		// expected
@@ -675,9 +678,11 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andDo(print());
 
 		List<Room> deletedRoom = roomRepository.findAll();
+		List<Routine> deletedRoutine = routineRepository.findAll();
 		List<Participant> deletedParticipant = participantRepository.findAll();
 
 		assertThat(deletedRoom).isEmpty();
+		assertThat(deletedRoutine).hasSize(0);
 		assertThat(deletedParticipant).hasSize(1);
 		assertThat(deletedParticipant.get(0).getDeletedAt()).isNotNull();
 		assertThat(deletedParticipant.get(0).getDeletedRoomTitle()).isNotNull();
@@ -807,9 +812,9 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Inventory inventory1 = InventoryFixture.inventory(1L, item);
 		Inventory inventory2 = InventoryFixture.inventory(member2.getId(), item);
 		Inventory inventory3 = InventoryFixture.inventory(member3.getId(), item);
-		inventory1.select();
-		inventory2.select();
-		inventory3.select();
+		inventory1.select(member);
+		inventory2.select(member2);
+		inventory3.select(member3);
 
 		itemRepository.save(item);
 		inventoryRepository.saveAll(List.of(inventory1, inventory2, inventory3));
@@ -1017,7 +1022,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Item item = ItemFixture.nightMageSkin();
 
 		Inventory inventory = InventoryFixture.inventory(member1.getId(), item);
-		inventory.select();
+		inventory.select(member1);
 
 		itemRepository.save(item);
 		inventoryRepository.save(inventory);

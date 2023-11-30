@@ -70,7 +70,7 @@ public class RankingService {
 			RankingInfo rankingInfo = objectMapper.convertValue(topRanking.getValue(), RankingInfo.class);
 			topRankingInfoRespons.add(RankingMapper.topRankingResponse(scoreSet.size(), score, rankingInfo));
 		}
-		
+
 		return topRankingInfoRespons;
 	}
 }

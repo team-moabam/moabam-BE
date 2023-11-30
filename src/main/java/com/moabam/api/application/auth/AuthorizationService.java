@@ -21,6 +21,7 @@ import com.moabam.api.dto.auth.AuthorizationTokenRequest;
 import com.moabam.api.dto.auth.AuthorizationTokenResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.auth.TokenSaveValue;
+import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.common.util.GlobalConstant;
@@ -41,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AuthorizationService {
 
+	private final FcmService fcmService;
 	private final OAuthConfig oAuthConfig;
 	private final TokenConfig tokenConfig;
 	private final OAuth2AuthorizationServerRequestService oauth2AuthorizationServerRequestService;
@@ -105,6 +107,7 @@ public class AuthorizationService {
 		HttpServletResponse httpServletResponse) {
 		removeToken(httpServletRequest, httpServletResponse);
 		tokenRepository.delete(authMember.id());
+		fcmService.deleteTokenByMemberId(authMember.id());
 	}
 
 	public void removeToken(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {

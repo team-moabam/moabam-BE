@@ -8,6 +8,7 @@ import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 public final class CouponWalletSnippet {
 
 	public static final ResponseFieldsSnippet COUPON_WALLET_RESPONSE = responseFields(
+		fieldWithPath("[].walletId").type(NUMBER).description("쿠폰지갑 ID"),
 		fieldWithPath("[].id").type(NUMBER).description("쿠폰 ID"),
 		fieldWithPath("[].name").type(STRING).description("쿠폰명"),
 		fieldWithPath("[].description").type(STRING).description("쿠폰에 대한 간단 소개 (NULL 가능)"),

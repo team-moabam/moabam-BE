@@ -32,6 +32,7 @@ import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.ModifyMemberRequest;
+import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
@@ -71,6 +72,9 @@ class MemberServiceTest {
 
 	@Mock
 	RankingService rankingService;
+
+	@Mock
+	FcmService fcmService;
 
 	@Mock
 	ItemRepository itemRepository;

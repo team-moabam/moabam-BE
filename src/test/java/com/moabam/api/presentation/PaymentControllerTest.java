@@ -29,11 +29,13 @@ import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.payment.Payment;
 import com.moabam.api.domain.payment.PaymentStatus;
 import com.moabam.api.domain.payment.repository.PaymentRepository;
+import com.moabam.api.domain.payment.repository.PaymentSearchRepository;
 import com.moabam.api.domain.product.Product;
 import com.moabam.api.domain.product.repository.ProductRepository;
 import com.moabam.api.dto.payment.ConfirmPaymentRequest;
 import com.moabam.api.dto.payment.PaymentRequest;
 import com.moabam.api.infrastructure.payment.TossPaymentService;
+import com.moabam.global.error.exception.TossPaymentException;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 
@@ -56,6 +58,9 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	PaymentRepository paymentRepository;
+
+	@Autowired
+	PaymentSearchRepository paymentSearchRepository;
 
 	@Autowired
 	ProductRepository productRepository;
@@ -116,7 +121,7 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 			Payment payment = paymentRepository.save(payment(product));
 			payment.request(ORDER_ID);
 			ConfirmPaymentRequest request = confirmPaymentRequest();
-			given(tossPaymentService.confirm(confirmTossPaymentRequest())).willReturn(confirmTossPaymentResponse());
+			given(tossPaymentService.confirm(request)).willReturn(confirmTossPaymentResponse());
 			given(memberService.findMember(memberId)).willReturn(member());
 
 			// expected
@@ -148,6 +153,29 @@ class PaymentControllerTest extends WithoutFilterSupporter {
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message").value("올바른 요청 정보가 아닙니다."))
 				.andDo(print());
+		}
+
+		@DisplayName("토스 결제 승인 요청이 실패하면 예외가 발생한다.")
+		@WithMember
+		@Test
+		void confirm_toss_exception() throws Exception {
+			// given
+			Long memberId = getAuthMember().id();
+			Product product = productRepository.save(bugProduct());
+			Payment payment = paymentRepository.save(payment(product));
+			payment.request(ORDER_ID);
+			ConfirmPaymentRequest request = confirmPaymentRequest();
+			given(memberService.findMember(memberId)).willReturn(member());
+			given(tossPaymentService.confirm(request)).willThrow(TossPaymentException.class);
+
+			// expected
+			mockMvc.perform(post("/payments/confirm")
+					.contentType(APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk())
+				.andDo(print());
+			assertThat(payment.getPaymentKey()).isEqualTo(PAYMENT_KEY);
+			assertThat(payment.getStatus()).isEqualTo(PaymentStatus.ABORTED);
 		}
 	}
 }

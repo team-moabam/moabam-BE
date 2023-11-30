@@ -30,6 +30,7 @@ import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.api.dto.member.ModifyMemberRequest;
 import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.api.dto.ranking.UpdateRanking;
+import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.BaseDataCode;
 import com.moabam.global.common.util.ClockHolder;
@@ -46,6 +47,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 
 	private final RankingService rankingService;
+	private final FcmService fcmService;
 	private final MemberRepository memberRepository;
 	private final InventoryRepository inventoryRepository;
 	private final ItemRepository itemRepository;
@@ -89,6 +91,7 @@ public class MemberService {
 		memberRepository.flush();
 		memberRepository.delete(member);
 		rankingService.removeRanking(MemberMapper.toRankingInfo(member));
+		fcmService.deleteTokenByMemberId(member.getId());
 	}
 
 	public MemberInfoResponse searchInfo(AuthMember authMember, Long memberId) {

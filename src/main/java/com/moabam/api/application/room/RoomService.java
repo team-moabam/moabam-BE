@@ -116,6 +116,8 @@ public class RoomService {
 			return;
 		}
 
+		List<Routine> routines = routineRepository.findAllByRoomId(roomId);
+		routineRepository.deleteAll(routines);
 		roomRepository.delete(room);
 	}
 
@@ -141,6 +143,8 @@ public class RoomService {
 		validateManagerAuthorization(managerParticipant);
 
 		Room room = managerParticipant.getRoom();
+		memberParticipant.removeRoom();
+		participantRepository.flush();
 		participantRepository.delete(memberParticipant);
 		room.decreaseCurrentUserCount();
 

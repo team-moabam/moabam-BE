@@ -16,7 +16,6 @@ import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.infrastructure.fcm.FcmService;
-import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -40,14 +39,14 @@ public class NotificationService {
 	private final ParticipantSearchRepository participantSearchRepository;
 
 	@Transactional
-	public void sendKnock(AuthMember member, Long targetId, Long roomId) {
+	public void sendKnock(Long roomId, Long targetId, Long memberId, String memberNickname) {
 		roomService.validateRoomById(roomId);
-		validateConflictKnock(member.id(), targetId, roomId);
+		validateConflictKnock(roomId, targetId, memberId);
 		String fcmToken = fcmService.findTokenByMemberId(targetId)
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_FCM_TOKEN));
 
-		fcmService.sendAsync(fcmToken, String.format(KNOCK_BODY, member.nickname()));
-		notificationRepository.saveKnock(member.id(), targetId, roomId);
+		fcmService.sendAsync(fcmToken, String.format(KNOCK_BODY, memberNickname));
+		notificationRepository.saveKnock(roomId, targetId, memberId);
 	}
 
 	public void sendCouponIssueResult(Long memberId, String couponName, String body) {
@@ -73,8 +72,8 @@ public class NotificationService {
 			.filter(participant -> !participant.getMemberId().equals(memberId))
 			.toList();
 
-		Predicate<Long> knockPredicate = targetId -> notificationRepository.existsKnockByKey(memberId, targetId,
-			roomId);
+		Predicate<Long> knockPredicate = targetId ->
+			notificationRepository.existsKnockByKey(roomId, targetId, memberId);
 
 		Map<Boolean, List<Long>> knockStatus = filteredParticipants.stream()
 			.map(Participant::getMemberId)
@@ -83,8 +82,8 @@ public class NotificationService {
 		return knockStatus.get(true);
 	}
 
-	private void validateConflictKnock(Long memberId, Long targetId, Long roomId) {
-		if (notificationRepository.existsKnockByKey(memberId, targetId, roomId)) {
+	private void validateConflictKnock(Long roomId, Long targetId, Long memberId) {
+		if (notificationRepository.existsKnockByKey(roomId, targetId, memberId)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_KNOCK);
 		}
 	}

@@ -103,7 +103,7 @@ class InventorySearchRepositoryTest {
 		Member member = memberRepository.save(member("11314"));
 		Item item = itemRepository.save(nightMageSkin());
 		Inventory inventory = inventoryRepository.save(inventory(member.getId(), item));
-		inventory.select();
+		inventory.select(member);
 
 		// when
 		Optional<Inventory> actual = inventorySearchRepository.findDefault(member.getId(), inventory.getItemType());
@@ -121,8 +121,8 @@ class InventorySearchRepositoryTest {
 		Item item = itemRepository.save(nightMageSkin());
 		Inventory inventory1 = inventoryRepository.save(inventory(member1.getId(), item));
 		Inventory inventory2 = inventoryRepository.save(inventory(member2.getId(), item));
-		inventory1.select();
-		inventory2.select();
+		inventory1.select(member1);
+		inventory2.select(member2);
 
 		// when
 		List<Inventory> actual = inventorySearchRepository.findDefaultInventories(List.of(member1.getId(),
@@ -151,10 +151,10 @@ class InventorySearchRepositoryTest {
 			itemRepository.saveAll(List.of(night, morning, killer));
 
 			Inventory nightInven = InventoryFixture.inventory(member.getId(), night);
-			nightInven.select();
+			nightInven.select(member);
 
 			Inventory morningInven = InventoryFixture.inventory(member.getId(), morning);
-			morningInven.select();
+			morningInven.select(member);
 
 			Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
 			inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
