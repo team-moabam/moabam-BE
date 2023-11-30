@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # .env 파일 로드
-if [ -f /home/ubuntu/moabam/.env ]; then
-    source /home/ubuntu/moabam/.env
+if [ -f /home/ubuntu/moabam/infra/.env ]; then
+    source /home/ubuntu/moabam/infra/.env
 fi
 
 if ! [ -x "$(command -v docker-compose)" ]; then
@@ -12,7 +12,7 @@ fi
 
 domains="${SERVER_DOMAIN}"
 rsa_key_size=4096
-data_path="/home/ubuntu/moabam/nginx/certbot"
+data_path="/home/ubuntu/moabam/infra/nginx/certbot"
 email="${MY_EMAIL}" # Adding a valid address is strongly recommended
 staging=1 # Set to 1 if you're testing your setup to avoid hitting request limits
 
