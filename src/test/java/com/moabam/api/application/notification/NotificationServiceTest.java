@@ -16,9 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.room.RoomService;
+import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.notification.repository.NotificationRepository;
 import com.moabam.api.domain.room.Participant;
+import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
@@ -29,12 +32,17 @@ import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.FilterProcessExtension;
+import com.moabam.support.fixture.MemberFixture;
+import com.moabam.support.fixture.RoomFixture;
 
 @ExtendWith({MockitoExtension.class, FilterProcessExtension.class})
 class NotificationServiceTest {
 
 	@InjectMocks
 	NotificationService notificationService;
+
+	@Mock
+	MemberService memberService;
 
 	@Mock
 	RoomService roomService;
@@ -57,27 +65,47 @@ class NotificationServiceTest {
 	@Test
 	void sendKnock_success() {
 		// Given
-		willDoNothing().given(roomService).validateRoomById(any(Long.class));
+		Room room = RoomFixture.room();
+		Member member = MemberFixture.member();
+
+		given(roomService.findRoom(any(Long.class))).willReturn(room);
+		given(memberService.findMember(any(Long.class))).willReturn(member);
 		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.of("FCM-TOKEN"));
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(false);
 
 		// When
-		notificationService.sendKnock(1L, 1L, 2L, "nickName");
+		notificationService.sendKnock(1L, 1L, 2L);
 
 		// Then
-		verify(fcmService).sendAsync(any(String.class), any(String.class));
+		verify(fcmService).sendAsync(any(String.class), any(String.class), any(String.class));
 		verify(notificationRepository).saveKnock(any(Long.class), any(Long.class), any(Long.class));
 	}
 
-	@DisplayName("콕 찌를 상대의 방이 존재하지 않는다. - NotFoundException")
+	@DisplayName("콕 찌를 때, 방이 존재하지 않는다. - NotFoundException")
 	@Test
 	void sendKnock_Room_NotFoundException() {
 		// Given
-		willThrow(NotFoundException.class).given(roomService).validateRoomById(any(Long.class));
+		given(roomService.findRoom(any(Long.class))).willThrow(NotFoundException.class);
+		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.of("FCM-TOKEN"));
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L, "nickName"))
+		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L))
+			.isInstanceOf(NotFoundException.class);
+	}
+
+	@DisplayName("콕 찌를 상대가 존재하지 않는다. - NotFoundException")
+	@Test
+	void sendKnock_Member_NotFoundException() {
+		// Given
+		Room room = RoomFixture.room();
+
+		given(roomService.findRoom(any(Long.class))).willReturn(room);
+		given(memberService.findMember(any(Long.class))).willThrow(NotFoundException.class);
+		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.of("FCM-TOKEN"));
+
+		// When & Then
+		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L))
 			.isInstanceOf(NotFoundException.class);
 	}
 
@@ -85,13 +113,12 @@ class NotificationServiceTest {
 	@Test
 	void sendKnock_FcmToken_NotFoundException() {
 		// Given
-		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.empty());
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(false);
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L, "nickName"))
+		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L))
 			.isInstanceOf(NotFoundException.class)
 			.hasMessage(ErrorMessage.NOT_FOUND_FCM_TOKEN.getMessage());
 	}
@@ -100,12 +127,11 @@ class NotificationServiceTest {
 	@Test
 	void sendKnock_ConflictException() {
 		// Given
-		willDoNothing().given(roomService).validateRoomById(any(Long.class));
 		given(notificationRepository.existsKnockByKey(any(Long.class), any(Long.class), any(Long.class)))
 			.willReturn(true);
 
 		// When & Then
-		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L, "nickName"))
+		assertThatThrownBy(() -> notificationService.sendKnock(1L, 1L, 2L))
 			.isInstanceOf(ConflictException.class)
 			.hasMessage(ErrorMessage.CONFLICT_KNOCK.getMessage());
 	}
@@ -120,7 +146,7 @@ class NotificationServiceTest {
 		notificationService.sendCouponIssueResult(1L, "couponName", successIssueResult);
 
 		// Then
-		verify(fcmService).sendAsync(any(String.class), any(String.class));
+		verify(fcmService).sendAsync(any(String.class), any(String.class), any(String.class));
 	}
 
 	@DisplayName("로그아웃된 사용자에게 쿠폰 이슈 결과를 성공적으로 전송한다. - Void")
@@ -133,7 +159,7 @@ class NotificationServiceTest {
 		notificationService.sendCouponIssueResult(1L, "couponName", successIssueResult);
 
 		// Then
-		verify(fcmService).sendAsync(isNull(), any(String.class));
+		verify(fcmService).sendAsync(isNull(), any(String.class), any(String.class));
 	}
 
 	@DisplayName("특정 인증 시간에 해당하는 방 사용자들에게 알림을 성공적으로 보낸다. - Void")
@@ -149,7 +175,8 @@ class NotificationServiceTest {
 		notificationService.sendCertificationTime();
 
 		// Then
-		verify(fcmService, times(3)).sendAsync(any(String.class), any(String.class));
+		verify(fcmService, times(3))
+			.sendAsync(any(String.class), any(String.class), any(String.class));
 	}
 
 	@DisplayName("특정 인증 시간에 해당하는 방 사용자들의 토큰값이 없다. - Void")
@@ -165,7 +192,8 @@ class NotificationServiceTest {
 		notificationService.sendCertificationTime();
 
 		// Then
-		verify(fcmService, times(0)).sendAsync(any(String.class), any(String.class));
+		verify(fcmService, times(0))
+			.sendAsync(any(String.class), any(String.class), any(String.class));
 	}
 
 	@WithMember

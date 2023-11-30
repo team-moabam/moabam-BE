@@ -16,24 +16,33 @@ values ('NIGHT', 'SKIN', '부엉이', 'https://image.moabam.com/moabam/skins/owl
 
 insert into item (type, category, name, awake_image, sleep_image, bug_price, golden_bug_price, unlock_level, created_at)
 values ('MORNING', 'SKIN', '안경 오목눈이', 'https://image.moabam.com/moabam/skins/omok/glasses/eyes-opened.png',
-        'https://image.moabam.com/moabam/skins/omok/glasses/eyes-closed', 10, 5, 5, current_time());
+        'https://image.moabam.com/moabam/skins/omok/glasses/eyes-closed.png', 10, 5, 5, current_time());
 
 insert into item (type, category, name, awake_image, sleep_image, bug_price, golden_bug_price, unlock_level, created_at)
 values ('NIGHT', 'SKIN', '안경 부엉이', 'https://image.moabam.com/moabam/skins/owl/glasses/eyes-opened.png',
-        'https://image.moabam.com/moabam/skins/owl/glasses/eyes-closed', 10, 5, 5, current_time());
+        'https://image.moabam.com/moabam/skins/owl/glasses/eyes-closed.png', 10, 5, 5, current_time());
 
 insert into item (type, category, name, awake_image, sleep_image, bug_price, golden_bug_price, unlock_level, created_at)
 values ('MORNING', 'SKIN', '목도리 오목눈이', 'https://image.moabam.com/moabam/skins/omok/scarf/eyes-opened.png',
-        'https://image.moabam.com/moabam/skins/omok/scarf/eyes-closed', 20, 10, 10, current_time());
+        'https://image.moabam.com/moabam/skins/omok/scarf/eyes-closed.png', 20, 10, 10, current_time());
 
 insert into item (type, category, name, awake_image, sleep_image, bug_price, golden_bug_price, unlock_level, created_at)
 values ('NIGHT', 'SKIN', '목도리 부엉이', 'https://image.moabam.com/moabam/skins/owl/scarf/eyes-opened.png',
-        'https://image.moabam.com/moabam/skins/owl/scarf/eyes-closed', 20, 10, 10, current_time());
+        'https://image.moabam.com/moabam/skins/owl/scarf/eyes-closed.png', 20, 10, 10, current_time());
 
 insert into item (type, category, name, awake_image, sleep_image, bug_price, golden_bug_price, unlock_level, created_at)
 values ('MORNING', 'SKIN', '산타 오목눈이', 'https://image.moabam.com/moabam/skins/omok/santa/eyes-opened.png',
-        'https://image.moabam.com/moabam/skins/omok/santa/eyes-closed', 30, 15, 15, current_time());
+        'https://image.moabam.com/moabam/skins/omok/santa/eyes-closed.png', 30, 15, 15, current_time());
 
 insert into item (type, category, name, awake_image, sleep_image, bug_price, golden_bug_price, unlock_level, created_at)
 values ('NIGHT', 'SKIN', '산타 부엉이', 'https://image.moabam.com/moabam/skins/owl/santa/eyes-opened.png',
-        'https://image.moabam.com/moabam/skins/owl/santa/eyes-closed', 30, 15, 15, current_time());
+        'https://image.moabam.com/moabam/skins/owl/santa/eyes-closed.png', 30, 15, 15, current_time());
+
+insert into product (id, type, name, price, quantity, created_at, updated_at)
+values (null, 'BUG', '황금벌레x5', 3000, 5, current_time(), null);
+
+insert into product (id, type, name, price, quantity, created_at, updated_at)
+values (null, 'BUG', '황금벌레x10', 7000, 10, current_time(), null);
+
+insert into product (id, type, name, price, quantity, created_at, updated_at)
+values (null, 'BUG', '황금벌레x25', 9900, 25, current_time(), null);

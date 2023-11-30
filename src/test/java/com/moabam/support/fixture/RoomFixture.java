@@ -30,6 +30,7 @@ public class RoomFixture {
 
 	public static Room room(int certifyTime) {
 		return Room.builder()
+			.id(1L)
 			.title("testTitle")
 			.roomType(RoomType.MORNING)
 			.certifyTime(certifyTime)
