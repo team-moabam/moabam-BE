@@ -38,6 +38,7 @@ public class PaymentService {
 		payment.request(request.orderId());
 	}
 
+	@Transactional
 	public RequestConfirmPaymentResponse requestConfirm(Long memberId, ConfirmPaymentRequest request) {
 		Payment payment = getByOrderId(request.orderId());
 		payment.validateInfo(memberId, request.amount());
