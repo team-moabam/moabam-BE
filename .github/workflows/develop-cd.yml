@@ -126,7 +126,7 @@ jobs:
       - name: Docker Hub 빌드하고 푸시
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./infra
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ secrets.DOCKER_HUB_DEV_TAG }}
           build-args: |
