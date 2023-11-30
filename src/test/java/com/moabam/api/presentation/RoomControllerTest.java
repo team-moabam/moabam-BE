@@ -799,8 +799,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Participant participant1 = RoomFixture.participant(room, 1L);
 		participant1.enableManager();
 
-		Member member2 = MemberFixture.member("2", "NICK2");
-		Member member3 = MemberFixture.member("3", "NICK3");
+		Member member2 = MemberFixture.member("2");
+		Member member3 = MemberFixture.member("3");
 
 		roomRepository.save(room);
 		routineRepository.saveAll(routines);
@@ -865,7 +865,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	void deport_member_success() throws Exception {
 		// given
 		Room room = RoomFixture.room();
-		Member member = MemberFixture.member("1234", "참여자");
+		Member member = MemberFixture.member("1234");
 		memberRepository.save(member);
 
 		Participant memberParticipant = RoomFixture.participant(room, member.getId());
@@ -916,7 +916,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	@Test
 	void mandate_manager_success() throws Exception {
 		// given
-		Member member2 = MemberFixture.member("1234", "방장될 멤버");
+		Member member2 = MemberFixture.member("1234");
 		memberRepository.save(member2);
 
 		Room room = RoomFixture.room();
@@ -1016,7 +1016,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Room room = RoomFixture.room("테스트 방", NIGHT, 21);
 		Room savedRoom = roomRepository.save(room);
 
-		Member member1 = MemberFixture.member("901010", "testtest");
+		Member member1 = MemberFixture.member("901010");
 		member1 = memberRepository.save(member1);
 
 		Item item = ItemFixture.nightMageSkin();
@@ -1536,8 +1536,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	@Test
 	void get_room_details_before_modification_success() throws Exception {
 		// given
-		Member member2 = MemberFixture.member("123", "참여자1");
-		Member member3 = MemberFixture.member("456", "참여자2");
+		Member member2 = MemberFixture.member("123");
+		Member member3 = MemberFixture.member("456");
 		member2 = memberRepository.save(member2);
 		member3 = memberRepository.save(member3);
 

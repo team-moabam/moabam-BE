@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.application.ranking.RankingService;
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.repository.InventoryRepository;
@@ -68,6 +69,9 @@ class MemberServiceTest {
 
 	@Mock
 	InventoryRepository inventoryRepository;
+
+	@Mock
+	RankingService rankingService;
 
 	@Mock
 	FcmService fcmService;
@@ -228,5 +232,18 @@ class MemberServiceTest {
 			() -> assertThat(member.getIntro()).isEqualTo(modifyMemberRequest.intro()),
 			() -> assertThat(member.getProfileImage()).isEqualTo("/main")
 		);
+	}
+
+	@DisplayName("모든 랭킹 업데이트")
+	@Test
+	void update_all_ranking() {
+		// given
+		Member member1 = MemberFixture.member("1");
+		Member member2 = MemberFixture.member("2");
+		given(memberSearchRepository.findAllMembers())
+			.willReturn(List.of(member1, member2));
+
+		// when + Then
+		assertThatNoException().isThrownBy(() -> memberService.updateAllRanking());
 	}
 }

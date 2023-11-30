@@ -19,6 +19,8 @@ import com.moabam.api.dto.member.BadgeResponse;
 import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.MemberInfoSearchResponse;
+import com.moabam.api.dto.ranking.RankingInfo;
+import com.moabam.api.dto.ranking.UpdateRanking;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -30,6 +32,13 @@ public final class MemberMapper {
 		return Member.builder()
 			.socialId(String.valueOf(socialId))
 			.bug(Bug.builder().build())
+			.build();
+	}
+
+	public static UpdateRanking toUpdateRanking(Member member) {
+		return UpdateRanking.builder()
+			.rankingInfo(toRankingInfo(member))
+			.score(member.getTotalCertifyCount())
 			.build();
 	}
 
@@ -76,6 +85,14 @@ public final class MemberMapper {
 			.memberId(memberId)
 			.item(item)
 			.isDefault(true)
+			.build();
+	}
+
+	public static RankingInfo toRankingInfo(Member member) {
+		return RankingInfo.builder()
+			.memberId(member.getId())
+			.nickname(member.getNickname())
+			.image(member.getProfileImage())
 			.build();
 	}
 

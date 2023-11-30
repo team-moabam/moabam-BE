@@ -58,7 +58,7 @@ class MemberRepositoryTest {
 	@Test
 	void test() {
 		// given
-		Member member = MemberFixture.member("313", "test");
+		Member member = MemberFixture.member("313");
 		memberRepository.save(member);
 
 		// when
@@ -76,7 +76,7 @@ class MemberRepositoryTest {
 		@Test
 		void room_exist_and_manager_error() {
 			// given
-			Member member = MemberFixture.member("1111", "test");
+			Member member = MemberFixture.member("1111");
 			memberRepository.save(member);
 
 			Room room = RoomFixture.room();
@@ -102,7 +102,7 @@ class MemberRepositoryTest {
 			room.changeManagerNickname("test");
 			roomRepository.save(room);
 
-			Member member = MemberFixture.member("44", "test");
+			Member member = MemberFixture.member("44");
 			member.changeNickName("not");
 			memberRepository.save(member);
 
@@ -133,7 +133,7 @@ class MemberRepositoryTest {
 		@Test
 		void search_info_success() {
 			// given
-			Member member = MemberFixture.member("hhhh", "test");
+			Member member = MemberFixture.member("hhhh");
 			member.enterRoom(RoomType.MORNING);
 			memberRepository.save(member);
 
@@ -158,7 +158,7 @@ class MemberRepositoryTest {
 		@Test
 		void no_badges_search_success() {
 			// given
-			Member member = MemberFixture.member("ttttt", "test");
+			Member member = MemberFixture.member("ttttt");
 			member.enterRoom(RoomType.MORNING);
 			memberRepository.save(member);
 
