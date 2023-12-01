@@ -299,15 +299,11 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Participant participant = RoomFixture.participant(room, 1L);
 		participant.enableManager();
 
-		List<String> newRoutines = new ArrayList<>();
-		newRoutines.add("물 마시기");
-		newRoutines.add("코테 풀기");
-
 		roomRepository.save(room);
 		routineRepository.saveAll(routines);
 		participantRepository.save(participant);
 
-		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "공지공지", newRoutines, "4567", 10, 7);
+		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "공지공지", "4567", 10, 7);
 		String json = objectMapper.writeValueAsString(modifyRoomRequest);
 
 		// expected
@@ -343,13 +339,9 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		Participant participant = RoomFixture.participant(room, 1L);
 
-		List<String> routines = new ArrayList<>();
-		routines.add("물 마시기");
-		routines.add("코테 풀기");
-
 		roomRepository.save(room);
 		participantRepository.save(participant);
-		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "방 공지", routines, "1234", 9, 7);
+		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "방 공지", "1234", 9, 7);
 		String json = objectMapper.writeValueAsString(modifyRoomRequest);
 		String message = "{\"message\":\"방장이 아닌 사용자는 방을 수정할 수 없습니다.\"}";
 
