@@ -58,7 +58,13 @@ public class CouponManageRepository {
 
 	public int getCount(String couponName) {
 		String couponCountKey = String.format(COUPON_COUNT_KEY, requireNonNull(couponName));
-		return Integer.parseInt(valueRedisRepository.get(couponCountKey));
+		String count = valueRedisRepository.get(couponCountKey);
+
+		if (isNull(count)) {
+			return 0;
+		}
+
+		return Integer.parseInt(count);
 	}
 
 	public void increase(String couponName, long count) {

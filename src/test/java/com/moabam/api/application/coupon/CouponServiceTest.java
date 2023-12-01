@@ -183,7 +183,7 @@ class CouponServiceTest {
 
 		// Then
 		verify(couponRepository).delete(coupon);
-		verify(couponManageService).deleteQueue(any(String.class));
+		verify(couponManageService).delete(any(String.class));
 	}
 
 	@DisplayName("권한 없는 사용자가 쿠폰을 삭제한다. - NotFoundException")

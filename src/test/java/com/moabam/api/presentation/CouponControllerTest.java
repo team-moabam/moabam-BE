@@ -35,6 +35,7 @@ import com.moabam.api.domain.member.Role;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
+import com.moabam.api.infrastructure.redis.ValueRedisRepository;
 import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.model.ErrorMessage;
@@ -72,6 +73,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 
 	@MockBean
 	ZSetRedisRepository zSetRedisRepository;
+
+	@MockBean
+	ValueRedisRepository valueRedisRepository;
 
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("POST - 쿠폰을 성공적으로 발행한다. - Void")
@@ -420,9 +424,31 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	}
 
 	@WithMember
-	@DisplayName("POST - 발급 가능 날짜가 아닌 쿠폰에 발급 요청을 한다. (Not found) - BadRequestException")
+	@DisplayName("POST - 쿠폰 발급을 성공적으로 한다. - Void")
 	@Test
-	void registerQueue_Zero_StartAt_BadRequestException() throws Exception {
+	void registerQueue_success() throws Exception {
+		// Given
+		Coupon couponFixture = CouponFixture.coupon("CouponName", 2, 1);
+		Coupon coupon = couponRepository.save(couponFixture);
+
+		given(clockHolder.date()).willReturn(LocalDate.of(2023, 2, 1));
+		given(zSetRedisRepository.score(anyString(), anyLong())).willReturn(null);
+		given(zSetRedisRepository.size(anyString())).willReturn((long)(coupon.getMaxCount() - 1));
+
+		// When & Then
+		mockMvc.perform(post("/coupons")
+				.param("couponName", coupon.getName()))
+			.andDo(print())
+			.andDo(document("coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint())))
+			.andExpect(status().isOk());
+	}
+
+	@WithMember
+	@DisplayName("POST - 발급 가능 날짜가 아닌 쿠폰에 발급 요청을 한다. - NotFoundException")
+	@Test
+	void registerQueue_NotFoundException() throws Exception {
 		// Given
 		Coupon couponFixture = CouponFixture.coupon();
 		Coupon coupon = couponRepository.save(couponFixture);
@@ -437,39 +463,45 @@ class CouponControllerTest extends WithoutFilterSupporter {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
-			.andExpect(status().isBadRequest())
+			.andExpect(status().isNotFound())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
 	}
 
 	@WithMember
-	@DisplayName("POST - 발급 가능 날짜가 아닌 쿠폰에 발급 요청을 한다. (Not equals) - BadRequestException")
+	@DisplayName("POST - 동일한 쿠폰 이벤트에 중복으로 요청한다. - ConflictException")
 	@Test
-	void registerQueue_Not_StartAt_BadRequestException() throws Exception {
+	void registerQueue_ConflictException() throws Exception {
 		// Given
-		given(clockHolder.date()).willReturn(LocalDate.of(2022, 2, 1));
+		Coupon coupon = couponRepository.save(CouponFixture.coupon());
+
+		given(clockHolder.date()).willReturn(LocalDate.of(2023, 2, 1));
+		given(zSetRedisRepository.score(anyString(), anyLong())).willReturn(7.0);
 
 		// When & Then
 		mockMvc.perform(post("/coupons")
-				.param("couponName", "not start couponName"))
+				.param("couponName", coupon.getName()))
 			.andDo(print())
 			.andDo(document("coupons",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
-			.andExpect(status().isBadRequest())
+			.andExpect(status().isConflict())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
+			.andExpect(jsonPath("$.message").value(ErrorMessage.CONFLICT_COUPON_ISSUE.getMessage()));
 	}
 
 	@WithMember
-	@DisplayName("POST - 존재하지 않는 쿠폰에 발급 요청을 한다. - NotFoundException")
+	@DisplayName("POST - 선착순 이벤트가 마감된 쿠폰에 발급 요청을 한다. - BadRequestException")
 	@Test
-	void registerQueue_NotFoundException() throws Exception {
+	void registerQueue_BadRequestException() throws Exception {
 		// Given
-		Coupon coupon = CouponFixture.coupon("Not found couponName", 2, 1);
+		Coupon couponFixture = CouponFixture.coupon();
+		Coupon coupon = couponRepository.save(couponFixture);
 
 		given(clockHolder.date()).willReturn(LocalDate.of(2023, 2, 1));
+		given(zSetRedisRepository.score(anyString(), anyLong())).willReturn(null);
+		given(zSetRedisRepository.size(anyString())).willReturn((long)(coupon.getMaxCount()));
 
 		// When & Then
 		mockMvc.perform(post("/coupons")
@@ -481,6 +513,6 @@ class CouponControllerTest extends WithoutFilterSupporter {
 				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
 			.andExpect(status().isBadRequest())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
+			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_STOCK_END.getMessage()));
 	}
 }

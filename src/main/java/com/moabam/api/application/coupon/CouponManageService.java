@@ -16,6 +16,7 @@ import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
+import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 
 import lombok.RequiredArgsConstructor;
@@ -75,7 +76,7 @@ public class CouponManageService {
 		couponManageRepository.addIfAbsentQueue(couponName, memberId, registerTime);
 	}
 
-	public void deleteQueue(String couponName) {
+	public void delete(String couponName) {
 		couponManageRepository.deleteQueue(couponName);
 		couponManageRepository.deleteCount(couponName);
 	}
@@ -83,7 +84,7 @@ public class CouponManageService {
 	private void validateRegisterQueue(String couponName, Long memberId) {
 		LocalDate now = clockHolder.date();
 		Coupon coupon = couponRepository.findByNameAndStartAt(couponName, now)
-			.orElseThrow(() -> new BadRequestException(ErrorMessage.INVALID_COUPON_PERIOD));
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.INVALID_COUPON_PERIOD));
 
 		if (couponManageRepository.hasValue(couponName, memberId)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_ISSUE);

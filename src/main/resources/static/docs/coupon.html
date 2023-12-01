@@ -498,7 +498,7 @@ Access-Control-Max-Age: 3600</code></pre>
 <h4 id="_요청_2" class="discrete">요청</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admins/coupons/33 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /admins/coupons/36 HTTP/1.1
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -526,7 +526,7 @@ Access-Control-Max-Age: 3600</code></pre>
 <h4 id="_요청_3">요청</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /coupons/21 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /coupons/24 HTTP/1.1
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -543,7 +543,7 @@ Content-Type: application/json
 Content-Length: 201
 
 {
-  "id" : 21,
+  "id" : 24,
   "adminName" : "ID : 1",
   "name" : "couponName",
   "description" : "",
@@ -593,7 +593,7 @@ Content-Type: application/json
 Content-Length: 202
 
 [ {
-  "id" : 22,
+  "id" : 25,
   "adminName" : "ID : 1",
   "name" : "coupon1",
   "description" : "",
@@ -630,17 +630,17 @@ couponName=couponName</code></pre>
 <h4 id="_응답_5" class="discrete">응답</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
 Access-Control-Allow-Origin:
 Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
 Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
 Access-Control-Allow-Credentials: true
 Access-Control-Max-Age: 3600
 Content-Type: application/json
-Content-Length: 64
+Content-Length: 63
 
 {
-  "message" : "쿠폰 발급 가능 기간이 아닙니다."
+  "message" : "이미 쿠폰 발급에 성공했습니다!"
 }</code></pre>
 </div>
 </div>
