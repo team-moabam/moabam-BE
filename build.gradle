@@ -105,9 +105,8 @@ dependencies {
     // webflux
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-    // Sentry
-    implementation 'io.sentry:sentry-spring-boot-starter-jakarta:6.34.0'
-    implementation 'io.sentry:sentry-logback:6.34.0'
+    // Slack Webhook
+    implementation "net.gpedro.integrations.slack:slack-webhook:1.4.0"
 }
 
 tasks.named('test') {
