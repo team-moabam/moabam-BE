@@ -447,9 +447,6 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@Test
 	void registerQueue_Not_StartAt_BadRequestException() throws Exception {
 		// Given
-		Coupon couponFixture = CouponFixture.coupon();
-		couponRepository.save(couponFixture);
-
 		given(clockHolder.date()).willReturn(LocalDate.of(2022, 2, 1));
 
 		// When & Then

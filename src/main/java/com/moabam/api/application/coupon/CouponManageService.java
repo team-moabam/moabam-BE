@@ -49,13 +49,17 @@ public class CouponManageService {
 		Coupon coupon = optionalCoupon.get();
 		String couponName = coupon.getName();
 		int maxCount = coupon.getMaxCount();
-		int currentCount = couponManageRepository.getCouponCount(couponName);
+		int currentCount = couponManageRepository.getCount(couponName);
 
 		if (maxCount <= currentCount) {
 			return;
 		}
 
 		Set<Long> membersId = couponManageRepository.rangeQueue(couponName, currentCount, currentCount + ISSUE_SIZE);
+
+		if (membersId.isEmpty()) {
+			return;
+		}
 
 		for (Long memberId : membersId) {
 			couponWalletRepository.save(CouponWallet.create(memberId, coupon));
@@ -73,6 +77,7 @@ public class CouponManageService {
 
 	public void deleteQueue(String couponName) {
 		couponManageRepository.deleteQueue(couponName);
+		couponManageRepository.deleteCount(couponName);
 	}
 
 	private void validateRegisterQueue(String couponName, Long memberId) {

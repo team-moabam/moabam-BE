@@ -41,12 +41,12 @@ public class CouponManageRepository {
 	}
 
 	public boolean hasValue(String couponName, Long memberId) {
-		return Objects.nonNull(zSetRedisRepository.score(couponName, memberId));
+		return Objects.nonNull(zSetRedisRepository.score(requireNonNull(couponName), memberId));
 	}
 
 	public int sizeQueue(String couponName) {
 		return zSetRedisRepository
-			.size(couponName)
+			.size(requireNonNull(couponName))
 			.intValue();
 	}
 
@@ -56,17 +56,22 @@ public class CouponManageRepository {
 			.intValue();
 	}
 
-	public int getCouponCount(String couponName) {
-		String couponCountKey = String.format(COUPON_COUNT_KEY, couponName);
+	public int getCount(String couponName) {
+		String couponCountKey = String.format(COUPON_COUNT_KEY, requireNonNull(couponName));
 		return Integer.parseInt(valueRedisRepository.get(couponCountKey));
 	}
 
 	public void increase(String couponName, long count) {
-		String couponCountKey = String.format(COUPON_COUNT_KEY, couponName);
+		String couponCountKey = String.format(COUPON_COUNT_KEY, requireNonNull(couponName));
 		valueRedisRepository.increment(couponCountKey, count);
 	}
 
 	public void deleteQueue(String couponName) {
 		valueRedisRepository.delete(requireNonNull(couponName));
+	}
+
+	public void deleteCount(String couponName) {
+		String couponCountKey = String.format(COUPON_COUNT_KEY, requireNonNull(couponName));
+		valueRedisRepository.delete(couponCountKey);
 	}
 }

@@ -61,7 +61,7 @@ class CouponManageServiceTest {
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
 		given(couponManageRepository.rangeQueue(any(String.class), any(long.class), any(long.class)))
 			.willReturn(values);
-		given(couponManageRepository.getCouponCount(any(String.class))).willReturn(coupon.getMaxCount() - 1);
+		given(couponManageRepository.getCount(any(String.class))).willReturn(coupon.getMaxCount() - 1);
 
 		// When
 		couponManageService.issue();
@@ -99,7 +99,7 @@ class CouponManageServiceTest {
 
 		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
-		given(couponManageRepository.getCouponCount(any(String.class))).willReturn(coupon.getMaxCount());
+		given(couponManageRepository.getCount(any(String.class))).willReturn(coupon.getMaxCount());
 
 		// When
 		couponManageService.issue();
