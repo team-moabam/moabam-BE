@@ -147,7 +147,7 @@ public class SearchService {
 			participantResponses.add(ParticipantMapper.toParticipantResponse(member, contributionPoint));
 		}
 
-		return RoomMapper.toManageRoomResponse(room, routineResponses, participantResponses);
+		return RoomMapper.toManageRoomResponse(room, memberId, routineResponses, participantResponses);
 	}
 
 	public GetAllRoomsResponse getAllRooms(@Nullable RoomType roomType, @Nullable Long roomId) {

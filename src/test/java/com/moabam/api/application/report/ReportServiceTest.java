@@ -52,7 +52,7 @@ class ReportServiceTest {
 	@Test
 	void no_report_subject_fail(@WithMember AuthMember authMember) {
 		// given
-		ReportRequest reportRequest = new ReportRequest(5L, null, null, "st");
+		ReportRequest reportRequest = new ReportRequest(null, null, null, "st");
 
 		// When + Then
 		assertThatThrownBy(() -> reportService.report(authMember, reportRequest))

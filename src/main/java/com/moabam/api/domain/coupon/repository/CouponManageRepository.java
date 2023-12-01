@@ -2,6 +2,7 @@ package com.moabam.api.domain.coupon.repository;
 
 import static java.util.Objects.*;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CouponManageRepository {
 
+	private static final String COUPON_COUNT_KEY = "%s_COUPON_COUNT_KEY";
 	private static final int EXPIRE_DAYS = 2;
 
 	private final ZSetRedisRepository zSetRedisRepository;
@@ -34,8 +36,18 @@ public class CouponManageRepository {
 		return zSetRedisRepository
 			.range(requireNonNull(couponName), start, end)
 			.stream()
-			.map(Long.class::cast)
+			.map(memberId -> Long.parseLong(String.valueOf(memberId)))
 			.collect(Collectors.toSet());
+	}
+
+	public boolean hasValue(String couponName, Long memberId) {
+		return Objects.nonNull(zSetRedisRepository.score(requireNonNull(couponName), memberId));
+	}
+
+	public int sizeQueue(String couponName) {
+		return zSetRedisRepository
+			.size(requireNonNull(couponName))
+			.intValue();
 	}
 
 	public int rankQueue(String couponName, Long memberId) {
@@ -44,7 +56,22 @@ public class CouponManageRepository {
 			.intValue();
 	}
 
+	public int getCount(String couponName) {
+		String couponCountKey = String.format(COUPON_COUNT_KEY, requireNonNull(couponName));
+		return Integer.parseInt(valueRedisRepository.get(couponCountKey));
+	}
+
+	public void increase(String couponName, long count) {
+		String couponCountKey = String.format(COUPON_COUNT_KEY, requireNonNull(couponName));
+		valueRedisRepository.increment(couponCountKey, count);
+	}
+
 	public void deleteQueue(String couponName) {
 		valueRedisRepository.delete(requireNonNull(couponName));
+	}
+
+	public void deleteCount(String couponName) {
+		String couponCountKey = String.format(COUPON_COUNT_KEY, requireNonNull(couponName));
+		valueRedisRepository.delete(couponCountKey);
 	}
 }

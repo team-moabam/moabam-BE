@@ -26,14 +26,17 @@ public class NotificationController {
 
 	@GetMapping("/rooms/{roomId}/members/{memberId}")
 	@ResponseStatus(HttpStatus.OK)
-	public void sendKnockNotification(@Auth AuthMember member, @PathVariable("roomId") Long roomId,
-		@PathVariable("memberId") Long memberId) {
-		notificationService.sendKnock(member, memberId, roomId);
+	public void sendKnock(
+		@PathVariable("roomId") Long roomId,
+		@PathVariable("memberId") Long memberId,
+		@Auth AuthMember authMember
+	) {
+		notificationService.sendKnock(roomId, memberId, authMember.id());
 	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.OK)
-	public void createFcmToken(@Auth AuthMember authMember, @RequestParam("fcmToken") String fcmToken) {
-		fcmService.createToken(authMember, fcmToken);
+	public void createFcmToken(@RequestParam("fcmToken") String fcmToken, @Auth AuthMember authMember) {
+		fcmService.createToken(fcmToken, authMember.id());
 	}
 }

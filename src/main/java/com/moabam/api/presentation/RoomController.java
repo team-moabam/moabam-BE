@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.moabam.api.application.image.ImageService;
 import com.moabam.api.application.room.CertificationService;
 import com.moabam.api.application.room.RoomService;
 import com.moabam.api.application.room.SearchService;
 import com.moabam.api.domain.image.ImageType;
+import com.moabam.api.domain.image.NewImage;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.dto.room.CertifiedMemberInfo;
+import com.moabam.api.dto.room.CertifyRoomsRequest;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.GetAllRoomsResponse;
@@ -38,9 +38,11 @@ import com.moabam.global.auth.model.AuthMember;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/rooms")
 public class RoomController {
 
@@ -52,7 +54,7 @@ public class RoomController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Long createRoom(@Auth AuthMember authMember, @Valid @RequestBody CreateRoomRequest createRoomRequest) {
-		return roomService.createRoom(authMember.id(), authMember.nickname(), createRoomRequest);
+		return roomService.createRoom(authMember.id(), createRoomRequest);
 	}
 
 	@GetMapping
@@ -110,8 +112,9 @@ public class RoomController {
 	@PostMapping("/{roomId}/certification")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void certifyRoom(@Auth AuthMember authMember, @PathVariable("roomId") Long roomId,
-		@RequestPart List<MultipartFile> multipartFiles) {
-		List<String> imageUrls = imageService.uploadImages(multipartFiles, ImageType.CERTIFICATION);
+		CertifyRoomsRequest request) {
+		List<NewImage> images = imageService.getNewImages(request);
+		List<String> imageUrls = imageService.uploadImages(images, ImageType.CERTIFICATION);
 		CertifiedMemberInfo info = certificationService.getCertifiedMemberInfo(authMember.id(), roomId, imageUrls);
 		certificationService.certifyRoom(info);
 	}

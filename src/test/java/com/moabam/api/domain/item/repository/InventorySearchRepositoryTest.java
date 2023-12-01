@@ -85,7 +85,7 @@ class InventorySearchRepositoryTest {
 	@Test
 	void find_one_success() {
 		// given
-		Member member = memberRepository.save(member("999", "test"));
+		Member member = memberRepository.save(member("999"));
 		Item item = itemRepository.save(nightMageSkin());
 		Inventory inventory = inventoryRepository.save(inventory(member.getId(), item));
 
@@ -100,10 +100,10 @@ class InventorySearchRepositoryTest {
 	@Test
 	void find_default_success() {
 		// given
-		Member member = memberRepository.save(member("11314", "test"));
+		Member member = memberRepository.save(member("11314"));
 		Item item = itemRepository.save(nightMageSkin());
 		Inventory inventory = inventoryRepository.save(inventory(member.getId(), item));
-		inventory.select();
+		inventory.select(member);
 
 		// when
 		Optional<Inventory> actual = inventorySearchRepository.findDefault(member.getId(), inventory.getItemType());
@@ -116,13 +116,13 @@ class InventorySearchRepositoryTest {
 	@Test
 	void find_all_default_type_night_success() {
 		// given
-		Member member1 = memberRepository.save(member("625", "회원1"));
-		Member member2 = memberRepository.save(member("255", "회원2"));
+		Member member1 = memberRepository.save(member("625"));
+		Member member2 = memberRepository.save(member("255"));
 		Item item = itemRepository.save(nightMageSkin());
 		Inventory inventory1 = inventoryRepository.save(inventory(member1.getId(), item));
 		Inventory inventory2 = inventoryRepository.save(inventory(member2.getId(), item));
-		inventory1.select();
-		inventory2.select();
+		inventory1.select(member1);
+		inventory2.select(member2);
 
 		// when
 		List<Inventory> actual = inventorySearchRepository.findDefaultInventories(List.of(member1.getId(),
@@ -141,7 +141,7 @@ class InventorySearchRepositoryTest {
 		@Test
 		void bird_find_success() {
 			// given
-			Member member = MemberFixture.member("fffdd", "test");
+			Member member = MemberFixture.member("fffdd");
 			member.exitRoom(RoomType.MORNING);
 			memberRepository.save(member);
 
@@ -151,10 +151,10 @@ class InventorySearchRepositoryTest {
 			itemRepository.saveAll(List.of(night, morning, killer));
 
 			Inventory nightInven = InventoryFixture.inventory(member.getId(), night);
-			nightInven.select();
+			nightInven.select(member);
 
 			Inventory morningInven = InventoryFixture.inventory(member.getId(), morning);
-			morningInven.select();
+			morningInven.select(member);
 
 			Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
 			inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -17,6 +18,8 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.moabam.global.error.exception.MoabamException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -60,6 +63,15 @@ public class EmbeddedRedisConfig {
 		redisTemplate.setConnectionFactory(redisConnectionFactory);
 
 		return redisTemplate;
+	}
+
+	@Order(2)
+	@Bean
+	public ObjectMapper objectRedisMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModules(new JavaTimeModule());
+
+		return objectMapper;
 	}
 
 	public void startRedis() {

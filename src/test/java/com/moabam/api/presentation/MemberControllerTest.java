@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -29,6 +30,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -45,6 +48,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moabam.api.application.auth.OAuth2AuthorizationServerRequestService;
 import com.moabam.api.application.image.ImageService;
+import com.moabam.api.application.member.MemberMapper;
 import com.moabam.api.domain.auth.repository.TokenRepository;
 import com.moabam.api.domain.image.ImageType;
 import com.moabam.api.domain.item.Inventory;
@@ -63,6 +67,8 @@ import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
 import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.api.dto.member.ModifyMemberRequest;
+import com.moabam.api.dto.ranking.RankingInfo;
+import com.moabam.global.config.EmbeddedRedisConfig;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.handler.RestTemplateResponseHandler;
@@ -83,6 +89,7 @@ import jakarta.persistence.EntityManager;
 @AutoConfigureMockMvc
 @AutoConfigureMockRestServiceServer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import(EmbeddedRedisConfig.class)
 class MemberControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
@@ -133,12 +140,15 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@Autowired
 	EntityManager entityManager;
 
+	@Autowired
+	RedisTemplate<String, Object> redisTemplate;
+
 	@BeforeAll
 	void allSetUp() {
 		restTemplateBuilder = new RestTemplateBuilder()
 			.errorHandler(new RestTemplateResponseHandler());
 
-		member = MemberFixture.member("1234567890987654", "nickname");
+		member = MemberFixture.member("1234567890987654");
 		member.increaseTotalCertifyCount();
 		memberRepository.save(member);
 	}
@@ -192,7 +202,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 		Member deletedMEmber = deletedMemberOptional.get();
 		assertThat(deletedMEmber.getDeletedAt()).isNotNull();
-		assertThat(deletedMEmber.getNickname()).isEqualTo(nickname);
+		assertThat(deletedMEmber.getNickname()).isNull();
 	}
 
 	@DisplayName("회원이 없어서 회원 삭제 실패")
@@ -266,10 +276,10 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		itemRepository.saveAll(List.of(night, morning, killer));
 
 		Inventory nightInven = InventoryFixture.inventory(member.getId(), night);
-		nightInven.select();
+		nightInven.select(member);
 
 		Inventory morningInven = InventoryFixture.inventory(member.getId(), morning);
-		morningInven.select();
+		morningInven.select(member);
 
 		Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
 		inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
@@ -291,13 +301,13 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				// MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
 				// MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
 
-				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("MORNING_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("오목눈이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("MORNING_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("어른 오목눈이"),
 				MockMvcResultMatchers.jsonPath("$.badges[1].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("NIGHT_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("부엉이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[2].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("NIGHT_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("어른 부엉이"),
 				MockMvcResultMatchers.jsonPath("$.badges[3].unlock").value(false),
 				MockMvcResultMatchers.jsonPath("$.goldenBug").value(member.getBug().getGoldenBug()),
 				MockMvcResultMatchers.jsonPath("$.morningBug").value(member.getBug().getMorningBug()),
@@ -316,10 +326,10 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		itemRepository.saveAll(List.of(night, morning, killer));
 
 		Inventory nightInven = InventoryFixture.inventory(member.getId(), night);
-		nightInven.select();
+		nightInven.select(member);
 
 		Inventory morningInven = InventoryFixture.inventory(member.getId(), morning);
-		morningInven.select();
+		morningInven.select(member);
 
 		Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
 		inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
@@ -342,13 +352,13 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				// MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
 				// MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
 
-				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("MORNING_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("오목눈이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(false),
-				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("MORNING_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("어른 오목눈이"),
 				MockMvcResultMatchers.jsonPath("$.badges[1].unlock").value(false),
-				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("NIGHT_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("부엉이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[2].unlock").value(false),
-				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("NIGHT_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("어른 부엉이"),
 				MockMvcResultMatchers.jsonPath("$.badges[3].unlock").value(false),
 				MockMvcResultMatchers.jsonPath("$.goldenBug").value(member.getBug().getGoldenBug()),
 				MockMvcResultMatchers.jsonPath("$.morningBug").value(member.getBug().getMorningBug()),
@@ -361,7 +371,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@Test
 	void search_friend_info_success() throws Exception {
 		// given
-		Member friend = MemberFixture.member("123456789", "nick");
+		Member friend = MemberFixture.member("123456789");
 		memberRepository.save(friend);
 
 		Badge morningBirth = BadgeFixture.badge(friend.getId(), BadgeType.MORNING_BIRTH);
@@ -377,10 +387,10 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		itemRepository.saveAll(List.of(night, morning, killer));
 
 		Inventory nightInven = InventoryFixture.inventory(friend.getId(), night);
-		nightInven.select();
+		nightInven.select(member);
 
 		Inventory morningInven = InventoryFixture.inventory(friend.getId(), morning);
-		morningInven.select();
+		morningInven.select(member);
 
 		Inventory killerInven = InventoryFixture.inventory(friend.getId(), killer);
 		friend.changeDefaultSkintUrl(morning);
@@ -405,13 +415,13 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getAwakeImage()),
 				MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getAwakeImage()),
 
-				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("MORNING_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("오목눈이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("MORNING_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("어른 오목눈이"),
 				MockMvcResultMatchers.jsonPath("$.badges[1].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("NIGHT_BIRTH"),
+				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("부엉이 탄생"),
 				MockMvcResultMatchers.jsonPath("$.badges[2].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("NIGHT_ADULT"),
+				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("어른 부엉이"),
 				MockMvcResultMatchers.jsonPath("$.badges[3].unlock").value(true)
 			).andDo(print());
 	}
@@ -435,13 +445,13 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		itemRepository.saveAll(List.of(night, morning, killer));
 
 		Inventory nightInven = InventoryFixture.inventory(member.getId(), night);
-		nightInven.select();
+		nightInven.select(member);
 
 		Inventory morningInven = InventoryFixture.inventory(member.getId(), morning);
-		morningInven.select();
+		morningInven.select(member);
 
 		Inventory killerInven = InventoryFixture.inventory(member.getId(), killer);
-		killerInven.select();
+		killerInven.select(member);
 		inventoryRepository.saveAll(List.of(nightInven, morningInven, killerInven));
 
 		// expected
@@ -481,6 +491,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				.characterEncoding("UTF-8"))
 			.andExpect(status().is2xxSuccessful())
 			.andDo(print());
+
 	}
 
 	@DisplayName("회원 프로필없이 성공 ")
@@ -499,6 +510,8 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 		willThrow(NullPointerException.class)
 			.given(imageService).uploadImages(any(), any());
+		RankingInfo rankingInfo = MemberMapper.toRankingInfo(member);
+		redisTemplate.opsForZSet().add("Ranking", rankingInfo, member.getTotalCertifyCount());
 
 		// expected
 		mockMvc.perform(multipart(HttpMethod.POST, "/members/modify")
@@ -508,5 +521,15 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				.characterEncoding("UTF-8"))
 			.andExpect(status().is2xxSuccessful())
 			.andDo(print());
+
+		String updateNick = member.getNickname();
+
+		if (Objects.nonNull(nickname)) {
+			updateNick = nickname;
+		}
+
+		Double result = redisTemplate.opsForZSet()
+			.score("Ranking", new RankingInfo(member.getId(), updateNick, member.getProfileImage()));
+		assertThat(result).isEqualTo(member.getTotalCertifyCount());
 	}
 }

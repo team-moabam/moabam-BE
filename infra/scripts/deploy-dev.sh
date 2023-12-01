@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # .env 파일 로드
-if [ -f /home/ubuntu/moabam/.env ]; then
-    source /home/ubuntu/moabam/.env
+if [ -f /home/ubuntu/moabam/infra/.env ]; then
+    source /home/ubuntu/moabam/infra/.env
 fi
 
 if [ $(docker ps | grep -c "nginx") -eq 0 ]; then
@@ -46,8 +46,8 @@ echo "### springboot blue-green 무중단 배포 시작 ###"
 echo
 
 IS_BLUE=$(docker ps | grep ${BLUE_CONTAINER})
-NGINX_CONF="/home/ubuntu/moabam/nginx/nginx.conf"
-UPSTREAM_CONF="/home/ubuntu/moabam/nginx/conf.d/upstream.conf"
+NGINX_CONF="/home/ubuntu/moabam/infra/nginx/nginx.conf"
+UPSTREAM_CONF="/home/ubuntu/moabam/infra/nginx/conf.d/upstream.conf"
 
 if [ -n "$IS_BLUE" ]; then
     echo "### BLUE => GREEN ###"

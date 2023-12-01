@@ -40,7 +40,7 @@ create table coupon
     point       integer     default 1                        not null,
     description varchar(50) default '',
     type        enum ('DISCOUNT','GOLDEN','MORNING','NIGHT') not null,
-    stock       integer     default 1                        not null,
+    max_count   integer     default 1                        not null,
     start_at    date                                         not null unique,
     open_at     date                                         not null,
     admin_id    bigint                                       not null,

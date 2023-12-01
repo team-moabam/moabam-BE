@@ -19,10 +19,10 @@ public class ValueRedisRepository {
 			.set(key, value, timeout);
 	}
 
-	public Long increment(String key) {
+	public Long increment(String key, long delta) {
 		return redisTemplate
 			.opsForValue()
-			.increment(key);
+			.increment(key, delta);
 	}
 
 	public String get(String key) {

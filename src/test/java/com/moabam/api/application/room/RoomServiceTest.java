@@ -70,7 +70,7 @@ class RoomServiceTest {
 		given(memberService.findMember(1L)).willReturn(member);
 
 		// when
-		Long result = roomService.createRoom(1L, "닉네임", createRoomRequest);
+		Long result = roomService.createRoom(1L, createRoomRequest);
 
 		// then
 		verify(roomRepository).save(any(Room.class));
@@ -98,7 +98,7 @@ class RoomServiceTest {
 		given(memberService.findMember(1L)).willReturn(member);
 
 		// when
-		Long result = roomService.createRoom(1L, "닉네임", createRoomRequest);
+		Long result = roomService.createRoom(1L, createRoomRequest);
 
 		// then
 		verify(roomRepository).save(any(Room.class));
@@ -115,7 +115,7 @@ class RoomServiceTest {
 		Long managerId = 1L;
 		Long memberId = 2L;
 
-		Member member = MemberFixture.member("1234", "닉네임");
+		Member member = MemberFixture.member("1234");
 
 		Room room = spy(RoomFixture.room());
 		given(room.getId()).willReturn(1L);

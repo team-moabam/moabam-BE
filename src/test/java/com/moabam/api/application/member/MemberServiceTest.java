@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.moabam.api.application.ranking.RankingService;
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.repository.InventoryRepository;
@@ -24,11 +25,14 @@ import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
+import com.moabam.api.domain.room.repository.ParticipantRepository;
+import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.api.dto.member.MemberInfoResponse;
 import com.moabam.api.dto.member.ModifyMemberRequest;
+import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
@@ -55,10 +59,22 @@ class MemberServiceTest {
 	MemberSearchRepository memberSearchRepository;
 
 	@Mock
+	ParticipantRepository participantRepository;
+
+	@Mock
+	ParticipantSearchRepository participantSearchRepository;
+
+	@Mock
 	InventorySearchRepository inventorySearchRepository;
 
 	@Mock
 	InventoryRepository inventoryRepository;
+
+	@Mock
+	RankingService rankingService;
+
+	@Mock
+	FcmService fcmService;
 
 	@Mock
 	ItemRepository itemRepository;
@@ -204,6 +220,8 @@ class MemberServiceTest {
 		Member member = MemberFixture.member();
 		ModifyMemberRequest modifyMemberRequest = ModifyImageFixture.modifyMemberRequest();
 		given(memberSearchRepository.findMember(authMember.id())).willReturn(Optional.ofNullable(member));
+		given(participantSearchRepository.findAllRoomMangerByMemberId(any()))
+			.willReturn(List.of());
 
 		// when
 		memberService.modifyInfo(authMember, modifyMemberRequest, "/main");
@@ -214,5 +232,18 @@ class MemberServiceTest {
 			() -> assertThat(member.getIntro()).isEqualTo(modifyMemberRequest.intro()),
 			() -> assertThat(member.getProfileImage()).isEqualTo("/main")
 		);
+	}
+
+	@DisplayName("모든 랭킹 업데이트")
+	@Test
+	void update_all_ranking() {
+		// given
+		Member member1 = MemberFixture.member("1");
+		Member member2 = MemberFixture.member("2");
+		given(memberSearchRepository.findAllMembers())
+			.willReturn(List.of(member1, member2));
+
+		// when + Then
+		assertThatNoException().isThrownBy(() -> memberService.updateAllRanking());
 	}
 }

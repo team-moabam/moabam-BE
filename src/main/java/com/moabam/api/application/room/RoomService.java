@@ -45,7 +45,7 @@ public class RoomService {
 	private final MemberService memberService;
 
 	@Transactional
-	public Long createRoom(Long memberId, String nickname, CreateRoomRequest createRoomRequest) {
+	public Long createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
 		Room room = RoomMapper.toRoomEntity(createRoomRequest);
 		List<Routine> routines = RoutineMapper.toRoutineEntities(room, createRoomRequest.routines());
 		Participant participant = ParticipantMapper.toParticipant(room, memberId);
@@ -55,7 +55,7 @@ public class RoomService {
 		Member member = memberService.findMember(memberId);
 		member.enterRoom(room.getRoomType());
 		participant.enableManager();
-		room.changeManagerNickname(nickname);
+		room.changeManagerNickname(member.getNickname());
 
 		Room savedRoom = roomRepository.save(room);
 		routineRepository.saveAll(routines);
@@ -116,6 +116,8 @@ public class RoomService {
 			return;
 		}
 
+		List<Routine> routines = routineRepository.findAllByRoomId(roomId);
+		routineRepository.deleteAll(routines);
 		roomRepository.delete(room);
 	}
 
@@ -135,11 +137,14 @@ public class RoomService {
 
 	@Transactional
 	public void deportParticipant(Long managerId, Long roomId, Long memberId) {
+		validateDeportParticipant(managerId, memberId);
 		Participant managerParticipant = getParticipant(managerId, roomId);
 		Participant memberParticipant = getParticipant(memberId, roomId);
 		validateManagerAuthorization(managerParticipant);
 
 		Room room = managerParticipant.getRoom();
+		memberParticipant.removeRoom();
+		participantRepository.flush();
 		participantRepository.delete(memberParticipant);
 		room.decreaseCurrentUserCount();
 
@@ -156,12 +161,6 @@ public class RoomService {
 		}
 	}
 
-	public void validateRoomById(Long roomId) {
-		if (!roomRepository.existsById(roomId)) {
-			throw new NotFoundException(ROOM_NOT_FOUND);
-		}
-	}
-
 	public Room findRoom(Long roomId) {
 		return roomRepository.findById(roomId)
 			.orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
@@ -170,6 +169,12 @@ public class RoomService {
 	private Participant getParticipant(Long memberId, Long roomId) {
 		return participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
+	}
+
+	private void validateDeportParticipant(Long managerId, Long memberId) {
+		if (managerId.equals(memberId)) {
+			throw new BadRequestException(PARTICIPANT_DEPORT_ERROR);
+		}
 	}
 
 	private void validateManagerAuthorization(Participant participant) {

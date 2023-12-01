@@ -1,5 +1,6 @@
 package com.moabam.api.application.room;
 
+import static com.moabam.global.common.util.GlobalConstant.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 
 import java.time.LocalDate;
@@ -109,8 +110,13 @@ public class CertificationService {
 
 	private void validateCertifyTime(LocalDateTime now, int certifyTime) {
 		LocalTime targetTime = LocalTime.of(certifyTime, 0);
-		LocalDateTime minusTenMinutes = LocalDateTime.of(now.toLocalDate(), targetTime).minusMinutes(10);
-		LocalDateTime plusTenMinutes = LocalDateTime.of(now.toLocalDate(), targetTime).plusMinutes(10);
+		LocalDateTime targetDateTime = LocalDateTime.of(now.toLocalDate(), targetTime);
+		if (certifyTime == MIDNIGHT_HOUR) {
+			targetDateTime = targetDateTime.plusDays(1);
+		}
+
+		LocalDateTime minusTenMinutes = targetDateTime.minusMinutes(10);
+		LocalDateTime plusTenMinutes = targetDateTime.plusMinutes(10);
 
 		if (now.isBefore(minusTenMinutes) || now.isAfter(plusTenMinutes)) {
 			throw new BadRequestException(INVALID_CERTIFY_TIME);

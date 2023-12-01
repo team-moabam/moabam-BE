@@ -105,19 +105,22 @@ class ReportControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().is2xxSuccessful());
 	}
 
-	@DisplayName("방과 인증 값 둘 다 들어오지 않는다면 테스트 실패")
+	@DisplayName("사용자 신고 성공")
 	@WithMember
 	@Test
 	void reports_failBy_subject_null() throws Exception {
 		// given
-		ReportRequest reportRequest = ReportFixture.reportRequest(123L, null, null);
+		Member member = MemberFixture.member("2");
+		memberRepository.save(member);
+
+		ReportRequest reportRequest = ReportFixture.reportRequest(member.getId(), null, null);
 		String request = objectMapper.writeValueAsString(reportRequest);
 
 		// expected
 		mockMvc.perform(post("/reports")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
-			.andExpect(status().isBadRequest());
+			.andExpect(status().is2xxSuccessful());
 	}
 
 	@DisplayName("회원 조회 실패로 신고 실패")
@@ -125,7 +128,7 @@ class ReportControllerTest extends WithoutFilterSupporter {
 	@Test
 	void reports_failBy_member() throws Exception {
 		// given
-		Member newMember = MemberFixture.member("9999", "n");
+		Member newMember = MemberFixture.member("9999");
 		memberRepository.save(newMember);
 
 		newMember.delete(LocalDateTime.now());

@@ -13,10 +13,10 @@ import com.moabam.api.domain.payment.repository.PaymentSearchRepository;
 import com.moabam.api.dto.payment.ConfirmPaymentRequest;
 import com.moabam.api.dto.payment.ConfirmTossPaymentResponse;
 import com.moabam.api.dto.payment.PaymentRequest;
-import com.moabam.api.infrastructure.payment.TossPaymentMapper;
+import com.moabam.api.dto.payment.RequestConfirmPaymentResponse;
 import com.moabam.api.infrastructure.payment.TossPaymentService;
-import com.moabam.global.error.exception.MoabamException;
 import com.moabam.global.error.exception.NotFoundException;
+import com.moabam.global.error.exception.TossPaymentException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,23 +39,27 @@ public class PaymentService {
 	}
 
 	@Transactional
-	public void confirm(Long memberId, ConfirmPaymentRequest request) {
+	public RequestConfirmPaymentResponse requestConfirm(Long memberId, ConfirmPaymentRequest request) {
 		Payment payment = getByOrderId(request.orderId());
 		payment.validateInfo(memberId, request.amount());
 
 		try {
-			ConfirmTossPaymentResponse response = tossPaymentService.confirm(
-				TossPaymentMapper.toConfirmRequest(request.paymentKey(), request.orderId(), request.amount())
-			);
-			payment.confirm(response.paymentKey(), response.approvedAt());
-
-			if (payment.isCouponApplied()) {
-				couponService.discount(memberId, payment.getCouponWalletId());
-			}
-			bugService.charge(memberId, payment.getProduct());
-		} catch (MoabamException exception) {
+			ConfirmTossPaymentResponse response = tossPaymentService.confirm(request);
+			return PaymentMapper.toRequestConfirmPaymentResponse(payment, response);
+		} catch (TossPaymentException exception) {
 			payment.fail(request.paymentKey());
+			throw exception;
 		}
+	}
+
+	@Transactional
+	public void confirm(Long memberId, Payment payment, String paymentKey) {
+		payment.confirm(paymentKey);
+
+		if (payment.isCouponApplied()) {
+			couponService.discount(payment.getCouponWalletId(), memberId);
+		}
+		bugService.charge(memberId, payment.getProduct());
 	}
 
 	private Payment getById(Long paymentId) {

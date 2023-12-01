@@ -14,7 +14,7 @@ public final class CouponSnippet {
 		fieldWithPath("description").type(STRING).description("쿠폰 간단 소개 (NULL 가능)"),
 		fieldWithPath("type").type(STRING).description("쿠폰 종류 (아침, 저녁, 황금, 할인)"),
 		fieldWithPath("point").type(NUMBER).description("쿠폰 사용 시, 제공하는 포인트량"),
-		fieldWithPath("stock").type(NUMBER).description("쿠폰을 발급 받을 수 있는 수"),
+		fieldWithPath("maxCount").type(NUMBER).description("쿠폰을 발급 최대 갯수"),
 		fieldWithPath("startAt").type(STRING).description("쿠폰 발급 시작 날짜 (Ex: yyyy-MM-dd)"),
 		fieldWithPath("openAt").type(STRING).description("쿠폰 정보 오픈 날짜 (Ex: yyyy-MM-dd)")
 	);
@@ -25,9 +25,8 @@ public final class CouponSnippet {
 		fieldWithPath("name").type(STRING).description("쿠폰명"),
 		fieldWithPath("description").type(STRING).description("쿠폰에 대한 간단 소개 (NULL 가능)"),
 		fieldWithPath("point").type(NUMBER).description("쿠폰 사용 시, 제공하는 포인트량"),
-		fieldWithPath("stock").type(NUMBER).description("쿠폰을 발급 받을 수 있는 수"),
-		fieldWithPath("type").type(STRING)
-			.description("쿠폰 종류 (MORNING_COUPON, NIGHT_COUPON, GOLDEN_COUPON, DISCOUNT_COUPON)"),
+		fieldWithPath("maxCount").type(NUMBER).description("쿠폰을 발급 최대 갯수"),
+		fieldWithPath("type").type(STRING).description("쿠폰 종류 (MORNING, NIGHT, GOLDEN, DISCOUNT)"),
 		fieldWithPath("startAt").type(STRING).description("쿠폰 발급 시작 날짜 (Ex: yyyy-MM-dd)"),
 		fieldWithPath("openAt").type(STRING).description("쿠폰 정보 오픈 날짜 (Ex: yyyy-MM-dd)")
 	);
@@ -43,9 +42,8 @@ public final class CouponSnippet {
 		fieldWithPath("[].name").type(STRING).description("쿠폰명"),
 		fieldWithPath("[].description").type(STRING).description("쿠폰에 대한 간단 소개 (NULL 가능)"),
 		fieldWithPath("[].point").type(NUMBER).description("쿠폰 사용 시, 제공하는 포인트량"),
-		fieldWithPath("[].stock").type(NUMBER).description("쿠폰을 발급 받을 수 있는 수"),
-		fieldWithPath("[].type").type(STRING)
-			.description("쿠폰 종류 (MORNING_COUPON, NIGHT_COUPON, GOLDEN_COUPON, DISCOUNT_COUPON)"),
+		fieldWithPath("[].maxCount").type(NUMBER).description("쿠폰을 발급 최대 갯수"),
+		fieldWithPath("[].type").type(STRING).description("쿠폰 종류 (MORNING, NIGHT, GOLDEN, DISCOUNT)"),
 		fieldWithPath("[].startAt").type(STRING).description("쿠폰 발급 시작 날짜 (Ex: yyyy-MM-dd)"),
 		fieldWithPath("[].openAt").type(STRING).description("쿠폰 정보 오픈 날짜 (Ex: yyyy-MM-dd)")
 	);

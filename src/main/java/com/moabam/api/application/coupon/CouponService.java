@@ -19,7 +19,6 @@ import com.moabam.api.dto.coupon.CouponResponse;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
 import com.moabam.api.dto.coupon.MyCouponResponse;
-import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
@@ -42,29 +41,47 @@ public class CouponService {
 	private final CouponWalletSearchRepository couponWalletSearchRepository;
 
 	@Transactional
-	public void create(AuthMember admin, CreateCouponRequest request) {
-		validateAdminRole(admin);
+	public void create(CreateCouponRequest request, Long adminId, Role role) {
+		validateAdminRole(role);
 		validateConflictName(request.name());
 		validateConflictStartAt(request.startAt());
 		validatePeriod(request.startAt(), request.openAt());
 
-		Coupon coupon = CouponMapper.toEntity(admin.id(), request);
+		Coupon coupon = CouponMapper.toEntity(adminId, request);
+
 		couponRepository.save(coupon);
 	}
 
 	@Transactional
-	public void use(Long memberId, Long couponWalletId) {
-		CouponWallet couponWallet = getWalletByIdAndMemberId(couponWalletId, memberId);
+	public void delete(Long couponId, Role role) {
+		validateAdminRole(role);
+
+		Coupon coupon = couponRepository.findById(couponId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
+
+		couponRepository.delete(coupon);
+		couponManageService.deleteQueue(coupon.getName());
+	}
+
+	@Transactional
+	public void use(Long couponWalletId, Long memberId) {
+		CouponWallet couponWallet = couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 		Coupon coupon = couponWallet.getCoupon();
 		BugType bugType = coupon.getType().getBugType();
+
+		if (coupon.getType().isDiscount()) {
+			throw new BadRequestException(ErrorMessage.INVALID_DISCOUNT_COUPON);
+		}
 
 		bugService.applyCoupon(memberId, bugType, coupon.getPoint());
 		couponWalletRepository.delete(couponWallet);
 	}
 
 	@Transactional
-	public void discount(Long memberId, Long couponWalletId) {
-		CouponWallet couponWallet = getWalletByIdAndMemberId(couponWalletId, memberId);
+	public void discount(Long couponWalletId, Long memberId) {
+		CouponWallet couponWallet = couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 		Coupon coupon = couponWallet.getCoupon();
 
 		if (!coupon.getType().isDiscount()) {
@@ -72,15 +89,6 @@ public class CouponService {
 		}
 
 		couponWalletRepository.delete(couponWallet);
-	}
-
-	@Transactional
-	public void delete(AuthMember admin, Long couponId) {
-		validateAdminRole(admin);
-		Coupon coupon = couponRepository.findById(couponId)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
-		couponRepository.delete(coupon);
-		couponManageService.deleteQueue(coupon.getName());
 	}
 
 	public CouponResponse getById(Long couponId) {
@@ -97,16 +105,11 @@ public class CouponService {
 		return CouponMapper.toResponses(coupons);
 	}
 
-	public List<MyCouponResponse> getWallet(Long couponId, AuthMember authMember) {
+	public List<MyCouponResponse> getAllByWalletIdAndMemberId(Long couponWalletId, Long memberId) {
 		List<CouponWallet> couponWallets =
-			couponWalletSearchRepository.findAllByCouponIdAndMemberId(couponId, authMember.id());
+			couponWalletSearchRepository.findAllByIdAndMemberId(couponWalletId, memberId);
 
 		return CouponMapper.toMyResponses(couponWallets);
-	}
-
-	public CouponWallet getWalletByIdAndMemberId(Long couponWalletId, Long memberId) {
-		return couponWalletSearchRepository.findByIdAndMemberId(couponWalletId, memberId)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON_WALLET));
 	}
 
 	private void validatePeriod(LocalDate startAt, LocalDate openAt) {
@@ -121,8 +124,8 @@ public class CouponService {
 		}
 	}
 
-	private void validateAdminRole(AuthMember admin) {
-		if (!admin.role().equals(Role.ADMIN)) {
+	private void validateAdminRole(Role role) {
+		if (!role.equals(Role.ADMIN)) {
 			throw new NotFoundException(ErrorMessage.MEMBER_NOT_FOUND);
 		}
 	}

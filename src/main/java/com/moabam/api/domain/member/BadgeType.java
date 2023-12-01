@@ -27,7 +27,7 @@ public enum BadgeType {
 	public static List<BadgeResponse> memberBadgeMap(Set<BadgeType> badgeTypes) {
 		return Arrays.stream(BadgeType.values())
 			.map(badgeType -> BadgeResponse.builder()
-				.badge(badgeType)
+				.badge(badgeType.korean)
 				.unlock(badgeTypes.contains(badgeType))
 				.build())
 			.toList();

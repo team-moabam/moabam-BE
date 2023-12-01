@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,6 +35,7 @@ import com.moabam.api.domain.member.Role;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.dto.coupon.CouponStatusRequest;
 import com.moabam.api.dto.coupon.CreateCouponRequest;
+import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.annotation.WithMember;
@@ -69,6 +69,9 @@ class CouponControllerTest extends WithoutFilterSupporter {
 
 	@MockBean
 	ClockHolder clockHolder;
+
+	@MockBean
+	ZSetRedisRepository zSetRedisRepository;
 
 	@WithMember(role = Role.ADMIN)
 	@DisplayName("POST - 쿠폰을 성공적으로 발행한다. - Void")
@@ -301,105 +304,16 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(jsonPath("$", hasSize(1)));
 	}
 
-	@Disabled
-	@WithMember
-	@DisplayName("POST - 쿠폰 발급 요청을 성공적으로 한다. - Void")
-	@Test
-	void registerQueue_success() throws Exception {
-		// Given
-		Coupon couponFixture = CouponFixture.coupon();
-		Coupon coupon = couponRepository.save(couponFixture);
-
-		given(clockHolder.date()).willReturn(LocalDate.of(2023, 2, 1));
-
-		// When & Then
-		mockMvc.perform(post("/coupons")
-				.param("couponName", coupon.getName()))
-			.andDo(print())
-			.andDo(document("coupons",
-				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint())))
-			.andExpect(status().isOk());
-	}
-
-	@WithMember
-	@DisplayName("POST - 발급 가능 날짜가 아닌 쿠폰에 발급 요청을 한다. (Not found) - BadRequestException")
-	@Test
-	void registerQueue_Zero_StartAt_BadRequestException() throws Exception {
-		// Given
-		Coupon couponFixture = CouponFixture.coupon();
-		Coupon coupon = couponRepository.save(couponFixture);
-
-		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
-
-		// When & Then
-		mockMvc.perform(post("/coupons")
-				.param("couponName", coupon.getName()))
-			.andDo(print())
-			.andDo(document("coupons",
-				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint()),
-				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
-			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
-	}
-
-	@WithMember
-	@DisplayName("POST - 발급 가능 날짜가 아닌 쿠폰에 발급 요청을 한다. (Not equals) - BadRequestException")
-	@Test
-	void registerQueue_Not_StartAt_BadRequestException() throws Exception {
-		// Given
-		Coupon couponFixture = CouponFixture.coupon();
-		couponRepository.save(couponFixture);
-
-		given(clockHolder.date()).willReturn(LocalDate.of(2022, 2, 1));
-
-		// When & Then
-		mockMvc.perform(post("/coupons")
-				.param("couponName", "not start couponName"))
-			.andDo(print())
-			.andDo(document("coupons",
-				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint()),
-				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
-			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
-	}
-
-	@WithMember
-	@DisplayName("POST - 존재하지 않는 쿠폰에 발급 요청을 한다. - NotFoundException")
-	@Test
-	void registerQueue_NotFoundException() throws Exception {
-		// Given
-		Coupon coupon = CouponFixture.coupon("Not found couponName", 2, 1);
-
-		given(clockHolder.date()).willReturn(LocalDate.of(2023, 2, 1));
-
-		// When & Then
-		mockMvc.perform(post("/coupons")
-				.param("couponName", coupon.getName()))
-			.andDo(print())
-			.andDo(document("coupons",
-				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint()),
-				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
-			.andExpect(status().isBadRequest())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
-	}
-
 	@WithMember
 	@DisplayName("GET - 나의 쿠폰함에서 특정 쿠폰을 조회한다. - List<MyCouponResponse>")
 	@Test
-	void getWallet_success() throws Exception {
+	void getAllByWalletIdAndMemberId_success() throws Exception {
 		// Given
 		Coupon coupon = couponRepository.save(CouponFixture.coupon());
-		couponWalletRepository.save(CouponWallet.create(1L, coupon));
+		CouponWallet couponWallet = couponWalletRepository.save(CouponWallet.create(1L, coupon));
 
 		// When & Then
-		mockMvc.perform(get("/my-coupons/" + coupon.getId()))
+		mockMvc.perform(get("/my-coupons/" + couponWallet.getId()))
 			.andDo(print())
 			.andDo(document("my-coupons/couponId",
 				preprocessRequest(prettyPrint()),
@@ -416,7 +330,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@DisplayName("GET - 나의 쿠폰 보관함에 있는 모든 쿠폰을 조회한다. - List<MyCouponResponse>")
 	@MethodSource("com.moabam.support.fixture.CouponWalletFixture#provideCouponWalletByCouponId1_total5")
 	@ParameterizedTest
-	void getWallet_all_success(List<CouponWallet> couponWallets) throws Exception {
+	void getAllByWalletIdAndMemberId_all_success(List<CouponWallet> couponWallets) throws Exception {
 		// Given
 		couponWallets.forEach(couponWallet -> {
 			Coupon coupon = couponRepository.save(couponWallet.getCoupon());
@@ -438,7 +352,7 @@ class CouponControllerTest extends WithoutFilterSupporter {
 	@WithMember
 	@DisplayName("GET - 쿠폰이 없는 사용자의 쿠폰함을 조회한다. - List<MyCouponResponse>")
 	@Test
-	void getWallet_no_coupon() throws Exception {
+	void getAllByWalletIdAndMemberId_no_coupon() throws Exception {
 		// When & Then
 		mockMvc.perform(get("/my-coupons"))
 			.andDo(print())
@@ -503,5 +417,70 @@ class CouponControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isBadRequest())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_DISCOUNT_COUPON.getMessage()));
+	}
+
+	@WithMember
+	@DisplayName("POST - 발급 가능 날짜가 아닌 쿠폰에 발급 요청을 한다. (Not found) - BadRequestException")
+	@Test
+	void registerQueue_Zero_StartAt_BadRequestException() throws Exception {
+		// Given
+		Coupon couponFixture = CouponFixture.coupon();
+		Coupon coupon = couponRepository.save(couponFixture);
+
+		given(clockHolder.date()).willReturn(LocalDate.of(2022, 1, 1));
+
+		// When & Then
+		mockMvc.perform(post("/coupons")
+				.param("couponName", coupon.getName()))
+			.andDo(print())
+			.andDo(document("coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
+	}
+
+	@WithMember
+	@DisplayName("POST - 발급 가능 날짜가 아닌 쿠폰에 발급 요청을 한다. (Not equals) - BadRequestException")
+	@Test
+	void registerQueue_Not_StartAt_BadRequestException() throws Exception {
+		// Given
+		given(clockHolder.date()).willReturn(LocalDate.of(2022, 2, 1));
+
+		// When & Then
+		mockMvc.perform(post("/coupons")
+				.param("couponName", "not start couponName"))
+			.andDo(print())
+			.andDo(document("coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
+	}
+
+	@WithMember
+	@DisplayName("POST - 존재하지 않는 쿠폰에 발급 요청을 한다. - NotFoundException")
+	@Test
+	void registerQueue_NotFoundException() throws Exception {
+		// Given
+		Coupon coupon = CouponFixture.coupon("Not found couponName", 2, 1);
+
+		given(clockHolder.date()).willReturn(LocalDate.of(2023, 2, 1));
+
+		// When & Then
+		mockMvc.perform(post("/coupons")
+				.param("couponName", coupon.getName()))
+			.andDo(print())
+			.andDo(document("coupons",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				ErrorSnippet.ERROR_MESSAGE_RESPONSE))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.message").value(ErrorMessage.INVALID_COUPON_PERIOD.getMessage()));
 	}
 }

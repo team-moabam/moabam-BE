@@ -43,6 +43,10 @@ public class Coupon extends BaseTimeEntity {
 	@Column(name = "point", nullable = false)
 	private int point;
 
+	@ColumnDefault("1")
+	@Column(name = "max_count", nullable = false)
+	private int maxCount;
+
 	@ColumnDefault("''")
 	@Column(name = "description", length = 50)
 	private String description;
@@ -51,31 +55,31 @@ public class Coupon extends BaseTimeEntity {
 	@Column(name = "type", nullable = false)
 	private CouponType type;
 
-	@ColumnDefault("1")
-	@Column(name = "stock", nullable = false)
-	private int stock;
-
 	@Column(name = "start_at", unique = true, nullable = false)
 	private LocalDate startAt;
 
 	@Column(name = "open_at", nullable = false)
 	private LocalDate openAt;
 
-	// TODO : 관리자 테이블 생기면 관리자 테이블이랑 다대일 관계 맺을 예정
 	@Column(name = "admin_id", updatable = false, nullable = false)
 	private Long adminId;
 
 	@Builder
-	private Coupon(String name, String description, int point, int stock, CouponType type, LocalDate startAt,
+	private Coupon(String name, String description, int point, int maxCount, CouponType type, LocalDate startAt,
 		LocalDate openAt, Long adminId) {
 		this.name = requireNonNull(name);
 		this.point = validatePoint(point);
+		this.maxCount = validateStock(maxCount);
 		this.description = Optional.ofNullable(description).orElse(BLANK);
 		this.type = requireNonNull(type);
-		this.stock = validateStock(stock);
 		this.startAt = requireNonNull(startAt);
 		this.openAt = requireNonNull(openAt);
 		this.adminId = requireNonNull(adminId);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Coupon{startAt=%s, openAt=%s}", startAt, openAt);
 	}
 
 	private int validatePoint(int point) {
@@ -92,10 +96,5 @@ public class Coupon extends BaseTimeEntity {
 		}
 
 		return stock;
-	}
-
-	@Override
-	public String toString() {
-		return String.format("Coupon{startAt=%s, openAt=%s}", startAt, openAt);
 	}
 }

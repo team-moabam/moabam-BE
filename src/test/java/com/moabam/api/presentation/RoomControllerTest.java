@@ -663,10 +663,13 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.maxUserCount(8)
 			.build();
 
+		List<Routine> routines = RoomFixture.routines(room);
+
 		Participant participant = RoomFixture.participant(room, 1L);
 		participant.enableManager();
 
 		roomRepository.save(room);
+		routineRepository.saveAll(routines);
 		participantRepository.save(participant);
 
 		// expected
@@ -675,9 +678,11 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andDo(print());
 
 		List<Room> deletedRoom = roomRepository.findAll();
+		List<Routine> deletedRoutine = routineRepository.findAll();
 		List<Participant> deletedParticipant = participantRepository.findAll();
 
 		assertThat(deletedRoom).isEmpty();
+		assertThat(deletedRoutine).hasSize(0);
 		assertThat(deletedParticipant).hasSize(1);
 		assertThat(deletedParticipant.get(0).getDeletedAt()).isNotNull();
 		assertThat(deletedParticipant.get(0).getDeletedRoomTitle()).isNotNull();
@@ -794,8 +799,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Participant participant1 = RoomFixture.participant(room, 1L);
 		participant1.enableManager();
 
-		Member member2 = MemberFixture.member("2", "NICK2");
-		Member member3 = MemberFixture.member("3", "NICK3");
+		Member member2 = MemberFixture.member("2");
+		Member member3 = MemberFixture.member("3");
 
 		roomRepository.save(room);
 		routineRepository.saveAll(routines);
@@ -807,9 +812,9 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Inventory inventory1 = InventoryFixture.inventory(1L, item);
 		Inventory inventory2 = InventoryFixture.inventory(member2.getId(), item);
 		Inventory inventory3 = InventoryFixture.inventory(member3.getId(), item);
-		inventory1.select();
-		inventory2.select();
-		inventory3.select();
+		inventory1.select(member);
+		inventory2.select(member2);
+		inventory3.select(member3);
 
 		itemRepository.save(item);
 		inventoryRepository.saveAll(List.of(inventory1, inventory2, inventory3));
@@ -845,7 +850,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		dailyRoomCertificationRepository.save(dailyRoomCertification);
 
 		DailyRoomCertification dailyRoomCertification1 = RoomFixture.dailyRoomCertification(room.getId(),
-			LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), LocalDate.now().getDayOfMonth() - 3));
+			LocalDate.now().minusDays(3));
 		dailyRoomCertificationRepository.save(dailyRoomCertification1);
 
 		// expected
@@ -860,7 +865,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	void deport_member_success() throws Exception {
 		// given
 		Room room = RoomFixture.room();
-		Member member = MemberFixture.member("1234", "참여자");
+		Member member = MemberFixture.member("1234");
 		memberRepository.save(member);
 
 		Participant memberParticipant = RoomFixture.participant(room, member.getId());
@@ -887,12 +892,31 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		assertThat(participantSearchRepository.findOne(member.getId(), room.getId())).isEmpty();
 	}
 
+	@DisplayName("방장 본인 추방 시도 - 예외 처리")
+	@WithMember(id = 1L)
+	@Test
+	void deport_self_fail() throws Exception {
+		// given
+		Room room = RoomFixture.room();
+
+		Participant managerParticipant = RoomFixture.participant(room, member.getId());
+		managerParticipant.enableManager();
+
+		roomRepository.save(room);
+		participantRepository.save(managerParticipant);
+
+		// expected
+		mockMvc.perform(delete("/rooms/" + room.getId() + "/members/" + member.getId()))
+			.andExpect(status().isBadRequest())
+			.andDo(print());
+	}
+
 	@DisplayName("방장 위임 성공")
 	@WithMember(id = 1L)
 	@Test
 	void mandate_manager_success() throws Exception {
 		// given
-		Member member2 = MemberFixture.member("1234", "방장될 멤버");
+		Member member2 = MemberFixture.member("1234");
 		memberRepository.save(member2);
 
 		Room room = RoomFixture.room();
@@ -992,13 +1016,13 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Room room = RoomFixture.room("테스트 방", NIGHT, 21);
 		Room savedRoom = roomRepository.save(room);
 
-		Member member1 = MemberFixture.member("901010", "testtest");
+		Member member1 = MemberFixture.member("901010");
 		member1 = memberRepository.save(member1);
 
 		Item item = ItemFixture.nightMageSkin();
 
 		Inventory inventory = InventoryFixture.inventory(member1.getId(), item);
-		inventory.select();
+		inventory.select(member1);
 
 		itemRepository.save(item);
 		inventoryRepository.save(inventory);
@@ -1512,8 +1536,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	@Test
 	void get_room_details_before_modification_success() throws Exception {
 		// given
-		Member member2 = MemberFixture.member("123", "참여자1");
-		Member member3 = MemberFixture.member("456", "참여자2");
+		Member member2 = MemberFixture.member("123");
+		Member member3 = MemberFixture.member("456");
 		member2 = memberRepository.save(member2);
 		member3 = memberRepository.save(member3);
 

@@ -10,10 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
-import com.moabam.global.auth.model.AuthMember;
-import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.config.FcmConfig;
-import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 
 @SpringBootTest(classes = {FcmConfig.class, FcmService.class})
@@ -28,46 +25,34 @@ class FcmServiceTest extends WithoutFilterSupporter {
 	@MockBean
 	FcmRepository fcmRepository;
 
-	@WithMember
 	@DisplayName("FCM 토큰이 성공적으로 저장된다. - Void")
 	@Test
 	void saveToken_success() {
-		// Given
-		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
-
 		// When
-		fcmService.createToken(authMember, "value1");
+		fcmService.createToken("FCM-TOKEN", 1L);
 
 		// Then
-		verify(fcmRepository).saveToken(any(Long.class), any(String.class));
+		verify(fcmRepository).saveToken(any(String.class), any(Long.class));
 	}
 
-	@WithMember
 	@DisplayName("FCM 토큰으로 빈값이 넘어와 아무일도 일어나지 않는다. - Void")
 	@Test
 	void saveToken_Blank() {
-		// Given
-		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
-
 		// When
-		fcmService.createToken(authMember, "");
+		fcmService.createToken("", 1L);
 
 		// Then
-		verify(fcmRepository, times(0)).saveToken(any(Long.class), any(String.class));
+		verify(fcmRepository, times(0)).saveToken(any(String.class), any(Long.class));
 	}
 
-	@WithMember
 	@DisplayName("FCM 토큰으로 null이 넘어와 아무일도 일어나지 않는다. - Void")
 	@Test
 	void saveToken_Null() {
-		// Given
-		AuthMember authMember = AuthorizationThreadLocal.getAuthMember();
-
 		// When
-		fcmService.createToken(authMember, null);
+		fcmService.createToken(null, 1L);
 
 		// Then
-		verify(fcmRepository, times(0)).saveToken(any(Long.class), any(String.class));
+		verify(fcmRepository, times(0)).saveToken(any(String.class), any(Long.class));
 	}
 
 	@DisplayName("FCM 토큰이 성공적으로 삭제된다. - Void")
@@ -94,7 +79,7 @@ class FcmServiceTest extends WithoutFilterSupporter {
 	@Test
 	void sendAsync_success() {
 		// When
-		fcmService.sendAsync("FCM-TOKEN", "알림");
+		fcmService.sendAsync("FCM-TOKEN", "title", "body");
 
 		// Then
 		verify(firebaseMessaging).sendAsync(any(Message.class));
@@ -104,7 +89,7 @@ class FcmServiceTest extends WithoutFilterSupporter {
 	@Test
 	void sendAsync_null() {
 		// When
-		fcmService.sendAsync(null, "알림");
+		fcmService.sendAsync(null, "titile", "body");
 
 		// Then
 		verify(firebaseMessaging, times(0)).sendAsync(any(Message.class));

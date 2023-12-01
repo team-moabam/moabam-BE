@@ -29,6 +29,15 @@ public class MemberSearchRepository {
 		return findMember(memberId, true);
 	}
 
+	public List<Member> findAllMembers() {
+		return jpaQueryFactory
+			.selectFrom(member)
+			.where(
+				member.deletedAt.isNotNull()
+			)
+			.fetch();
+	}
+
 	public Optional<Member> findMember(Long memberId, boolean isNotDeleted) {
 		return Optional.ofNullable(jpaQueryFactory
 			.selectFrom(member)

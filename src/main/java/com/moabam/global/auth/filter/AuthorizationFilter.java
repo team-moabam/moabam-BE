@@ -50,7 +50,6 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 		try {
 			invoke(httpServletRequest, httpServletResponse);
 		} catch (UnauthorizedException unauthorizedException) {
-			log.error("Login Failed");
 			authorizationService.removeToken(httpServletRequest, httpServletResponse);
 			handlerExceptionResolver.resolveException(httpServletRequest, httpServletResponse, null,
 				unauthorizedException);
