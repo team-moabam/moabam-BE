@@ -39,6 +39,18 @@ public class ZSetRedisRepository {
 			.rank(key, value);
 	}
 
+	public Double score(String key, Object value) {
+		return redisTemplate
+			.opsForZSet()
+			.score(key, value);
+	}
+
+	public Long size(String key) {
+		return redisTemplate
+			.opsForZSet()
+			.zCard(key);
+	}
+
 	public void add(String key, Object value, double score) {
 		redisTemplate
 			.opsForZSet()

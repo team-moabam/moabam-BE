@@ -24,7 +24,7 @@ import com.moabam.api.domain.coupon.repository.CouponManageRepository;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.global.common.util.ClockHolder;
-import com.moabam.global.error.exception.BadRequestException;
+import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.CouponFixture;
@@ -50,14 +50,7 @@ class CouponManageServiceTest {
 	@Mock
 	ClockHolder clockHolder;
 
-	@DisplayName("쿠폰 관리 인덱스를 성공적으로 초기화한다.")
-	@Test
-	void init_success() {
-		// When & Then
-		assertThatNoException().isThrownBy(() -> couponManageService.init());
-	}
-
-	@DisplayName("10명의 사용자가 쿠폰 발행을 성공적으로 한.")
+	@DisplayName("10명의 사용자가 쿠폰 발행을 성공적으로 한다.")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideValues_Long")
 	@ParameterizedTest
 	void issue_all_success(Set<Long> values) {
@@ -66,9 +59,9 @@ class CouponManageServiceTest {
 
 		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
-		given(couponManageRepository.rankQueue(any(String.class), any(Long.class))).willReturn(coupon.getStock());
 		given(couponManageRepository.rangeQueue(any(String.class), any(long.class), any(long.class)))
 			.willReturn(values);
+		given(couponManageRepository.getCount(any(String.class))).willReturn(coupon.getMaxCount() - 1);
 
 		// When
 		couponManageService.issue();
@@ -100,22 +93,22 @@ class CouponManageServiceTest {
 	@DisplayName("해당 쿠폰은 재고가 마감된 쿠폰이다.")
 	@MethodSource("com.moabam.support.fixture.CouponFixture#provideValues_Long")
 	@ParameterizedTest
-	void issue_stockEnd(Set<Long> values) {
+	void issue_stockEnd() {
 		// Given
 		Coupon coupon = CouponFixture.coupon(1000, 100);
 
 		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
-		given(couponManageRepository.rankQueue(any(String.class), any(Long.class))).willReturn(coupon.getStock() + 1);
-		given(couponManageRepository.rangeQueue(any(String.class), any(long.class), any(long.class)))
-			.willReturn(values);
+		given(couponManageRepository.getCount(any(String.class))).willReturn(coupon.getMaxCount());
 
 		// When
 		couponManageService.issue();
 
 		// Then
+		verify(couponManageRepository, times(0)).increase(any(String.class), any(int.class));
 		verify(couponWalletRepository, times(0)).save(any(CouponWallet.class));
-		verify(notificationService, times(10))
+		verify(couponManageRepository, times(0)).rangeQueue(any(String.class), any(int.class), any(int.class));
+		verify(notificationService, times(0))
 			.sendCouponIssueResult(any(Long.class), any(String.class), any(String.class));
 	}
 
@@ -126,7 +119,9 @@ class CouponManageServiceTest {
 		Coupon coupon = CouponFixture.coupon();
 
 		given(clockHolder.date()).willReturn(LocalDate.now());
-		given(couponRepository.existsByNameAndStartAt(any(String.class), any(LocalDate.class))).willReturn(true);
+		given(couponManageRepository.sizeQueue(any(String.class))).willReturn(coupon.getMaxCount() - 1);
+		given(couponRepository.findByNameAndStartAt(any(String.class), any(LocalDate.class)))
+			.willReturn(Optional.of(coupon));
 
 		// When
 		couponManageService.registerQueue(coupon.getName(), 1L);
@@ -140,11 +135,12 @@ class CouponManageServiceTest {
 	void registerQueue_No_BadRequestException() {
 		// Given
 		given(clockHolder.date()).willReturn(LocalDate.now());
-		given(couponRepository.existsByNameAndStartAt(any(String.class), any(LocalDate.class))).willReturn(false);
+		given(couponRepository.findByNameAndStartAt(any(String.class), any(LocalDate.class)))
+			.willReturn(Optional.empty());
 
 		// When & Then
 		assertThatThrownBy(() -> couponManageService.registerQueue("couponName", 1L))
-			.isInstanceOf(BadRequestException.class)
+			.isInstanceOf(NotFoundException.class)
 			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD.getMessage());
 	}
 
@@ -155,7 +151,7 @@ class CouponManageServiceTest {
 		String couponName = "couponName";
 
 		// When
-		couponManageService.deleteQueue(couponName);
+		couponManageService.delete(couponName);
 
 		// Then
 		verify(couponManageRepository).deleteQueue(couponName);
@@ -170,7 +166,7 @@ class CouponManageServiceTest {
 			.deleteQueue(any(String.class));
 
 		// When & Then
-		assertThatThrownBy(() -> couponManageService.deleteQueue("null"))
+		assertThatThrownBy(() -> couponManageService.delete("null"))
 			.isInstanceOf(NullPointerException.class);
 	}
 }

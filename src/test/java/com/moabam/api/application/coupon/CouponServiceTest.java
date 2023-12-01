@@ -183,7 +183,7 @@ class CouponServiceTest {
 
 		// Then
 		verify(couponRepository).delete(coupon);
-		verify(couponManageService).deleteQueue(any(String.class));
+		verify(couponManageService).delete(any(String.class));
 	}
 
 	@DisplayName("권한 없는 사용자가 쿠폰을 삭제한다. - NotFoundException")
@@ -220,7 +220,7 @@ class CouponServiceTest {
 
 		// Then
 		assertThat(actual.point()).isEqualTo(coupon.getPoint());
-		assertThat(actual.stock()).isEqualTo(coupon.getStock());
+		assertThat(actual.maxCount()).isEqualTo(coupon.getMaxCount());
 	}
 
 	@DisplayName("존재하지 않는 쿠폰을 조회한다. - NotFoundException")

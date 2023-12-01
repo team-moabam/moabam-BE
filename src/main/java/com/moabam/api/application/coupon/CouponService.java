@@ -60,7 +60,7 @@ public class CouponService {
 			.orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_COUPON));
 
 		couponRepository.delete(coupon);
-		couponManageService.deleteQueue(coupon.getName());
+		couponManageService.delete(coupon.getName());
 	}
 
 	@Transactional

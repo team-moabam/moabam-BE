@@ -77,3 +77,8 @@ payment:
   toss:
     base-url: "https://api.tosspayments.com"
     secret-key: "test_sk_4yKeq5bgrpWk4XYdDoBxVGX0lzW6:"
+
+# Webhook
+webhook:
+  slack:
+    url: test
