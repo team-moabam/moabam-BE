@@ -34,6 +34,7 @@ public enum ErrorMessage {
 	IMAGE_CONVERT_FAIL("이미지 변환을 실패했습니다."),
 
 	LOGIN_FAILED("로그인에 실패했습니다."),
+	LOGIN_FAILED_ADMIN_KEY("어드민키가 달라요"),
 	REQUEST_FAILED("네트워크 접근 실패입니다."),
 	GRANT_FAILED("인가 코드 실패"),
 	AUTHENTICATE_FAIL("인증 실패"),

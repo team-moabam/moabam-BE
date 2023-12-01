@@ -1,14 +1,15 @@
 package com.moabam.global.auth.filter;
 
 import java.io.IOException;
+import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import com.google.cloud.storage.HttpMethod;
+import com.moabam.global.config.AllowOriginConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -31,26 +32,27 @@ public class CorsFilter extends OncePerRequestFilter {
 
 	private final HandlerExceptionResolver handlerExceptionResolver;
 
-	@Value("${allow}")
-	private String allowOrigin;
+	private final AllowOriginConfig allowOriginsConfig;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
 		FilterChain filterChain) throws ServletException, IOException {
+		String refer = httpServletRequest.getHeader("referer");
+		String origin = secureMatch(refer);
 
 		try {
-			if (!secureMatch(httpServletRequest, allowOrigin)) {
+			if (Objects.isNull(origin)) {
 				throw new UnauthorizedException(ErrorMessage.INVALID_REQUEST_URL);
 			}
 		} catch (UnauthorizedException unauthorizedException) {
-			log.error("{}, {}", httpServletRequest.getHeader("referer"), allowOrigin);
+			log.error("{}, {}", httpServletRequest.getHeader("referer"), allowOriginsConfig.origin());
 			handlerExceptionResolver.resolveException(httpServletRequest, httpServletResponse, null,
 				unauthorizedException);
 
 			return;
 		}
 
-		httpServletResponse.setHeader("Access-Control-Allow-Origin", allowOrigin);
+		httpServletResponse.setHeader("Access-Control-Allow-Origin", origin);
 		httpServletResponse.setHeader("Access-Control-Allow-Methods", ALLOWED_METHOD_NAMES);
 		httpServletResponse.setHeader("Access-Control-Allow-Headers", ALLOWED_HEADERS);
 		httpServletResponse.setHeader("Access-Control-Allow-Credentials", "true");
@@ -63,8 +65,11 @@ public class CorsFilter extends OncePerRequestFilter {
 		filterChain.doFilter(httpServletRequest, httpServletResponse);
 	}
 
-	public boolean secureMatch(HttpServletRequest request, String origin) {
-		return request.getHeader("referer").contains(origin);
+	public String secureMatch(String refer) {
+		return allowOriginsConfig.origin().stream()
+			.filter(refer::contains)
+			.findFirst()
+			.orElse(null);
 	}
 
 	public boolean isOption(String method) {

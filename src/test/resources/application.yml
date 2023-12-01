@@ -62,6 +62,7 @@ oauth2:
     token-uri: https://kauth.kakao.com/oauth/token
     token-info: https://kapi.kakao.com/v1/user/access_token_info
     unlink: https://kapi.kakao.com/v1/user/unlink
+    admin-redirect-uri: https://dev-admin.moabam.com/login/kakao/oauth
 
 
 token:
@@ -70,7 +71,12 @@ token:
   refresh-expire: 150000
   secret-key: testestestestestestestestestesttestestestestestestestestestest
 
-allow: ""
+allows:
+  origin:
+    - "https://test.com"
+    - "https://test.com"
+
+admin: moamoamoabam
 
 # Payment
 payment:

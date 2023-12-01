@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolv
 import com.moabam.api.domain.member.Role;
 import com.moabam.global.auth.filter.CorsFilter;
 import com.moabam.global.auth.handler.PathResolver;
+import com.moabam.global.config.AllowOriginConfig;
 
 @Import(DataCleanResolver.class)
 @ExtendWith({FilterProcessExtension.class, ClearDataExtension.class})
@@ -29,10 +30,13 @@ public class WithoutFilterSupporter {
 	@SpyBean
 	private CorsFilter corsFilter;
 
+	@SpyBean
+	private AllowOriginConfig allowOriginConfig;
+
 	@BeforeEach
 	void setUpMock() {
-		willReturn(true)
-			.given(corsFilter).secureMatch(any(), any());
+		willReturn("http://localhost:8080")
+			.given(corsFilter).secureMatch(any());
 
 		willReturn(Optional.of(PathResolver.Path.builder()
 			.uri("/")

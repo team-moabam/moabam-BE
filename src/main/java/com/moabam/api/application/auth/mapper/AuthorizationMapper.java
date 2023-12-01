@@ -23,11 +23,12 @@ public final class AuthorizationMapper {
 			.build();
 	}
 
-	public static AuthorizationTokenRequest toAuthorizationTokenRequest(OAuthConfig oAuthConfig, String code) {
+	public static AuthorizationTokenRequest toAuthorizationTokenRequest(OAuthConfig oAuthConfig, String code,
+		String redirectUri) {
 		return AuthorizationTokenRequest.builder()
 			.grantType(oAuthConfig.client().authorizationGrantType())
 			.clientId(oAuthConfig.client().clientId())
-			.redirectUri(oAuthConfig.provider().redirectUri())
+			.redirectUri(redirectUri)
 			.code(code)
 			.clientSecret(oAuthConfig.client().clientSecret())
 			.build();
