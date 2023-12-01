@@ -89,7 +89,7 @@ class MemberAuthorizeControllerTest {
 		RestTemplate restTemplate = restTemplateBuilder.build();
 		ReflectionTestUtils.setField(oAuth2AuthorizationServerRequestService, "restTemplate", restTemplate);
 		mockRestServiceServer = MockRestServiceServer.createServer(restTemplate);
-		willReturn(true).given(corsFilter).secureMatch(any());
+		willReturn("http://localhost").given(corsFilter).secureMatch(any());
 	}
 
 	@DisplayName("인가 코드 받기 위한 로그인 페이지 요청")
