@@ -111,7 +111,8 @@ public class CertificationService {
 	private void validateCertifyTime(LocalDateTime now, int certifyTime) {
 		LocalTime targetTime = LocalTime.of(certifyTime, 0);
 		LocalDateTime targetDateTime = LocalDateTime.of(now.toLocalDate(), targetTime);
-		if (certifyTime == MIDNIGHT_HOUR) {
+
+		if (certifyTime == MIDNIGHT_HOUR && now.getHour() == ONE_HOUR_BEFORE_MIDNIGHT_HOUR) {
 			targetDateTime = targetDateTime.plusDays(1);
 		}
 
