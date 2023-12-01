@@ -24,7 +24,7 @@ import com.moabam.api.domain.coupon.repository.CouponManageRepository;
 import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.global.common.util.ClockHolder;
-import com.moabam.global.error.exception.BadRequestException;
+import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.CouponFixture;
@@ -140,7 +140,7 @@ class CouponManageServiceTest {
 
 		// When & Then
 		assertThatThrownBy(() -> couponManageService.registerQueue("couponName", 1L))
-			.isInstanceOf(BadRequestException.class)
+			.isInstanceOf(NotFoundException.class)
 			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD.getMessage());
 	}
 
@@ -151,7 +151,7 @@ class CouponManageServiceTest {
 		String couponName = "couponName";
 
 		// When
-		couponManageService.deleteQueue(couponName);
+		couponManageService.delete(couponName);
 
 		// Then
 		verify(couponManageRepository).deleteQueue(couponName);
@@ -166,7 +166,7 @@ class CouponManageServiceTest {
 			.deleteQueue(any(String.class));
 
 		// When & Then
-		assertThatThrownBy(() -> couponManageService.deleteQueue("null"))
+		assertThatThrownBy(() -> couponManageService.delete("null"))
 			.isInstanceOf(NullPointerException.class);
 	}
 }
