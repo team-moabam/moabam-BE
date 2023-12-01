@@ -89,13 +89,13 @@ class AuthorizationServiceTest {
 
 		oauthConfig = new OAuthConfig(
 			new OAuthConfig.Provider("https://authorization/url", "http://redirect/url", "http://token/url",
-				"http://tokenInfo/url", "https://deleteRequest/url"),
+				"http://tokenInfo/url", "https://deleteRequest/url", "https://adminRequest/url"),
 			new OAuthConfig.Client("provider", "testtestetsttest", "testtesttest", "authorization_code",
 				List.of("profile_nickname", "profile_image"), "adminKey"));
 		ReflectionTestUtils.setField(authorizationService, "oAuthConfig", oauthConfig);
 
 		noOAuthConfig = new OAuthConfig(
-			new OAuthConfig.Provider(null, null, null, null, null),
+			new OAuthConfig.Provider(null, null, null, null, null, null),
 			new OAuthConfig.Client(null, null, null, null, null, null));
 		noPropertyService = new AuthorizationService(fcmService, noOAuthConfig, tokenConfig,
 			oAuth2AuthorizationServerRequestService, memberService, jwtProviderService, tokenRepository, cookieUtils);
@@ -167,7 +167,8 @@ class AuthorizationServiceTest {
 	@Test
 	void token_request_mapping_failBy_code() {
 		// When + Then
-		Assertions.assertThatThrownBy(() -> AuthorizationMapper.toAuthorizationTokenRequest(oauthConfig, null))
+		Assertions.assertThatThrownBy(() -> AuthorizationMapper.toAuthorizationTokenRequest(oauthConfig,
+				null, oauthConfig.provider().redirectUri()))
 			.isInstanceOf(NullPointerException.class);
 	}
 
@@ -175,7 +176,8 @@ class AuthorizationServiceTest {
 	@Test
 	void token_request_mapping_failBy_config() {
 		// When + Then
-		Assertions.assertThatThrownBy(() -> AuthorizationMapper.toAuthorizationTokenRequest(noOAuthConfig, "Test"))
+		Assertions.assertThatThrownBy(() -> AuthorizationMapper.toAuthorizationTokenRequest(noOAuthConfig, "Test",
+				oauthConfig.provider().redirectUri()))
 			.isInstanceOf(NullPointerException.class);
 	}
 
@@ -185,7 +187,7 @@ class AuthorizationServiceTest {
 		// Given
 		String code = "Test";
 		AuthorizationTokenRequest authorizationTokenRequest = AuthorizationMapper.toAuthorizationTokenRequest(
-			oauthConfig, code);
+			oauthConfig, code, oauthConfig.provider().redirectUri());
 
 		// When + Then
 		assertThat(authorizationTokenRequest).isNotNull();

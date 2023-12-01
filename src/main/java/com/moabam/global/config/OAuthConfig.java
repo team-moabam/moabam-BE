@@ -26,7 +26,8 @@ public record OAuthConfig(
 		String redirectUri,
 		String tokenUri,
 		String tokenInfo,
-		String unlink
+		String unlink,
+		String adminRedirectUri
 	) {
 
 	}

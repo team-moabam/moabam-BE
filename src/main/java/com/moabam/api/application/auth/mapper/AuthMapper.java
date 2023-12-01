@@ -1,5 +1,6 @@
 package com.moabam.api.application.auth.mapper;
 
+import com.moabam.admin.domain.admin.Admin;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.dto.auth.TokenSaveValue;
@@ -17,6 +18,17 @@ public final class AuthMapper {
 				.id(member.getId())
 				.nickname(member.getNickname())
 				.role(member.getRole())
+				.build())
+			.isSignUp(isSignUp)
+			.build();
+	}
+
+	public static LoginResponse toLoginResponse(Admin admin, boolean isSignUp) {
+		return LoginResponse.builder()
+			.publicClaim(PublicClaim.builder()
+				.id(admin.getId())
+				.nickname(admin.getNickname())
+				.role(admin.getRole())
 				.build())
 			.isSignUp(isSignUp)
 			.build();

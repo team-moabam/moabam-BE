@@ -56,10 +56,17 @@ public class AuthorizationService {
 		oauth2AuthorizationServerRequestService.loginRequest(httpServletResponse, authorizationCodeUri);
 	}
 
+	public AuthorizationTokenResponse requestAdminToken(AuthorizationCodeResponse authorizationCodeResponse) {
+		validAuthorizationGrant(authorizationCodeResponse.code());
+
+		return issueTokenToAuthorizationServer(authorizationCodeResponse.code(),
+			oAuthConfig.provider().adminRedirectUri());
+	}
+
 	public AuthorizationTokenResponse requestToken(AuthorizationCodeResponse authorizationCodeResponse) {
 		validAuthorizationGrant(authorizationCodeResponse.code());
 
-		return issueTokenToAuthorizationServer(authorizationCodeResponse.code());
+		return issueTokenToAuthorizationServer(authorizationCodeResponse.code(), oAuthConfig.provider().redirectUri());
 	}
 
 	public AuthorizationTokenInfoResponse requestTokenInfo(AuthorizationTokenResponse authorizationTokenResponse) {
@@ -182,10 +189,9 @@ public class AuthorizationService {
 		}
 	}
 
-	private AuthorizationTokenResponse issueTokenToAuthorizationServer(String code) {
+	private AuthorizationTokenResponse issueTokenToAuthorizationServer(String code, String redirectUri) {
 		AuthorizationTokenRequest authorizationTokenRequest = AuthorizationMapper.toAuthorizationTokenRequest(
-			oAuthConfig,
-			code);
+			oAuthConfig, code, redirectUri);
 		MultiValueMap<String, String> uriParams = generateTokenRequest(authorizationTokenRequest);
 		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse =
 			oauth2AuthorizationServerRequestService.requestAuthorizationServer(oAuthConfig.provider().tokenUri(),

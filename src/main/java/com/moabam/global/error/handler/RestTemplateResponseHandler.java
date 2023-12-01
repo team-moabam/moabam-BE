@@ -1,6 +1,8 @@
 package com.moabam.global.error.handler;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
@@ -14,7 +16,7 @@ import com.moabam.global.error.model.ErrorMessage;
 public class RestTemplateResponseHandler implements ResponseErrorHandler {
 
 	@Override
-	public boolean hasError(ClientHttpResponse response) {
+	public boolean hasError(ClientHttpResponse response) throws IOException {
 		try {
 			return response.getStatusCode().isError();
 		} catch (IOException ioException) {
@@ -25,11 +27,27 @@ public class RestTemplateResponseHandler implements ResponseErrorHandler {
 	@Override
 	public void handleError(ClientHttpResponse response) {
 		try {
+			String errorMessage = parseErrorMessage(response);
 			HttpStatusCode statusCode = response.getStatusCode();
+
 			validResponse(statusCode);
 		} catch (IOException ioException) {
 			throw new BadRequestException(ErrorMessage.REQUEST_FAILED);
 		}
+	}
+
+	private String parseErrorMessage(ClientHttpResponse response) throws IOException {
+		BufferedReader errorMessage = new BufferedReader(new InputStreamReader(response.getBody()));
+
+		String line = errorMessage.readLine();
+		StringBuilder sb = new StringBuilder();
+
+		while (line != null) {
+			sb.append(line).append("\n");
+			line = errorMessage.readLine();
+		}
+
+		return sb.toString();
 	}
 
 	private void validResponse(HttpStatusCode statusCode) {

@@ -32,7 +32,7 @@ public class WithoutFilterSupporter {
 	@BeforeEach
 	void setUpMock() {
 		willReturn(true)
-			.given(corsFilter).secureMatch(any(), any());
+			.given(corsFilter).secureMatch(any());
 
 		willReturn(Optional.of(PathResolver.Path.builder()
 			.uri("/")
