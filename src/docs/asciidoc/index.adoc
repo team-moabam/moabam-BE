@@ -17,8 +17,8 @@
 [cols="2,5,3"]
 |====
 |환경         |DNS |비고
-|개발(dev)    | link:[dev-api.moabam.com] |
-|운영(prod)   | link:[api.moabam.com] |
+|개발(dev)    | link:[dev.moabam.com] |
+|운영(prod)   | link:[www.moabam.com] |
 |====
 
 [NOTE]
