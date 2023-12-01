@@ -1,8 +1,6 @@
 package com.moabam.global.error.handler;
 
-import static com.moabam.global.error.model.ErrorMessage.INVALID_REQUEST_FIELD;
-import static com.moabam.global.error.model.ErrorMessage.INVALID_REQUEST_VALUE_TYPE_FORMAT;
-import static com.moabam.global.error.model.ErrorMessage.S3_INVALID_IMAGE_SIZE;
+import static com.moabam.global.error.model.ErrorMessage.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +60,10 @@ public class GlobalExceptionHandler {
 	}
 
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	@ExceptionHandler({FcmException.class, TossPaymentException.class})
+	@ExceptionHandler({
+		FcmException.class,
+		TossPaymentException.class
+	})
 	protected ErrorResponse handleFcmException(MoabamException moabamException) {
 		return new ErrorResponse(moabamException.getMessage(), null);
 	}

@@ -38,11 +38,11 @@ insert into item (type, category, name, awake_image, sleep_image, bug_price, gol
 values ('NIGHT', 'SKIN', '산타 부엉이', 'https://image.moabam.com/moabam/skins/owl/santa/eyes-opened.png',
         'https://image.moabam.com/moabam/skins/owl/santa/eyes-closed.png', 30, 15, 15, current_time());
 
-insert into product (id, type, name, price, quantity, created_at, updated_at)
-values (null, 'BUG', '황금벌레x5', 3000, 5, current_time(), null);
+insert into product (type, name, price, quantity, created_at)
+values ('BUG', '황금벌레 5', 3000, 5, current_time());
 
-insert into product (id, type, name, price, quantity, created_at, updated_at)
-values (null, 'BUG', '황금벌레x10', 7000, 10, current_time(), null);
+insert into product (type, name, price, quantity, created_at)
+values ('BUG', '황금벌레 15', 7000, 15, current_time());
 
-insert into product (id, type, name, price, quantity, created_at, updated_at)
-values (null, 'BUG', '황금벌레x25', 9900, 25, current_time(), null);
+insert into product (type, name, price, quantity, created_at)
+values ('BUG', '황금벌레 25', 9900, 25, current_time());
