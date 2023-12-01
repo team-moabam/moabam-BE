@@ -75,12 +75,6 @@ public class RoomService {
 		room.changePassword(modifyRoomRequest.password());
 		room.changeCertifyTime(modifyRoomRequest.certifyTime());
 		room.changeMaxCount(modifyRoomRequest.maxUserCount());
-
-		List<Routine> routines = routineRepository.findAllByRoomId(roomId);
-		routineRepository.deleteAll(routines);
-
-		List<Routine> newRoutines = RoutineMapper.toRoutineEntities(room, modifyRoomRequest.routines());
-		routineRepository.saveAll(newRoutines);
 	}
 
 	@Transactional
