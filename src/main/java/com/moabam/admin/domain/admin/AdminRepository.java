@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 
-	Optional<Admin> findBySocialId(String s);
+	Optional<Admin> findBySocialId(String socialId);
 }
