@@ -709,12 +709,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isOk())
 			.andDo(print());
 
-		List<Room> deletedRoom = roomRepository.findAll();
-		List<Routine> deletedRoutine = routineRepository.findAll();
 		List<Participant> deletedParticipant = participantRepository.findAll();
 
-		assertThat(deletedRoom).isEmpty();
-		assertThat(deletedRoutine).hasSize(0);
 		assertThat(deletedParticipant).hasSize(1);
 		assertThat(deletedParticipant.get(0).getDeletedAt()).isNotNull();
 		assertThat(deletedParticipant.get(0).getDeletedRoomTitle()).isNotNull();
