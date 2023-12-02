@@ -260,7 +260,7 @@ public class SearchService {
 
 		List<TodayCertificateRankResponse> responses = new ArrayList<>();
 		List<Certification> certifications = certificationsSearchRepository.findCertifications(roomId, date);
-		List<Participant> participants = participantSearchRepository.findParticipantsByRoomId(roomId);
+		List<Participant> participants = participantSearchRepository.findAllParticipantsByRoomId(roomId);
 		List<Member> members = memberService.getRoomMembers(participants.stream()
 			.map(Participant::getMemberId)
 			.toList());
