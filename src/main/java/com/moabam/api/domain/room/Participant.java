@@ -76,6 +76,5 @@ public class Participant extends BaseTimeEntity {
 
 	public void removeRoom() {
 		this.deletedRoomTitle = this.room.getTitle();
-		this.room = null;
 	}
 }

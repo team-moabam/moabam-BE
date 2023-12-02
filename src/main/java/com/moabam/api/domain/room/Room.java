@@ -4,7 +4,10 @@ import static com.moabam.api.domain.room.RoomType.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
 
 import com.moabam.global.common.entity.BaseTimeEntity;
 import com.moabam.global.error.exception.BadRequestException;
@@ -26,6 +29,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "room")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE room SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 public class Room extends BaseTimeEntity {
 
 	private static final int LEVEL_5 = 5;
@@ -84,6 +88,9 @@ public class Room extends BaseTimeEntity {
 
 	@Column(name = "manager_nickname", length = 30)
 	private String managerNickname;
+
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 
 	@Builder
 	private Room(Long id, String title, String password, RoomType roomType, int certifyTime, int maxUserCount) {

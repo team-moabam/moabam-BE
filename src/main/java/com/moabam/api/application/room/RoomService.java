@@ -16,7 +16,6 @@ import com.moabam.api.application.room.mapper.ParticipantMapper;
 import com.moabam.api.application.room.mapper.RoomMapper;
 import com.moabam.api.application.room.mapper.RoutineMapper;
 import com.moabam.api.domain.member.Member;
-import com.moabam.api.domain.room.Certification;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.RoomType;
@@ -122,11 +121,6 @@ public class RoomService {
 			return;
 		}
 
-		List<Routine> routines = routineRepository.findAllByRoomId(roomId);
-		List<Certification> certifications = certificationService.findCertifications(routines);
-
-		certificationService.deleteCertifications(certifications);
-		routineRepository.deleteAll(routines);
 		roomRepository.delete(room);
 	}
 
