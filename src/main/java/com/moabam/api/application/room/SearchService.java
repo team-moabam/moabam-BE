@@ -374,6 +374,7 @@ public class SearchService {
 	private int calculateContributionPoint(Long memberId, List<Participant> participants, LocalDate date) {
 		Participant participant = participants.stream()
 			.filter(p -> p.getMemberId().equals(memberId))
+			.filter(p -> p.getDeletedAt() == null)
 			.findAny()
 			.orElseThrow(() -> new NotFoundException(ROOM_DETAILS_ERROR));
 
