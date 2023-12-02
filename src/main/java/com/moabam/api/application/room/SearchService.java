@@ -325,6 +325,7 @@ public class SearchService {
 
 		List<Long> allMemberIds = participants.stream()
 			.map(Participant::getMemberId)
+			.distinct()
 			.collect(Collectors.toList());
 
 		List<Long> certifiedMemberIds = dailyMemberCertifications.stream()
