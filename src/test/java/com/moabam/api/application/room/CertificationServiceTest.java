@@ -127,7 +127,7 @@ class CertificationServiceTest {
 		imageUrls.add("https://image.moabam.com/certifications/20231108/1_asdfsdfxcv-4815vcx-asfd");
 		imageUrls.add("https://image.moabam.com/certifications/20231108/2_asdfsdfxcv-4815vcx-asfd");
 
-		given(clockHolder.times()).willReturn(LocalDateTime.now().withHour(9).withMinute(58));
+		given(clockHolder.times()).willReturn(LocalDateTime.now().withHour(10).withMinute(6));
 		given(clockHolder.date()).willReturn(today);
 		given(participantSearchRepository.findOne(memberId, roomId)).willReturn(Optional.of(participant));
 		given(memberService.findMember(memberId)).willReturn(member1);
