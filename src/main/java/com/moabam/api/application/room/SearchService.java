@@ -263,6 +263,7 @@ public class SearchService {
 		List<Participant> participants = participantSearchRepository.findAllParticipantsByRoomId(roomId);
 		List<Member> members = memberService.getRoomMembers(participants.stream()
 			.map(Participant::getMemberId)
+			.distinct()
 			.toList());
 
 		List<Long> knocks = notificationService.getMyKnockStatusInRoom(memberId, roomId, participants);
