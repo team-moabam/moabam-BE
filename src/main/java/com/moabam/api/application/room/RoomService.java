@@ -120,7 +120,7 @@ public class RoomService {
 			room.decreaseCurrentUserCount();
 			return;
 		}
-		
+
 		roomRepository.delete(room);
 	}
 
