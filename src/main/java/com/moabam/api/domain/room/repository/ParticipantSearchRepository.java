@@ -44,6 +44,15 @@ public class ParticipantSearchRepository {
 			.fetch();
 	}
 
+	public List<Participant> findAllParticipantsByRoomId(Long roomId) {
+		return jpaQueryFactory
+			.selectFrom(participant)
+			.where(
+				participant.room.id.eq(roomId)
+			)
+			.fetch();
+	}
+
 	public List<Participant> findNotDeletedParticipantsByMemberId(Long memberId) {
 		return jpaQueryFactory
 			.selectFrom(participant)
