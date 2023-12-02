@@ -31,7 +31,7 @@ public class NotificationService {
 
 	private static final String COMMON_TITLE = "모아밤";
 	private static final String KNOCK_BODY = "[%s] - [%s]님이 콕콕콕!";
-	private static final String CERTIFY_TIME_BODY = "[%s] - 인증 시간!";
+	private static final String CERTIFY_TIME_BODY = "[%s] - 5분 후 인증 시간입니다!";
 
 	private final ClockHolder clockHolder;
 	private final FcmService fcmService;
@@ -62,7 +62,7 @@ public class NotificationService {
 		fcmService.sendAsync(fcmToken, COMMON_TITLE, notificationBody);
 	}
 
-	@Scheduled(cron = "0 50 * * * *")
+	@Scheduled(cron = "0 55 * * * *")
 	public void sendCertificationTime() {
 		int certificationTime = (clockHolder.times().getHour() + ONE_HOUR) % HOURS_IN_A_DAY;
 		List<Participant> participants = participantSearchRepository.findAllByRoomCertifyTime(certificationTime);

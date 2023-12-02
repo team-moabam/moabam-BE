@@ -33,7 +33,7 @@ public final class CouponMapper {
 	public static CouponResponse toResponse(Coupon coupon) {
 		return CouponResponse.builder()
 			.id(coupon.getId())
-			.adminName("ID : " + coupon.getAdminId())
+			.adminId(coupon.getAdminId())
 			.name(coupon.getName())
 			.description(coupon.getDescription())
 			.point(coupon.getPoint())

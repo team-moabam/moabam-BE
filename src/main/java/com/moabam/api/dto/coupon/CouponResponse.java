@@ -10,7 +10,7 @@ import lombok.Builder;
 @Builder
 public record CouponResponse(
 	Long id,
-	String adminName,
+	Long adminId,
 	String name,
 	String description,
 	int point,
