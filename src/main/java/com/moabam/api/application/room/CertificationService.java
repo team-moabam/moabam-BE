@@ -113,14 +113,6 @@ public class CertificationService {
 			.orElseThrow(() -> new NotFoundException(CERTIFICATION_NOT_FOUND));
 	}
 
-	public List<Certification> findCertifications(List<Routine> routines) {
-		return certificationsSearchRepository.findCertificationsByRoutines(routines);
-	}
-
-	public void deleteCertifications(List<Certification> certifications) {
-		certificationRepository.deleteAll(certifications);
-	}
-
 	private void validateCertifyTime(LocalDateTime now, int certifyTime) {
 		LocalTime targetTime = LocalTime.of(certifyTime, 0);
 		LocalDateTime targetDateTime = LocalDateTime.of(now.toLocalDate(), targetTime);
