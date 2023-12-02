@@ -10,4 +10,6 @@ public interface DailyMemberCertificationRepository extends JpaRepository<DailyM
 
 	boolean existsByMemberIdAndRoomIdAndCreatedAtBetween(Long memberId, Long roomId, LocalDateTime startTime,
 		LocalDateTime endTime);
+
+	boolean existsByRoomIdAndCreatedAtBetween(Long roomId, LocalDateTime startTime, LocalDateTime endTime);
 }

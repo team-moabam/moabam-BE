@@ -25,6 +25,7 @@ import com.moabam.api.domain.room.repository.RoutineRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -42,7 +43,9 @@ public class RoomService {
 	private final RoutineRepository routineRepository;
 	private final ParticipantRepository participantRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
+	private final CertificationService certificationService;
 	private final MemberService memberService;
+	private final ClockHolder clockHolder;
 
 	@Transactional
 	public Long createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
@@ -73,8 +76,12 @@ public class RoomService {
 		room.changeTitle(modifyRoomRequest.title());
 		room.changeAnnouncement(modifyRoomRequest.announcement());
 		room.changePassword(modifyRoomRequest.password());
-		room.changeCertifyTime(modifyRoomRequest.certifyTime());
 		room.changeMaxCount(modifyRoomRequest.maxUserCount());
+
+		if (room.getCertifyTime() != modifyRoomRequest.certifyTime()) {
+			validateChangeCertifyTime(roomId);
+		}
+		room.changeCertifyTime(modifyRoomRequest.certifyTime());
 	}
 
 	@Transactional
@@ -158,6 +165,12 @@ public class RoomService {
 	public Room findRoom(Long roomId) {
 		return roomRepository.findById(roomId)
 			.orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
+	}
+
+	private void validateChangeCertifyTime(Long roomId) {
+		if (certificationService.existsAnyMemberCertification(roomId, clockHolder.date())) {
+			throw new BadRequestException(UNAVAILABLE_TO_CHANGE_CERTIFY_TIME);
+		}
 	}
 
 	private Participant getParticipant(Long memberId, Long roomId) {
