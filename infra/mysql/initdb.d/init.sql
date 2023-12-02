@@ -1,5 +1,16 @@
 use moabam_dev;
 
+create table admin
+(
+    id         bigint                                        not null auto_increment,
+    nickname   varchar(255)                                  not null unique,
+    social_id  varchar(255) unique,
+    role       enum ('ADMIN','BLACK','USER') default 'ADMIN' not null,
+    created_at datetime(6)                                   not null,
+    updated_at datetime(6),
+    primary key (id)
+);
+
 create table badge
 (
     id         bigint                                                             not null auto_increment,

@@ -21,7 +21,7 @@ public final class CouponSnippet {
 
 	public static final ResponseFieldsSnippet COUPON_RESPONSE = responseFields(
 		fieldWithPath("id").type(NUMBER).description("쿠폰 ID"),
-		fieldWithPath("adminName").type(STRING).description("쿠폰 관리자명"),
+		fieldWithPath("adminId").type(NUMBER).description("쿠폰 관리자 ID"),
 		fieldWithPath("name").type(STRING).description("쿠폰명"),
 		fieldWithPath("description").type(STRING).description("쿠폰에 대한 간단 소개 (NULL 가능)"),
 		fieldWithPath("point").type(NUMBER).description("쿠폰 사용 시, 제공하는 포인트량"),
@@ -38,7 +38,7 @@ public final class CouponSnippet {
 
 	public static final ResponseFieldsSnippet COUPON_STATUS_RESPONSE = responseFields(
 		fieldWithPath("[].id").type(NUMBER).description("쿠폰 ID"),
-		fieldWithPath("[].adminName").type(STRING).description("쿠폰 관리자명"),
+		fieldWithPath("[].adminId").type(NUMBER).description("쿠폰 관리자 ID"),
 		fieldWithPath("[].name").type(STRING).description("쿠폰명"),
 		fieldWithPath("[].description").type(STRING).description("쿠폰에 대한 간단 소개 (NULL 가능)"),
 		fieldWithPath("[].point").type(NUMBER).description("쿠폰 사용 시, 제공하는 포인트량"),

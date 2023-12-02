@@ -32,6 +32,9 @@ public enum ErrorMessage {
 	NEED_TO_EXIT_ALL_ROOMS("모든 방에서 나가야 회원 탈퇴가 가능합니다."),
 	PARTICIPANT_DEPORT_ERROR("방장은 자신을 추방할 수 없습니다."),
 	IMAGE_CONVERT_FAIL("이미지 변환을 실패했습니다."),
+	UNAVAILABLE_TO_CHANGE_CERTIFY_TIME("이미 한명 이상이 인증을 하면 인증 시간을 바꿀 수 없습니다."),
+	CERTIFIED_ROOM_EXIT_FAILED("오늘 인증한 방은 나갈 수 없습니다."),
+	ROOM_ENTER_FAILED("해당 방의 인증 시간에는 입장할 수 없습니다."),
 
 	LOGIN_FAILED("로그인에 실패했습니다."),
 	LOGIN_FAILED_ADMIN_KEY("어드민키가 달라요"),

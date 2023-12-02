@@ -3,6 +3,8 @@ package com.moabam.api.application.room;
 import static com.moabam.api.domain.room.RoomType.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,10 +16,12 @@ import com.moabam.api.application.room.mapper.ParticipantMapper;
 import com.moabam.api.application.room.mapper.RoomMapper;
 import com.moabam.api.application.room.mapper.RoutineMapper;
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.room.Certification;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.domain.room.Routine;
+import com.moabam.api.domain.room.repository.DailyMemberCertificationRepository;
 import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
@@ -25,6 +29,7 @@ import com.moabam.api.domain.room.repository.RoutineRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
+import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ForbiddenException;
 import com.moabam.global.error.exception.NotFoundException;
@@ -42,7 +47,10 @@ public class RoomService {
 	private final RoutineRepository routineRepository;
 	private final ParticipantRepository participantRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
+	private final DailyMemberCertificationRepository dailyMemberCertificationRepository;
+	private final CertificationService certificationService;
 	private final MemberService memberService;
+	private final ClockHolder clockHolder;
 
 	@Transactional
 	public Long createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
@@ -73,8 +81,12 @@ public class RoomService {
 		room.changeTitle(modifyRoomRequest.title());
 		room.changeAnnouncement(modifyRoomRequest.announcement());
 		room.changePassword(modifyRoomRequest.password());
-		room.changeCertifyTime(modifyRoomRequest.certifyTime());
 		room.changeMaxCount(modifyRoomRequest.maxUserCount());
+
+		if (room.getCertifyTime() != modifyRoomRequest.certifyTime()) {
+			validateChangeCertifyTime(roomId);
+		}
+		room.changeCertifyTime(modifyRoomRequest.certifyTime());
 	}
 
 	@Transactional
@@ -111,6 +123,9 @@ public class RoomService {
 		}
 
 		List<Routine> routines = routineRepository.findAllByRoomId(roomId);
+		List<Certification> certifications = certificationService.findCertifications(routines);
+
+		certificationService.deleteCertifications(certifications);
 		routineRepository.deleteAll(routines);
 		roomRepository.delete(room);
 	}
@@ -160,6 +175,12 @@ public class RoomService {
 			.orElseThrow(() -> new NotFoundException(ROOM_NOT_FOUND));
 	}
 
+	private void validateChangeCertifyTime(Long roomId) {
+		if (certificationService.existsAnyMemberCertification(roomId, clockHolder.date())) {
+			throw new BadRequestException(UNAVAILABLE_TO_CHANGE_CERTIFY_TIME);
+		}
+	}
+
 	private Participant getParticipant(Long memberId, Long roomId) {
 		return participantSearchRepository.findOne(memberId, roomId)
 			.orElseThrow(() -> new NotFoundException(PARTICIPANT_NOT_FOUND));
@@ -179,6 +200,7 @@ public class RoomService {
 
 	private void validateRoomEnter(Long memberId, String requestPassword, Room room) {
 		validateEnteredRoomCount(memberId, room.getRoomType());
+		validateCertifyTime(room);
 
 		if (!StringUtils.isEmpty(requestPassword) && !room.getPassword().equals(requestPassword)) {
 			throw new BadRequestException(WRONG_ROOM_PASSWORD);
@@ -199,9 +221,26 @@ public class RoomService {
 		}
 	}
 
+	private void validateCertifyTime(Room room) {
+		LocalDateTime now = clockHolder.times();
+		LocalTime targetTime = LocalTime.of(room.getCertifyTime(), 0);
+		LocalDateTime targetDateTime = LocalDateTime.of(now.toLocalDate(), targetTime);
+
+		LocalDateTime plusTenMinutes = targetDateTime.plusMinutes(10);
+
+		if (now.isAfter(targetDateTime) && now.isBefore(plusTenMinutes)) {
+			throw new BadRequestException(ROOM_ENTER_FAILED);
+		}
+	}
+
 	private void validateRoomExit(Participant participant, Room room) {
 		if (participant.isManager() && room.getCurrentUserCount() != 1) {
 			throw new BadRequestException(ROOM_EXIT_MANAGER_FAIL);
+		}
+
+		if (dailyMemberCertificationRepository.existsByMemberIdAndRoomIdAndCreatedAtBetween(participant.getMemberId(),
+			room.getId(), clockHolder.date().atStartOfDay(), clockHolder.date().atTime(LocalTime.MAX))) {
+			throw new BadRequestException(CERTIFIED_ROOM_EXIT_FAILED);
 		}
 	}
 }

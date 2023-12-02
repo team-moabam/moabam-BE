@@ -354,6 +354,46 @@ class RoomControllerTest extends WithoutFilterSupporter {
 			.andDo(print());
 	}
 
+	@DisplayName("방 수정 실패 - 이미 한 참여자가 인증하고 방의 인증 시간을 바꾸려고 할때 예외 처리")
+	@WithMember(id = 1L)
+	@Test
+	void room_certify_time_modification_fail() throws Exception {
+		// given
+		Room room = Room.builder()
+			.title("처음 제목")
+			.password("1234")
+			.roomType(MORNING)
+			.certifyTime(9)
+			.maxUserCount(5)
+			.build();
+		room = roomRepository.save(room);
+
+		Member member2 = MemberFixture.member("12313123");
+		member2 = memberRepository.save(member2);
+
+		Participant participant1 = RoomFixture.participant(room, 1L);
+		participant1.enableManager();
+
+		Participant participant2 = RoomFixture.participant(room, member2.getId());
+
+		participantRepository.saveAll(List.of(participant1, participant2));
+
+		DailyMemberCertification dailyMemberCertification = RoomFixture.dailyMemberCertification(member2.getId(),
+			room.getId(), participant2);
+
+		dailyMemberCertificationRepository.save(dailyMemberCertification);
+
+		ModifyRoomRequest modifyRoomRequest = new ModifyRoomRequest("수정할 방임!", "방 공지", "1234", 10, 7);
+		String json = objectMapper.writeValueAsString(modifyRoomRequest);
+
+		// expected
+		mockMvc.perform(put("/rooms/" + room.getId())
+				.contentType(APPLICATION_JSON)
+				.content(json))
+			.andExpect(status().isBadRequest())
+			.andDo(print());
+	}
+
 	@DisplayName("비밀번호 있는 방 참여 성공")
 	@WithMember(id = 1L)
 	@Test

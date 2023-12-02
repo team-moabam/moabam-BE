@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.moabam.admin.application.admin.AdminService;
 import com.moabam.api.application.bug.BugService;
 import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.coupon.Coupon;
@@ -34,7 +35,9 @@ public class CouponService {
 
 	private final ClockHolder clockHolder;
 	private final BugService bugService;
+	private final AdminService adminService;
 	private final CouponManageService couponManageService;
+
 	private final CouponRepository couponRepository;
 	private final CouponSearchRepository couponSearchRepository;
 	private final CouponWalletRepository couponWalletRepository;

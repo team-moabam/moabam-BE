@@ -479,7 +479,7 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
-Access-Control-Allow-Origin:
+Access-Control-Allow-Origin: http://localhost:8080
 Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
 Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
 Access-Control-Allow-Credentials: true
@@ -506,7 +506,7 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Access-Control-Allow-Origin:
+Access-Control-Allow-Origin: http://localhost:8080
 Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
 Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
 Access-Control-Allow-Credentials: true
@@ -534,17 +534,17 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Access-Control-Allow-Origin:
+Access-Control-Allow-Origin: http://localhost:8080
 Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
 Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
 Access-Control-Allow-Credentials: true
 Access-Control-Max-Age: 3600
 Content-Type: application/json
-Content-Length: 201
+Content-Length: 192
 
 {
   "id" : 24,
-  "adminName" : "ID : 1",
+  "adminId" : 1,
   "name" : "couponName",
   "description" : "",
   "point" : 10,
@@ -584,17 +584,17 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Access-Control-Allow-Origin:
+Access-Control-Allow-Origin: http://localhost:8080
 Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
 Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
 Access-Control-Allow-Credentials: true
 Access-Control-Max-Age: 3600
 Content-Type: application/json
-Content-Length: 202
+Content-Length: 193
 
 [ {
   "id" : 25,
-  "adminName" : "ID : 1",
+  "adminId" : 1,
   "name" : "coupon1",
   "description" : "",
   "point" : 10,
@@ -631,7 +631,7 @@ couponName=couponName</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
-Access-Control-Allow-Origin:
+Access-Control-Allow-Origin: http://localhost:8080
 Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
 Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
 Access-Control-Allow-Credentials: true
@@ -666,7 +666,7 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Access-Control-Allow-Origin:
+Access-Control-Allow-Origin: http://localhost:8080
 Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
 Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
 Access-Control-Allow-Credentials: true
@@ -700,7 +700,7 @@ Content-Type: application/x-www-form-urlencoded</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Access-Control-Allow-Origin:
+Access-Control-Allow-Origin: http://localhost:8080
 Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH
 Access-Control-Allow-Headers: Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, X-Requested-With,Content-Type, Referer
 Access-Control-Allow-Credentials: true
