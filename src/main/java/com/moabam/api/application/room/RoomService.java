@@ -3,6 +3,7 @@ package com.moabam.api.application.room;
 import static com.moabam.api.domain.room.RoomType.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,10 +15,12 @@ import com.moabam.api.application.room.mapper.ParticipantMapper;
 import com.moabam.api.application.room.mapper.RoomMapper;
 import com.moabam.api.application.room.mapper.RoutineMapper;
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.room.Certification;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.domain.room.Routine;
+import com.moabam.api.domain.room.repository.DailyMemberCertificationRepository;
 import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
@@ -43,6 +46,7 @@ public class RoomService {
 	private final RoutineRepository routineRepository;
 	private final ParticipantRepository participantRepository;
 	private final ParticipantSearchRepository participantSearchRepository;
+	private final DailyMemberCertificationRepository dailyMemberCertificationRepository;
 	private final CertificationService certificationService;
 	private final MemberService memberService;
 	private final ClockHolder clockHolder;
@@ -118,6 +122,9 @@ public class RoomService {
 		}
 
 		List<Routine> routines = routineRepository.findAllByRoomId(roomId);
+		List<Certification> certifications = certificationService.findCertifications(routines);
+
+		certificationService.deleteCertifications(certifications);
 		routineRepository.deleteAll(routines);
 		roomRepository.delete(room);
 	}
@@ -215,6 +222,11 @@ public class RoomService {
 	private void validateRoomExit(Participant participant, Room room) {
 		if (participant.isManager() && room.getCurrentUserCount() != 1) {
 			throw new BadRequestException(ROOM_EXIT_MANAGER_FAIL);
+		}
+
+		if (dailyMemberCertificationRepository.existsByMemberIdAndRoomIdAndCreatedAtBetween(participant.getMemberId(),
+			room.getId(), clockHolder.date().atStartOfDay(), clockHolder.date().atTime(LocalTime.MAX))) {
+			throw new BadRequestException(CERTIFIED_ROOM_EXIT_FAILED);
 		}
 	}
 }
