@@ -103,6 +103,11 @@ public class CertificationService {
 		return dailyRoomCertificationRepository.existsByRoomIdAndCertifiedAt(roomId, date);
 	}
 
+	public boolean existsAnyMemberCertification(Long roomId, LocalDate date) {
+		return dailyMemberCertificationRepository.existsByRoomIdAndCreatedAtBetween(roomId, date.atStartOfDay(),
+			date.atTime(LocalTime.MAX));
+	}
+
 	public Certification findCertification(Long certificationId) {
 		return certificationRepository.findById(certificationId)
 			.orElseThrow(() -> new NotFoundException(CERTIFICATION_NOT_FOUND));
@@ -112,14 +117,13 @@ public class CertificationService {
 		LocalTime targetTime = LocalTime.of(certifyTime, 0);
 		LocalDateTime targetDateTime = LocalDateTime.of(now.toLocalDate(), targetTime);
 
-		if (certifyTime == MIDNIGHT_HOUR && now.getHour() == ONE_HOUR_BEFORE_MIDNIGHT_HOUR) {
+		if (certifyTime == MIDNIGHT_HOUR && now.getHour() != MIDNIGHT_HOUR) {
 			targetDateTime = targetDateTime.plusDays(1);
 		}
 
-		LocalDateTime minusTenMinutes = targetDateTime.minusMinutes(10);
 		LocalDateTime plusTenMinutes = targetDateTime.plusMinutes(10);
 
-		if (now.isBefore(minusTenMinutes) || now.isAfter(plusTenMinutes)) {
+		if (now.isBefore(targetDateTime) || now.isAfter(plusTenMinutes)) {
 			throw new BadRequestException(INVALID_CERTIFY_TIME);
 		}
 	}
