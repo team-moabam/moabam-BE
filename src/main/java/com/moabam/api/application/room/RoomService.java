@@ -3,6 +3,7 @@ package com.moabam.api.application.room;
 import static com.moabam.api.domain.room.RoomType.*;
 import static com.moabam.global.error.model.ErrorMessage.*;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -199,6 +200,7 @@ public class RoomService {
 
 	private void validateRoomEnter(Long memberId, String requestPassword, Room room) {
 		validateEnteredRoomCount(memberId, room.getRoomType());
+		validateCertifyTime(room);
 
 		if (!StringUtils.isEmpty(requestPassword) && !room.getPassword().equals(requestPassword)) {
 			throw new BadRequestException(WRONG_ROOM_PASSWORD);
@@ -216,6 +218,18 @@ public class RoomService {
 		}
 		if (roomType.equals(NIGHT) && member.getCurrentNightCount() >= 3) {
 			throw new BadRequestException(MEMBER_ROOM_EXCEED);
+		}
+	}
+
+	private void validateCertifyTime(Room room) {
+		LocalDateTime now = clockHolder.times();
+		LocalTime targetTime = LocalTime.of(room.getCertifyTime(), 0);
+		LocalDateTime targetDateTime = LocalDateTime.of(now.toLocalDate(), targetTime);
+
+		LocalDateTime plusTenMinutes = targetDateTime.plusMinutes(10);
+
+		if (now.isAfter(targetDateTime) && now.isBefore(plusTenMinutes)) {
+			throw new BadRequestException(ROOM_ENTER_FAILED);
 		}
 	}
 
