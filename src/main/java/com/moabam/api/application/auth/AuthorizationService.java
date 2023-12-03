@@ -100,6 +100,8 @@ public class AuthorizationService {
 
 		response.addCookie(CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire(), domain));
 		response.addCookie(
+			CookieUtils.typeCookie("Test_be_erase", tokenConfig.getRefreshExpire(), publicClaim.role().name()));
+		response.addCookie(
 			CookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire(), domain));
 		response.addCookie(
 			CookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire(), domain));
