@@ -1,11 +1,13 @@
 package com.moabam.api.application.auth;
 
 import java.nio.charset.StandardCharsets;
+import java.security.Key;
 
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
+import com.moabam.api.domain.member.Role;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
@@ -22,10 +24,12 @@ public class JwtAuthenticationService {
 
 	private final TokenConfig tokenConfig;
 
-	public boolean isTokenExpire(String token) {
+	public boolean isTokenExpire(String token, Role role) {
 		try {
+			Key key = getSecret(role);
+
 			Jwts.parserBuilder()
-				.setSigningKey(tokenConfig.getKey())
+				.setSigningKey(key)
 				.build()
 				.parseClaimsJws(token);
 			return false;
@@ -34,6 +38,14 @@ public class JwtAuthenticationService {
 		} catch (Exception exception) {
 			throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
 		}
+	}
+
+	private Key getSecret(Role role) {
+		if (role.equals(Role.ADMIN)) {
+			return tokenConfig.getAdminKey();
+		}
+
+		return tokenConfig.getKey();
 	}
 
 	public PublicClaim parseClaim(String token) {

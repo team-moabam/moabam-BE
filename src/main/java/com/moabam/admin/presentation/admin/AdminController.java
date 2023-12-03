@@ -31,9 +31,11 @@ public class AdminController {
 		HttpServletResponse httpServletResponse) {
 		adminService.validate(authorizationCodeResponse.state());
 		AuthorizationTokenResponse tokenResponse = authorizationService.requestAdminToken(authorizationCodeResponse);
-		AuthorizationTokenInfoResponse authorizationTokenInfoResponse = authorizationService.requestTokenInfo(
-			tokenResponse);
+		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
+			authorizationService.requestTokenInfo(tokenResponse);
+		LoginResponse loginResponse = adminService.signUpOrLogin(authorizationTokenInfoResponse);
+		authorizationService.issueServiceToken(httpServletResponse, loginResponse.publicClaim());
 
-		return adminService.signUpOrLogin(httpServletResponse, authorizationTokenInfoResponse);
+		return loginResponse;
 	}
 }

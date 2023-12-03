@@ -23,10 +23,12 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.moabam.admin.application.admin.AdminService;
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.auth.repository.TokenRepository;
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.auth.AuthorizationCodeRequest;
 import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
@@ -36,8 +38,8 @@ import com.moabam.api.dto.auth.LoginResponse;
 import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.PublicClaim;
-import com.moabam.global.common.util.cookie.CookieDevUtils;
-import com.moabam.global.common.util.cookie.CookieUtils;
+import com.moabam.global.common.util.CookieUtils;
+import com.moabam.global.config.AllowOriginConfig;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
@@ -65,6 +67,9 @@ class AuthorizationServiceTest {
 	MemberService memberService;
 
 	@Mock
+	AdminService adminService;
+
+	@Mock
 	JwtProviderService jwtProviderService;
 
 	@Mock
@@ -73,19 +78,22 @@ class AuthorizationServiceTest {
 	@Mock
 	TokenRepository tokenRepository;
 
-	CookieUtils cookieUtils;
+	AllowOriginConfig allowOriginsConfig;
 	OAuthConfig oauthConfig;
 	TokenConfig tokenConfig;
 	AuthorizationService noPropertyService;
 	OAuthConfig noOAuthConfig;
+	String domain = "Test";
 
 	@BeforeEach
 	public void initParams() {
-		cookieUtils = new CookieDevUtils();
-		tokenConfig = new TokenConfig(null, 100000, 150000,
-			"testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttest");
+		String secretKey = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttest";
+		String adminKey = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttest";
+
+		allowOriginsConfig = new AllowOriginConfig(domain, domain, List.of("test", "test"));
+		ReflectionTestUtils.setField(authorizationService, "allowOriginsConfig", allowOriginsConfig);
+		tokenConfig = new TokenConfig(null, 100000, 150000, secretKey, adminKey);
 		ReflectionTestUtils.setField(authorizationService, "tokenConfig", tokenConfig);
-		ReflectionTestUtils.setField(authorizationService, "cookieUtils", cookieUtils);
 
 		oauthConfig = new OAuthConfig(
 			new OAuthConfig.Provider("https://authorization/url", "http://redirect/url", "http://token/url",
@@ -98,7 +106,8 @@ class AuthorizationServiceTest {
 			new OAuthConfig.Provider(null, null, null, null, null, null),
 			new OAuthConfig.Client(null, null, null, null, null, null));
 		noPropertyService = new AuthorizationService(fcmService, noOAuthConfig, tokenConfig,
-			oAuth2AuthorizationServerRequestService, memberService, jwtProviderService, tokenRepository, cookieUtils);
+			oAuth2AuthorizationServerRequestService, memberService, adminService,
+			jwtProviderService, tokenRepository, allowOriginsConfig);
 	}
 
 	@DisplayName("인가코드 URI 생성 매퍼 실패")
@@ -222,7 +231,7 @@ class AuthorizationServiceTest {
 		AuthorizationTokenInfoResponse authorizationTokenInfoResponse =
 			AuthorizationResponseFixture.authorizationTokenInfoResponse();
 		LoginResponse loginResponse = LoginResponse.builder()
-			.publicClaim(PublicClaim.builder().id(1L).nickname("nickname").build())
+			.publicClaim(PublicClaim.builder().id(1L).nickname("nickname").role(Role.USER).build())
 			.isSignUp(isSignUp)
 			.build();
 
@@ -255,22 +264,25 @@ class AuthorizationServiceTest {
 	@Test
 	void valid_token_in_redis() {
 		// Given
-		willReturn(TokenSaveValueFixture.tokenSaveValue("token")).given(tokenRepository).getTokenSaveValue(1L);
+		willReturn(TokenSaveValueFixture.tokenSaveValue("token"))
+			.given(tokenRepository).getTokenSaveValue(1L, Role.USER);
 
 		// When + Then
-		assertThatNoException().isThrownBy(() -> authorizationService.validTokenPair(1L, "token"));
+		assertThatNoException().isThrownBy(() ->
+			authorizationService.validTokenPair(1L, "token", Role.USER));
 	}
 
 	@DisplayName("이전 토큰과 동일한지 검증")
 	@Test
 	void valid_token_failby_notEquals_token() {
 		// Given
-		willReturn(TokenSaveValueFixture.tokenSaveValue("token")).given(tokenRepository).getTokenSaveValue(1L);
+		willReturn(TokenSaveValueFixture.tokenSaveValue("token"))
+			.given(tokenRepository).getTokenSaveValue(1L, Role.USER);
 
 		// When + Then
-		assertThatThrownBy(() -> authorizationService.validTokenPair(1L, "oldToken")).isInstanceOf(
+		assertThatThrownBy(() -> authorizationService.validTokenPair(1L, "oldToken", Role.USER)).isInstanceOf(
 			UnauthorizedException.class).hasMessage(ErrorMessage.AUTHENTICATE_FAIL.getMessage());
-		verify(tokenRepository).delete(1L);
+		verify(tokenRepository).delete(1L, Role.USER);
 	}
 
 	@DisplayName("토큰 삭제 성공")
@@ -278,8 +290,10 @@ class AuthorizationServiceTest {
 	void error_with_expire_token(@WithMember AuthMember authMember) {
 		// given
 		MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
-		httpServletRequest.setCookies(cookieUtils.tokenCookie("access_token", "value", 100000),
-			cookieUtils.tokenCookie("refresh_token", "value", 100000), cookieUtils.typeCookie("Bearer", 100000));
+		httpServletRequest.setCookies(
+			CookieUtils.tokenCookie("access_token", "value", 100000, domain),
+			CookieUtils.tokenCookie("refresh_token", "value", 100000, domain),
+			CookieUtils.typeCookie("Bearer", 100000, domain));
 
 		MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 
@@ -292,7 +306,7 @@ class AuthorizationServiceTest {
 		assertThat(cookie.getMaxAge()).isZero();
 		assertThat(cookie.getValue()).isEqualTo("value");
 
-		verify(tokenRepository).delete(authMember.id());
+		verify(tokenRepository).delete(authMember.id(), Role.USER);
 	}
 
 	@DisplayName("토큰 없어서 삭제 실패")

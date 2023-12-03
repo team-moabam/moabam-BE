@@ -1,9 +1,11 @@
 package com.moabam.api.application.auth;
 
+import java.security.Key;
 import java.util.Date;
 
 import org.springframework.stereotype.Service;
 
+import com.moabam.api.domain.member.Role;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.config.TokenConfig;
 
@@ -22,23 +24,23 @@ public class JwtProviderService {
 		return generateIdToken(publicClaim, tokenConfig.getAccessExpire());
 	}
 
-	public String provideRefreshToken() {
-		return generateCommonInfo(tokenConfig.getRefreshExpire());
+	public String provideRefreshToken(Role role) {
+		return generateCommonInfo(tokenConfig.getRefreshExpire(), role);
 	}
 
 	private String generateIdToken(PublicClaim publicClaim, long expireTime) {
-		return commonInfo(expireTime)
+		return commonInfo(expireTime, publicClaim.role())
 			.claim("id", publicClaim.id())
 			.claim("nickname", publicClaim.nickname())
 			.claim("role", publicClaim.role())
 			.compact();
 	}
 
-	private String generateCommonInfo(long expireTime) {
-		return commonInfo(expireTime).compact();
+	private String generateCommonInfo(long expireTime, Role role) {
+		return commonInfo(expireTime, role).compact();
 	}
 
-	private JwtBuilder commonInfo(long expireTime) {
+	private JwtBuilder commonInfo(long expireTime, Role role) {
 		Date issueDate = new Date();
 		Date expireDate = new Date(issueDate.getTime() + expireTime);
 
@@ -48,6 +50,14 @@ public class JwtProviderService {
 			.setIssuer(tokenConfig.getIss())
 			.setIssuedAt(issueDate)
 			.setExpiration(expireDate)
-			.signWith(tokenConfig.getKey(), SignatureAlgorithm.HS256);
+			.signWith(getSecretKey(role), SignatureAlgorithm.HS256);
+	}
+
+	private Key getSecretKey(Role role) {
+		if (role.equals(Role.ADMIN)) {
+			return tokenConfig.getAdminKey();
+		}
+
+		return tokenConfig.getKey();
 	}
 }

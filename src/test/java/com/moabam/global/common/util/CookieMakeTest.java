@@ -13,11 +13,13 @@ import jakarta.servlet.http.Cookie;
 @ExtendWith(MockitoExtension.class)
 class CookieMakeTest {
 
+	String domain = "test";
+
 	@DisplayName("prod환경에서 cookie 생성 테스트")
 	@Test
 	void create_test() {
 		// Given
-		Cookie cookie = CookieUtils.tokenCookie("access_token", "value", 10000);
+		Cookie cookie = CookieUtils.tokenCookie("access_token", "value", 10000, domain);
 
 		// When + Then
 		assertAll(
@@ -33,7 +35,7 @@ class CookieMakeTest {
 	@Test
 	void delete_test() {
 		// given
-		Cookie cookie = CookieUtils.tokenCookie("access_token", "value", 10000);
+		Cookie cookie = CookieUtils.tokenCookie("access_token", "value", 10000, domain);
 
 		// when
 		Cookie deletedCookie = CookieUtils.deleteCookie(cookie);
@@ -49,7 +51,7 @@ class CookieMakeTest {
 	@Test
 	void typeCookie_create_test() {
 		// Given + When
-		Cookie cookie = CookieUtils.typeCookie("Bearer", 10000);
+		Cookie cookie = CookieUtils.typeCookie("Bearer", 10000, domain);
 
 		// then
 		assertThat(cookie.getName()).isEqualTo("token_type");

@@ -30,7 +30,7 @@ public class WithoutFilterSupporter {
 	@SpyBean
 	private CorsFilter corsFilter;
 
-	@SpyBean
+	@MockBean
 	private AllowOriginConfig allowOriginConfig;
 
 	@BeforeEach

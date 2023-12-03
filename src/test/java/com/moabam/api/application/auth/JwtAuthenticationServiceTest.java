@@ -16,8 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.moabam.api.application.auth.JwtAuthenticationService;
-import com.moabam.api.application.auth.JwtProviderService;
+import com.moabam.api.domain.member.Role;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.UnauthorizedException;
@@ -32,6 +31,7 @@ class JwtAuthenticationServiceTest {
 
 	String originIss = "PARK";
 	String originSecretKey = "testestestestestestestestestesttestestestestestestestestestest";
+	String adminKey = "testestestestestestestestestesttestestestestestestestestestest";
 	long originId = 1L;
 	long originAccessExpire = 100000;
 	long originRefreshExpire = 150000;
@@ -42,7 +42,7 @@ class JwtAuthenticationServiceTest {
 
 	@BeforeEach
 	void initConfig() {
-		tokenConfig = new TokenConfig(originIss, originAccessExpire, originRefreshExpire, originSecretKey);
+		tokenConfig = new TokenConfig(originIss, originAccessExpire, originRefreshExpire, originSecretKey, adminKey);
 		jwtProviderService = new JwtProviderService(tokenConfig);
 		jwtAuthenticationService = new JwtAuthenticationService(tokenConfig);
 	}
@@ -55,7 +55,7 @@ class JwtAuthenticationServiceTest {
 
 		// when, then
 		assertThatNoException().isThrownBy(() ->
-			jwtAuthenticationService.isTokenExpire(token));
+			jwtAuthenticationService.isTokenExpire(token, Role.USER));
 	}
 
 	@DisplayName("토큰 인증 시간 만료 테스트")
@@ -63,14 +63,14 @@ class JwtAuthenticationServiceTest {
 	void token_authentication_time_expire() {
 		// Given
 		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
-		TokenConfig tokenConfig = new TokenConfig(originIss, 0, 0, originSecretKey);
+		TokenConfig tokenConfig = new TokenConfig(originIss, 0, 0, originSecretKey, adminKey);
 		JwtAuthenticationService jwtAuthenticationService = new JwtAuthenticationService(tokenConfig);
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);
 		String token = jwtProviderService.provideAccessToken(publicClaim);
 
 		// When
 		assertThatNoException().isThrownBy(() -> {
-			boolean result = jwtAuthenticationService.isTokenExpire(token);
+			boolean result = jwtAuthenticationService.isTokenExpire(token, Role.USER);
 
 			// Then
 			assertThat(result).isTrue();
@@ -98,7 +98,7 @@ class JwtAuthenticationServiceTest {
 			parts[2]);
 
 		// Then
-		Assertions.assertThatThrownBy(() -> jwtAuthenticationService.isTokenExpire(newToken))
+		Assertions.assertThatThrownBy(() -> jwtAuthenticationService.isTokenExpire(newToken, Role.USER))
 			.isInstanceOf(UnauthorizedException.class);
 	}
 
@@ -121,7 +121,7 @@ class JwtAuthenticationServiceTest {
 			.compact();
 
 		// When + Then
-		assertThatThrownBy(() -> jwtAuthenticationService.isTokenExpire(token))
+		assertThatThrownBy(() -> jwtAuthenticationService.isTokenExpire(token, Role.USER))
 			.isExactlyInstanceOf(UnauthorizedException.class);
 	}
 

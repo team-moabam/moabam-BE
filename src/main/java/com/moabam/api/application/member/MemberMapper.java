@@ -13,6 +13,7 @@ import com.moabam.api.domain.bug.Bug;
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.ItemType;
+import com.moabam.api.domain.member.Badge;
 import com.moabam.api.domain.member.BadgeType;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.member.BadgeResponse;
@@ -93,6 +94,13 @@ public final class MemberMapper {
 			.memberId(member.getId())
 			.nickname(member.getNickname())
 			.image(member.getProfileImage())
+			.build();
+	}
+
+	public static Badge toBadge(Long memberId, BadgeType badgeType) {
+		return Badge.builder()
+			.type(badgeType)
+			.memberId(memberId)
 			.build();
 	}
 

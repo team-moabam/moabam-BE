@@ -22,9 +22,9 @@ public class MemberInfoSearchFixture {
 
 	public static List<MemberInfo> friendMemberInfo(long total) {
 		return List.of(
-			new MemberInfo(NICKNAME, PROFILE_IMAGE, MORNING_EGG, NIGHT_EGG, INTRO, total, BadgeType.MORNING_BIRTH,
+			new MemberInfo(NICKNAME, PROFILE_IMAGE, MORNING_EGG, NIGHT_EGG, INTRO, total, BadgeType.BIRTH,
 				0, 0, 0),
-			new MemberInfo(NICKNAME, PROFILE_IMAGE, MORNING_EGG, NIGHT_EGG, INTRO, total, BadgeType.NIGHT_BIRTH,
+			new MemberInfo(NICKNAME, PROFILE_IMAGE, MORNING_EGG, NIGHT_EGG, INTRO, total, BadgeType.LEVEL10,
 				0, 0, 0)
 		);
 	}
@@ -32,9 +32,9 @@ public class MemberInfoSearchFixture {
 	public static List<MemberInfo> myInfo(String morningImage, String nightImage) {
 		return List.of(
 			new MemberInfo(NICKNAME, PROFILE_IMAGE, morningImage, nightImage, INTRO, TOTAL_CERTIFY_COUNT,
-				BadgeType.MORNING_BIRTH, 0, 0, 0),
+				BadgeType.BIRTH, 0, 0, 0),
 			new MemberInfo(NICKNAME, PROFILE_IMAGE, morningImage, nightImage, INTRO, TOTAL_CERTIFY_COUNT,
-				BadgeType.NIGHT_BIRTH, 0, 0, 0)
+				BadgeType.LEVEL10, 0, 0, 0)
 		);
 	}
 }

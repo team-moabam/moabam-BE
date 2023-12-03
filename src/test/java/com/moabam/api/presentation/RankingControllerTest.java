@@ -79,7 +79,7 @@ class RankingControllerTest extends WithoutFilterSupporter {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.topRankings", hasSize(10)))
 			.andExpect(jsonPath("$.myRanking.nickname", is(members.get(0).getNickname())))
-			.andExpect(jsonPath("$.myRanking.rank", is(21)));
+			.andExpect(jsonPath("$.myRanking.rank", is(22)));
 
 		// then
 

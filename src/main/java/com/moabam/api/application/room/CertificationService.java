@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.api.application.bug.BugService;
+import com.moabam.api.application.member.BadgeService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.room.mapper.CertificationsMapper;
 import com.moabam.api.domain.bug.BugType;
@@ -53,6 +54,7 @@ public class CertificationService {
 	private final DailyRoomCertificationRepository dailyRoomCertificationRepository;
 	private final DailyMemberCertificationRepository dailyMemberCertificationRepository;
 	private final MemberService memberService;
+	private final BadgeService badgeService;
 	private final BugService bugService;
 	private final ClockHolder clockHolder;
 
@@ -139,6 +141,7 @@ public class CertificationService {
 			roomId, participant);
 		dailyMemberCertificationRepository.save(dailyMemberCertification);
 		member.increaseTotalCertifyCount();
+		badgeService.createBadge(member.getId(), member.getTotalCertifyCount());
 		participant.updateCertifyCount();
 
 		saveNewCertifications(memberId, urls);

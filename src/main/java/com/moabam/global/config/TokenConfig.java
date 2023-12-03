@@ -16,13 +16,17 @@ public class TokenConfig {
 	private final long accessExpire;
 	private final long refreshExpire;
 	private final String secretKey;
+	private final String adminSecret;
 	private final Key key;
+	private final Key adminKey;
 
-	public TokenConfig(String iss, long accessExpire, long refreshExpire, String secretKey) {
+	public TokenConfig(String iss, long accessExpire, long refreshExpire, String secretKey, String adminSecret) {
 		this.iss = iss;
 		this.accessExpire = accessExpire;
 		this.refreshExpire = refreshExpire;
 		this.secretKey = secretKey;
+		this.adminSecret = adminSecret;
 		this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+		this.adminKey = Keys.hmacShaKeyFor(adminSecret.getBytes(StandardCharsets.UTF_8));
 	}
 }

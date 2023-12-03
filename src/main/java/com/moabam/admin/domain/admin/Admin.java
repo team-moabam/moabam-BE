@@ -37,7 +37,7 @@ public class Admin extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
-	@ColumnDefault("'USER'")
+	@ColumnDefault("'ADMIN'")
 	private Role role;
 
 	@Builder

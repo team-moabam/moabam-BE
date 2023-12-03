@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.moabam.api.application.auth.JwtProviderService;
+import com.moabam.api.domain.member.Role;
 import com.moabam.global.common.util.cookie.CookieUtils;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.support.fixture.PublicClaimFixture;
@@ -47,7 +48,7 @@ public class WithFilterSupporter {
 					jwtProviderService.provideAccessToken(PublicClaimFixture.publicClaim()),
 					tokenConfig.getRefreshExpire()))
 				.cookie(cookieUtils.tokenCookie("refresh_token",
-					jwtProviderService.provideRefreshToken(),
+					jwtProviderService.provideRefreshToken(Role.USER),
 					tokenConfig.getRefreshExpire())))
 			.build();
 	}

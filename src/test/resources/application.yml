@@ -70,8 +70,11 @@ token:
   access-expire: 100000
   refresh-expire: 150000
   secret-key: testestestestestestestestestesttestestestestestestestestestest
+  admin-secret: testestestestestestestestestesttestestestestestestestestestest
 
 allows:
+  admin-domain: "localhost"
+  domain: "localhost"
   origin:
     - "https://test.com"
     - "https://test.com"

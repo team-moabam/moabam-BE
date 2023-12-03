@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +51,7 @@ import com.moabam.api.domain.room.repository.RoutineRepository;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.EnterRoomRequest;
 import com.moabam.api.dto.room.ModifyRoomRequest;
+import com.moabam.global.common.util.SystemClockHolder;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
 import com.moabam.support.fixture.BugFixture;
@@ -97,6 +101,9 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 	@Autowired
 	private InventoryRepository inventoryRepository;
+
+	@SpyBean
+	private SystemClockHolder clockHolder;
 
 	Member member;
 
@@ -424,6 +431,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	@Test
 	void enter_room_with_no_password_success() throws Exception {
 		// given
+		BDDMockito.given(clockHolder.times()).willReturn(LocalDateTime.of(2023, 12, 3, 14, 30, 0));
 		Room room = RoomFixture.room();
 
 		roomRepository.save(room);
