@@ -1,8 +1,8 @@
-name: develop-CD
+name: prod-CD
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 permissions:
   contents: write
@@ -30,52 +30,50 @@ jobs:
 
       - name: Github Actions IP 보안그룹 추가
         run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_PROD_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
       - name: 디렉토리 생성
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
+          host: ${{ secrets.EC2_PROD_INSTANCE_HOST }}
           port: 22
-          username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
-          key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
+          username: ${{ secrets.EC2_PROD_INSTANCE_USERNAME }}
+          key: ${{ secrets.EC2_PROD_INSTANCE_PRIVATE_KEY }}
           script: |
             mkdir -p /home/ubuntu/moabam/
 
       - name: Docker env 파일 생성
         run:
-          cp src/main/resources/config/dev.env ./infra/.env
+          cp src/main/resources/config/prod.env ./infra/.env
 
       - name: 서버로 전송 기본 파일들 전송
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
+          host: ${{ secrets.EC2_PROD_INSTANCE_HOST }}
           port: 22
-          username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
-          key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
-          source: "./infra/*, !./infra/docker-compose-prod.yml, !./infra/scripts/deploy-prod.sh"
+          username: ${{ secrets.EC2_PROD_INSTANCE_USERNAME }}
+          key: ${{ secrets.EC2_PROD_INSTANCE_PRIVATE_KEY }}
+          source: "./infra/*, !./infra/docker-compose-dev.yml, !./infra/scripts/deploy-dev.sh"
           target: "/home/ubuntu/moabam"
 
       - name: 파일 세팅
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
+          host: ${{ secrets.EC2_PROD_INSTANCE_HOST }}
           port: 22
-          username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
-          key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
+          username: ${{ secrets.EC2_PROD_INSTANCE_USERNAME }}
+          key: ${{ secrets.EC2_PROD_INSTANCE_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/moabam/infra
-            mv docker-compose-dev.yml docker-compose.yml
-            chmod +x ./scripts/deploy-dev.sh
+            mv docker-compose-prod.yml docker-compose.yml
+            chmod +x ./scripts/deploy-prod.sh
             chmod +x ./scripts/init-letsencrypt.sh
             chmod +x ./scripts/init-nginx-converter.sh
-            chmod +x ./mysql/initdb.d/init.sql
-            chmod +x ./mysql/initdb.d/item-data.sql
 
       - name: Github Actions IP 보안그룹에서 삭제
         if: always()
         run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_PROD_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
   deploy:
     name: deploy
@@ -131,7 +129,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ secrets.DOCKER_HUB_DEV_TAG }}
           build-args: |
-            "SPRING_ACTIVE_PROFILES=dev"
+            "SPRING_ACTIVE_PROFILES=prod"
           platforms: |
             linux/amd64
             linux/arm64
@@ -149,22 +147,22 @@ jobs:
 
       - name: Github Actions IP 보안그룹 추가
         run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_PROD_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
       - name: EC2 서버에 배포
         uses: appleboy/ssh-action@master
-        id: deploy-dev
-        if: contains(github.ref, 'dev')
+        id: deploy-prod
+        if: contains(github.ref, 'main')
         with:
-          host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
+          host: ${{ secrets.EC2_PROD_INSTANCE_HOST }}
           port: 22
-          username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
-          key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
-          source: "./infra/docker-compose-dev.yml"
+          username: ${{ secrets.EC2_PROD_INSTANCE_USERNAME }}
+          key: ${{ secrets.EC2_PROD_INSTANCE_PRIVATE_KEY }}
+          source: "./infra/docker-compose-prod.yml"
           script: |
             cd /home/ubuntu/moabam/infra
             echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
-            ./scripts/deploy-dev.sh
+            ./scripts/deploy-prod.sh
             docker rm `docker ps -a -q`
             docker rmi $(docker images -aq)
             echo "### 배포 완료 ###"
@@ -172,4 +170,4 @@ jobs:
       - name: Github Actions IP 보안그룹에서 삭제
         if: always()
         run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_PROD_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
