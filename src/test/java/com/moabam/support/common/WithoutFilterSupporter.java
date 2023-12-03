@@ -36,7 +36,7 @@ public class WithoutFilterSupporter {
 	@BeforeEach
 	void setUpMock() {
 		willReturn("http://localhost:8080")
-			.given(corsFilter).secureMatch(any());
+			.given(corsFilter).getReferer(any());
 
 		willReturn(Optional.of(PathResolver.Path.builder()
 			.uri("/")

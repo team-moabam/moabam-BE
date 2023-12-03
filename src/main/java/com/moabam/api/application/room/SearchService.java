@@ -277,7 +277,7 @@ public class SearchService {
 			completedMembers(dailyMemberCertifications, members, certifications, participants, date, knocks,
 				inventories));
 
-		if (clockHolder.date() == date) {
+		if (clockHolder.date().equals(date)) {
 			responses.addAll(uncompletedMembers(dailyMemberCertifications, members, participants, date, knocks,
 				inventories));
 		}
@@ -328,6 +328,7 @@ public class SearchService {
 		List<TodayCertificateRankResponse> responses = new ArrayList<>();
 
 		List<Long> allMemberIds = participants.stream()
+			.filter(p -> p.getDeletedAt() == null)
 			.map(Participant::getMemberId)
 			.distinct()
 			.collect(Collectors.toList());
@@ -397,7 +398,7 @@ public class SearchService {
 	}
 
 	private double calculateCompletePercentage(int certifiedMembersCount, Room room, LocalDate date) {
-		if (date != clockHolder.date()) {
+		if (!date.equals(clockHolder.date())) {
 			return 0;
 		}
 
