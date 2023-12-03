@@ -398,7 +398,7 @@ public class SearchService {
 	}
 
 	private double calculateCompletePercentage(int certifiedMembersCount, Room room, LocalDate date) {
-		if (date != clockHolder.date()) {
+		if (!date.equals(clockHolder.date())) {
 			return 0;
 		}
 
