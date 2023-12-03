@@ -277,7 +277,7 @@ public class SearchService {
 			completedMembers(dailyMemberCertifications, members, certifications, participants, date, knocks,
 				inventories));
 
-		if (clockHolder.date() == date) {
+		if (clockHolder.date().equals(date)) {
 			responses.addAll(uncompletedMembers(dailyMemberCertifications, members, participants, date, knocks,
 				inventories));
 		}
