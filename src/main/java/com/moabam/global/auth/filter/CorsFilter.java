@@ -45,7 +45,6 @@ public class CorsFilter extends OncePerRequestFilter {
 				throw new UnauthorizedException(ErrorMessage.INVALID_REQUEST_URL);
 			}
 		} catch (UnauthorizedException unauthorizedException) {
-			log.error("{}, {}", httpServletRequest.getHeader("referer"), allowOriginsConfig.origin());
 			handlerExceptionResolver.resolveException(httpServletRequest, httpServletResponse, null,
 				unauthorizedException);
 

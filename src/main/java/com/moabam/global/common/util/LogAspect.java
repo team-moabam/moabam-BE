@@ -15,9 +15,10 @@ public class LogAspect {
 	@Around("execution(* com.moabam.global.error.handler.GlobalExceptionHandler.*(..))")
 	public Object printExceptionLog(ProceedingJoinPoint joinPoint) throws Throwable {
 		Object[] args = joinPoint.getArgs();
+		Exception exception = (Exception)args[0];
 
-		log.error("===== EXCEPTION LOG =====", (Exception)args[0]);
-
+		log.error("===== EXCEPTION LOG =====", exception);
+		
 		return joinPoint.proceed();
 	}
 }
