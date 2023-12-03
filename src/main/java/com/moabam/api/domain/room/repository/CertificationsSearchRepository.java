@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 import com.moabam.api.domain.room.Certification;
 import com.moabam.api.domain.room.DailyMemberCertification;
 import com.moabam.api.domain.room.DailyRoomCertification;
-import com.moabam.api.domain.room.Routine;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.LockModeType;
@@ -32,14 +31,6 @@ public class CertificationsSearchRepository {
 			.where(
 				certification.routine.room.id.eq(roomId),
 				certification.createdAt.between(date.atStartOfDay(), date.atTime(LocalTime.MAX))
-			)
-			.fetch();
-	}
-
-	public List<Certification> findCertificationsByRoutines(List<Routine> routines) {
-		return jpaQueryFactory.selectFrom(certification)
-			.where(
-				certification.routine.in(routines)
 			)
 			.fetch();
 	}
