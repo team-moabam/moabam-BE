@@ -31,32 +31,32 @@ public class GlobalExceptionHandler {
 
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler(NotFoundException.class)
-	protected ErrorResponse handleNotFoundException(MoabamException moabamException) {
-		return new ErrorResponse(moabamException.getMessage(), null);
+	protected ErrorResponse handleNotFoundException(MoabamException exception) {
+		return new ErrorResponse(exception.getMessage(), null);
 	}
 
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	@ExceptionHandler(UnauthorizedException.class)
-	protected ErrorResponse handleUnauthorizedException(MoabamException moabamException) {
-		return new ErrorResponse(moabamException.getMessage(), null);
+	protected ErrorResponse handleUnauthorizedException(MoabamException exception) {
+		return new ErrorResponse(exception.getMessage(), null);
 	}
 
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler(ForbiddenException.class)
-	protected ErrorResponse handleForbiddenException(MoabamException moabamException) {
-		return new ErrorResponse(moabamException.getMessage(), null);
+	protected ErrorResponse handleForbiddenException(MoabamException exception) {
+		return new ErrorResponse(exception.getMessage(), null);
 	}
 
 	@ResponseStatus(HttpStatus.CONFLICT)
 	@ExceptionHandler(ConflictException.class)
-	protected ErrorResponse handleConflictException(MoabamException moabamException) {
-		return new ErrorResponse(moabamException.getMessage(), null);
+	protected ErrorResponse handleConflictException(MoabamException exception) {
+		return new ErrorResponse(exception.getMessage(), null);
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(BadRequestException.class)
-	protected ErrorResponse handleBadRequestException(MoabamException moabamException) {
-		return new ErrorResponse(moabamException.getMessage(), null);
+	protected ErrorResponse handleBadRequestException(MoabamException exception) {
+		return new ErrorResponse(exception.getMessage(), null);
 	}
 
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -64,14 +64,14 @@ public class GlobalExceptionHandler {
 		FcmException.class,
 		TossPaymentException.class
 	})
-	protected ErrorResponse handleFcmException(MoabamException moabamException) {
-		return new ErrorResponse(moabamException.getMessage(), null);
+	protected ErrorResponse handleFcmException(MoabamException exception) {
+		return new ErrorResponse(exception.getMessage(), null);
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MoabamException.class)
-	protected ErrorResponse handleMoabamException(MoabamException moabamException) {
-		return new ErrorResponse(moabamException.getMessage(), null);
+	protected ErrorResponse handleMoabamException(MoabamException exception) {
+		return new ErrorResponse(exception.getMessage(), null);
 	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -95,7 +95,7 @@ public class GlobalExceptionHandler {
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
-	public ErrorResponse handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
+	protected ErrorResponse handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
 		String typeName = Optional.ofNullable(exception.getRequiredType())
 			.map(Class::getSimpleName)
 			.orElse("");
@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(MaxUploadSizeExceededException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ErrorResponse handleMaxSizeException(MaxUploadSizeExceededException exception) {
+	protected ErrorResponse handleMaxSizeException(MaxUploadSizeExceededException exception) {
 		String message = String.format(S3_INVALID_IMAGE_SIZE.getMessage());
 
 		return new ErrorResponse(message, null);
