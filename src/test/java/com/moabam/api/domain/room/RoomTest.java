@@ -93,10 +93,10 @@ class RoomTest {
 	@DisplayName("레벨에 따른 이미지 업데이트")
 	@ParameterizedTest
 	@CsvSource({
-		"5, https://image.moabam.com/moabam/default/room-level-05.png",
-		"10, https://image.moabam.com/moabam/default/room-level-10.png",
-		"20, https://image.moabam.com/moabam/default/room-level-20.png",
-		"30, https://image.moabam.com/moabam/default/room-level-30.png",
+		"1, https://image.moabam.com/moabam/default/room-level-01.png",
+		"2, https://image.moabam.com/moabam/default/room-level-02.png",
+		"3, https://image.moabam.com/moabam/default/room-level-03.png",
+		"4, https://image.moabam.com/moabam/default/room-level-04.png",
 	})
 	void update_room_image_success(int level, String image) {
 		// given
