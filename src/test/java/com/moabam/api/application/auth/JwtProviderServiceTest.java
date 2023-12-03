@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.moabam.api.domain.member.Role;
 import com.moabam.global.auth.model.PublicClaim;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.support.fixture.PublicClaimFixture;
@@ -24,6 +25,7 @@ class JwtProviderServiceTest {
 
 	String iss = "PARK";
 	String secretKey = "testestestestestestestestestesttestestestestestestestestestest";
+	String adminKey = "testestestestestestestestestesttestestestestestestestestestest";
 	long id = 1L;
 
 	@DisplayName("access 토큰 생성 성공")
@@ -32,7 +34,7 @@ class JwtProviderServiceTest {
 		// given
 		long accessExpire = 10000L;
 
-		TokenConfig tokenConfig = new TokenConfig("PARK", accessExpire, 0L, secretKey);
+		TokenConfig tokenConfig = new TokenConfig("PARK", accessExpire, 0L, secretKey, adminKey);
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);
 		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
 
@@ -97,11 +99,11 @@ class JwtProviderServiceTest {
 		// given
 		long refreshExpire = 15000L;
 
-		TokenConfig tokenConfig = new TokenConfig("PARK", 0L, refreshExpire, secretKey);
+		TokenConfig tokenConfig = new TokenConfig("PARK", 0L, refreshExpire, secretKey, adminKey);
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);
 
 		// when
-		String refreshToken = jwtProviderService.provideRefreshToken();
+		String refreshToken = jwtProviderService.provideRefreshToken(Role.USER);
 
 		String[] parts = refreshToken.split("\\.");
 		String headers = new String(Base64.getDecoder().decode(parts[0]));
@@ -128,7 +130,7 @@ class JwtProviderServiceTest {
 		// given
 		long accessExpire = -1L;
 
-		TokenConfig tokenConfig = new TokenConfig("PARK", accessExpire, 0L, secretKey);
+		TokenConfig tokenConfig = new TokenConfig("PARK", accessExpire, 0L, secretKey, adminKey);
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);
 		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
 
@@ -149,7 +151,7 @@ class JwtProviderServiceTest {
 		// given
 		long refreshExpire = -1L;
 
-		TokenConfig tokenConfig = new TokenConfig("PARK", 0L, refreshExpire, secretKey);
+		TokenConfig tokenConfig = new TokenConfig("PARK", 0L, refreshExpire, secretKey, adminKey);
 		JwtProviderService jwtProviderService = new JwtProviderService(tokenConfig);
 		PublicClaim publicClaim = PublicClaimFixture.publicClaim();
 

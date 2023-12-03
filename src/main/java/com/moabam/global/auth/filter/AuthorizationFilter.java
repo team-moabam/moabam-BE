@@ -13,8 +13,10 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import com.moabam.api.application.auth.AuthorizationService;
 import com.moabam.api.application.auth.JwtAuthenticationService;
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
+import com.moabam.api.domain.member.Role;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
 import com.moabam.global.auth.model.PublicClaim;
+import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -39,8 +41,9 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(@NotNull HttpServletRequest httpServletRequest,
-		@NotNull HttpServletResponse httpServletResponse,
-		@NotNull FilterChain filterChain) throws ServletException, IOException {
+		@NotNull HttpServletResponse httpServletResponse, @NotNull FilterChain filterChain) throws
+		ServletException,
+		IOException {
 
 		if (isPermit(httpServletRequest)) {
 			filterChain.doFilter(httpServletRequest, httpServletResponse);
@@ -73,30 +76,43 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 			throw new UnauthorizedException(ErrorMessage.GRANT_FAILED);
 		}
 
-		handleTokenAuthenticate(cookies, httpServletResponse);
+		handleTokenAuthenticate(cookies, httpServletResponse, httpServletRequest);
 	}
 
 	private boolean isTokenTypeBearer(Cookie[] cookies) {
 		return "Bearer".equals(extractTokenFromCookie(cookies, "token_type"));
 	}
 
-	private void handleTokenAuthenticate(Cookie[] cookies,
-		HttpServletResponse httpServletResponse) {
+	private void handleTokenAuthenticate(Cookie[] cookies, HttpServletResponse httpServletResponse,
+		HttpServletRequest httpServletRequest) {
 		String accessToken = extractTokenFromCookie(cookies, "access_token");
 		PublicClaim publicClaim = authenticationService.parseClaim(accessToken);
 
-		if (authenticationService.isTokenExpire(accessToken)) {
+		if (authenticationService.isTokenExpire(accessToken, publicClaim.role())) {
 			String refreshToken = extractTokenFromCookie(cookies, "refresh_token");
 
-			if (authenticationService.isTokenExpire(refreshToken)) {
+			if (authenticationService.isTokenExpire(refreshToken, publicClaim.role())) {
 				throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
 			}
 
-			authorizationService.validTokenPair(publicClaim.id(), refreshToken);
+			validInvalidMember(publicClaim, refreshToken, httpServletRequest);
 			authorizationService.issueServiceToken(httpServletResponse, publicClaim);
 		}
 
 		AuthorizationThreadLocal.setAuthMember(AuthorizationMapper.toAuthMember(publicClaim));
+	}
+
+	private void validInvalidMember(PublicClaim publicClaim, String refreshToken,
+		HttpServletRequest httpServletRequest) {
+		boolean isAdminPath = httpServletRequest.getRequestURI().contains("admins");
+
+		if (!((publicClaim.role().equals(Role.ADMIN) && isAdminPath) || (publicClaim.role().equals(Role.USER)
+			&& !isAdminPath))) {
+			throw new BadRequestException(ErrorMessage.INVALID_REQUEST_ROLE);
+		}
+
+		authorizationService.validTokenPair(publicClaim.id(), refreshToken, publicClaim.role());
+		authorizationService.validMemberExist(publicClaim.id(), publicClaim.role());
 	}
 
 	private Cookie[] getCookiesOrThrow(HttpServletRequest httpServletRequest) {

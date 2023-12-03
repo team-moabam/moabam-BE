@@ -25,7 +25,7 @@ public class RankingMapper {
 
 	public static TopRankingInfo topRankingResponse(int rank, UpdateRanking updateRanking) {
 		return TopRankingInfo.builder()
-			.rank(rank)
+			.rank(rank + 1)
 			.score(updateRanking.score())
 			.nickname(updateRanking.rankingInfo().nickname())
 			.image(updateRanking.rankingInfo().image())
@@ -33,11 +33,7 @@ public class RankingMapper {
 			.build();
 	}
 
-	public static TopRankingResponse topRankingResponses(TopRankingInfo myRanking,
-		List<TopRankingInfo> topRankings) {
-		return TopRankingResponse.builder()
-			.topRankings(topRankings)
-			.myRanking(myRanking)
-			.build();
+	public static TopRankingResponse topRankingResponses(TopRankingInfo myRanking, List<TopRankingInfo> topRankings) {
+		return TopRankingResponse.builder().topRankings(topRankings).myRanking(myRanking).build();
 	}
 }

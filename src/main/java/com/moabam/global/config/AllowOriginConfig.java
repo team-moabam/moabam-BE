@@ -6,7 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "allows")
 public record AllowOriginConfig(
-	List<String> origin
-) {
+	String adminDomain,
+	String domain,
+	List<String> origin) {
 
 }

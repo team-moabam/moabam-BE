@@ -9,11 +9,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.moabam.admin.application.admin.AdminService;
 import com.moabam.api.application.auth.mapper.AuthMapper;
 import com.moabam.api.application.auth.mapper.AuthorizationMapper;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.domain.auth.repository.TokenRepository;
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.auth.AuthorizationCodeRequest;
 import com.moabam.api.dto.auth.AuthorizationCodeResponse;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
@@ -24,8 +26,9 @@ import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.api.infrastructure.fcm.FcmService;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.PublicClaim;
+import com.moabam.global.common.util.CookieUtils;
 import com.moabam.global.common.util.GlobalConstant;
-import com.moabam.global.common.util.cookie.CookieUtils;
+import com.moabam.global.config.AllowOriginConfig;
 import com.moabam.global.config.OAuthConfig;
 import com.moabam.global.config.TokenConfig;
 import com.moabam.global.error.exception.BadRequestException;
@@ -47,9 +50,10 @@ public class AuthorizationService {
 	private final TokenConfig tokenConfig;
 	private final OAuth2AuthorizationServerRequestService oauth2AuthorizationServerRequestService;
 	private final MemberService memberService;
+	private final AdminService adminService;
 	private final JwtProviderService jwtProviderService;
 	private final TokenRepository tokenRepository;
-	private final CookieUtils cookieUtils;
+	private final AllowOriginConfig allowOriginsConfig;
 
 	public void redirectToLoginPage(HttpServletResponse httpServletResponse) {
 		String authorizationCodeUri = getAuthorizationCodeUri();
@@ -87,24 +91,25 @@ public class AuthorizationService {
 
 	public void issueServiceToken(HttpServletResponse response, PublicClaim publicClaim) {
 		String accessToken = jwtProviderService.provideAccessToken(publicClaim);
-		String refreshToken = jwtProviderService.provideRefreshToken();
+		String refreshToken = jwtProviderService.provideRefreshToken(publicClaim.role());
 		TokenSaveValue tokenSaveRequest = AuthMapper.toTokenSaveValue(refreshToken, null);
 
-		tokenRepository.saveToken(publicClaim.id(), tokenSaveRequest);
+		tokenRepository.saveToken(publicClaim.id(), tokenSaveRequest, publicClaim.role());
 
+		String domain = getDomain(publicClaim.role());
+
+		response.addCookie(CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire(), domain));
 		response.addCookie(
-			cookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire()));
+			CookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire(), domain));
 		response.addCookie(
-			cookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire()));
-		response.addCookie(
-			cookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire()));
+			CookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire(), domain));
 	}
 
-	public void validTokenPair(Long id, String oldRefreshToken) {
-		TokenSaveValue tokenSaveValue = tokenRepository.getTokenSaveValue(id);
+	public void validTokenPair(Long id, String oldRefreshToken, Role role) {
+		TokenSaveValue tokenSaveValue = tokenRepository.getTokenSaveValue(id, role);
 
 		if (!tokenSaveValue.refreshToken().equals(oldRefreshToken)) {
-			tokenRepository.delete(id);
+			tokenRepository.delete(id, role);
 
 			throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
 		}
@@ -113,7 +118,7 @@ public class AuthorizationService {
 	public void logout(AuthMember authMember, HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 		removeToken(httpServletRequest, httpServletResponse);
-		tokenRepository.delete(authMember.id());
+		tokenRepository.delete(authMember.id(), authMember.role());
 		fcmService.deleteTokenByMemberId(authMember.id());
 	}
 
@@ -122,12 +127,11 @@ public class AuthorizationService {
 			return;
 		}
 
-		Arrays.stream(httpServletRequest.getCookies())
-			.forEach(cookie -> {
-				if (cookie.getName().contains("token")) {
-					httpServletResponse.addCookie(cookieUtils.deleteCookie(cookie));
-				}
-			});
+		Arrays.stream(httpServletRequest.getCookies()).forEach(cookie -> {
+			if (cookie.getName().contains("token")) {
+				httpServletResponse.addCookie(CookieUtils.deleteCookie(cookie));
+			}
+		});
 	}
 
 	@Transactional
@@ -137,12 +141,18 @@ public class AuthorizationService {
 		memberService.delete(member);
 	}
 
+	private String getDomain(Role role) {
+		if (role.equals(Role.ADMIN)) {
+			return allowOriginsConfig.adminDomain();
+		}
+
+		return allowOriginsConfig.domain();
+	}
+
 	private void unlinkRequest(String socialId) {
 		try {
-			oauth2AuthorizationServerRequestService.unlinkMemberRequest(
-				oAuthConfig.provider().unlink(),
-				oAuthConfig.client().adminKey(),
-				unlinkRequestParam(socialId));
+			oauth2AuthorizationServerRequestService.unlinkMemberRequest(oAuthConfig.provider().unlink(),
+				oAuthConfig.client().adminKey(), unlinkRequestParam(socialId));
 			log.info("회원 탈퇴 성공 : [socialId={}]", socialId);
 		} catch (BadRequestException badRequestException) {
 			log.warn("회원 탈퇴요청 실패 : 카카오 연결 오류");
@@ -174,8 +184,7 @@ public class AuthorizationService {
 			.queryParam("client_id", authorizationCodeRequest.clientId())
 			.queryParam("redirect_uri", authorizationCodeRequest.redirectUri());
 
-		if (authorizationCodeRequest.scope() != null
-			&& !authorizationCodeRequest.scope().isEmpty()) {
+		if (authorizationCodeRequest.scope() != null && !authorizationCodeRequest.scope().isEmpty()) {
 			String scopes = String.join(",", authorizationCodeRequest.scope());
 			authorizationCodeUri.queryParam("scope", scopes);
 		}
@@ -194,8 +203,8 @@ public class AuthorizationService {
 			oAuthConfig, code, redirectUri);
 		MultiValueMap<String, String> uriParams = generateTokenRequest(authorizationTokenRequest);
 		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse =
-			oauth2AuthorizationServerRequestService.requestAuthorizationServer(oAuthConfig.provider().tokenUri(),
-				uriParams);
+			oauth2AuthorizationServerRequestService
+				.requestAuthorizationServer(oAuthConfig.provider().tokenUri(), uriParams);
 
 		return authorizationTokenResponse.getBody();
 	}
@@ -212,5 +221,15 @@ public class AuthorizationService {
 		}
 
 		return contents;
+	}
+
+	public void validMemberExist(Long id, Role role) {
+		if (role.equals(Role.ADMIN)) {
+			adminService.findMember(id);
+
+			return;
+		}
+
+		memberService.findMember(id);
 	}
 }

@@ -66,10 +66,7 @@ public class CorsFilter extends OncePerRequestFilter {
 	}
 
 	public String secureMatch(String refer) {
-		return allowOriginsConfig.origin().stream()
-			.filter(refer::contains)
-			.findFirst()
-			.orElse(null);
+		return allowOriginsConfig.origin().stream().filter(refer::contains).findFirst().orElse(null);
 	}
 
 	public boolean isOption(String method) {

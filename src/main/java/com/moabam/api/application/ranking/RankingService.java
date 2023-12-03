@@ -35,8 +35,8 @@ public class RankingService {
 	}
 
 	public void updateScores(List<UpdateRanking> updateRankings) {
-		updateRankings.forEach(updateRanking ->
-			zSetRedisRepository.add(RANKING, updateRanking.rankingInfo(), updateRanking.score()));
+		updateRankings.forEach(
+			updateRanking -> zSetRedisRepository.add(RANKING, updateRanking.rankingInfo(), updateRanking.score()));
 	}
 
 	public void changeInfos(RankingInfo before, RankingInfo after) {
@@ -50,15 +50,14 @@ public class RankingService {
 	public TopRankingResponse getMemberRanking(UpdateRanking myRankingInfo) {
 		List<TopRankingInfo> topRankings = getTopRankings();
 		Long myRanking = zSetRedisRepository.reverseRank(RANKING, myRankingInfo.rankingInfo());
-		TopRankingInfo myRankingInfoResponse =
-			RankingMapper.topRankingResponse(myRanking.intValue(), myRankingInfo);
+		TopRankingInfo myRankingInfoResponse = RankingMapper.topRankingResponse(myRanking.intValue(), myRankingInfo);
 
 		return RankingMapper.topRankingResponses(myRankingInfoResponse, topRankings);
 	}
 
 	private List<TopRankingInfo> getTopRankings() {
-		Set<ZSetOperations.TypedTuple<Object>> topRankings =
-			zSetRedisRepository.rangeJson(RANKING, START_INDEX, LIMIT_INDEX);
+		Set<ZSetOperations.TypedTuple<Object>> topRankings = zSetRedisRepository.rangeJson(RANKING, START_INDEX,
+			LIMIT_INDEX);
 
 		Set<Long> scoreSet = new HashSet<>();
 		List<TopRankingInfo> topRankingInfo = new ArrayList<>();
