@@ -76,7 +76,8 @@ public class AuthorizationService {
 	public AuthorizationTokenInfoResponse requestTokenInfo(AuthorizationTokenResponse authorizationTokenResponse) {
 		String tokenValue = generateTokenValue(authorizationTokenResponse.accessToken());
 		ResponseEntity<AuthorizationTokenInfoResponse> authorizationTokenInfoResponse =
-			oauth2AuthorizationServerRequestService.tokenInfoRequest(oAuthConfig.provider().tokenInfo(), tokenValue);
+			oauth2AuthorizationServerRequestService
+				.tokenInfoRequest(oAuthConfig.provider().tokenInfo(), tokenValue);
 
 		return authorizationTokenInfoResponse.getBody();
 	}
@@ -99,12 +100,12 @@ public class AuthorizationService {
 		String domain = getDomain(publicClaim.role());
 
 		response.addCookie(CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire(), domain));
-		response.addCookie(
-			CookieUtils.typeCookie("Test_be_erase", tokenConfig.getRefreshExpire(), publicClaim.role().name()));
-		response.addCookie(
-			CookieUtils.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire(), domain));
-		response.addCookie(
-			CookieUtils.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire(), domain));
+		response.addCookie(CookieUtils
+			.tokenCookie("Test", publicClaim.role().name(), tokenConfig.getRefreshExpire(), domain));
+		response.addCookie(CookieUtils
+			.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire(), domain));
+		response.addCookie(CookieUtils
+			.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire(), domain));
 	}
 
 	public void validTokenPair(Long id, String oldRefreshToken, Role role) {
@@ -117,8 +118,8 @@ public class AuthorizationService {
 		}
 	}
 
-	public void logout(AuthMember authMember, HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse) {
+	public void logout(AuthMember authMember,
+		HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 		removeToken(httpServletRequest, httpServletResponse);
 		tokenRepository.delete(authMember.id(), authMember.role());
 		fcmService.deleteTokenByMemberId(authMember.id());
@@ -180,11 +181,13 @@ public class AuthorizationService {
 	}
 
 	private String generateQueryParamsWith(AuthorizationCodeRequest authorizationCodeRequest) {
-		UriComponentsBuilder authorizationCodeUri = UriComponentsBuilder.fromUriString(
-				oAuthConfig.provider().authorizationUri())
-			.queryParam("response_type", "code")
-			.queryParam("client_id", authorizationCodeRequest.clientId())
-			.queryParam("redirect_uri", authorizationCodeRequest.redirectUri());
+		UriComponentsBuilder authorizationCodeUri =
+			UriComponentsBuilder.fromUriString(
+					oAuthConfig.provider()
+						.authorizationUri())
+				.queryParam("response_type", "code")
+				.queryParam("client_id", authorizationCodeRequest.clientId())
+				.queryParam("redirect_uri", authorizationCodeRequest.redirectUri());
 
 		if (authorizationCodeRequest.scope() != null && !authorizationCodeRequest.scope().isEmpty()) {
 			String scopes = String.join(",", authorizationCodeRequest.scope());
@@ -201,8 +204,8 @@ public class AuthorizationService {
 	}
 
 	private AuthorizationTokenResponse issueTokenToAuthorizationServer(String code, String redirectUri) {
-		AuthorizationTokenRequest authorizationTokenRequest = AuthorizationMapper.toAuthorizationTokenRequest(
-			oAuthConfig, code, redirectUri);
+		AuthorizationTokenRequest authorizationTokenRequest =
+			AuthorizationMapper.toAuthorizationTokenRequest(oAuthConfig, code, redirectUri);
 		MultiValueMap<String, String> uriParams = generateTokenRequest(authorizationTokenRequest);
 		ResponseEntity<AuthorizationTokenResponse> authorizationTokenResponse =
 			oauth2AuthorizationServerRequestService

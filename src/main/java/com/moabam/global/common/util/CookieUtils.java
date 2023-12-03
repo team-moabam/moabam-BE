@@ -12,8 +12,9 @@ public class CookieUtils {
 		cookie.setSecure(true);
 		cookie.setHttpOnly(true);
 		cookie.setPath("/");
+		cookie.setDomain(domain);
 		cookie.setMaxAge((int)expireTime);
-		cookie.setAttribute("SameSite", "Lax");
+		cookie.setAttribute("SameSite", "None");
 
 		return cookie;
 	}
@@ -23,8 +24,9 @@ public class CookieUtils {
 		cookie.setSecure(true);
 		cookie.setHttpOnly(true);
 		cookie.setPath("/");
+		cookie.setDomain(domain);
 		cookie.setMaxAge((int)expireTime);
-		cookie.setAttribute("SameSite", "Lax");
+		cookie.setAttribute("SameSite", "None");
 
 		return cookie;
 	}
