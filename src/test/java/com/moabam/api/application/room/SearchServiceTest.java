@@ -82,7 +82,7 @@ class SearchServiceTest {
 		Participant participant3 = RoomFixture.participant(room3, memberId);
 		List<Participant> participants = List.of(participant1, participant2, participant3);
 
-		given(participantSearchRepository.findNotDeletedParticipantsByMemberId(memberId)).willReturn(participants);
+		given(participantSearchRepository.findNotDeletedAllByMemberId(memberId)).willReturn(participants);
 		given(certificationService.existsMemberCertification(memberId, room1.getId(), today)).willReturn(true);
 		given(certificationService.existsMemberCertification(memberId, room2.getId(), today)).willReturn(false);
 		given(certificationService.existsMemberCertification(memberId, room3.getId(), today)).willReturn(true);
@@ -130,7 +130,7 @@ class SearchServiceTest {
 
 		when(participant3.getDeletedAt()).thenReturn(today);
 		when(participant3.getDeletedRoomTitle()).thenReturn("밤 - 첫 번째 방");
-		given(participantSearchRepository.findAllParticipantsByMemberId(memberId)).willReturn(participants);
+		given(participantSearchRepository.findAllByMemberId(memberId)).willReturn(participants);
 
 		// when
 		RoomsHistoryResponse response = searchService.getJoinHistory(memberId);

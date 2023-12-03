@@ -95,7 +95,7 @@ class RoomServiceConcurrencyTest {
 
 		countDownLatch.await();
 
-		List<Participant> actual = participantSearchRepository.findParticipantsByRoomId(room.getId());
+		List<Participant> actual = participantSearchRepository.findAllByRoomId(room.getId());
 		Member newMember1 = memberRepository.findById(newMembers.get(0).getId()).orElseThrow();
 		Member newMember2 = memberRepository.findById(newMembers.get(1).getId()).orElseThrow();
 		Member newMember3 = memberRepository.findById(newMembers.get(2).getId()).orElseThrow();

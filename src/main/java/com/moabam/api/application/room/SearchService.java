@@ -5,6 +5,8 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +87,7 @@ public class SearchService {
 			roomId, dailyMemberCertifications, date, room.getRoomType());
 		List<LocalDate> certifiedDates = getCertifiedDatesBeforeWeek(roomId);
 		double completePercentage = calculateCompletePercentage(dailyMemberCertifications.size(),
-			room.getCurrentUserCount());
+			room, date);
 
 		return RoomMapper.toRoomDetailsResponse(memberId, room, managerNickname, routineResponses, certifiedDates,
 			todayCertificateRankResponses, completePercentage);
@@ -94,7 +96,7 @@ public class SearchService {
 	public MyRoomsResponse getMyRooms(Long memberId) {
 		LocalDate today = clockHolder.date();
 		List<MyRoomResponse> myRoomResponses = new ArrayList<>();
-		List<Participant> participants = participantSearchRepository.findNotDeletedParticipantsByMemberId(memberId);
+		List<Participant> participants = participantSearchRepository.findNotDeletedAllByMemberId(memberId);
 
 		for (Participant participant : participants) {
 			Room room = participant.getRoom();
@@ -108,7 +110,7 @@ public class SearchService {
 	}
 
 	public RoomsHistoryResponse getJoinHistory(Long memberId) {
-		List<Participant> participants = participantSearchRepository.findAllParticipantsByMemberId(memberId);
+		List<Participant> participants = participantSearchRepository.findAllByMemberId(memberId);
 		List<RoomHistoryResponse> roomHistoryResponses = participants.stream()
 			.map(participant -> {
 				if (participant.getRoom() == null) {
@@ -134,7 +136,7 @@ public class SearchService {
 
 		Room room = participant.getRoom();
 		List<RoutineResponse> routineResponses = getRoutineResponses(roomId);
-		List<Participant> participants = participantSearchRepository.findParticipantsByRoomId(roomId);
+		List<Participant> participants = participantSearchRepository.findAllByRoomId(roomId);
 		List<Long> memberIds = participants.stream()
 			.map(Participant::getMemberId)
 			.toList();
@@ -158,7 +160,6 @@ public class SearchService {
 		return RoomMapper.toSearchAllRoomsResponse(hasNext, getAllRoomResponse);
 	}
 
-	// TODO: full-text search 로 바꾸면서 리팩토링 예정
 	public GetAllRoomsResponse searchRooms(String keyword, @Nullable RoomType roomType, @Nullable Long roomId) {
 		List<GetAllRoomResponse> getAllRoomResponse = new ArrayList<>();
 		List<Room> rooms = new ArrayList<>();
@@ -258,9 +259,8 @@ public class SearchService {
 	private List<TodayCertificateRankResponse> getTodayCertificateRankResponses(Long memberId, Long roomId,
 		List<DailyMemberCertification> dailyMemberCertifications, LocalDate date, RoomType roomType) {
 
-		List<TodayCertificateRankResponse> responses = new ArrayList<>();
 		List<Certification> certifications = certificationsSearchRepository.findCertifications(roomId, date);
-		List<Participant> participants = participantSearchRepository.findAllParticipantsByRoomId(roomId);
+		List<Participant> participants = participantSearchRepository.findAllWithDeletedByRoomId(roomId);
 		List<Member> members = memberService.getRoomMembers(participants.stream()
 			.map(Participant::getMemberId)
 			.distinct()
@@ -273,10 +273,14 @@ public class SearchService {
 			.toList();
 		List<Inventory> inventories = inventorySearchRepository.findDefaultInventories(memberIds, roomType.name());
 
-		responses.addAll(completedMembers(dailyMemberCertifications, members, certifications, participants, date,
-			knocks, inventories));
-		responses.addAll(uncompletedMembers(dailyMemberCertifications, members, participants, date, knocks,
-			inventories));
+		List<TodayCertificateRankResponse> responses = new ArrayList<>(
+			completedMembers(dailyMemberCertifications, members, certifications, participants, date, knocks,
+				inventories));
+
+		if (clockHolder.date() == date) {
+			responses.addAll(uncompletedMembers(dailyMemberCertifications, members, participants, date, knocks,
+				inventories));
+		}
 
 		return responses;
 	}
@@ -392,8 +396,19 @@ public class SearchService {
 			.toList();
 	}
 
-	private double calculateCompletePercentage(int certifiedMembersCount, int currentsMembersCount) {
-		double completePercentage = ((double)certifiedMembersCount / currentsMembersCount) * 100;
+	private double calculateCompletePercentage(int certifiedMembersCount, Room room, LocalDate date) {
+		if (date != clockHolder.date()) {
+			return 0;
+		}
+
+		LocalDateTime now = clockHolder.times();
+		LocalTime targetTime = LocalTime.of(room.getCertifyTime(), 0);
+		LocalDateTime targetDateTime = LocalDateTime.of(now.toLocalDate(), targetTime);
+
+		List<Participant> participants = participantSearchRepository.findAllByRoomIdBeforeDate(room.getId(),
+			targetDateTime);
+
+		double completePercentage = ((double)certifiedMembersCount / participants.size()) * 100;
 
 		return Math.round(completePercentage * 100) / 100.0;
 	}
