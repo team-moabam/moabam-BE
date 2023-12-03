@@ -17,9 +17,11 @@ import com.moabam.global.error.model.ErrorResponse;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TossPaymentService {
 
@@ -43,7 +45,10 @@ public class TossPaymentService {
 			.body(BodyInserters.fromValue(request))
 			.retrieve()
 			.onStatus(HttpStatusCode::isError, response -> response.bodyToMono(ErrorResponse.class)
-				.flatMap(error -> Mono.error(new TossPaymentException(error.message()))))
+				.flatMap(error -> {
+					log.error("======= toss-payment confirmation error =======\n{}", error);
+					return Mono.error(new TossPaymentException(error.message()));
+				}))
 			.bodyToMono(ConfirmTossPaymentResponse.class)
 			.block();
 	}
