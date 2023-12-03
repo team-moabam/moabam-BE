@@ -5,6 +5,8 @@ import static java.util.Objects.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.redis.core.ZSetOperations;
@@ -50,6 +52,15 @@ public class RankingService {
 	public TopRankingResponse getMemberRanking(UpdateRanking myRankingInfo) {
 		List<TopRankingInfo> topRankings = getTopRankings();
 		Long myRanking = zSetRedisRepository.reverseRank(RANKING, myRankingInfo.rankingInfo());
+
+		Optional<TopRankingInfo> myTopRanking = topRankings.stream()
+			.filter(topRankingInfo -> Objects.equals(topRankingInfo.memberId(), myRankingInfo.rankingInfo().memberId()))
+			.findFirst();
+
+		if (myTopRanking.isPresent()) {
+			myRanking = (long)myTopRanking.get().rank();
+		}
+
 		TopRankingInfo myRankingInfoResponse = RankingMapper.topRankingResponse(myRanking.intValue(), myRankingInfo);
 
 		return RankingMapper.topRankingResponses(myRankingInfoResponse, topRankings);

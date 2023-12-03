@@ -81,7 +81,7 @@ public class MemberService {
 
 	@Transactional
 	public void delete(Member member) {
-		List<Participant> participants = participantRepository.findAllByMemberId(member.getId());
+		List<Participant> participants = participantSearchRepository.findAllByMemberIdParticipant(member.getId());
 
 		if (!participants.isEmpty()) {
 			throw new BadRequestException(NEED_TO_EXIT_ALL_ROOMS);
@@ -134,7 +134,7 @@ public class MemberService {
 		return MemberMapper.toUpdateRanking(member);
 	}
 
-	@Scheduled(cron = "0 15 * * * *")
+	@Scheduled(cron = "0 11 * * * *")
 	public void updateAllRanking() {
 		List<Member> members = memberSearchRepository.findAllMembers();
 		List<UpdateRanking> updateRankings = members.stream()
