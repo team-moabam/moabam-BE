@@ -1,175 +1,175 @@
 name: develop-CD
 
 on:
-  push:
-    branches: [ "develop" ]
+    push:
+        branches: [ "develop" ]
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  move-files:
-    name: move-files
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-          token: ${{ secrets.MOABAM_SUBMODULE_KEY }}
+    move-files:
+        name: move-files
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v3
+                with:
+                    submodules: true
+                    token: ${{ secrets.MOABAM_SUBMODULE_KEY }}
 
-      - name: Github Actions IP 획득
-        id: ip
-        uses: haythem/public-ip@v1.3
+            -   name: Github Actions IP 획득
+                id: ip
+                uses: haythem/public-ip@v1.3
 
-      - name: AWS Credentials 설정
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+            -   name: AWS Credentials 설정
+                uses: aws-actions/configure-aws-credentials@v4
+                with:
+                    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                    aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Github Actions IP 보안그룹 추가
-        run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            -   name: Github Actions IP 보안그룹 추가
+                run: |
+                    aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
-      - name: 디렉토리 생성
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
-          port: 22
-          username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
-          key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
-          script: |
-            mkdir -p /home/ubuntu/moabam/
+            -   name: 디렉토리 생성
+                uses: appleboy/ssh-action@master
+                with:
+                    host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
+                    port: 22
+                    username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
+                    key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
+                    script: |
+                        mkdir -p /home/ubuntu/moabam/
 
-      - name: Docker env 파일 생성
-        run:
-          cp src/main/resources/config/dev.env ./infra/.env
+            -   name: Docker env 파일 생성
+                run:
+                    cp src/main/resources/config/dev.env ./infra/.env
 
-      - name: 서버로 전송 기본 파일들 전송
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
-          port: 22
-          username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
-          key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
-          source: "infra/mysql/*, infra/nginx/*, infra/scripts/*.sh, !infra/scripts/deploy-prod.sh, infra/docker-compose-dev.yml"
-          target: "/home/ubuntu/moabam"
+            -   name: 서버로 전송 기본 파일들 전송
+                uses: appleboy/scp-action@master
+                with:
+                    host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
+                    port: 22
+                    username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
+                    key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
+                    source: "infra/mysql/*, infra/nginx/*, infra/scripts/*.sh, !infra/scripts/deploy-prod.sh, infra/docker-compose-dev.yml, infra/.env"
+                    target: "/home/ubuntu/moabam"
 
-      - name: 파일 세팅
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
-          port: 22
-          username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
-          key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
-          script: |
-            cd /home/ubuntu/moabam/infra
-            mv docker-compose-dev.yml docker-compose.yml
-            chmod +x ./scripts/deploy-dev.sh
-            chmod +x ./scripts/init-letsencrypt.sh
-            chmod +x ./scripts/init-nginx-converter.sh
-            chmod +x ./mysql/initdb.d/init.sql
-            chmod +x ./mysql/initdb.d/item-data.sql
+            -   name: 파일 세팅
+                uses: appleboy/ssh-action@master
+                with:
+                    host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
+                    port: 22
+                    username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
+                    key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
+                    script: |
+                        cd /home/ubuntu/moabam/infra
+                        mv docker-compose-dev.yml docker-compose.yml
+                        chmod +x ./scripts/deploy-dev.sh
+                        chmod +x ./scripts/init-letsencrypt.sh
+                        chmod +x ./scripts/init-nginx-converter.sh
+                        chmod +x ./mysql/initdb.d/init.sql
+                        chmod +x ./mysql/initdb.d/item-data.sql
 
-      - name: Github Actions IP 보안그룹에서 삭제
-        if: always()
-        run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            -   name: Github Actions IP 보안그룹에서 삭제
+                if: always()
+                run: |
+                    aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
-  deploy:
-    name: deploy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-          token: ${{ secrets.MOABAM_SUBMODULE_KEY }}
+    deploy:
+        name: deploy
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v3
+                with:
+                    submodules: true
+                    token: ${{ secrets.MOABAM_SUBMODULE_KEY }}
 
-      - name: JDK 17 셋업
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'corretto'
+            -   name: JDK 17 셋업
+                uses: actions/setup-java@v3
+                with:
+                    java-version: '17'
+                    distribution: 'corretto'
 
-      - name: Gradle 캐싱
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+            -   name: Gradle 캐싱
+                uses: actions/cache@v3
+                with:
+                    path: |
+                        ~/.gradle/caches
+                        ~/.gradle/wrapper
+                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                    restore-keys: |
+                        ${{ runner.os }}-gradle-
 
-      - name: Gradle Grant 권한 부여
-        run: chmod +x gradlew
+            -   name: Gradle Grant 권한 부여
+                run: chmod +x gradlew
 
-      - name: 테스트용 MySQL 도커 컨테이너 실행
-        run: |
-          sudo docker run -d -p 3305:3306 --env MYSQL_DATABASE=moabam --env MYSQL_ROOT_PASSWORD=1234 mysql:8.0.33
+            -   name: 테스트용 MySQL 도커 컨테이너 실행
+                run: |
+                    sudo docker run -d -p 3305:3306 --env MYSQL_DATABASE=moabam --env MYSQL_ROOT_PASSWORD=1234 mysql:8.0.33
 
-      - name: Gradle 빌드
-        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-        with:
-          arguments: build
+            -   name: Gradle 빌드
+                uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+                with:
+                    arguments: build
 
-      - name: 멀티플랫폼 위한 Docker Buildx 설정
-        uses: docker/setup-buildx-action@v2
+            -   name: 멀티플랫폼 위한 Docker Buildx 설정
+                uses: docker/setup-buildx-action@v2
 
-      - name: Docker Hub 로그인
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+            -   name: Docker Hub 로그인
+                uses: docker/login-action@v2
+                with:
+                    username: ${{ secrets.DOCKER_HUB_USERNAME }}
+                    password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: Docker Hub 빌드하고 푸시
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./infra/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ secrets.DOCKER_HUB_DEV_TAG }}
-          build-args: |
-            "SPRING_ACTIVE_PROFILES=dev"
-          platforms: |
-            linux/amd64
-            linux/arm64
+            -   name: Docker Hub 빌드하고 푸시
+                uses: docker/build-push-action@v4
+                with:
+                    context: .
+                    file: ./infra/Dockerfile
+                    push: true
+                    tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ secrets.DOCKER_HUB_DEV_TAG }}
+                    build-args: |
+                        "SPRING_ACTIVE_PROFILES=dev"
+                    platforms: |
+                        linux/amd64
+                        linux/arm64
 
-      - name: Github Actions IP 획득
-        id: ip
-        uses: haythem/public-ip@v1.3
+            -   name: Github Actions IP 획득
+                id: ip
+                uses: haythem/public-ip@v1.3
 
-      - name: AWS Credentials 설정
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+            -   name: AWS Credentials 설정
+                uses: aws-actions/configure-aws-credentials@v4
+                with:
+                    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                    aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Github Actions IP 보안그룹 추가
-        run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            -   name: Github Actions IP 보안그룹 추가
+                run: |
+                    aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
-      - name: EC2 서버에 배포
-        uses: appleboy/ssh-action@master
-        id: deploy-dev
-        if: contains(github.ref, 'dev')
-        with:
-          host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
-          port: 22
-          username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
-          key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
-          source: "./infra/docker-compose-dev.yml"
-          script: |
-            cd /home/ubuntu/moabam/infra
-            echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
-            ./scripts/deploy-dev.sh
-            docker rm `docker ps -a -q`
-            docker rmi $(docker images -aq)
-            echo "### 배포 완료 ###"
+            -   name: EC2 서버에 배포
+                uses: appleboy/ssh-action@master
+                id: deploy-dev
+                if: contains(github.ref, 'dev')
+                with:
+                    host: ${{ secrets.EC2_DEV_INSTANCE_HOST }}
+                    port: 22
+                    username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
+                    key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
+                    source: "./infra/docker-compose-dev.yml"
+                    script: |
+                        cd /home/ubuntu/moabam/infra
+                        echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+                        ./scripts/deploy-dev.sh
+                        docker rm `docker ps -a -q`
+                        docker rmi $(docker images -aq)
+                        echo "### 배포 완료 ###"
 
-      - name: Github Actions IP 보안그룹에서 삭제
-        if: always()
-        run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            -   name: Github Actions IP 보안그룹에서 삭제
+                if: always()
+                run: |
+                    aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_DEV_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
