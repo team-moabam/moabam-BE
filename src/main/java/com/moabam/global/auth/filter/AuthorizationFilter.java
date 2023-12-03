@@ -73,7 +73,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 		Cookie[] cookies = getCookiesOrThrow(httpServletRequest);
 
 		if (!isTokenTypeBearer(cookies)) {
-			throw new UnauthorizedException(ErrorMessage.GRANT_FAILED);
+			throw new UnauthorizedException(ErrorMessage.TOKEN_TYPE_FAILED);
 		}
 
 		handleTokenAuthenticate(cookies, httpServletResponse, httpServletRequest);
@@ -92,7 +92,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 			String refreshToken = extractTokenFromCookie(cookies, "refresh_token");
 
 			if (authenticationService.isTokenExpire(refreshToken, publicClaim.role())) {
-				throw new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL);
+				throw new UnauthorizedException(ErrorMessage.TOKEN_EXPIRE);
 			}
 
 			validInvalidMember(publicClaim, refreshToken, httpServletRequest);
@@ -117,7 +117,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
 	private Cookie[] getCookiesOrThrow(HttpServletRequest httpServletRequest) {
 		return Optional.ofNullable(httpServletRequest.getCookies())
-			.orElseThrow(() -> new UnauthorizedException(ErrorMessage.GRANT_FAILED));
+			.orElseThrow(() -> new UnauthorizedException(ErrorMessage.COOKIE_NOT_FOUND));
 	}
 
 	private String extractTokenFromCookie(Cookie[] cookies, String tokenName) {
@@ -125,6 +125,6 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 			.filter(cookie -> tokenName.equals(cookie.getName()))
 			.map(Cookie::getValue)
 			.findFirst()
-			.orElseThrow(() -> new UnauthorizedException(ErrorMessage.AUTHENTICATE_FAIL));
+			.orElseThrow(() -> new UnauthorizedException(ErrorMessage.TOKEN_NOT_FOUND));
 	}
 }

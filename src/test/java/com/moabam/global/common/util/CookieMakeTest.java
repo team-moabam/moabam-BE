@@ -27,7 +27,7 @@ class CookieMakeTest {
 			() -> assertThat(cookie.getSecure()).isTrue(),
 			() -> assertThat(cookie.getPath()).isEqualTo("/"),
 			() -> assertThat(cookie.getMaxAge()).isEqualTo(10000),
-			() -> assertThat(cookie.getAttribute("SameSite")).isEqualTo("Lax")
+			() -> assertThat(cookie.getAttribute("SameSite")).isEqualTo("None")
 		);
 	}
 
