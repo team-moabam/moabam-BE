@@ -18,7 +18,7 @@ public class LogAspect {
 		Exception exception = (Exception)args[0];
 
 		log.error("===== EXCEPTION LOG =====", exception);
-		
+
 		return joinPoint.proceed();
 	}
 }
