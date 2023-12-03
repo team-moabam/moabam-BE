@@ -11,7 +11,7 @@ public class CookieUtils {
 		Cookie cookie = new Cookie(name, value);
 		cookie.setSecure(true);
 		cookie.setHttpOnly(true);
-		cookie.setDomain(domain);
+		cookie.setDomain("moabam.com");
 		cookie.setPath("/");
 		cookie.setMaxAge((int)expireTime);
 		cookie.setAttribute("SameSite", "Lax");
@@ -23,7 +23,7 @@ public class CookieUtils {
 		Cookie cookie = new Cookie("token_type", value);
 		cookie.setSecure(true);
 		cookie.setHttpOnly(true);
-		cookie.setDomain(domain);
+		cookie.setDomain("moabam.com");
 		cookie.setPath("/");
 		cookie.setMaxAge((int)expireTime);
 		cookie.setAttribute("SameSite", "Lax");
