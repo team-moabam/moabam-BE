@@ -9,6 +9,7 @@ import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.room.Participant;
 import com.moabam.api.domain.room.Room;
+import com.moabam.api.domain.room.RoomExp;
 import com.moabam.api.dto.room.CreateRoomRequest;
 import com.moabam.api.dto.room.GetAllRoomResponse;
 import com.moabam.api.dto.room.GetAllRoomsResponse;
@@ -51,7 +52,8 @@ public final class RoomMapper {
 			.managerNickName(managerNickname)
 			.roomImage(room.getRoomImage())
 			.level(room.getLevel())
-			.exp(room.getExp())
+			.currentExp(room.getExp())
+			.totalExp(RoomExp.of(room.getLevel()).getTotalExp())
 			.roomType(room.getRoomType())
 			.certifyTime(room.getCertifyTime())
 			.currentUserCount(room.getCurrentUserCount())
@@ -149,7 +151,8 @@ public final class RoomMapper {
 			.title(room.getTitle())
 			.roomImage(room.getRoomImage())
 			.level(room.getLevel())
-			.exp(room.getExp())
+			.currentExp(room.getExp())
+			.totalExp(RoomExp.of(room.getLevel()).getTotalExp())
 			.roomType(room.getRoomType())
 			.certifyTime(room.getCertifyTime())
 			.currentUserCount(room.getCurrentUserCount())
