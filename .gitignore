@@ -121,3 +121,6 @@ gradle-app.setting
 logs/
 application-*.yml
 src/main/resources/config
+!application-test.yml
+src/main/generated
+dump.rdb

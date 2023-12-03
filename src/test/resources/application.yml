@@ -1,0 +1,93 @@
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.springframework: DEBUG
+
+spring:
+
+  # Profile
+  profiles:
+    active: test
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3305/moabam?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 1234
+  
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+    database: mysql
+
+  # Redis
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+  # AWS
+  cloud:
+    aws:
+      region:
+        static: ap-test-test
+      s3:
+        bucket: test
+        url: test
+      cloud-front:
+        url: test
+      credentials:
+        access-key: test
+        secret-key: test
+      max-request-size: 10MB # 요청 당 최대 사이즈
+
+oauth2:
+  client:
+    provider: test
+    client-id: testtestetsttest
+    client-secret: testtestetsttest
+    authorization-grant-type: authorization_code
+    admin-key: testtesttesttesttesttesttest
+    scope:
+      - profile_nickname
+      - profile_image
+
+  provider:
+    authorization_uri: https://authorization.com/test/test
+    redirect_uri: http://redirect:8080/test
+    token-uri: https://kauth.kakao.com/oauth/token
+    token-info: https://kapi.kakao.com/v1/user/access_token_info
+    unlink: https://kapi.kakao.com/v1/user/unlink
+    admin-redirect-uri: https://dev-admin.moabam.com/login/kakao/oauth
+
+
+token:
+  iss: "PARK"
+  access-expire: 100000
+  refresh-expire: 150000
+  secret-key: testestestestestestestestestesttestestestestestestestestestest
+  admin-secret: testestestestestestestestestesttestestestestestestestestestest
+
+allows:
+  admin-domain: "localhost"
+  domain: "localhost"
+  origin:
+    - "https://test.com"
+    - "https://test.com"
+
+admin: moamoamoabam
+
+# Payment
+payment:
+  toss:
+    base-url: "https://api.tosspayments.com"
+    secret-key: "test_sk_4yKeq5bgrpWk4XYdDoBxVGX0lzW6:"
+
+# Webhook
+webhook:
+  slack:
+    url: test
