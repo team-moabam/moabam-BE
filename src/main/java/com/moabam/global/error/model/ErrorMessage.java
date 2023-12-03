@@ -12,6 +12,7 @@ public enum ErrorMessage {
 	INVALID_REQUEST_VALUE_TYPE_FORMAT("'%s' 값은 유효한 %s 값이 아닙니다."),
 	NOT_FOUND_AVAILABLE_PORT("사용 가능한 포트를 찾을 수 없습니다. (10000 ~ 65535)"),
 	ERROR_EXECUTING_EMBEDDED_REDIS("Embedded Redis 실행 중 오류가 발생했습니다."),
+	INVALID_REQUEST_ROLE("회원은 회원에, 어드민은 어드민에 연결해야 합니다."),
 
 	REPORT_REQUEST_ERROR("신고 요청하고자 하는 방이나 대상이 존재하지 않습니다."),
 

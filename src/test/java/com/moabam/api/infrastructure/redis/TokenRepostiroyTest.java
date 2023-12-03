@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.domain.auth.repository.TokenRepository;
+import com.moabam.api.domain.member.Role;
 import com.moabam.api.dto.auth.TokenSaveValue;
 import com.moabam.support.fixture.TokenSaveValueFixture;
 
@@ -35,7 +36,7 @@ class TokenRepostiroyTest {
 
 		// When + Then
 		Assertions.assertThatNoException()
-			.isThrownBy(() -> tokenRepository.saveToken(1L, TokenSaveValueFixture.tokenSaveValue()));
+			.isThrownBy(() -> tokenRepository.saveToken(1L, TokenSaveValueFixture.tokenSaveValue(), Role.USER));
 	}
 
 	@DisplayName("토큰 조회 성공")
@@ -46,7 +47,7 @@ class TokenRepostiroyTest {
 			.given(hashRedisRepository).get(anyString());
 
 		// when
-		TokenSaveValue tokenSaveValue = tokenRepository.getTokenSaveValue(123L);
+		TokenSaveValue tokenSaveValue = tokenRepository.getTokenSaveValue(123L, Role.USER);
 
 		// then
 		assertAll(
@@ -60,6 +61,6 @@ class TokenRepostiroyTest {
 	void delete_token_suceess() {
 		// When + Then
 		Assertions.assertThatNoException()
-			.isThrownBy(() -> tokenRepository.delete(1L));
+			.isThrownBy(() -> tokenRepository.delete(1L, Role.USER));
 	}
 }

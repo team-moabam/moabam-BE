@@ -21,6 +21,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import com.moabam.api.application.auth.AuthorizationService;
 import com.moabam.api.application.auth.JwtAuthenticationService;
 import com.moabam.api.application.auth.JwtProviderService;
+import com.moabam.api.domain.member.Role;
 import com.moabam.global.auth.filter.AuthorizationFilter;
 import com.moabam.global.auth.model.AuthMember;
 import com.moabam.global.auth.model.AuthorizationThreadLocal;
@@ -98,7 +99,7 @@ class AuthorizationFilterTest {
 		httpServletRequest.addHeader("token_type", "Bearer");
 
 		// when
-		String token = jwtProviderService.provideRefreshToken();
+		String token = jwtProviderService.provideRefreshToken(Role.USER);
 		httpServletRequest.setCookies(new Cookie("refresh_token", token));
 
 		authorizationFilter.doFilter(httpServletRequest, httpServletResponse, mockFilterChain);
@@ -128,7 +129,7 @@ class AuthorizationFilterTest {
 			new Cookie("access_token", token));
 
 		when(jwtAuthenticationService.parseClaim(token)).thenReturn(publicClaim);
-		when(jwtAuthenticationService.isTokenExpire(token)).thenReturn(true);
+		when(jwtAuthenticationService.isTokenExpire(token, Role.USER)).thenReturn(true);
 
 		authorizationFilter.doFilter(httpServletRequest, httpServletResponse, mockFilterChain);
 
@@ -152,15 +153,15 @@ class AuthorizationFilterTest {
 
 		// when
 		String accessToken = jwtProviderService.provideAccessToken(publicClaim);
-		String refreshToken = jwtProviderService.provideRefreshToken();
+		String refreshToken = jwtProviderService.provideRefreshToken(Role.USER);
 		httpServletRequest.setCookies(
 			new Cookie("token_type", "Bearer"),
 			new Cookie("access_token", accessToken),
 			new Cookie("refresh_token", refreshToken));
 
 		when(jwtAuthenticationService.parseClaim(accessToken)).thenReturn(publicClaim);
-		when(jwtAuthenticationService.isTokenExpire(accessToken)).thenReturn(true);
-		when(jwtAuthenticationService.isTokenExpire(refreshToken)).thenReturn(false);
+		when(jwtAuthenticationService.isTokenExpire(accessToken, Role.USER)).thenReturn(true);
+		when(jwtAuthenticationService.isTokenExpire(refreshToken, Role.USER)).thenReturn(false);
 
 		authorizationFilter.doFilter(httpServletRequest, httpServletResponse, mockFilterChain);
 

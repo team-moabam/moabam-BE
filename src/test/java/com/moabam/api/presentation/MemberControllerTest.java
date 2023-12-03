@@ -58,6 +58,7 @@ import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.domain.member.Badge;
 import com.moabam.api.domain.member.BadgeType;
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.Role;
 import com.moabam.api.domain.member.repository.BadgeRepository;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
@@ -167,14 +168,14 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	void logout_success() throws Exception {
 		// given
 		TokenSaveValue tokenSaveValue = TokenSaveValueFixture.tokenSaveValue();
-		tokenRepository.saveToken(member.getId(), tokenSaveValue);
+		tokenRepository.saveToken(member.getId(), tokenSaveValue, Role.USER);
 
 		// expected
 		ResultActions result = mockMvc.perform(get("/members/logout"));
 
 		result.andExpect(status().is2xxSuccessful());
 
-		Assertions.assertThatThrownBy(() -> tokenRepository.getTokenSaveValue(member.getId()))
+		Assertions.assertThatThrownBy(() -> tokenRepository.getTokenSaveValue(member.getId(), Role.USER))
 			.isInstanceOf(UnauthorizedException.class);
 	}
 
