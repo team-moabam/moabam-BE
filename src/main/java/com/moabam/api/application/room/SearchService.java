@@ -263,6 +263,7 @@ public class SearchService {
 		List<Participant> participants = participantSearchRepository.findAllParticipantsByRoomId(roomId);
 		List<Member> members = memberService.getRoomMembers(participants.stream()
 			.map(Participant::getMemberId)
+			.distinct()
 			.toList());
 
 		List<Long> knocks = notificationService.getMyKnockStatusInRoom(memberId, roomId, participants);
@@ -324,6 +325,7 @@ public class SearchService {
 
 		List<Long> allMemberIds = participants.stream()
 			.map(Participant::getMemberId)
+			.distinct()
 			.collect(Collectors.toList());
 
 		List<Long> certifiedMemberIds = dailyMemberCertifications.stream()
@@ -372,6 +374,7 @@ public class SearchService {
 	private int calculateContributionPoint(Long memberId, List<Participant> participants, LocalDate date) {
 		Participant participant = participants.stream()
 			.filter(p -> p.getMemberId().equals(memberId))
+			.filter(p -> p.getDeletedAt() == null)
 			.findAny()
 			.orElseThrow(() -> new NotFoundException(ROOM_DETAILS_ERROR));
 

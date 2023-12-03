@@ -212,6 +212,7 @@ create table room
     announcement       varchar(100),
     room_image         varchar(500),
     manager_nickname   varchar(30),
+    deleted_at         datetime(6),
     created_at         datetime(6)       not null,
     updated_at         datetime(6),
     primary key (id)
