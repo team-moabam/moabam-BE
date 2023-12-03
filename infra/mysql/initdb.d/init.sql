@@ -121,7 +121,7 @@ create table member
 (
     id                    bigint                                       not null auto_increment,
     social_id             varchar(255)                                 not null unique,
-    nickname              varchar(255)                                 not null unique,
+    nickname              varchar(255)                                 unique,
     intro                 varchar(30),
     profile_image         varchar(255)                                 not null,
     morning_image         varchar(255)                                 not null,
