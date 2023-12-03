@@ -37,11 +37,10 @@ public class CorsFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
 		FilterChain filterChain) throws ServletException, IOException {
-		String refer = httpServletRequest.getHeader("referer");
-		String origin = secureMatch(refer);
+		String refer = getReferer(httpServletRequest);
 
 		try {
-			if (Objects.isNull(origin)) {
+			if (Objects.isNull(refer)) {
 				throw new UnauthorizedException(ErrorMessage.INVALID_REQUEST_URL);
 			}
 		} catch (UnauthorizedException unauthorizedException) {
@@ -50,6 +49,8 @@ public class CorsFilter extends OncePerRequestFilter {
 
 			return;
 		}
+
+		String origin = secureMatch(refer);
 
 		httpServletResponse.setHeader("Access-Control-Allow-Origin", origin);
 		httpServletResponse.setHeader("Access-Control-Allow-Methods", ALLOWED_METHOD_NAMES);
@@ -62,6 +63,10 @@ public class CorsFilter extends OncePerRequestFilter {
 		}
 
 		filterChain.doFilter(httpServletRequest, httpServletResponse);
+	}
+
+	public String getReferer(HttpServletRequest httpServletRequest) {
+		return httpServletRequest.getHeader("referer");
 	}
 
 	public String secureMatch(String refer) {
