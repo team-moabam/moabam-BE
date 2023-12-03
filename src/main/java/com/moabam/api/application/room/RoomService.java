@@ -90,7 +90,7 @@ public class RoomService {
 
 	@Transactional
 	public void enterRoom(Long memberId, Long roomId, EnterRoomRequest enterRoomRequest) {
-		Room room = roomRepository.findWithPessimisticLockById(roomId).orElseThrow(
+		Room room = roomRepository.findWithPessimisticLockByIdAndDeletedAtIsNull(roomId).orElseThrow(
 			() -> new NotFoundException(ROOM_NOT_FOUND));
 		validateRoomEnter(memberId, enterRoomRequest.password(), room);
 

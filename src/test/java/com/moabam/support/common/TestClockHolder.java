@@ -19,6 +19,6 @@ public class TestClockHolder implements ClockHolder {
 
 	@Override
 	public LocalDate date() {
-		return times().toLocalDate();
+		return LocalDateTime.now().toLocalDate();
 	}
 }

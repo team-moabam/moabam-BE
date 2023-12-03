@@ -32,15 +32,18 @@ import lombok.NoArgsConstructor;
 @SQLDelete(sql = "UPDATE room SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 public class Room extends BaseTimeEntity {
 
+	private static final int LEVEL_0 = 0;
+	private static final int LEVEL_1 = 1;
+	private static final int LEVEL_2 = 2;
+	private static final int LEVEL_3 = 3;
+	private static final int LEVEL_4 = 4;
 	private static final int LEVEL_5 = 5;
-	private static final int LEVEL_10 = 10;
-	private static final int LEVEL_20 = 20;
-	private static final int LEVEL_30 = 30;
 	private static final String ROOM_LEVEL_0_IMAGE = "https://image.moabam.com/moabam/default/room-level-00.png";
+	private static final String ROOM_LEVEL_1_IMAGE = "https://image.moabam.com/moabam/default/room-level-01.png";
+	private static final String ROOM_LEVEL_2_IMAGE = "https://image.moabam.com/moabam/default/room-level-02.png";
+	private static final String ROOM_LEVEL_3_IMAGE = "https://image.moabam.com/moabam/default/room-level-03.png";
+	private static final String ROOM_LEVEL_4_IMAGE = "https://image.moabam.com/moabam/default/room-level-04.png";
 	private static final String ROOM_LEVEL_5_IMAGE = "https://image.moabam.com/moabam/default/room-level-05.png";
-	private static final String ROOM_LEVEL_10_IMAGE = "https://image.moabam.com/moabam/default/room-level-10.png";
-	private static final String ROOM_LEVEL_20_IMAGE = "https://image.moabam.com/moabam/default/room-level-20.png";
-	private static final String ROOM_LEVEL_30_IMAGE = "https://image.moabam.com/moabam/default/room-level-30.png";
 	private static final int MORNING_START_TIME = 4;
 	private static final int MORNING_END_TIME = 10;
 	private static final int NIGHT_START_TIME = 20;
@@ -113,23 +116,28 @@ public class Room extends BaseTimeEntity {
 	}
 
 	public void upgradeRoomImage(int level) {
+		if (level == LEVEL_1) {
+			this.roomImage = ROOM_LEVEL_1_IMAGE;
+			return;
+		}
+
+		if (level == LEVEL_2) {
+			this.roomImage = ROOM_LEVEL_2_IMAGE;
+			return;
+		}
+
+		if (level == LEVEL_3) {
+			this.roomImage = ROOM_LEVEL_3_IMAGE;
+			return;
+		}
+
+		if (level == LEVEL_4) {
+			this.roomImage = ROOM_LEVEL_4_IMAGE;
+			return;
+		}
+
 		if (level == LEVEL_5) {
 			this.roomImage = ROOM_LEVEL_5_IMAGE;
-			return;
-		}
-
-		if (level == LEVEL_10) {
-			this.roomImage = ROOM_LEVEL_10_IMAGE;
-			return;
-		}
-
-		if (level == LEVEL_20) {
-			this.roomImage = ROOM_LEVEL_20_IMAGE;
-			return;
-		}
-
-		if (level == LEVEL_30) {
-			this.roomImage = ROOM_LEVEL_30_IMAGE;
 		}
 	}
 

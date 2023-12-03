@@ -15,7 +15,7 @@ create table badge
 (
     id         bigint                                                             not null auto_increment,
     member_id  bigint                                                             not null,
-    type       enum ('BIRTH','LEVEL10','LEVEL50') not null,
+    type       enum ('BIRTH','LEVEL10','LEVEL50')                                 not null,
     created_at datetime(6)                                                        not null,
     primary key (id)
 );
