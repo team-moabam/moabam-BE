@@ -5,6 +5,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+import com.moabam.global.error.exception.UnauthorizedException;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Aspect
@@ -17,7 +19,9 @@ public class LogAspect {
 		Object[] args = joinPoint.getArgs();
 		Exception exception = (Exception)args[0];
 
-		log.error("===== EXCEPTION LOG =====", exception);
+		if (!(exception instanceof UnauthorizedException)) {
+			log.error("===== EXCEPTION LOG =====", exception);
+		}
 
 		return joinPoint.proceed();
 	}
