@@ -7,33 +7,31 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CookieUtils {
 
-	public static Cookie tokenCookie(String name, String value, long expireTime, String domain) {
-		Cookie cookie = new Cookie(name, value);
-		cookie.setSecure(true);
-		cookie.setHttpOnly(true);
-		cookie.setDomain(".moabam.com");
-		cookie.setPath("/");
-		cookie.setMaxAge((int)expireTime);
-		cookie.setAttribute("SameSite", "Lax");
+    public static Cookie tokenCookie(String name, String value, long expireTime, String domain) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge((int) expireTime);
+        cookie.setAttribute("SameSite", "Lax");
 
-		return cookie;
-	}
+        return cookie;
+    }
 
-	public static Cookie typeCookie(String value, long expireTime, String domain) {
-		Cookie cookie = new Cookie("token_type", value);
-		cookie.setSecure(true);
-		cookie.setHttpOnly(true);
-		cookie.setDomain(".moabam.com");
-		cookie.setPath("/");
-		cookie.setMaxAge((int)expireTime);
-		cookie.setAttribute("SameSite", "Lax");
+    public static Cookie typeCookie(String value, long expireTime, String domain) {
+        Cookie cookie = new Cookie("token_type", value);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge((int) expireTime);
+        cookie.setAttribute("SameSite", "Lax");
 
-		return cookie;
-	}
+        return cookie;
+    }
 
-	public static Cookie deleteCookie(Cookie cookie) {
-		cookie.setMaxAge(0);
-		cookie.setPath("/");
-		return cookie;
-	}
+    public static Cookie deleteCookie(Cookie cookie) {
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        return cookie;
+    }
 }
