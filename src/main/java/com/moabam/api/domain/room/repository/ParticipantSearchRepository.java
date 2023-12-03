@@ -3,6 +3,7 @@ package com.moabam.api.domain.room.repository;
 import static com.moabam.api.domain.room.QParticipant.*;
 import static com.moabam.api.domain.room.QRoom.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class ParticipantSearchRepository {
 		);
 	}
 
-	public List<Participant> findParticipantsByRoomId(Long roomId) {
+	public List<Participant> findAllByRoomId(Long roomId) {
 		return jpaQueryFactory
 			.selectFrom(participant)
 			.where(
@@ -44,7 +45,7 @@ public class ParticipantSearchRepository {
 			.fetch();
 	}
 
-	public List<Participant> findAllParticipantsByRoomId(Long roomId) {
+	public List<Participant> findAllWithDeletedByRoomId(Long roomId) {
 		return jpaQueryFactory
 			.selectFrom(participant)
 			.where(
@@ -53,7 +54,18 @@ public class ParticipantSearchRepository {
 			.fetch();
 	}
 
-	public List<Participant> findNotDeletedParticipantsByMemberId(Long memberId) {
+	public List<Participant> findAllByRoomIdBeforeDate(Long roomId, LocalDateTime date) {
+		return jpaQueryFactory
+			.selectFrom(participant)
+			.where(
+				participant.room.id.eq(roomId),
+				participant.createdAt.before(date),
+				participant.deletedAt.isNull()
+			)
+			.fetch();
+	}
+
+	public List<Participant> findNotDeletedAllByMemberId(Long memberId) {
 		return jpaQueryFactory
 			.selectFrom(participant)
 			.join(participant.room, room).fetchJoin()
@@ -64,7 +76,7 @@ public class ParticipantSearchRepository {
 			.fetch();
 	}
 
-	public List<Participant> findAllParticipantsByMemberId(Long memberId) {
+	public List<Participant> findAllByMemberId(Long memberId) {
 		return jpaQueryFactory
 			.selectFrom(participant)
 			.leftJoin(participant.room, room).fetchJoin()
