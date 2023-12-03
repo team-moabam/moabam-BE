@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.room.Participant;
 import com.moabam.api.dto.member.MemberInfo;
 import com.moabam.global.common.util.DynamicQuery;
 import com.querydsl.core.types.Expression;
@@ -48,15 +49,14 @@ public class MemberSearchRepository {
 			.fetchOne());
 	}
 
-	public Optional<Member> findMemberNotManager(Long memberId) {
-		return Optional.ofNullable(jpaQueryFactory
-			.selectFrom(member)
-			.leftJoin(participant).on(member.id.eq(participant.memberId))
+	public List<Participant> findParticipantByMemberId(Long memberId) {
+		return jpaQueryFactory
+			.selectFrom(participant)
 			.where(
-				member.id.eq(memberId),
-				participant.isManager.isNull().or(participant.isManager.isFalse())
+				participant.memberId.eq(memberId),
+				participant.deletedAt.isNull()
 			)
-			.fetchFirst());
+			.fetch();
 	}
 
 	public List<MemberInfo> findMemberAndBadges(Long searchId, boolean isMe) {

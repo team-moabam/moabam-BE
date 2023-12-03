@@ -17,8 +17,6 @@ import com.moabam.api.application.member.MemberMapper;
 import com.moabam.api.domain.member.repository.BadgeRepository;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
-import com.moabam.api.domain.room.Participant;
-import com.moabam.api.domain.room.Room;
 import com.moabam.api.domain.room.RoomType;
 import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.RoomRepository;
@@ -27,8 +25,6 @@ import com.moabam.api.dto.member.MemberInfoSearchResponse;
 import com.moabam.support.annotation.QuerydslRepositoryTest;
 import com.moabam.support.fixture.BadgeFixture;
 import com.moabam.support.fixture.MemberFixture;
-import com.moabam.support.fixture.ParticipantFixture;
-import com.moabam.support.fixture.RoomFixture;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -66,53 +62,6 @@ class MemberRepositoryTest {
 
 		// then
 		assertThat(savedMember).isNotNull();
-	}
-
-	@DisplayName("회원 찾는 query 조회")
-	@Nested
-	class FindMemberTest {
-
-		@DisplayName("회원이 방 매니저이면 에러")
-		@Test
-		void room_exist_and_manager_error() {
-			// given
-			Member member = MemberFixture.member("1111");
-			memberRepository.save(member);
-
-			Room room = RoomFixture.room();
-			roomRepository.save(room);
-
-			Participant participant = ParticipantFixture.participant(room, member.getId());
-			participant.enableManager();
-			participantRepository.save(participant);
-
-			// when
-			Optional<Member> memberOptional =
-				memberSearchRepository.findMemberNotManager(member.getId());
-
-			// then
-			assertThat(memberOptional).isEmpty();
-		}
-
-		@DisplayName("매니저가 아니면 회원 조회 성공")
-		@Test
-		void room_exist_and_not_manager_success() {
-			// given
-			Room room = RoomFixture.room();
-			room.changeManagerNickname("test");
-			roomRepository.save(room);
-
-			Member member = MemberFixture.member("44");
-			member.changeNickName("not");
-			memberRepository.save(member);
-
-			// when
-			Optional<Member> memberOptional =
-				memberSearchRepository.findMemberNotManager(member.getId());
-
-			// then
-			assertThat(memberOptional).isNotEmpty();
-		}
 	}
 
 	@DisplayName("회원 정보 찾는 Query")

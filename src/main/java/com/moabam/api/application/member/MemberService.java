@@ -73,10 +73,12 @@ public class MemberService {
 		return memberRepository.findAllById(memberIds);
 	}
 
-	@Transactional
-	public Member findMemberToDelete(Long memberId) {
-		return memberSearchRepository.findMemberNotManager(memberId)
-			.orElseThrow(() -> new NotFoundException(MEMBER_NOT_FOUND));
+	public void validateMemberToDelete(Long memberId) {
+		List<Participant> participants = memberSearchRepository.findParticipantByMemberId(memberId);
+
+		if (!participants.isEmpty()) {
+			throw new NotFoundException(MEMBER_NOT_FOUND);
+		}
 	}
 
 	@Transactional

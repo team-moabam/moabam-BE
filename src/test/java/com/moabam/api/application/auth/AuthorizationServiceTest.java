@@ -331,7 +331,7 @@ class AuthorizationServiceTest {
 
 		willReturn(member)
 			.given(memberService)
-			.findMemberToDelete(authMember.id());
+			.validateMemberToDelete(authMember.id());
 		doNothing().when(oAuth2AuthorizationServerRequestService)
 			.unlinkMemberRequest(eq(oauthConfig.provider().unlink()), eq(oauthConfig.client().adminKey()), any());
 
@@ -345,7 +345,7 @@ class AuthorizationServiceTest {
 		// Given + When
 		willThrow(new NotFoundException(ErrorMessage.MEMBER_NOT_FOUND))
 			.given(memberService)
-			.findMemberToDelete(authMember.id());
+			.validateMemberToDelete(authMember.id());
 
 		assertThatThrownBy(() -> authorizationService.unLinkMember(authMember))
 			.isInstanceOf(NotFoundException.class)
@@ -360,7 +360,7 @@ class AuthorizationServiceTest {
 
 		willReturn(member)
 			.given(memberService)
-			.findMemberToDelete(authMember.id());
+			.validateMemberToDelete(authMember.id());
 		willThrow(BadRequestException.class)
 			.given(oAuth2AuthorizationServerRequestService)
 			.unlinkMemberRequest(eq(oauthConfig.provider().unlink()), eq(oauthConfig.client().adminKey()), any());

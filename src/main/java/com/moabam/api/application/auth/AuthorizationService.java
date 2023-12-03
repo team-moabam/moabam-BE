@@ -101,8 +101,6 @@ public class AuthorizationService {
 
 		response.addCookie(CookieUtils.typeCookie("Bearer", tokenConfig.getRefreshExpire(), domain));
 		response.addCookie(CookieUtils
-			.tokenCookie("Test", publicClaim.role().name(), tokenConfig.getRefreshExpire(), domain));
-		response.addCookie(CookieUtils
 			.tokenCookie("access_token", accessToken, tokenConfig.getRefreshExpire(), domain));
 		response.addCookie(CookieUtils
 			.tokenCookie("refresh_token", refreshToken, tokenConfig.getRefreshExpire(), domain));
@@ -139,7 +137,8 @@ public class AuthorizationService {
 
 	@Transactional
 	public void unLinkMember(AuthMember authMember) {
-		Member member = memberService.findMemberToDelete(authMember.id());
+		memberService.validateMemberToDelete(authMember.id());
+		Member member = memberService.findMember(authMember.id());
 		unlinkRequest(member.getSocialId());
 		memberService.delete(member);
 	}
