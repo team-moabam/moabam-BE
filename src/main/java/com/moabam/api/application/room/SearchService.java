@@ -328,6 +328,7 @@ public class SearchService {
 		List<TodayCertificateRankResponse> responses = new ArrayList<>();
 
 		List<Long> allMemberIds = participants.stream()
+			.filter(p -> p.getDeletedAt() == null)
 			.map(Participant::getMemberId)
 			.distinct()
 			.collect(Collectors.toList());
