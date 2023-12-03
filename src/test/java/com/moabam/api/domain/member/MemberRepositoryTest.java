@@ -137,11 +137,10 @@ class MemberRepositoryTest {
 			member.enterRoom(RoomType.MORNING);
 			memberRepository.save(member);
 
-			Badge morningBirth = BadgeFixture.badge(member.getId(), BadgeType.MORNING_BIRTH);
-			Badge morningAdult = BadgeFixture.badge(member.getId(), BadgeType.MORNING_ADULT);
-			Badge nightBirth = BadgeFixture.badge(member.getId(), BadgeType.NIGHT_BIRTH);
-			Badge nightAdult = BadgeFixture.badge(member.getId(), BadgeType.NIGHT_ADULT);
-			List<Badge> badges = List.of(morningBirth, morningAdult, nightBirth, nightAdult);
+			Badge birth = BadgeFixture.badge(member.getId(), BadgeType.BIRTH);
+			Badge level50 = BadgeFixture.badge(member.getId(), BadgeType.LEVEL50);
+			Badge level10 = BadgeFixture.badge(member.getId(), BadgeType.LEVEL10);
+			List<Badge> badges = List.of(birth, level10, level50);
 			badgeRepository.saveAll(badges);
 
 			// when

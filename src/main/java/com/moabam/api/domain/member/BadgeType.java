@@ -2,6 +2,7 @@ package com.moabam.api.domain.member;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import com.moabam.api.dto.member.BadgeResponse;
@@ -11,16 +12,15 @@ import lombok.Getter;
 @Getter
 public enum BadgeType {
 
-	MORNING_BIRTH("MORNING", "오목눈이 탄생"),
-	MORNING_ADULT("MORNING", "어른 오목눈이"),
-	NIGHT_BIRTH("NIGHT", "부엉이 탄생"),
-	NIGHT_ADULT("NIGHT", "어른 부엉이");
+	BIRTH(10, "탄생 축하 뱃지"),
+	LEVEL10(100, "10레벨 뱃지"),
+	LEVEL50(500, "50레벨 뱃지");
 
-	private final String period;
+	private final long certifyCount;
 	private final String korean;
 
-	BadgeType(String period, String korean) {
-		this.period = period;
+	BadgeType(long certifyCount, String korean) {
+		this.certifyCount = certifyCount;
 		this.korean = korean;
 	}
 
@@ -31,5 +31,11 @@ public enum BadgeType {
 				.unlock(badgeTypes.contains(badgeType))
 				.build())
 			.toList();
+	}
+
+	public static Optional<BadgeType> getBadgeFrom(long certifyCount) {
+		return Arrays.stream(BadgeType.values())
+			.filter(badgeType -> badgeType.certifyCount == certifyCount)
+			.findFirst();
 	}
 }

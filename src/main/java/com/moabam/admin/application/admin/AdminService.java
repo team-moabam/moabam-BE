@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.moabam.admin.domain.admin.Admin;
 import com.moabam.admin.domain.admin.AdminRepository;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AdminService {
 
 	@Value("${admin}")
@@ -31,6 +33,7 @@ public class AdminService {
 		}
 	}
 
+	@Transactional
 	public LoginResponse signUpOrLogin(AuthorizationTokenInfoResponse authorizationTokenInfoResponse) {
 		return login(authorizationTokenInfoResponse);
 	}

@@ -265,10 +265,10 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@Test
 	void search_my_info_success() throws Exception {
 		// given
-		Badge morningBirth = BadgeFixture.badge(member.getId(), BadgeType.MORNING_BIRTH);
-		Badge morningAdult = BadgeFixture.badge(member.getId(), BadgeType.MORNING_ADULT);
-		Badge nightBirth = BadgeFixture.badge(member.getId(), BadgeType.NIGHT_BIRTH);
-		List<Badge> badges = List.of(morningBirth, morningAdult, nightBirth);
+		Badge birth = BadgeFixture.badge(member.getId(), BadgeType.BIRTH);
+		Badge level50 = BadgeFixture.badge(member.getId(), BadgeType.LEVEL50);
+		Badge level10 = BadgeFixture.badge(member.getId(), BadgeType.LEVEL10);
+		List<Badge> badges = List.of(birth, level10, level50);
 		badgeRepository.saveAll(badges);
 
 		Item night = ItemFixture.nightMageSkin();
@@ -302,14 +302,12 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				// MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
 				// MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
 
-				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("오목눈이 탄생"),
+				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("탄생 축하 뱃지"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("어른 오목눈이"),
+				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("10레벨 뱃지"),
 				MockMvcResultMatchers.jsonPath("$.badges[1].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("부엉이 탄생"),
+				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("50레벨 뱃지"),
 				MockMvcResultMatchers.jsonPath("$.badges[2].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("어른 부엉이"),
-				MockMvcResultMatchers.jsonPath("$.badges[3].unlock").value(false),
 				MockMvcResultMatchers.jsonPath("$.goldenBug").value(member.getBug().getGoldenBug()),
 				MockMvcResultMatchers.jsonPath("$.morningBug").value(member.getBug().getMorningBug()),
 				MockMvcResultMatchers.jsonPath("$.nightBug").value(member.getBug().getNightBug())
@@ -353,14 +351,12 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				// MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getImage()),
 				// MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getImage()),
 
-				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("오목눈이 탄생"),
+				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("탄생 축하 뱃지"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(false),
-				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("어른 오목눈이"),
+				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("10레벨 뱃지"),
 				MockMvcResultMatchers.jsonPath("$.badges[1].unlock").value(false),
-				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("부엉이 탄생"),
+				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("50레벨 뱃지"),
 				MockMvcResultMatchers.jsonPath("$.badges[2].unlock").value(false),
-				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("어른 부엉이"),
-				MockMvcResultMatchers.jsonPath("$.badges[3].unlock").value(false),
 				MockMvcResultMatchers.jsonPath("$.goldenBug").value(member.getBug().getGoldenBug()),
 				MockMvcResultMatchers.jsonPath("$.morningBug").value(member.getBug().getMorningBug()),
 				MockMvcResultMatchers.jsonPath("$.nightBug").value(member.getBug().getNightBug())
@@ -375,11 +371,9 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		Member friend = MemberFixture.member("123456789");
 		memberRepository.save(friend);
 
-		Badge morningBirth = BadgeFixture.badge(friend.getId(), BadgeType.MORNING_BIRTH);
-		Badge morningAdult = BadgeFixture.badge(friend.getId(), BadgeType.MORNING_ADULT);
-		Badge nightBirth = BadgeFixture.badge(friend.getId(), BadgeType.NIGHT_BIRTH);
-		Badge nightAdult = BadgeFixture.badge(friend.getId(), BadgeType.NIGHT_ADULT);
-		List<Badge> badges = List.of(morningBirth, morningAdult, nightBirth, nightAdult);
+		Badge birth = BadgeFixture.badge(friend.getId(), BadgeType.BIRTH);
+		Badge level10 = BadgeFixture.badge(friend.getId(), BadgeType.LEVEL10);
+		List<Badge> badges = List.of(birth, level10);
 		badgeRepository.saveAll(badges);
 
 		Item night = ItemFixture.nightMageSkin();
@@ -388,10 +382,10 @@ class MemberControllerTest extends WithoutFilterSupporter {
 		itemRepository.saveAll(List.of(night, morning, killer));
 
 		Inventory nightInven = InventoryFixture.inventory(friend.getId(), night);
-		nightInven.select(member);
+		nightInven.select(friend);
 
 		Inventory morningInven = InventoryFixture.inventory(friend.getId(), morning);
-		morningInven.select(member);
+		morningInven.select(friend);
 
 		Inventory killerInven = InventoryFixture.inventory(friend.getId(), killer);
 		friend.changeDefaultSkintUrl(morning);
@@ -416,14 +410,12 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				MockMvcResultMatchers.jsonPath("$.birds.MORNING").value(morningInven.getItem().getAwakeImage()),
 				MockMvcResultMatchers.jsonPath("$.birds.NIGHT").value(nightInven.getItem().getAwakeImage()),
 
-				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("오목눈이 탄생"),
+				MockMvcResultMatchers.jsonPath("$.badges[0].badge").value("탄생 축하 뱃지"),
 				MockMvcResultMatchers.jsonPath("$.badges[0].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("어른 오목눈이"),
+				MockMvcResultMatchers.jsonPath("$.badges[1].badge").value("10레벨 뱃지"),
 				MockMvcResultMatchers.jsonPath("$.badges[1].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("부엉이 탄생"),
-				MockMvcResultMatchers.jsonPath("$.badges[2].unlock").value(true),
-				MockMvcResultMatchers.jsonPath("$.badges[3].badge").value("어른 부엉이"),
-				MockMvcResultMatchers.jsonPath("$.badges[3].unlock").value(true)
+				MockMvcResultMatchers.jsonPath("$.badges[2].badge").value("50레벨 뱃지"),
+				MockMvcResultMatchers.jsonPath("$.badges[2].unlock").value(false)
 			).andDo(print());
 	}
 

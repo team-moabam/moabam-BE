@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.moabam.api.application.bug.BugService;
 import com.moabam.api.application.image.ImageService;
+import com.moabam.api.application.member.BadgeService;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.room.mapper.CertificationsMapper;
 import com.moabam.api.domain.bug.BugType;
@@ -81,6 +82,9 @@ class CertificationServiceTest {
 
 	@Mock
 	private ImageService imageService;
+
+	@Mock
+	private BadgeService badgeService;
 
 	@Mock
 	private ClockHolder clockHolder;
