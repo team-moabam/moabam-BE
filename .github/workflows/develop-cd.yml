@@ -53,7 +53,7 @@ jobs:
           port: 22
           username: ${{ secrets.EC2_DEV_INSTANCE_USERNAME }}
           key: ${{ secrets.EC2_DEV_INSTANCE_PRIVATE_KEY }}
-          source: "infra/mysql/*, infra/nginx/*, infra/scripts/*.sh, !infra/scripts/deploy-prod.sh, infra/docker-compose-dev.yml"
+          source: "infra/mysql/*, infra/nginx/*, infra/scripts/*.sh, !infra/scripts/deploy-prod.sh, infra/docker-compose-dev.yml, .env"
           target: "/home/ubuntu/moabam"
 
       - name: 파일 세팅
