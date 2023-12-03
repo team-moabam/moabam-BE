@@ -34,7 +34,7 @@ public class MemberSearchRepository {
 		return jpaQueryFactory
 			.selectFrom(member)
 			.where(
-				member.deletedAt.isNotNull()
+				member.deletedAt.isNull()
 			)
 			.fetch();
 	}

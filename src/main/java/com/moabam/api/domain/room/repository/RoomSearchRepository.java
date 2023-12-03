@@ -24,7 +24,8 @@ public class RoomSearchRepository {
 		return jpaQueryFactory.selectFrom(room)
 			.where(
 				DynamicQuery.generateEq(roomType, room.roomType::eq),
-				DynamicQuery.generateEq(roomId, room.id::lt)
+				DynamicQuery.generateEq(roomId, room.id::lt),
+				room.deletedAt.isNull()
 			)
 			.orderBy(room.id.desc())
 			.limit(ROOM_FIXED_SEARCH_SIZE + 1L)

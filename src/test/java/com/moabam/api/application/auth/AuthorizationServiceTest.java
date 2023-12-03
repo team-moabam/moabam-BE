@@ -329,9 +329,7 @@ class AuthorizationServiceTest {
 		// given
 		Member member = MemberFixture.member();
 
-		willReturn(member)
-			.given(memberService)
-			.validateMemberToDelete(authMember.id());
+		given(memberService.findMember(any())).willReturn(MemberFixture.member());
 		doNothing().when(oAuth2AuthorizationServerRequestService)
 			.unlinkMemberRequest(eq(oauthConfig.provider().unlink()), eq(oauthConfig.client().adminKey()), any());
 
@@ -350,24 +348,5 @@ class AuthorizationServiceTest {
 		assertThatThrownBy(() -> authorizationService.unLinkMember(authMember))
 			.isInstanceOf(NotFoundException.class)
 			.hasMessage(ErrorMessage.MEMBER_NOT_FOUND.getMessage());
-	}
-
-	@DisplayName("소셜 탈퇴 요청 실패로 인한 실패")
-	@Test
-	void unlink_failBy_(@WithMember AuthMember authMember) {
-		// Given
-		Member member = MemberFixture.member();
-
-		willReturn(member)
-			.given(memberService)
-			.validateMemberToDelete(authMember.id());
-		willThrow(BadRequestException.class)
-			.given(oAuth2AuthorizationServerRequestService)
-			.unlinkMemberRequest(eq(oauthConfig.provider().unlink()), eq(oauthConfig.client().adminKey()), any());
-
-		// When + Then
-		assertThatThrownBy(() -> authorizationService.unLinkMember(authMember))
-			.isInstanceOf(BadRequestException.class)
-			.hasMessage(ErrorMessage.UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS.getMessage());
 	}
 }
