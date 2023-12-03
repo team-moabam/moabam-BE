@@ -102,11 +102,14 @@ dependencies {
     implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.2")
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 
-    // webflux
+    // Webflux
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     // Slack Webhook
-    implementation "net.gpedro.integrations.slack:slack-webhook:1.4.0"
+    implementation 'net.gpedro.integrations.slack:slack-webhook:1.4.0'
+
+    // Logback Slack Appender
+    implementation 'com.github.maricn:logback-slack-appender:1.6.1'
 
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
