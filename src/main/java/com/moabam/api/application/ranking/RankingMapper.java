@@ -25,7 +25,7 @@ public class RankingMapper {
 
 	public static TopRankingInfo topRankingResponse(int rank, UpdateRanking updateRanking) {
 		return TopRankingInfo.builder()
-			.rank(rank + 1)
+			.rank(rank)
 			.score(updateRanking.score())
 			.nickname(updateRanking.rankingInfo().nickname())
 			.image(updateRanking.rankingInfo().image())

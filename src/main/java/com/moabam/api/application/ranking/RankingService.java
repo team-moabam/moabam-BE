@@ -51,17 +51,17 @@ public class RankingService {
 
 	public TopRankingResponse getMemberRanking(UpdateRanking myRankingInfo) {
 		List<TopRankingInfo> topRankings = getTopRankings();
-		Long myRanking = zSetRedisRepository.reverseRank(RANKING, myRankingInfo.rankingInfo());
+		long myRanking = zSetRedisRepository.reverseRank(RANKING, myRankingInfo.rankingInfo()) + 1;
 
 		Optional<TopRankingInfo> myTopRanking = topRankings.stream()
 			.filter(topRankingInfo -> Objects.equals(topRankingInfo.memberId(), myRankingInfo.rankingInfo().memberId()))
 			.findFirst();
 
 		if (myTopRanking.isPresent()) {
-			myRanking = (long)myTopRanking.get().rank();
+			myRanking = myTopRanking.get().rank();
 		}
 
-		TopRankingInfo myRankingInfoResponse = RankingMapper.topRankingResponse(myRanking.intValue(), myRankingInfo);
+		TopRankingInfo myRankingInfoResponse = RankingMapper.topRankingResponse((int)myRanking, myRankingInfo);
 
 		return RankingMapper.topRankingResponses(myRankingInfoResponse, topRankings);
 	}
