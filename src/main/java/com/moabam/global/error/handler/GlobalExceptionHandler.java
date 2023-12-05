@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,6 +27,7 @@ import com.moabam.global.error.exception.TossPaymentException;
 import com.moabam.global.error.exception.UnauthorizedException;
 import com.moabam.global.error.model.ErrorResponse;
 
+@Order(1)
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
