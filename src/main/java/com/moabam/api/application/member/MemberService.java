@@ -158,7 +158,7 @@ public class MemberService {
 		if (Objects.isNull(nickname)) {
 			return;
 		}
-		if (StringUtils.isEmpty(nickname) && memberRepository.existsByNickname(nickname)) {
+		if (StringUtils.isEmpty(nickname) || memberRepository.existsByNickname(nickname)) {
 			throw new ConflictException(NICKNAME_CONFLICT);
 		}
 	}
