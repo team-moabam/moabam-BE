@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -112,6 +113,12 @@ public class GlobalExceptionHandler {
 		String message = String.format(INVALID_REQUEST_VALUE_TYPE_FORMAT.getMessage(), exception.getValue(), typeName);
 
 		return new ErrorResponse(message, null);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MissingRequestValueException.class)
+	protected ErrorResponse handleMethodArgumentTypeMismatchException(MissingRequestValueException exception) {
+		return new ErrorResponse(exception.getMessage(), null);
 	}
 
 	@ExceptionHandler(MaxUploadSizeExceededException.class)
