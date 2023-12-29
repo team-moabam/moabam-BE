@@ -37,7 +37,8 @@ public class Routine extends BaseTimeEntity {
 	@JoinColumn(name = "room_id", updatable = false)
 	private Room room;
 
-	@Column(name = "content", nullable = false, length = 20)
+	@Column(name = "content",
+		columnDefinition = "VARCHAR(20) NOT NULL, FULLTEXT INDEX full_content (content) WITH PARSER ngram")
 	private String content;
 
 	@Builder
