@@ -404,7 +404,7 @@ class SearchServiceTest {
 			routine16, routine17, routine18, routine19, routine20, routine21, routine22, routine23, routine24,
 			routine25, routine26, routine27, routine28);
 
-		given(roomRepository.searchByKeyword("번째")).willReturn(rooms);
+		given(roomSearchRepository.searchWithKeyword("번째", null, null)).willReturn(rooms);
 		given(routineRepository.findAllByRoomIdIn(anyList())).willReturn(routines);
 
 		// when

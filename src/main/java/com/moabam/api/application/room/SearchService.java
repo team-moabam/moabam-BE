@@ -162,25 +162,7 @@ public class SearchService {
 
 	public GetAllRoomsResponse searchRooms(String keyword, @Nullable RoomType roomType, @Nullable Long roomId) {
 		List<GetAllRoomResponse> getAllRoomResponse = new ArrayList<>();
-		List<Room> rooms = new ArrayList<>();
-
-		if (roomId == null && roomType == null) {
-			rooms = new ArrayList<>(roomRepository.searchByKeyword(keyword));
-		}
-
-		if (roomId == null && roomType != null) {
-			rooms = new ArrayList<>(roomRepository.searchByKeywordAndRoomType(keyword, roomType.name()));
-		}
-
-		if (roomId != null && roomType == null) {
-			rooms = new ArrayList<>(roomRepository.searchByKeywordAndRoomId(keyword, roomId));
-		}
-
-		if (roomId != null && roomType != null) {
-			rooms = new ArrayList<>(
-				roomRepository.searchByKeywordAndRoomIdAndRoomType(keyword, roomType.name(), roomId));
-		}
-
+		List<Room> rooms = new ArrayList<>(roomSearchRepository.searchWithKeyword(keyword, roomType, roomId));
 		boolean hasNext = isHasNext(getAllRoomResponse, rooms);
 
 		return RoomMapper.toSearchAllRoomsResponse(hasNext, getAllRoomResponse);
