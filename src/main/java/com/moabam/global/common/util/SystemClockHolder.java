@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile({"dev", "prod"})
+@Profile({"dev", "prod", "local"})
 public class SystemClockHolder implements ClockHolder {
 
 	@Override

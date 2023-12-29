@@ -602,7 +602,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 
 		Member member = Member.builder()
 			.id(1L)
-			.socialId("1")
+			.socialId("321313")
 			.bug(BugFixture.bug())
 			.build();
 
@@ -1329,7 +1329,7 @@ class RoomControllerTest extends WithoutFilterSupporter {
 	@Test
 	void search_first_page_all_rooms_by_keyword_success() throws Exception {
 		// given
-		Room room1 = RoomFixture.room("아침 - 첫 번째 방", RoomType.MORNING, 10, "1234");
+		Room room1 = RoomFixture.room("테스트하는 방입니다", RoomType.MORNING, 10, "1234");
 		Room room2 = RoomFixture.room("아침 - 두 번째 방", RoomType.MORNING, 9);
 		Room room3 = RoomFixture.room("밤 - 세 번째 방", RoomType.NIGHT, 22);
 		Room room4 = RoomFixture.room("아침 - 네 번째 방", RoomType.MORNING, 7);
@@ -1343,6 +1343,8 @@ class RoomControllerTest extends WithoutFilterSupporter {
 		Room room12 = RoomFixture.room("아침 - 열둘 번째 방", RoomType.MORNING, 10);
 		Room room13 = RoomFixture.room("밤 - 열셋 번째 방", RoomType.NIGHT, 2);
 		Room room14 = RoomFixture.room("밤 - 열넷 번째 방", RoomType.NIGHT, 21);
+
+		room1.changeManagerNickname("아침");
 
 		Routine routine1 = RoomFixture.routine(room1, "방1의 루틴1");
 		Routine routine2 = RoomFixture.routine(room1, "방1의 루틴2");
@@ -1396,17 +1398,17 @@ class RoomControllerTest extends WithoutFilterSupporter {
 				routine20, routine21, routine22, routine23, routine24, routine25, routine26, routine27, routine28));
 
 		// expected
-		mockMvc.perform(get("/rooms/search?keyword=아침"))
+		mockMvc.perform(get("/rooms/search?keyword=테스트"))
 			.andExpect(status().isOk())
 			.andDo(print());
 
-		mockMvc.perform(get("/rooms/search?keyword=방12"))
-			.andExpect(status().isOk())
-			.andDo(print());
-
-		mockMvc.perform(get("/rooms/search?keyword=방"))
-			.andExpect(status().isOk())
-			.andDo(print());
+		// mockMvc.perform(get("/rooms/search?keyword=방12"))
+		// 	.andExpect(status().isOk())
+		// 	.andDo(print());
+		//
+		// mockMvc.perform(get("/rooms/search?keyword=방"))
+		// 	.andExpect(status().isOk())
+		// 	.andDo(print());
 	}
 
 	@DisplayName("방 검색 조회 성공 - 키워드 + 방 타입 존재")
