@@ -384,7 +384,7 @@ public class SearchService {
 			return 0;
 		}
 
-		LocalDateTime now = clockHolder.times();
+		LocalDateTime now = clockHolder.dateTime();
 		LocalTime targetTime = LocalTime.of(room.getCertifyTime(), 0);
 		LocalDateTime targetDateTime = LocalDateTime.of(now.toLocalDate(), targetTime);
 
