@@ -11,4 +11,6 @@ public interface ClockHolder {
 	LocalDate date();
 
 	LocalTime time();
+
+	LocalTime endOfDay();
 }

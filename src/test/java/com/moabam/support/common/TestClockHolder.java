@@ -25,6 +25,11 @@ public class TestClockHolder implements ClockHolder {
 
 	@Override
 	public LocalTime time() {
-		return LocalTime.now();
+		return LocalTime.of(23, 50, 50);
+	}
+
+	@Override
+	public LocalTime endOfDay() {
+		return LocalTime.of(23, 59, 59, 999_999_999);
 	}
 }

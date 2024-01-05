@@ -25,4 +25,9 @@ public class SystemClockHolder implements ClockHolder {
 	public LocalTime time() {
 		return LocalTime.now();
 	}
+
+	@Override
+	public LocalTime endOfDay() {
+		return LocalTime.of(23, 59, 59, 999_999_999);
+	}
 }
