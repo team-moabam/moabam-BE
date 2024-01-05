@@ -11,12 +11,10 @@ import com.moabam.api.application.notification.NotificationService;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponManageRepository;
-import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
-import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.global.error.model.ErrorMessage;
 
 import lombok.RequiredArgsConstructor;
@@ -34,14 +32,14 @@ public class CouponManageService {
 	private final ClockHolder clockHolder;
 	private final NotificationService notificationService;
 
-	private final CouponRepository couponRepository;
+	private final CouponCacheService couponCacheService;
 	private final CouponManageRepository couponManageRepository;
 	private final CouponWalletRepository couponWalletRepository;
 
 	@Scheduled(fixedDelay = 1000)
 	public void issue() {
 		LocalDate now = clockHolder.date();
-		Optional<Coupon> optionalCoupon = couponRepository.findByStartAt(now);
+		Optional<Coupon> optionalCoupon = couponCacheService.getByStartAt(now);
 
 		if (optionalCoupon.isEmpty()) {
 			return;
@@ -70,21 +68,20 @@ public class CouponManageService {
 		couponManageRepository.increase(couponName, membersId.size());
 	}
 
+	public void delete(String couponName) {
+		couponManageRepository.deleteQueue(couponName);
+		couponManageRepository.deleteCount(couponName);
+	}
+
 	public void registerQueue(String couponName, Long memberId) {
 		double registerTime = System.currentTimeMillis();
 		validateRegisterQueue(couponName, memberId);
 		couponManageRepository.addIfAbsentQueue(couponName, memberId, registerTime);
 	}
 
-	public void delete(String couponName) {
-		couponManageRepository.deleteQueue(couponName);
-		couponManageRepository.deleteCount(couponName);
-	}
-
 	private void validateRegisterQueue(String couponName, Long memberId) {
 		LocalDate now = clockHolder.date();
-		Coupon coupon = couponRepository.findByNameAndStartAt(couponName, now)
-			.orElseThrow(() -> new NotFoundException(ErrorMessage.INVALID_COUPON_PERIOD));
+		Coupon coupon = couponCacheService.getByNameAndStartAt(couponName, now);
 
 		if (couponManageRepository.hasValue(couponName, memberId)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_ISSUE);

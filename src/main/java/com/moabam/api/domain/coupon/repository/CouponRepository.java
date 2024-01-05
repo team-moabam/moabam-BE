@@ -16,6 +16,4 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 	Optional<Coupon> findByStartAt(LocalDate startAt);
 
 	Optional<Coupon> findByNameAndStartAt(String couponName, LocalDate startAt);
-
-	boolean existsByNameAndStartAt(String couponName, LocalDate startAt);
 }
