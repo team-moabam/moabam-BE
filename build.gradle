@@ -15,14 +15,26 @@ java {
     sourceCompatibility = '17'
 }
 
+compileJava {
+    options.compilerArgs << '-parameters'
+    options.encoding = 'UTF-8'
+}
+
+compileTestJava {
+    options.compilerArgs << '-parameters'
+    options.encoding = 'UTF-8'
+}
+
 ext {
     snippetsDir = file('build/generated-snippets')
 }
 
 def querydslSrcDir = 'src/main/generated'
+
 clean {
     delete file(querydslSrcDir)
 }
+
 tasks.withType(JavaCompile) {
     options.generatedSourceOutputDirectory = file(querydslSrcDir)
 }
@@ -74,6 +86,9 @@ dependencies {
 
     // Apache Commons Lang 3
     implementation 'org.apache.commons:commons-lang3:3.13.0'
+
+    // Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
 
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -134,27 +149,24 @@ jacocoTestReport {
 
     afterEvaluate {
         classDirectories.setFrom(
-                files(classDirectories.files.collect {
-                    fileTree(dir: it, excludes: [
-                            "**/*Application*",
-                            "**/*Config*",
-                            "**/*Request*",
-                            "**/*Response*",
-                            "**/*Exception*",
-                            "**/*Mapper*",
-                            "**/*ErrorMessage*",
-                            "**/*DynamicQuery*",
-                            "**/*BaseTimeEntity*",
-                            "**/*HealthCheckController*",
-                            "**/*S3Manager*",
-                    ] + Qdomains)
-                })
+            files(classDirectories.files.collect {
+                fileTree(dir: it, excludes: [
+                    "**/*Application*",
+                    "**/*Config*",
+                    "**/*Request*",
+                    "**/*Response*",
+                    "**/*Exception*",
+                    "**/*Mapper*",
+                    "**/*ErrorMessage*",
+                    "**/*DynamicQuery*",
+                    "**/*BaseTimeEntity*",
+                    "**/*HealthCheckController*",
+                    "**/*S3Manager*",
+                ] + Qdomains)
+            })
         )
     }
 }
-
-compileJava.options.encoding = 'UTF-8'
-compileTestJava.options.encoding = 'UTF-8'
 
 tasks.withType(Checkstyle).configureEach {
     reports {
@@ -177,9 +189,9 @@ sonar {
         property "sonar.host.url", "https://sonarcloud.io"
         property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
         property 'sonar.coverage.exclusions', '**/test/**, **/Q*.java, **/*Doc*.java, **/resources/** ' +
-                ',**/*Application*.java , **/*Config*.java, **/*Request*.java, **/*Response*.java ,**/*Exception*.java ' +
-                ',**/*ErrorMessage*.java, **/*Mapper*.java, **/*DynamicQuery*, **/*BaseTimeEntity*, **/*HealthCheckController* ' +
-                ', **/*S3Manager*.java'
+            ',**/*Application*.java , **/*Config*.java, **/*Request*.java, **/*Response*.java ,**/*Exception*.java ' +
+            ',**/*ErrorMessage*.java, **/*Mapper*.java, **/*DynamicQuery*, **/*BaseTimeEntity*, **/*HealthCheckController* ' +
+            ', **/*S3Manager*.java'
         property 'sonar.java.checkstyle.reportPaths', 'build/reports/checkstyle/main.xml'
     }
 }

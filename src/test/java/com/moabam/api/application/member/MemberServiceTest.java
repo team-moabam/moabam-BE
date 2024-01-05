@@ -129,7 +129,7 @@ class MemberServiceTest {
 	void undo_delete_member(@WithMember AuthMember authMember) {
 		// given
 		Member member = MemberFixture.member();
-		given(clockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.dateTime()).willReturn(LocalDateTime.now());
 
 		// When
 		memberService.delete(member);
