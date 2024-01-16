@@ -216,7 +216,8 @@ create table room
     created_at         datetime(6)       not null,
     updated_at         datetime(6),
     primary key (id),
-    FULLTEXT INDEX full_index_room (title, manager_nickname) WITH PARSER ngram
+    FULLTEXT INDEX full_index_title (title) WITH PARSER ngram,
+    FULLTEXT INDEX full_index_manager_nickname (manager_nickname) WITH PARSER ngram
 );
 
 create table routine
