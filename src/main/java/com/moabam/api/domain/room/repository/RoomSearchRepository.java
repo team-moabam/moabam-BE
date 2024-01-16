@@ -22,7 +22,8 @@ import lombok.RequiredArgsConstructor;
 public class RoomSearchRepository {
 
 	private static final double MATCH_THRESHOLD = 0.0;
-	private static final String MATCH_AGAINST_TEMPLATE = "function('match_against', {0}, {1})";
+	private static final String MATCH_AGAINST_TEMPLATE_ONE = "function('match_against', {0}, {1})";
+	private static final String MATCH_AGAINST_TEMPLATE_TWO = "function('match_against_two', {0}, {1}, {2})";
 
 	private final JPAQueryFactory jpaQueryFactory;
 
@@ -56,11 +57,9 @@ public class RoomSearchRepository {
 	private BooleanExpression matchAgainst(String keyword) {
 		keyword = "\"" + keyword + "\"";
 
-		return Expressions.numberTemplate(Double.class, MATCH_AGAINST_TEMPLATE, room.title, keyword)
-			.gt(MATCH_THRESHOLD)
-			.or(Expressions.numberTemplate(Double.class, MATCH_AGAINST_TEMPLATE, room.managerNickname, keyword)
-				.gt(MATCH_THRESHOLD))
-			.or(Expressions.numberTemplate(Double.class, MATCH_AGAINST_TEMPLATE, routine.content, keyword)
+		return Expressions.numberTemplate(Double.class, MATCH_AGAINST_TEMPLATE_TWO, room.title, room.managerNickname,
+				keyword).gt(MATCH_THRESHOLD)
+			.or(Expressions.numberTemplate(Double.class, MATCH_AGAINST_TEMPLATE_ONE, routine.content, keyword)
 				.gt(MATCH_THRESHOLD));
 	}
 }
