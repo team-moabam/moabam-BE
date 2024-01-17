@@ -124,3 +124,4 @@ src/main/resources/config
 !application-test.yml
 src/main/generated
 dump.rdb
+/src/main/resources/firebase-local.json

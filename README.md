@@ -8,7 +8,7 @@
 
 ## 👨‍👨‍👧 Backend Team 소개
 
-|                                      김영명                                       |                                      김희빈                                       |                                    박세연(PO)                                     |                                      신재윤                                       |                                    홍혁준(SM)                                     |
+|                                      김영명                                       |                                    김희빈(PO)                                     |                                      박세연                                       |                                      신재윤                                       |                                    홍혁준(SM)                                     |
 |:------------------------------------------------------------------------------:|:------------------------------------------------------------------------------:|:------------------------------------------------------------------------------:|:------------------------------------------------------------------------------:|:------------------------------------------------------------------------------:|
 |                                   DEVELOPER                                    |                                   DEVELOPER                                    |                                   DEVELOPER                                    |                                   DEVELOPER                                    |                                   DEVELOPER                                    |
 | <img src="https://avatars.githubusercontent.com/u/83266154?v=4" width="250" /> | <img src="https://avatars.githubusercontent.com/u/72112845?v=4" width="250" /> | <img src="https://avatars.githubusercontent.com/u/54196094?v=4" width="250" /> | <img src="https://avatars.githubusercontent.com/u/87688023?v=4" width="250" /> | <img src="https://avatars.githubusercontent.com/u/31675711?v=4" width="250" /> |
@@ -28,6 +28,14 @@
 ## CI/CD 파이프라인
 
 ![img.png](readme-image/파이프라인.png)
+
+## 테이블 아키텍처
+
+![img.png](readme-image/table.png)
+
+## API 명세
+
+![img.png](readme-image/api.png)
 
 ## 컨벤션
 
