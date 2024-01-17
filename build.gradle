@@ -5,7 +5,7 @@ plugins {
     id 'org.sonarqube' version '4.4.1.3373'
     id 'jacoco'
     id 'checkstyle'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'com.epages.restdocs-api-spec' version '0.18.4'
 }
 
 group = 'com.moabam'
@@ -25,10 +25,6 @@ compileTestJava {
     options.encoding = 'UTF-8'
 }
 
-ext {
-    snippetsDir = file('build/generated-snippets')
-}
-
 def querydslSrcDir = 'src/main/generated'
 
 clean {
@@ -40,8 +36,6 @@ tasks.withType(JavaCompile) {
 }
 
 configurations {
-    asciidoctorExtensions
-
     compileOnly {
         extendsFrom annotationProcessor
     }
@@ -70,7 +64,14 @@ dependencies {
 
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'com.squareup.okhttp3:mockwebserver:4.11.0'
+    testImplementation 'com.squareup.okhttp3:mockwebserver'
+
+    // RestDocs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.4'
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
     // Querydsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -107,12 +108,6 @@ dependencies {
     // JSON parser
     implementation 'org.json:json:20230618'
 
-    // Asciidoctor
-    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-
-    // RestDocs
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-
     // S3
     implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.2")
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
@@ -125,9 +120,6 @@ dependencies {
 
     // Logback Slack Appender
     implementation 'com.github.maricn:logback-slack-appender:1.6.1'
-
-    // Swagger
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 }
 
 tasks.named('test') {
@@ -196,30 +188,17 @@ sonar {
     }
 }
 
-test {
-    outputs.dir snippetsDir
-}
+openapi3 {
+    servers = [
+        { url = 'http://localhost:8080' },
+        { url = 'http://dev.moabam.com' }
+    ]
 
-asciidoctor {
-    configurations 'asciidoctorExtensions'
-    inputs.dir snippetsDir
-    dependsOn test
-}
+    title = 'MOABAM API DOCS'
+    format = 'json'
 
-asciidoctor.doFirst {
-    delete file('src/main/resources/static/docs')
-}
-
-tasks.register('copyDocument', Copy) {
-    dependsOn asciidoctor
-    from file("build/docs/asciidoc")
-    into file("src/main/resources/static/docs")
-}
-
-bootJar {
-    dependsOn copyDocument
-}
-
-build {
-    dependsOn copyDocument
+    copy {
+        from 'build/api-spec'
+        into 'src/main/resources/static/docs'
+    }
 }

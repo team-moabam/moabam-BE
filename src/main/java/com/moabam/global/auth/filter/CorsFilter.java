@@ -3,6 +3,7 @@ package com.moabam.global.auth.filter;
 import java.io.IOException;
 import java.util.Objects;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Order(0)
+@Profile("!local")
 @Component
 @RequiredArgsConstructor
 public class CorsFilter extends OncePerRequestFilter {
