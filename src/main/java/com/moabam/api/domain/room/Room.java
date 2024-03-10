@@ -55,7 +55,8 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "title", nullable = false, length = 20)
+	@Column(name = "title",
+		columnDefinition = "VARCHAR(20) NOT NULL, FULLTEXT INDEX full_title (title) WITH PARSER ngram")
 	private String title;
 
 	@Column(name = "password", length = 8)
@@ -89,7 +90,8 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "room_image", length = 500)
 	private String roomImage;
 
-	@Column(name = "manager_nickname", length = 30)
+	@Column(name = "manager_nickname",
+		columnDefinition = "VARCHAR(30), FULLTEXT INDEX full_nickname (manager_nickname) WITH PARSER ngram")
 	private String managerNickname;
 
 	@Column(name = "deleted_at")

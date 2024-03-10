@@ -64,7 +64,7 @@ public class NotificationService {
 
 	@Scheduled(cron = "0 55 * * * *")
 	public void sendCertificationTime() {
-		int certificationTime = (clockHolder.times().getHour() + ONE_HOUR) % HOURS_IN_A_DAY;
+		int certificationTime = (clockHolder.dateTime().getHour() + ONE_HOUR) % HOURS_IN_A_DAY;
 		List<Participant> participants = participantSearchRepository.findAllByRoomCertifyTime(certificationTime);
 
 		participants.parallelStream().forEach(participant -> {

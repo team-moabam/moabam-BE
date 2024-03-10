@@ -89,7 +89,7 @@ public class MemberService {
 			throw new BadRequestException(NEED_TO_EXIT_ALL_ROOMS);
 		}
 
-		member.delete(clockHolder.times());
+		member.delete(clockHolder.dateTime());
 		memberRepository.flush();
 		memberRepository.delete(member);
 		rankingService.removeRanking(MemberMapper.toRankingInfo(member));

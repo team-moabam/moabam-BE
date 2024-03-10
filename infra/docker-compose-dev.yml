@@ -1,77 +1,77 @@
 version: '3.7'
 
 services:
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    platform: linux/arm64/v8
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
-      - ../logs/nginx:/var/log/nginx
-  certbot:
-    image: certbot/certbot:latest
-    container_name: certbot
-    platform: linux/arm64
-    restart: unless-stopped
-    volumes:
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-  moabam-blue:
-    image: ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${DOCKER_HUB_TAG}
-    container_name: ${BLUE_CONTAINER}
-    restart: unless-stopped
-    expose:
-      - ${SERVER_PORT}
-    depends_on:
-      - redis
-      - mysql
-    environment:
-      SPRING_ACTIVE_PROFILES: ${SPRING_ACTIVE_PROFILES}
-  moabam-green:
-    image: ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${DOCKER_HUB_TAG}
-    container_name: ${GREEN_CONTAINER}
-    restart: unless-stopped
-    expose:
-      - ${SERVER_PORT}
-    depends_on:
-      - redis
-      - mysql
-    environment:
-      SPRING_ACTIVE_PROFILES: ${SPRING_ACTIVE_PROFILES}
-  redis:
-    image: redis:alpine
-    container_name: redis
-    platform: linux/arm64
-    restart: always
-    command: redis-server
-    ports:
-      - "6379:6379"
-    volumes:
-      - ./data/redis:/data
-  mysql:
-    image: mysql:8.0.33
-    container_name: mysql
-    platform: linux/arm64/v8
-    restart: always
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: ${DEV_MYSQL_DATABASE}
-      MYSQL_USERNAME: ${DEV_MYSQL_USERNAME}
-      MYSQL_ROOT_PASSWORD: ${DEV_MYSQL_PASSWORD}
-      TZ: Asia/Seoul
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-      - --skip-character-set-client-handshake
-    volumes:
-      - ./data/mysql:/var/lib/mysql
-      - ./mysql/initdb.d:/docker-entrypoint-initdb.d
+    nginx:
+        image: nginx:latest
+        container_name: nginx
+        platform: linux/arm64/v8
+        restart: always
+        ports:
+            - "80:80"
+            #      - "443:443"
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./nginx/conf.d:/etc/nginx/conf.d
+            #      - ./nginx/certbot/conf:/etc/letsencrypt
+            #      - ./nginx/certbot/www:/var/www/certbot
+            - ../logs/nginx:/var/log/nginx
+    certbot:
+        image: certbot/certbot:latest
+        container_name: certbot
+        platform: linux/arm64
+        restart: unless-stopped
+        volumes:
+            - ./nginx/certbot/conf:/etc/letsencrypt
+            - ./nginx/certbot/www:/var/www/certbot
+        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    moabam-blue:
+        image: ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${DOCKER_HUB_TAG}
+        container_name: ${BLUE_CONTAINER}
+        restart: unless-stopped
+        expose:
+            - ${SERVER_PORT}
+        depends_on:
+            - redis
+            - mysql
+        environment:
+            SPRING_ACTIVE_PROFILES: ${SPRING_ACTIVE_PROFILES}
+    moabam-green:
+        image: ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${DOCKER_HUB_TAG}
+        container_name: ${GREEN_CONTAINER}
+        restart: unless-stopped
+        expose:
+            - ${SERVER_PORT}
+        depends_on:
+            - redis
+            - mysql
+        environment:
+            SPRING_ACTIVE_PROFILES: ${SPRING_ACTIVE_PROFILES}
+    redis:
+        image: redis:alpine
+        container_name: redis
+        platform: linux/arm64
+        restart: always
+        command: redis-server
+        ports:
+            - "6379:6379"
+        volumes:
+            - ./data/redis:/data
+    mysql:
+        image: mysql:8.0.33
+        container_name: mysql
+        platform: linux/arm64/v8
+        restart: always
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: ${DEV_MYSQL_DATABASE}
+            MYSQL_USERNAME: ${DEV_MYSQL_USERNAME}
+            MYSQL_ROOT_PASSWORD: ${DEV_MYSQL_PASSWORD}
+            TZ: Asia/Seoul
+        command:
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
+            - --skip-character-set-client-handshake
+        volumes:
+            - ./data/mysql:/var/lib/mysql
+            - ./mysql/initdb.d:/docker-entrypoint-initdb.d

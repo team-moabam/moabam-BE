@@ -13,10 +13,10 @@ create table admin
 
 create table badge
 (
-    id         bigint                                                             not null auto_increment,
-    member_id  bigint                                                             not null,
-    type       enum ('BIRTH','LEVEL10','LEVEL50')                                 not null,
-    created_at datetime(6)                                                        not null,
+    id         bigint                             not null auto_increment,
+    member_id  bigint                             not null,
+    type       enum ('BIRTH','LEVEL10','LEVEL50') not null,
+    created_at datetime(6)                        not null,
     primary key (id)
 );
 
@@ -121,7 +121,7 @@ create table member
 (
     id                    bigint                                       not null auto_increment,
     social_id             varchar(255)                                 not null unique,
-    nickname              varchar(255)                                 unique,
+    nickname              varchar(255) unique,
     intro                 varchar(30),
     profile_image         varchar(255)                                 not null,
     morning_image         varchar(255)                                 not null,
@@ -215,7 +215,9 @@ create table room
     deleted_at         datetime(6),
     created_at         datetime(6)       not null,
     updated_at         datetime(6),
-    primary key (id)
+    primary key (id),
+    FULLTEXT INDEX full_index_title (title) WITH PARSER ngram,
+    FULLTEXT INDEX full_index_manager_nickname (manager_nickname) WITH PARSER ngram
 );
 
 create table routine
@@ -225,7 +227,8 @@ create table routine
     content    varchar(20) not null,
     created_at datetime(6) not null,
     updated_at datetime(6),
-    primary key (id)
+    primary key (id),
+    FULLTEXT INDEX full_index_content (content) WITH PARSER ngram
 );
 
 alter table bug_history

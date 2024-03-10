@@ -169,7 +169,7 @@ class NotificationServiceTest {
 		// Given
 		given(participantSearchRepository.findAllByRoomCertifyTime(any(Integer.class))).willReturn(participants);
 		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.of("FCM-TOKEN"));
-		given(clockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.dateTime()).willReturn(LocalDateTime.now());
 
 		// When
 		notificationService.sendCertificationTime();
@@ -186,7 +186,7 @@ class NotificationServiceTest {
 		// Given
 		given(participantSearchRepository.findAllByRoomCertifyTime(any(Integer.class))).willReturn(participants);
 		given(fcmService.findTokenByMemberId(any(Long.class))).willReturn(Optional.empty());
-		given(clockHolder.times()).willReturn(LocalDateTime.now());
+		given(clockHolder.dateTime()).willReturn(LocalDateTime.now());
 
 		// When
 		notificationService.sendCertificationTime();
