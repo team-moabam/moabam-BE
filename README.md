@@ -52,3 +52,6 @@
 ## 협업 규칙
 ![image](https://github.com/team-moabam/moabam-BE/assets/31675711/1c9ae816-9174-42fd-959a-bad9f375878d)
 
+## 시연 영상
+[![시연 영상](https://github.com/team-moabam/moabam-FE/assets/50488780/63dcbe33-e382-4427-91bb-112310ee98a2)](https://www.youtube.com/watch?v=_3enPDzkLns)
+
