@@ -70,7 +70,7 @@ public class CertificationService {
 			case NIGHT -> BugType.NIGHT;
 		};
 
-		validateCertifyTime(clockHolder.times(), room.getCertifyTime());
+		validateCertifyTime(clockHolder.dateTime(), room.getCertifyTime());
 		validateAlreadyCertified(memberId, roomId, today);
 
 		certifyMember(memberId, roomId, participant, member, imageUrls);

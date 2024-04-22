@@ -213,7 +213,8 @@ class MemberAuthorizeControllerTest {
 			.andRespond(withStatus(HttpStatusCode.valueOf(code)));
 
 		mockMvc.perform(post("/members/login/kakao/oauth")
-				.flashAttr("authorizationCodeResponse", authorizationCodeResponse))
+				.content(objectMapper.writeValueAsString(authorizationCodeResponse))
+				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest());
 	}
 }

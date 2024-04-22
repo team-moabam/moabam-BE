@@ -8,12 +8,12 @@ services:
     restart: always
     ports:
       - "80:80"
-      - "443:443"
+      #      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
+      #      - ./nginx/certbot/conf:/etc/letsencrypt
+      #      - ./nginx/certbot/www:/var/www/certbot
       - ../logs/nginx:/var/log/nginx
   certbot:
     image: certbot/certbot:latest
@@ -75,4 +75,3 @@ services:
     volumes:
       - ./data/mysql:/var/lib/mysql
       - ./mysql/initdb.d:/docker-entrypoint-initdb.d
-

@@ -43,8 +43,9 @@ public class WebConfig implements WebMvcConfigurer {
 				PathMapper.parsePath("/favicon/*"),
 				PathMapper.parsePath("/*/icon-*"),
 				PathMapper.parsePath("/favicon.ico"),
-				PathMapper.parsePath("/v3/api-docs"),
-				PathMapper.parsePath("/swagger*/**"),
+				PathMapper.parsePath("/swagger-ui/**"),
+				PathMapper.parsePath("/swagger-resources/**"),
+				PathMapper.parsePath("/v3/api-docs/**"),
 				PathMapper.pathWithMethod("/serverTime", List.of(HttpMethod.GET))))
 			.build();
 

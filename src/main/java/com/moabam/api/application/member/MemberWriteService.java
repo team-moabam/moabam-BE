@@ -40,13 +40,13 @@ public class MemberWriteService {
 	}
 
 	public void delete(Member member) {
-		member.delete(clockHolder.times());
+		member.delete(clockHolder.dateTime());
 		memberRepository.delete(member);
 		memberRepository.flush();
 	}
 
 	public void softDelete(Member member) {
-		member.delete(clockHolder.times());
+		member.delete(clockHolder.dateTime());
 		memberRepository.flush();
 	}
 

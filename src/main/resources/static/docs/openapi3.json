@@ -1,0 +1,327 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "MOABAM API DOCS",
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8080"
+  }, {
+    "url" : "http://www.moabam.com"
+  }, {
+    "url" : "http://dev.moabam.com"
+  } ],
+  "tags" : [ ],
+  "paths" : {
+    "/admins/coupons" : {
+      "post" : {
+        "tags" : [ "admins" ],
+        "operationId" : "admins/coupons",
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/admins-coupons399785149"
+              },
+              "examples" : {
+                "admins/coupons" : {
+                  "value" : "{\n  \"name\" : \"couponName\",\n  \"description\" : \"coupon description\",\n  \"type\" : \"황금\",\n  \"point\" : 10,\n  \"maxCount\" : 10,\n  \"startAt\" : \"2023-02-01\",\n  \"openAt\" : \"2023-01-01\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "201"
+          }
+        }
+      }
+    },
+    "/admins/coupons/36" : {
+      "delete" : {
+        "tags" : [ "admins" ],
+        "operationId" : "admins/coupons/couponId",
+        "responses" : {
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/coupons" : {
+      "post" : {
+        "tags" : [ "coupons" ],
+        "operationId" : "coupons",
+        "requestBody" : {
+          "content" : {
+            "application/x-www-form-urlencoded" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/my-coupons486549215"
+              },
+              "examples" : {
+                "coupons" : {
+                  "value" : "couponName=couponName"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "409" : {
+            "description" : "409",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/coupons475340455"
+                },
+                "examples" : {
+                  "coupons" : {
+                    "value" : "{\n  \"message\" : \"이미 쿠폰 발급에 성공했습니다!\"\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coupons/24" : {
+      "get" : {
+        "tags" : [ "coupons" ],
+        "operationId" : "coupons/couponId",
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/coupons-24975308875"
+                },
+                "examples" : {
+                  "coupons/couponId" : {
+                    "value" : "{\n  \"id\" : 24,\n  \"adminId\" : 1,\n  \"name\" : \"couponName\",\n  \"description\" : \"\",\n  \"point\" : 10,\n  \"maxCount\" : 100,\n  \"type\" : \"MORNING\",\n  \"startAt\" : \"2023-02-01\",\n  \"openAt\" : \"2023-01-01\"\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coupons/search" : {
+      "post" : {
+        "tags" : [ "coupons" ],
+        "operationId" : "coupons/search",
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/coupons-search1819561800"
+              },
+              "examples" : {
+                "coupons/search" : {
+                  "value" : "{\n  \"opened\" : false,\n  \"ended\" : false\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/my-coupons486549215"
+                },
+                "examples" : {
+                  "coupons/search" : {
+                    "value" : "[ {\n  \"id\" : 25,\n  \"adminId\" : 1,\n  \"name\" : \"coupon1\",\n  \"description\" : \"\",\n  \"point\" : 10,\n  \"maxCount\" : 100,\n  \"type\" : \"MORNING\",\n  \"startAt\" : \"2023-03-01\",\n  \"openAt\" : \"2023-01-01\"\n} ]"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/my-coupons" : {
+      "get" : {
+        "tags" : [ "my-coupons" ],
+        "operationId" : "my-coupons/couponId",
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/my-coupons486549215"
+                },
+                "examples" : {
+                  "my-coupons/couponId" : {
+                    "value" : "[ ]"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/my-coupons/8" : {
+      "post" : {
+        "tags" : [ "my-coupons" ],
+        "operationId" : "my-coupons/couponWalletId",
+        "responses" : {
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/notifications" : {
+      "post" : {
+        "tags" : [ "notifications" ],
+        "operationId" : "notifications",
+        "requestBody" : {
+          "content" : {
+            "application/x-www-form-urlencoded" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/my-coupons486549215"
+              },
+              "examples" : {
+                "notifications" : {
+                  "value" : "fcmToken=FCM-TOKEN"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/notifications/rooms/1/members/2" : {
+      "get" : {
+        "tags" : [ "notifications" ],
+        "operationId" : "notifications/rooms/roomId/members/memberId",
+        "responses" : {
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "coupons475340455" : {
+        "required" : [ "message" ],
+        "type" : "object",
+        "properties" : {
+          "message" : {
+            "type" : "string",
+            "description" : "에러 메시지"
+          }
+        }
+      },
+      "admins-coupons399785149" : {
+        "required" : [ "description", "maxCount", "name", "openAt", "point", "startAt", "type" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "쿠폰명"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "쿠폰 간단 소개 (NULL 가능)"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "쿠폰 종류 (아침, 저녁, 황금, 할인)"
+          },
+          "maxCount" : {
+            "type" : "number",
+            "description" : "쿠폰을 발급 최대 갯수"
+          },
+          "openAt" : {
+            "type" : "string",
+            "description" : "쿠폰 정보 오픈 날짜 (Ex: yyyy-MM-dd)"
+          },
+          "startAt" : {
+            "type" : "string",
+            "description" : "쿠폰 발급 시작 날짜 (Ex: yyyy-MM-dd)"
+          },
+          "point" : {
+            "type" : "number",
+            "description" : "쿠폰 사용 시, 제공하는 포인트량"
+          }
+        }
+      },
+      "coupons-24975308875" : {
+        "required" : [ "adminId", "description", "id", "maxCount", "name", "openAt", "point", "startAt", "type" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "쿠폰명"
+          },
+          "adminId" : {
+            "type" : "number",
+            "description" : "쿠폰 관리자 ID"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "쿠폰에 대한 간단 소개 (NULL 가능)"
+          },
+          "id" : {
+            "type" : "number",
+            "description" : "쿠폰 ID"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "쿠폰 종류 (MORNING, NIGHT, GOLDEN, DISCOUNT)"
+          },
+          "maxCount" : {
+            "type" : "number",
+            "description" : "쿠폰을 발급 최대 갯수"
+          },
+          "openAt" : {
+            "type" : "string",
+            "description" : "쿠폰 정보 오픈 날짜 (Ex: yyyy-MM-dd)"
+          },
+          "startAt" : {
+            "type" : "string",
+            "description" : "쿠폰 발급 시작 날짜 (Ex: yyyy-MM-dd)"
+          },
+          "point" : {
+            "type" : "number",
+            "description" : "쿠폰 사용 시, 제공하는 포인트량"
+          }
+        }
+      },
+      "coupons-search1819561800" : {
+        "required" : [ "ended", "opened" ],
+        "type" : "object",
+        "properties" : {
+          "ended" : {
+            "type" : "boolean",
+            "description" : "종료된 쿠폰 (true, false)"
+          },
+          "opened" : {
+            "type" : "boolean",
+            "description" : "쿠폰 정보가 오픈된 쿠폰 (true, false)"
+          }
+        }
+      },
+      "my-coupons486549215" : {
+        "type" : "object"
+      }
+    }
+  }
+}

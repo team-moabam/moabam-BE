@@ -21,11 +21,9 @@ import com.moabam.api.application.notification.NotificationService;
 import com.moabam.api.domain.coupon.Coupon;
 import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponManageRepository;
-import com.moabam.api.domain.coupon.repository.CouponRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.global.common.util.ClockHolder;
 import com.moabam.global.error.exception.NotFoundException;
-import com.moabam.global.error.model.ErrorMessage;
 import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.CouponFixture;
 
@@ -39,7 +37,7 @@ class CouponManageServiceTest {
 	NotificationService notificationService;
 
 	@Mock
-	CouponRepository couponRepository;
+	CouponCacheService couponCacheService;
 
 	@Mock
 	CouponManageRepository couponManageRepository;
@@ -58,7 +56,7 @@ class CouponManageServiceTest {
 		Coupon coupon = CouponFixture.coupon(1000, 100);
 
 		given(clockHolder.date()).willReturn(LocalDate.now());
-		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
+		given(couponCacheService.getByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
 		given(couponManageRepository.rangeQueue(any(String.class), any(long.class), any(long.class)))
 			.willReturn(values);
 		given(couponManageRepository.getCount(any(String.class))).willReturn(coupon.getMaxCount() - 1);
@@ -77,7 +75,7 @@ class CouponManageServiceTest {
 	void issue_notStartAt() {
 		// Given
 		given(clockHolder.date()).willReturn(LocalDate.now());
-		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.empty());
+		given(couponCacheService.getByStartAt(any(LocalDate.class))).willReturn(Optional.empty());
 
 		// When
 		couponManageService.issue();
@@ -98,7 +96,7 @@ class CouponManageServiceTest {
 		Coupon coupon = CouponFixture.coupon(1000, 100);
 
 		given(clockHolder.date()).willReturn(LocalDate.now());
-		given(couponRepository.findByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
+		given(couponCacheService.getByStartAt(any(LocalDate.class))).willReturn(Optional.of(coupon));
 		given(couponManageRepository.getCount(any(String.class))).willReturn(coupon.getMaxCount());
 
 		// When
@@ -120,8 +118,7 @@ class CouponManageServiceTest {
 
 		given(clockHolder.date()).willReturn(LocalDate.now());
 		given(couponManageRepository.sizeQueue(any(String.class))).willReturn(coupon.getMaxCount() - 1);
-		given(couponRepository.findByNameAndStartAt(any(String.class), any(LocalDate.class)))
-			.willReturn(Optional.of(coupon));
+		given(couponCacheService.getByNameAndStartAt(any(String.class), any(LocalDate.class))).willReturn(coupon);
 
 		// When
 		couponManageService.registerQueue(coupon.getName(), 1L);
@@ -135,13 +132,12 @@ class CouponManageServiceTest {
 	void registerQueue_No_BadRequestException() {
 		// Given
 		given(clockHolder.date()).willReturn(LocalDate.now());
-		given(couponRepository.findByNameAndStartAt(any(String.class), any(LocalDate.class)))
-			.willReturn(Optional.empty());
+		given(couponCacheService.getByNameAndStartAt(any(String.class), any(LocalDate.class)))
+			.willThrow(NotFoundException.class);
 
 		// When & Then
 		assertThatThrownBy(() -> couponManageService.registerQueue("couponName", 1L))
-			.isInstanceOf(NotFoundException.class)
-			.hasMessage(ErrorMessage.INVALID_COUPON_PERIOD.getMessage());
+			.isInstanceOf(NotFoundException.class);
 	}
 
 	@DisplayName("쿠폰 대기열과 발행된 재고가 정상적으로 삭제된다.")

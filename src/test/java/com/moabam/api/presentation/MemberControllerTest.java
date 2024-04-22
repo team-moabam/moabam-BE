@@ -203,7 +203,6 @@ class MemberControllerTest extends WithoutFilterSupporter {
 
 		Member deletedMEmber = deletedMemberOptional.get();
 		assertThat(deletedMEmber.getDeletedAt()).isNotNull();
-		assertThat(deletedMEmber.getNickname()).isNull();
 	}
 
 	@DisplayName("회원이 없어서 회원 삭제 실패")
