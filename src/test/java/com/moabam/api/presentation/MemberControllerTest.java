@@ -455,7 +455,7 @@ class MemberControllerTest extends WithoutFilterSupporter {
 	@DisplayName("회원 정보 요청 성공")
 	@WithMember
 	@ParameterizedTest
-	@CsvSource({"intro,", ", nickname", ",", "intro, nickname"})
+	@CsvSource({"intro,", ", nickname2", ",", "intro, nickname3"})
 	void member_modify_request_success(String intro, String nickname) throws Exception {
 		// given
 		ModifyMemberRequest request = new ModifyMemberRequest(intro, nickname);
@@ -484,13 +484,47 @@ class MemberControllerTest extends WithoutFilterSupporter {
 				.characterEncoding("UTF-8"))
 			.andExpect(status().is2xxSuccessful())
 			.andDo(print());
+	}
 
+	@DisplayName("회원 정보 요청 성공")
+	@WithMember
+	@Test
+	void member_modify_sameName_request_success() throws Exception {
+		// given
+		String intro = "intro";
+		String nickname = member.getNickname();
+		ModifyMemberRequest request = new ModifyMemberRequest(intro, nickname);
+		MockMultipartFile newProfileImage =
+			new MockMultipartFile(
+				"profileImage",
+				"tooth.png",
+				"multipart/form-data",
+				"uploadFile".getBytes(StandardCharsets.UTF_8));
+		MockMultipartFile modifyMemberRequest =
+			new MockMultipartFile(
+				"modifyMemberRequest",
+				null,
+				"application/json",
+				objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8));
+
+		willReturn(List.of("/main"))
+			.given(imageService).uploadImages(List.of(newProfileImage), ImageType.PROFILE_IMAGE);
+
+		// expected
+		mockMvc.perform(multipart(HttpMethod.POST, "/members/modify")
+				.file(modifyMemberRequest)
+				.file(newProfileImage)
+				.contentType("multipart/form-data")
+
+				.characterEncoding("UTF-8"))
+			.andExpect(status().is2xxSuccessful())
+			.andDo(print());
 	}
 
 	@DisplayName("회원 프로필없이 성공 ")
 	@WithMember
 	@ParameterizedTest
-	@CsvSource({"intro,", ", nickname", ",", "intro, nickname"})
+	@CsvSource({"intro,", ", nickname4", ",", "intro, nickname5"})
 	void member_modify_no_image_request_success(String intro, String nickname) throws Exception {
 		// given
 		ModifyMemberRequest request = new ModifyMemberRequest(intro, nickname);

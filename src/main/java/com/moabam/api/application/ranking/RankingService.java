@@ -1,23 +1,19 @@
 package com.moabam.api.application.ranking;
 
-import static java.util.Objects.*;
-
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
-import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moabam.api.application.member.MemberMapper;
+import com.moabam.api.application.member.MemberReadService;
+import com.moabam.api.domain.member.Member;
 import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.api.dto.ranking.TopRankingInfo;
 import com.moabam.api.dto.ranking.TopRankingResponse;
 import com.moabam.api.dto.ranking.UpdateRanking;
-import com.moabam.api.infrastructure.redis.ZSetRedisRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,61 +22,55 @@ import lombok.RequiredArgsConstructor;
 public class RankingService {
 
 	private static final String RANKING = "Ranking";
-	private static final int START_INDEX = 0;
-	private static final int LIMIT_INDEX = 9;
 
-	private final ObjectMapper objectMapper;
-	private final ZSetRedisRepository zSetRedisRepository;
+	private final RankingReadService rankingReadService;
+	private final RankingWriteService rankingWriteService;
+	private final MemberReadService memberReadService;
+
+	@Scheduled(cron = "0 11 * * * *")
+	public void updateAllRanking() {
+		List<Member> members = memberReadService.findAllMembers();
+		List<UpdateRanking> updateRankings = members.stream()
+			.map(MemberMapper::toUpdateRanking)
+			.toList();
+
+		updateScores(updateRankings);
+	}
 
 	public void addRanking(RankingInfo rankingInfo, Long totalCertifyCount) {
-		zSetRedisRepository.add(RANKING, rankingInfo, totalCertifyCount);
+		rankingWriteService.addRanking(RANKING, rankingInfo, totalCertifyCount);
 	}
 
 	public void updateScores(List<UpdateRanking> updateRankings) {
-		updateRankings.forEach(
-			updateRanking -> zSetRedisRepository.add(RANKING, updateRanking.rankingInfo(), updateRanking.score()));
+		rankingWriteService.updateScores(RANKING, updateRankings);
 	}
 
 	public void changeInfos(RankingInfo before, RankingInfo after) {
-		zSetRedisRepository.changeMember(RANKING, before, after);
+		rankingWriteService.changeInfos(RANKING, before, after);
 	}
 
 	public void removeRanking(RankingInfo rankingInfo) {
-		zSetRedisRepository.delete(RANKING, rankingInfo);
+		rankingWriteService.removeRanking(RANKING, rankingInfo);
 	}
 
 	public TopRankingResponse getMemberRanking(UpdateRanking myRankingInfo) {
-		List<TopRankingInfo> topRankings = getTopRankings();
-		long myRanking = zSetRedisRepository.reverseRank(RANKING, myRankingInfo.rankingInfo()) + 1;
+		List<TopRankingInfo> topRankings = rankingReadService.readTopRankings(RANKING);
+		Long myRanking = rankingReadService.readRank(RANKING, myRankingInfo.rankingInfo());
+
+		if (Objects.isNull(myRanking)) {
+			updateAllRanking();
+		}
 
 		Optional<TopRankingInfo> myTopRanking = topRankings.stream()
 			.filter(topRankingInfo -> Objects.equals(topRankingInfo.memberId(), myRankingInfo.rankingInfo().memberId()))
 			.findFirst();
 
 		if (myTopRanking.isPresent()) {
-			myRanking = myTopRanking.get().rank();
+			myRanking = (long)myTopRanking.get().rank();
 		}
 
-		TopRankingInfo myRankingInfoResponse = RankingMapper.topRankingResponse((int)myRanking, myRankingInfo);
+		TopRankingInfo myRankingInfoResponse = RankingMapper.topRankingResponse(myRanking, myRankingInfo);
 
 		return RankingMapper.topRankingResponses(myRankingInfoResponse, topRankings);
-	}
-
-	private List<TopRankingInfo> getTopRankings() {
-		Set<ZSetOperations.TypedTuple<Object>> topRankings = zSetRedisRepository.rangeJson(RANKING, START_INDEX,
-			LIMIT_INDEX);
-
-		Set<Long> scoreSet = new HashSet<>();
-		List<TopRankingInfo> topRankingInfo = new ArrayList<>();
-
-		for (ZSetOperations.TypedTuple<Object> topRanking : topRankings) {
-			long score = requireNonNull(topRanking.getScore()).longValue();
-			scoreSet.add(score);
-
-			RankingInfo rankingInfo = objectMapper.convertValue(topRanking.getValue(), RankingInfo.class);
-			topRankingInfo.add(RankingMapper.topRankingResponse(scoreSet.size(), score, rankingInfo));
-		}
-
-		return topRankingInfo;
 	}
 }

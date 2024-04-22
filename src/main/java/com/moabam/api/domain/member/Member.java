@@ -7,7 +7,6 @@ import static com.moabam.global.error.model.ErrorMessage.*;
 import static java.util.Objects.*;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
@@ -19,6 +18,7 @@ import com.moabam.api.domain.room.RoomType;
 import com.moabam.global.common.entity.BaseTimeEntity;
 import com.moabam.global.error.exception.NotFoundException;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -139,7 +139,7 @@ public class Member extends BaseTimeEntity {
 	}
 
 	public boolean changeNickName(String nickname) {
-		if (Objects.isNull(nickname)) {
+		if (StringUtils.isEmpty(nickname)) {
 			return false;
 		}
 		this.nickname = nickname;
