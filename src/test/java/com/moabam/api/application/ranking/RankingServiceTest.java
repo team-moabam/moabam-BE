@@ -12,12 +12,17 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 import com.moabam.api.application.member.MemberMapper;
+import com.moabam.api.application.member.MemberReadService;
 import com.moabam.api.domain.member.Member;
+import com.moabam.api.domain.member.repository.MemberRepository;
+import com.moabam.api.domain.member.repository.MemberSearchRepository;
+import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.dto.ranking.RankingInfo;
 import com.moabam.api.dto.ranking.TopRankingInfo;
 import com.moabam.api.dto.ranking.TopRankingResponse;
@@ -27,7 +32,10 @@ import com.moabam.global.config.EmbeddedRedisConfig;
 import com.moabam.support.fixture.BugFixture;
 import com.moabam.support.fixture.MemberFixture;
 
-@SpringBootTest(classes = {EmbeddedRedisConfig.class, RankingService.class, ZSetRedisRepository.class})
+@SpringBootTest(classes = {EmbeddedRedisConfig.class, RankingService.class,
+	RankingReadService.class, RankingWriteService.class, MemberReadService.class, ZSetRedisRepository.class,
+	MemberRepository.class, MemberSearchRepository.class, ParticipantSearchRepository.class
+})
 public class RankingServiceTest {
 
 	@Autowired
@@ -38,6 +46,24 @@ public class RankingServiceTest {
 
 	@Autowired
 	RankingService rankingService;
+
+	@Autowired
+	RankingReadService rankingReadService;
+
+	@Autowired
+	RankingWriteService rankingWriteService;
+
+	@MockBean
+	MemberReadService memberReadService;
+
+	@MockBean
+	MemberRepository memberRepository;
+
+	@MockBean
+	MemberSearchRepository memberSearchRepository;
+
+	@MockBean
+	ParticipantSearchRepository participantSearchRepository;
 
 	@BeforeEach
 	void init() {

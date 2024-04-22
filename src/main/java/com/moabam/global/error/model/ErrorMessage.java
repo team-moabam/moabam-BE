@@ -51,6 +51,7 @@ public enum ErrorMessage {
 	MEMBER_ROOM_EXCEED("참여할 수 있는 방의 개수가 모두 찼습니다."),
 	UNLINK_REQUEST_FAIL_ROLLBACK_SUCCESS("카카오 연결 요청 실패로 Rollback하였습니다."),
 	NICKNAME_CONFLICT("이미 존재하는 닉네임입니다."),
+	NICKNAME_NOT_NULL("닉네임은 공백이면 안됩니다."),
 
 	BASIC_SKIN_NOT_FOUND("기본 스킨 오류 발생, 관리자에게 문의하세요"),
 	INVALID_DEFAULT_SKIN_SIZE("기본 스킨은 2개여야 합니다. 관리자에게 문의하세요"),

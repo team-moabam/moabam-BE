@@ -27,6 +27,12 @@ public class PathFilter extends OncePerRequestFilter {
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 		Optional<PathResolver.Path> matchedPath = pathResolver.permitPathMatch(request.getRequestURI());
+		Optional<PathResolver.Path> authenticatedPath = pathResolver.authenticationsPatterns(request.getRequestURI());
+		authenticatedPath.ifPresent(path -> {
+			if (path.httpMethods().stream().anyMatch(httpMethod -> httpMethod.matches(request.getMethod()))) {
+				request.setAttribute("isPermit", true);
+			}
+		});
 
 		matchedPath.ifPresent(path -> {
 			if (path.httpMethods().stream()

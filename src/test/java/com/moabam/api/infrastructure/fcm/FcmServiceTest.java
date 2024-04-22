@@ -11,10 +11,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.moabam.global.config.FcmConfig;
-import com.moabam.support.common.WithoutFilterSupporter;
 
 @SpringBootTest(classes = {FcmConfig.class, FcmService.class})
-class FcmServiceTest extends WithoutFilterSupporter {
+class FcmServiceTest {
 
 	@Autowired
 	FcmService fcmService;

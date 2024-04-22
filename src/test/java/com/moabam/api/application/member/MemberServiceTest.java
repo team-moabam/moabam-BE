@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,12 +21,10 @@ import com.moabam.api.application.ranking.RankingService;
 import com.moabam.api.domain.item.Inventory;
 import com.moabam.api.domain.item.Item;
 import com.moabam.api.domain.item.repository.InventoryRepository;
-import com.moabam.api.domain.item.repository.InventorySearchRepository;
 import com.moabam.api.domain.item.repository.ItemRepository;
 import com.moabam.api.domain.member.Member;
 import com.moabam.api.domain.member.repository.MemberRepository;
 import com.moabam.api.domain.member.repository.MemberSearchRepository;
-import com.moabam.api.domain.room.repository.ParticipantRepository;
 import com.moabam.api.domain.room.repository.ParticipantSearchRepository;
 import com.moabam.api.dto.auth.AuthorizationTokenInfoResponse;
 import com.moabam.api.dto.auth.LoginResponse;
@@ -59,28 +58,29 @@ class MemberServiceTest {
 	MemberSearchRepository memberSearchRepository;
 
 	@Mock
-	ParticipantRepository participantRepository;
-
-	@Mock
 	ParticipantSearchRepository participantSearchRepository;
-
-	@Mock
-	InventorySearchRepository inventorySearchRepository;
-
-	@Mock
-	InventoryRepository inventoryRepository;
-
-	@Mock
-	RankingService rankingService;
-
-	@Mock
-	FcmService fcmService;
 
 	@Mock
 	ItemRepository itemRepository;
 
 	@Mock
 	ClockHolder clockHolder;
+
+	@BeforeEach
+	void init() {
+		MemberReadService memberReadService = new MemberReadService(memberRepository,
+			memberSearchRepository,
+			participantSearchRepository);
+
+		MemberWriteService memberWriteService = new MemberWriteService(memberRepository,
+			itemRepository,
+			mock(InventoryRepository.class),
+			participantSearchRepository,
+			clockHolder);
+
+		memberService = new MemberService(memberReadService, memberWriteService, mock(RankingService.class),
+			mock(FcmService.class));
+	}
 
 	@DisplayName("회원 존재하고 로그인 성공")
 	@Test
@@ -232,18 +232,5 @@ class MemberServiceTest {
 			() -> assertThat(member.getIntro()).isEqualTo(modifyMemberRequest.intro()),
 			() -> assertThat(member.getProfileImage()).isEqualTo("/main")
 		);
-	}
-
-	@DisplayName("모든 랭킹 업데이트")
-	@Test
-	void update_all_ranking() {
-		// given
-		Member member1 = MemberFixture.member("1");
-		Member member2 = MemberFixture.member("2");
-		given(memberSearchRepository.findAllMembers())
-			.willReturn(List.of(member1, member2));
-
-		// when + Then
-		assertThatNoException().isThrownBy(() -> memberService.updateAllRanking());
 	}
 }

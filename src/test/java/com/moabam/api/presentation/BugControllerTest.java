@@ -30,6 +30,7 @@ import com.moabam.api.application.bug.BugMapper;
 import com.moabam.api.application.member.MemberService;
 import com.moabam.api.application.product.ProductMapper;
 import com.moabam.api.domain.bug.BugActionType;
+import com.moabam.api.domain.bug.BugHistory;
 import com.moabam.api.domain.bug.BugType;
 import com.moabam.api.domain.bug.repository.BugHistoryRepository;
 import com.moabam.api.domain.bug.repository.BugHistorySearchRepository;
@@ -44,6 +45,7 @@ import com.moabam.api.dto.product.PurchaseProductRequest;
 import com.moabam.api.dto.product.PurchaseProductResponse;
 import com.moabam.support.annotation.WithMember;
 import com.moabam.support.common.WithoutFilterSupporter;
+import com.moabam.support.fixture.BugFixture;
 
 @Transactional
 @SpringBootTest
