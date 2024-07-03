@@ -13,7 +13,6 @@ import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponManageRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.global.common.util.ClockHolder;
-import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -49,18 +48,20 @@ public class CouponManageService {
 		String couponName = coupon.getName();
 		int maxCount = coupon.getMaxCount();
 		int currentCount = couponManageRepository.getCount(couponName);
-
-		if (maxCount <= currentCount) {
-			return;
-		}
-
 		Set<Long> membersId = couponManageRepository.rangeQueue(couponName, currentCount, currentCount + ISSUE_SIZE);
 
-		if (membersId.isEmpty()) {
+		if (membersId == null || membersId.isEmpty()) {
 			return;
 		}
 
 		for (Long memberId : membersId) {
+			int rank = couponManageRepository.rankQueue(couponName, memberId);
+
+			if (maxCount <= rank) {
+				notificationService.sendCouponIssueResult(memberId, couponName, FAIL_ISSUE_BODY);
+				continue;
+			}
+
 			couponWalletRepository.save(CouponWallet.create(memberId, coupon));
 			notificationService.sendCouponIssueResult(memberId, couponName, SUCCESS_ISSUE_BODY);
 		}
@@ -81,18 +82,12 @@ public class CouponManageService {
 
 	private void validateRegisterQueue(String couponName, Long memberId) {
 		LocalDate now = clockHolder.date();
-		Coupon coupon = couponCacheService.getByNameAndStartAt(couponName, now);
+		couponCacheService.getByNameAndStartAt(couponName, now);
 
 		if (couponManageRepository.hasValue(couponName, memberId)) {
 			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_ISSUE);
 		}
 
-		int maxCount = coupon.getMaxCount();
-		int sizeQueue = couponManageRepository.sizeQueue(couponName);
-
-		if (maxCount <= sizeQueue) {
-			notificationService.sendCouponIssueResult(memberId, couponName, FAIL_ISSUE_BODY);
-			throw new BadRequestException(ErrorMessage.INVALID_COUPON_STOCK_END);
-		}
+		notificationService.sendCouponIssueResult(memberId, couponName, FAIL_ISSUE_BODY);
 	}
 }
