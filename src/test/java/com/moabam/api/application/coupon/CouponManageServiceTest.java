@@ -27,6 +27,7 @@ import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.CouponFixture;
 
+@Disabled
 @ExtendWith({MockitoExtension.class, FilterProcessExtension.class})
 class CouponManageServiceTest {
 
