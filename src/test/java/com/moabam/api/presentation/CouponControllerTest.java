@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,7 +48,6 @@ import com.moabam.support.snippet.CouponSnippet;
 import com.moabam.support.snippet.CouponWalletSnippet;
 import com.moabam.support.snippet.ErrorSnippet;
 
-@Disabled
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
