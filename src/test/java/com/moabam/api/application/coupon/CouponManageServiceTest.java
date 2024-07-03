@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +27,6 @@ import com.moabam.global.error.exception.NotFoundException;
 import com.moabam.support.common.FilterProcessExtension;
 import com.moabam.support.fixture.CouponFixture;
 
-@Disabled
 @ExtendWith({MockitoExtension.class, FilterProcessExtension.class})
 class CouponManageServiceTest {
 
