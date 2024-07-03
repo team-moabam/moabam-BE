@@ -13,6 +13,7 @@ import com.moabam.api.domain.coupon.CouponWallet;
 import com.moabam.api.domain.coupon.repository.CouponManageRepository;
 import com.moabam.api.domain.coupon.repository.CouponWalletRepository;
 import com.moabam.global.common.util.ClockHolder;
+import com.moabam.global.error.exception.BadRequestException;
 import com.moabam.global.error.exception.ConflictException;
 import com.moabam.global.error.model.ErrorMessage;
 
@@ -25,8 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 public class CouponManageService {
 
 	private static final String SUCCESS_ISSUE_BODY = "%s 쿠폰 발행을 성공했습니다. 축하드립니다!";
-	private static final String SUCCESS_PRE_ISSUE_BODY = "%s 쿠폰 발급 신청을 성공했습니다.";
-	private static final String CONFLICT_ISSUE_BODY = "%s 쿠폰 발급 중복 신청은 불가능합니다.";
 	private static final String FAIL_ISSUE_BODY = "%s 쿠폰 발행을 실패했습니다. 다음 기회에!";
 	private static final long ISSUE_SIZE = 10;
 
@@ -50,20 +49,18 @@ public class CouponManageService {
 		String couponName = coupon.getName();
 		int maxCount = coupon.getMaxCount();
 		int currentCount = couponManageRepository.getCount(couponName);
+
+		if (maxCount <= currentCount) {
+			return;
+		}
+
 		Set<Long> membersId = couponManageRepository.rangeQueue(couponName, currentCount, currentCount + ISSUE_SIZE);
 
-		if (membersId == null || membersId.isEmpty()) {
+		if (membersId.isEmpty()) {
 			return;
 		}
 
 		for (Long memberId : membersId) {
-			int rank = couponManageRepository.rankQueue(couponName, memberId);
-
-			if (maxCount <= rank) {
-				notificationService.sendCouponIssueResult(memberId, couponName, FAIL_ISSUE_BODY);
-				continue;
-			}
-
 			couponWalletRepository.save(CouponWallet.create(memberId, coupon));
 			notificationService.sendCouponIssueResult(memberId, couponName, SUCCESS_ISSUE_BODY);
 		}
@@ -80,16 +77,22 @@ public class CouponManageService {
 		double registerTime = System.currentTimeMillis();
 		validateRegisterQueue(couponName, memberId);
 		couponManageRepository.addIfAbsentQueue(couponName, memberId, registerTime);
-		notificationService.sendCouponIssueResult(memberId, couponName, SUCCESS_PRE_ISSUE_BODY);
 	}
 
 	private void validateRegisterQueue(String couponName, Long memberId) {
 		LocalDate now = clockHolder.date();
-		couponCacheService.getByNameAndStartAt(couponName, now);
+		Coupon coupon = couponCacheService.getByNameAndStartAt(couponName, now);
 
 		if (couponManageRepository.hasValue(couponName, memberId)) {
-			notificationService.sendCouponIssueResult(memberId, couponName, CONFLICT_ISSUE_BODY);
 			throw new ConflictException(ErrorMessage.CONFLICT_COUPON_ISSUE);
+		}
+
+		int maxCount = coupon.getMaxCount();
+		int sizeQueue = couponManageRepository.sizeQueue(couponName);
+
+		if (maxCount <= sizeQueue) {
+			notificationService.sendCouponIssueResult(memberId, couponName, FAIL_ISSUE_BODY);
+			throw new BadRequestException(ErrorMessage.INVALID_COUPON_STOCK_END);
 		}
 	}
 }
